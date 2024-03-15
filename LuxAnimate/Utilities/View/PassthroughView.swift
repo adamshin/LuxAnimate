@@ -1,5 +1,5 @@
 //
-//  PassthroughViews.swift
+//  PassthroughView.swift
 //
 
 import UIKit

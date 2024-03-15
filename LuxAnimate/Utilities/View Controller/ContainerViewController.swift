@@ -11,36 +11,44 @@ class ContainerViewController: UIViewController {
     // MARK: - Lifecycle
     
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        return currentViewController?.supportedInterfaceOrientations
+        currentViewController?.supportedInterfaceOrientations
             ?? .portrait
     }
     
     override var childForStatusBarStyle: UIViewController? {
-        return currentViewController
+        currentViewController
     }
-    
     override var childForStatusBarHidden: UIViewController? {
-        return currentViewController
+        currentViewController
     }
-    
     override var childForHomeIndicatorAutoHidden: UIViewController? {
-        return currentViewController
+        currentViewController
     }
-    
     override var childForScreenEdgesDeferringSystemGestures: UIViewController? {
-        return currentViewController
+        currentViewController
     }
     
     // MARK: - View Controllers
     
-    func show(_ viewController: UIViewController?) {
+    func show(_ vc: UIViewController?) {
         currentViewController?.willMove(toParent: nil)
         currentViewController?.view.removeFromSuperview()
         currentViewController?.removeFromParent()
         
-        if let viewController {
-            add(viewController, to: view)
-            currentViewController = viewController
+        if let vc {
+            addChild(vc)
+            view.addSubview(vc.view)
+            vc.didMove(toParent: self)
+            
+            vc.view.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                vc.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+                vc.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+                vc.view.topAnchor.constraint(equalTo: view.topAnchor),
+                vc.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            ])
+            
+            currentViewController = vc
         }
         
         setNeedsStatusBarAppearanceUpdate()

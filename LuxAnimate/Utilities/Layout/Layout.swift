@@ -1,5 +1,5 @@
 //
-//  UIView+Layout.swift
+//  Layout.swift
 //
 
 import UIKit

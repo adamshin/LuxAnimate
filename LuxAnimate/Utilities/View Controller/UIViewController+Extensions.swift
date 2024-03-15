@@ -1,10 +1,21 @@
 //
-//  UIViewController+Misc.swift
+//  UIViewController+Extensions.swift
 //
 
 import UIKit
 
 extension UIViewController {
+    
+    func addChild(
+        _ childVC: UIViewController,
+        to containerView: UIView
+    ) {
+        addChild(childVC)
+        containerView.addSubview(childVC.view)
+        childVC.didMove(toParent: self)
+        
+        childVC.view.pinEdges(to: containerView)
+    }
     
     func topViewController() -> UIViewController {
         if let presentedViewController,
@@ -26,5 +37,17 @@ extension UIViewController {
             return self
         }
     }
-
+    
+    func showAlert(title: String?, message: String?) {
+        let alert = UIAlertController(
+            title: title, message: message,
+            preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(
+            title: "OK", style: .cancel,
+            handler: { _ in }))
+        
+        present(alert, animated: true)
+    }
+    
 }
