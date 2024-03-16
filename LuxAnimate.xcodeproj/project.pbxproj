@@ -26,6 +26,8 @@
 		66D084892BA4060E00EB8556 /* ProjectManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D084872BA4060E00EB8556 /* ProjectManifest.swift */; };
 		66D0848A2BA4060E00EB8556 /* PixelSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D084882BA4060E00EB8556 /* PixelSize.swift */; };
 		66D0848C2BA55B4300EB8556 /* LibraryManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0848B2BA55B4300EB8556 /* LibraryManifest.swift */; };
+		66D0848F2BA56FB400EB8556 /* EditorVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0848E2BA56FB400EB8556 /* EditorVC.swift */; };
+		66D084922BA5704500EB8556 /* EditorProjectReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D084912BA5704500EB8556 /* EditorProjectReader.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,6 +52,8 @@
 		66D084872BA4060E00EB8556 /* ProjectManifest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProjectManifest.swift; sourceTree = "<group>"; };
 		66D084882BA4060E00EB8556 /* PixelSize.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PixelSize.swift; sourceTree = "<group>"; };
 		66D0848B2BA55B4300EB8556 /* LibraryManifest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryManifest.swift; sourceTree = "<group>"; };
+		66D0848E2BA56FB400EB8556 /* EditorVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorVC.swift; sourceTree = "<group>"; };
+		66D084912BA5704500EB8556 /* EditorProjectReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorProjectReader.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -107,6 +111,7 @@
 			children = (
 				66D084552BA3CDE400EB8556 /* App */,
 				66D0847B2BA3D78900EB8556 /* Library */,
+				66D0848D2BA56E7800EB8556 /* Editor */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -198,6 +203,7 @@
 			isa = PBXGroup;
 			children = (
 				66D084802BA3FDF200EB8556 /* Library */,
+				66D084902BA5702C00EB8556 /* Editor */,
 			);
 			path = Logic;
 			sourceTree = "<group>";
@@ -208,6 +214,22 @@
 				66D084812BA3FDFC00EB8556 /* LibraryManager.swift */,
 			);
 			path = Library;
+			sourceTree = "<group>";
+		};
+		66D0848D2BA56E7800EB8556 /* Editor */ = {
+			isa = PBXGroup;
+			children = (
+				66D0848E2BA56FB400EB8556 /* EditorVC.swift */,
+			);
+			path = Editor;
+			sourceTree = "<group>";
+		};
+		66D084902BA5702C00EB8556 /* Editor */ = {
+			isa = PBXGroup;
+			children = (
+				66D084912BA5704500EB8556 /* EditorProjectReader.swift */,
+			);
+			path = Editor;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -282,6 +304,7 @@
 			files = (
 				66D084892BA4060E00EB8556 /* ProjectManifest.swift in Sources */,
 				66D0848C2BA55B4300EB8556 /* LibraryManifest.swift in Sources */,
+				66D084922BA5704500EB8556 /* EditorProjectReader.swift in Sources */,
 				66D0846C2BA3CEC300EB8556 /* Layout.swift in Sources */,
 				66D084822BA3FDFC00EB8556 /* LibraryManager.swift in Sources */,
 				66D0846D2BA3CEC300EB8556 /* CGPoint+Extensions.swift in Sources */,
@@ -296,6 +319,7 @@
 				66D0847D2BA3D79300EB8556 /* LibraryVC.swift in Sources */,
 				66D084572BA3CDF700EB8556 /* AppVC.swift in Sources */,
 				66D0843F2BA3840C00EB8556 /* SceneDelegate.swift in Sources */,
+				66D0848F2BA56FB400EB8556 /* EditorVC.swift in Sources */,
 				66D084702BA3CEC300EB8556 /* Math.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

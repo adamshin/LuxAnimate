@@ -4,14 +4,15 @@
 
 import Foundation
 
-class LibraryManager {
+struct LibraryManager {
     
     struct Project {
-        var name: String
+        var id: String
         var url: URL
+        var name: String
     }
     
-    private let fileManager: FileManager
+    private let fileManager = FileManager.default
     
     private let libraryDirectoryURL: URL
     private let libraryManifestURL: URL
@@ -22,8 +23,6 @@ class LibraryManager {
     // MARK: - Initializer
     
     init() throws {
-        fileManager = FileManager.default
-        
         let documentDirectoryURL = try fileManager.url(
             for: .documentDirectory,
             in: .userDomainMask,
@@ -108,8 +107,9 @@ class LibraryManager {
             else { continue }
             
             let project = Project(
-                name: projectManifest.name,
-                url: projectURL)
+                id: projectID,
+                url: projectURL,
+                name: projectManifest.name)
             
             projects.append(project)
         }
