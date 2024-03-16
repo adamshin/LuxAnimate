@@ -21,6 +21,11 @@
 		66D084772BA3CEC300EB8556 /* ContainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D084662BA3CEC300EB8556 /* ContainerViewController.swift */; };
 		66D084782BA3CEC300EB8556 /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D084672BA3CEC300EB8556 /* UIViewController+Extensions.swift */; };
 		66D0847D2BA3D79300EB8556 /* LibraryVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0847C2BA3D79300EB8556 /* LibraryVC.swift */; };
+		66D084822BA3FDFC00EB8556 /* LibraryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D084812BA3FDFC00EB8556 /* LibraryManager.swift */; };
+		66D084842BA3FE2E00EB8556 /* LibraryContentVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D084832BA3FE2E00EB8556 /* LibraryContentVC.swift */; };
+		66D084892BA4060E00EB8556 /* ProjectManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D084872BA4060E00EB8556 /* ProjectManifest.swift */; };
+		66D0848A2BA4060E00EB8556 /* PixelSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D084882BA4060E00EB8556 /* PixelSize.swift */; };
+		66D0848C2BA55B4300EB8556 /* LibraryManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0848B2BA55B4300EB8556 /* LibraryManifest.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +45,11 @@
 		66D084662BA3CEC300EB8556 /* ContainerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContainerViewController.swift; sourceTree = "<group>"; };
 		66D084672BA3CEC300EB8556 /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
 		66D0847C2BA3D79300EB8556 /* LibraryVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryVC.swift; sourceTree = "<group>"; };
+		66D084812BA3FDFC00EB8556 /* LibraryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryManager.swift; sourceTree = "<group>"; };
+		66D084832BA3FE2E00EB8556 /* LibraryContentVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryContentVC.swift; sourceTree = "<group>"; };
+		66D084872BA4060E00EB8556 /* ProjectManifest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProjectManifest.swift; sourceTree = "<group>"; };
+		66D084882BA4060E00EB8556 /* PixelSize.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PixelSize.swift; sourceTree = "<group>"; };
+		66D0848B2BA55B4300EB8556 /* LibraryManifest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryManifest.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +83,8 @@
 			isa = PBXGroup;
 			children = (
 				66D084532BA3CD3000EB8556 /* Views */,
+				66D0847E2BA3ED7600EB8556 /* Models */,
+				66D0847F2BA3ED7E00EB8556 /* Logic */,
 				66D0846B2BA3CEC300EB8556 /* Utilities */,
 				66D084522BA3CD1F00EB8556 /* System */,
 				66D084542BA3CD3F00EB8556 /* Resources */,
@@ -167,6 +179,33 @@
 			isa = PBXGroup;
 			children = (
 				66D0847C2BA3D79300EB8556 /* LibraryVC.swift */,
+				66D084832BA3FE2E00EB8556 /* LibraryContentVC.swift */,
+			);
+			path = Library;
+			sourceTree = "<group>";
+		};
+		66D0847E2BA3ED7600EB8556 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				66D0848B2BA55B4300EB8556 /* LibraryManifest.swift */,
+				66D084872BA4060E00EB8556 /* ProjectManifest.swift */,
+				66D084882BA4060E00EB8556 /* PixelSize.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		66D0847F2BA3ED7E00EB8556 /* Logic */ = {
+			isa = PBXGroup;
+			children = (
+				66D084802BA3FDF200EB8556 /* Library */,
+			);
+			path = Logic;
+			sourceTree = "<group>";
+		};
+		66D084802BA3FDF200EB8556 /* Library */ = {
+			isa = PBXGroup;
+			children = (
+				66D084812BA3FDFC00EB8556 /* LibraryManager.swift */,
 			);
 			path = Library;
 			sourceTree = "<group>";
@@ -241,10 +280,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				66D084892BA4060E00EB8556 /* ProjectManifest.swift in Sources */,
+				66D0848C2BA55B4300EB8556 /* LibraryManifest.swift in Sources */,
 				66D0846C2BA3CEC300EB8556 /* Layout.swift in Sources */,
+				66D084822BA3FDFC00EB8556 /* LibraryManager.swift in Sources */,
 				66D0846D2BA3CEC300EB8556 /* CGPoint+Extensions.swift in Sources */,
 				66D084712BA3CEC300EB8556 /* PassthroughView.swift in Sources */,
+				66D084842BA3FE2E00EB8556 /* LibraryContentVC.swift in Sources */,
 				66D0846F2BA3CEC300EB8556 /* Indirect.swift in Sources */,
+				66D0848A2BA4060E00EB8556 /* PixelSize.swift in Sources */,
 				66D084782BA3CEC300EB8556 /* UIViewController+Extensions.swift in Sources */,
 				66D084772BA3CEC300EB8556 /* ContainerViewController.swift in Sources */,
 				66D0843D2BA3840C00EB8556 /* AppDelegate.swift in Sources */,
