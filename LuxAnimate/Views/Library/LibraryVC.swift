@@ -8,17 +8,7 @@ class LibraryVC: UIViewController {
     
     private let contentVC = LibraryContentVC()
     
-    private let libraryManager: LibraryManager
-    
-    // MARK: - Initializer
-    
-    init() {
-        libraryManager = try! LibraryManager()
-        
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) { fatalError() }
+    private let libraryManager = LibraryManager()
     
     // MARK: - Lifecycle
     
@@ -69,7 +59,7 @@ extension LibraryVC: LibraryContentVCDelegate {
     }
     
     func onSelectProject(_ project: LibraryManager.Project) {
-        let vc = EditorVC(projectURL: project.url)
+        let vc = EditorVC(projectID: project.id)
         present(vc, animated: true)
     }
     

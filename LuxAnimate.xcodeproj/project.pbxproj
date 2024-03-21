@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		660CD12E2BA8F33500C8C7B5 /* EditorUndoHistoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660CD12D2BA8F33500C8C7B5 /* EditorUndoHistoryManager.swift */; };
+		660CD1302BA92FF500C8C7B5 /* ProjectEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660CD12F2BA92FF500C8C7B5 /* ProjectEditor.swift */; };
+		667BF7482BA653D6003E3430 /* EditorSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667BF7472BA653D6003E3430 /* EditorSessionManager.swift */; };
+		667BF74B2BA655CB003E3430 /* FileUrlHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667BF74A2BA655CB003E3430 /* FileUrlHelper.swift */; };
 		66D0843D2BA3840C00EB8556 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0843C2BA3840C00EB8556 /* AppDelegate.swift */; };
 		66D0843F2BA3840C00EB8556 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0843E2BA3840C00EB8556 /* SceneDelegate.swift */; };
 		66D084462BA3840D00EB8556 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 66D084452BA3840D00EB8556 /* Assets.xcassets */; };
@@ -27,10 +31,14 @@
 		66D0848A2BA4060E00EB8556 /* PixelSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D084882BA4060E00EB8556 /* PixelSize.swift */; };
 		66D0848C2BA55B4300EB8556 /* LibraryManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0848B2BA55B4300EB8556 /* LibraryManifest.swift */; };
 		66D0848F2BA56FB400EB8556 /* EditorVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0848E2BA56FB400EB8556 /* EditorVC.swift */; };
-		66D084922BA5704500EB8556 /* EditorProjectReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D084912BA5704500EB8556 /* EditorProjectReader.swift */; };
+		66D084922BA5704500EB8556 /* ProjectManifestReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D084912BA5704500EB8556 /* ProjectManifestReader.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		660CD12D2BA8F33500C8C7B5 /* EditorUndoHistoryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorUndoHistoryManager.swift; sourceTree = "<group>"; };
+		660CD12F2BA92FF500C8C7B5 /* ProjectEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectEditor.swift; sourceTree = "<group>"; };
+		667BF7472BA653D6003E3430 /* EditorSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorSessionManager.swift; sourceTree = "<group>"; };
+		667BF74A2BA655CB003E3430 /* FileUrlHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileUrlHelper.swift; sourceTree = "<group>"; };
 		66D084392BA3840C00EB8556 /* LuxAnimate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LuxAnimate.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66D0843C2BA3840C00EB8556 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		66D0843E2BA3840C00EB8556 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -53,7 +61,7 @@
 		66D084882BA4060E00EB8556 /* PixelSize.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PixelSize.swift; sourceTree = "<group>"; };
 		66D0848B2BA55B4300EB8556 /* LibraryManifest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryManifest.swift; sourceTree = "<group>"; };
 		66D0848E2BA56FB400EB8556 /* EditorVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorVC.swift; sourceTree = "<group>"; };
-		66D084912BA5704500EB8556 /* EditorProjectReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorProjectReader.swift; sourceTree = "<group>"; };
+		66D084912BA5704500EB8556 /* ProjectManifestReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectManifestReader.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +75,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		667BF7492BA655B6003E3430 /* Filesystem */ = {
+			isa = PBXGroup;
+			children = (
+				667BF74A2BA655CB003E3430 /* FileUrlHelper.swift */,
+			);
+			path = Filesystem;
+			sourceTree = "<group>";
+		};
 		66D084302BA3840B00EB8556 = {
 			isa = PBXGroup;
 			children = (
@@ -204,6 +220,7 @@
 			children = (
 				66D084802BA3FDF200EB8556 /* Library */,
 				66D084902BA5702C00EB8556 /* Editor */,
+				667BF7492BA655B6003E3430 /* Filesystem */,
 			);
 			path = Logic;
 			sourceTree = "<group>";
@@ -227,7 +244,10 @@
 		66D084902BA5702C00EB8556 /* Editor */ = {
 			isa = PBXGroup;
 			children = (
-				66D084912BA5704500EB8556 /* EditorProjectReader.swift */,
+				660CD12F2BA92FF500C8C7B5 /* ProjectEditor.swift */,
+				667BF7472BA653D6003E3430 /* EditorSessionManager.swift */,
+				660CD12D2BA8F33500C8C7B5 /* EditorUndoHistoryManager.swift */,
+				66D084912BA5704500EB8556 /* ProjectManifestReader.swift */,
 			);
 			path = Editor;
 			sourceTree = "<group>";
@@ -304,18 +324,22 @@
 			files = (
 				66D084892BA4060E00EB8556 /* ProjectManifest.swift in Sources */,
 				66D0848C2BA55B4300EB8556 /* LibraryManifest.swift in Sources */,
-				66D084922BA5704500EB8556 /* EditorProjectReader.swift in Sources */,
+				66D084922BA5704500EB8556 /* ProjectManifestReader.swift in Sources */,
+				660CD12E2BA8F33500C8C7B5 /* EditorUndoHistoryManager.swift in Sources */,
 				66D0846C2BA3CEC300EB8556 /* Layout.swift in Sources */,
 				66D084822BA3FDFC00EB8556 /* LibraryManager.swift in Sources */,
+				667BF74B2BA655CB003E3430 /* FileUrlHelper.swift in Sources */,
 				66D0846D2BA3CEC300EB8556 /* CGPoint+Extensions.swift in Sources */,
 				66D084712BA3CEC300EB8556 /* PassthroughView.swift in Sources */,
 				66D084842BA3FE2E00EB8556 /* LibraryContentVC.swift in Sources */,
 				66D0846F2BA3CEC300EB8556 /* Indirect.swift in Sources */,
 				66D0848A2BA4060E00EB8556 /* PixelSize.swift in Sources */,
+				660CD1302BA92FF500C8C7B5 /* ProjectEditor.swift in Sources */,
 				66D084782BA3CEC300EB8556 /* UIViewController+Extensions.swift in Sources */,
 				66D084772BA3CEC300EB8556 /* ContainerViewController.swift in Sources */,
 				66D0843D2BA3840C00EB8556 /* AppDelegate.swift in Sources */,
 				66D084762BA3CEC300EB8556 /* UIView+Extensions.swift in Sources */,
+				667BF7482BA653D6003E3430 /* EditorSessionManager.swift in Sources */,
 				66D0847D2BA3D79300EB8556 /* LibraryVC.swift in Sources */,
 				66D084572BA3CDF700EB8556 /* AppVC.swift in Sources */,
 				66D0843F2BA3840C00EB8556 /* SceneDelegate.swift in Sources */,

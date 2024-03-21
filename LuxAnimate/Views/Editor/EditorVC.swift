@@ -6,18 +6,18 @@ import UIKit
 
 class EditorVC: UIViewController {
     
-    private let projectURL: URL
+    private let projectID: String
     
     private var projectManifest: ProjectManifest?
     
-    private let reader = EditorProjectReader()
+    private let reader = ProjectManifestReader()
     
     private let infoLabel = UILabel()
     
     // MARK: - Initializer
     
-    init(projectURL: URL) {
-        self.projectURL = projectURL
+    init(projectID: String) {
+        self.projectID = projectID
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -51,7 +51,7 @@ class EditorVC: UIViewController {
         infoLabel.text = """
             Name: \(projectManifest.name)
             Created: \(projectManifest.createdAt)
-            Image: \(projectManifest.image ?? "none")
+            Drawings: \(projectManifest.drawings.count)
             """
     }
     
@@ -60,7 +60,7 @@ class EditorVC: UIViewController {
     private func reloadData() {
         do {
             let projectManifest = try reader
-                .getProjectManifest(for: projectURL)
+                .getProjectManifest(for: projectID)
             
             self.projectManifest = projectManifest
             updateUI()
