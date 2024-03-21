@@ -60,7 +60,9 @@ extension LibraryVC: LibraryContentVCDelegate {
     
     func onSelectProject(_ project: LibraryManager.Project) {
         let vc = EditorVC(projectID: project.id)
-        present(vc, animated: true)
+        let nav = UINavigationController(rootViewController: vc)
+        nav.modalPresentationStyle = .fullScreen
+        present(nav, animated: true)
     }
     
 }

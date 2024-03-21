@@ -6,6 +6,9 @@ import Foundation
 
 struct FileUrlHelper {
     
+    static let libraryManifestFileName = "manifest"
+    static let projectManifestFileName = "manifest"
+    
     private let fileManager = FileManager.default
     
     let libraryDirectoryURL: URL
@@ -25,7 +28,7 @@ struct FileUrlHelper {
             directoryHint: .isDirectory)
         
         libraryManifestURL = libraryDirectoryURL.appending(
-            path: "manifest")
+            path: Self.libraryManifestFileName)
         
         cacheDirectoryURL = try! fileManager.url(
             for: .cachesDirectory,
@@ -42,7 +45,7 @@ struct FileUrlHelper {
     
     func projectManifestURL(for projectID: String) -> URL {
         projectURL(for: projectID)
-            .appending(path: "manifest")
+            .appending(path: Self.projectManifestFileName)
     }
     
     func projectCacheDirectoryURL(for projectID: String) -> URL {
