@@ -78,6 +78,10 @@ class ProjectEditor {
     
     private func removeEditHistoryDirectory() throws {
         let url = editHistoryDirectoryURL()
+        
+        if !fileManager.fileExists(atPath: url.path()) {
+            return
+        }
         try fileManager.removeItem(at: url)
     }
     

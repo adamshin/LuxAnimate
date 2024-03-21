@@ -7,10 +7,7 @@ import UIKit
 class EditorVC: UIViewController {
     
     private let projectID: String
-    
-    private var projectManifest: ProjectManifest?
-    
-    private let reader = ProjectManifestReader()
+    private let editor: ProjectEditor?
     
     private let infoLabel = UILabel()
     
@@ -18,6 +15,8 @@ class EditorVC: UIViewController {
     
     init(projectID: String) {
         self.projectID = projectID
+        
+        editor = try? ProjectEditor(projectID: projectID)
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -46,7 +45,9 @@ class EditorVC: UIViewController {
     // MARK: - UI
     
     private func updateUI() {
-        guard let projectManifest else { return }
+        guard let editor else { return }
+        
+        let projectManifest = editor.currentProjectManifest
         
         infoLabel.text = """
             Name: \(projectManifest.name)
@@ -58,14 +59,7 @@ class EditorVC: UIViewController {
     // MARK: - Data
     
     private func reloadData() {
-        do {
-            let projectManifest = try reader
-                .getProjectManifest(for: projectID)
-            
-            self.projectManifest = projectManifest
-            updateUI()
-            
-        } catch { }
+        updateUI()
     }
     
 }
