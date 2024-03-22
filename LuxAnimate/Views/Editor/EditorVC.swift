@@ -19,8 +19,10 @@ class EditorVC: UIViewController {
     private let undoButton = UIBarButtonItem(title: "Undo")
     private let redoButton = UIBarButtonItem(title: "Redo")
     private let addDrawingButton = UIBarButtonItem(title: "Add Drawing")
+    private let deleteDrawingButton = UIBarButtonItem(title: "Delete Drawing")
     
     private let infoLabel = UILabel()
+    private var imageViews: [UIImageView] = []
     
     // MARK: - Initializer
     
@@ -52,8 +54,25 @@ class EditorVC: UIViewController {
         navigationItem.leftBarButtonItem = backButton
         
         view.addSubview(infoLabel)
-        infoLabel.pinCenter()
+        infoLabel.pin(.centerX)
+        infoLabel.pinEdges(.top, to: view.safeAreaLayoutGuide, padding: 40)
         infoLabel.numberOfLines = 0
+        
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.spacing = 20
+        view.addSubview(stack)
+        stack.pinCenter()
+        
+        for _ in 0..<15 {
+            let imageView = UIImageView()
+            imageView.contentMode = .scaleAspectFill
+            imageView.clipsToBounds = true
+            imageView.pinSize(to: 60)
+            
+            imageViews.append(imageView)
+            stack.addArrangedSubview(imageView)
+        }
         
         let toolbar = UIToolbar()
         view.addSubview(toolbar)
@@ -66,6 +85,8 @@ class EditorVC: UIViewController {
             redoButton,
             UIBarButtonItem.fixedSpace(buttonSpacing),
             addDrawingButton,
+            UIBarButtonItem.fixedSpace(buttonSpacing),
+            deleteDrawingButton,
         ]
         
         undoButton.target = self
@@ -76,6 +97,9 @@ class EditorVC: UIViewController {
         
         addDrawingButton.target = self
         addDrawingButton.action = #selector(onSelectAddDrawing)
+        
+        deleteDrawingButton.target = self
+        deleteDrawingButton.action = #selector(onSelectDeleteDrawing)
     }
     
     // MARK: - UI
@@ -93,6 +117,17 @@ class EditorVC: UIViewController {
         
         undoButton.isEnabled = editor.isUndoAvailable
         redoButton.isEnabled = editor.isRedoAvailable
+        
+        imageViews.forEach { $0.image = nil }
+        
+        for (drawing, imageView) in zip(projectManifest.drawings, imageViews) {
+            let url = FileUrlHelper().projectAssetURL(
+                projectID: projectID,
+                assetID: drawing.assetID)
+            let data = try? Data(contentsOf: url)
+            let image = UIImage(data: data ?? Data())
+            imageView.image = image
+        }
     }
     
     // MARK: - Handlers
@@ -128,9 +163,13 @@ class EditorVC: UIViewController {
         present(vc, animated: true)
     }
     
+    @objc private func onSelectDeleteDrawing() {
+        deleteLastDrawing()
+    }
+    
     // MARK: - Editing
     
-    func addDrawing(pngData: Data) {
+    private func addDrawing(pngData: Data) {
         guard let editor else { return }
         
         let newAssetID = UUID().uuidString
@@ -141,13 +180,35 @@ class EditorVC: UIViewController {
         let drawing = ProjectManifest.Drawing(assetID: newAssetID)
         
         var projectManifest = editor.currentProjectManifest
-        projectManifest.referencedAssetIDs.append(newAssetID)
+        projectManifest.referencedAssetIDs.insert(newAssetID)
         projectManifest.drawings.append(drawing)
         
         do {
             try editor.applyEdit(
                 newProjectManifest: projectManifest,
                 newAssets: [newAsset])
+        } catch {
+            print(error)
+        }
+        
+        updateUI()
+    }
+    
+    private func deleteLastDrawing() {
+        guard let editor else { return }
+        
+        var projectManifest = editor.currentProjectManifest
+        
+        guard let lastDrawing = projectManifest.drawings.last
+        else { return }
+        
+        projectManifest.drawings.removeLast()
+        projectManifest.referencedAssetIDs.remove(lastDrawing.assetID)
+        
+        do {
+            try editor.applyEdit(
+                newProjectManifest: projectManifest,
+                newAssets: [])
         } catch {
             print(error)
         }

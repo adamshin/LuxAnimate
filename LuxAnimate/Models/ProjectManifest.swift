@@ -20,7 +20,7 @@ struct ProjectManifest: Codable {
     
     var canvasSize: PixelSize
     
-    var referencedAssetIDs: [String]
+    var referencedAssetIDs: Set<String>
     
     var drawings: [Drawing]
     

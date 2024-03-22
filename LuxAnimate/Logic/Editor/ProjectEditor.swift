@@ -121,7 +121,7 @@ class ProjectEditor {
                     entryID: lastEntry.id)
             } catch { }
             
-            _ = undoHistoryEntries.dropLast()
+            undoHistoryEntries.removeLast()
         }
     }
     
@@ -233,8 +233,8 @@ class ProjectEditor {
         
         // Find assets referenced in the old manifest but not the
         // new one. Move these to the new history entry
-        let oldAssetIDs = Set(oldProjectManifest.referencedAssetIDs)
-        let newAssetIDs = Set(newProjectManifest.referencedAssetIDs)
+        let oldAssetIDs = oldProjectManifest.referencedAssetIDs
+        let newAssetIDs = newProjectManifest.referencedAssetIDs
         
         let diffAssetIDs = oldAssetIDs.subtracting(newAssetIDs)
         
@@ -328,8 +328,8 @@ class ProjectEditor {
         
         // Find assets referenced in the old manifest but not the
         // new one. Move these to the new history entry directory
-        let oldAssetIDs = Set(currentProjectManifest.referencedAssetIDs)
-        let newAssetIDs = Set(consumedProjectManifest.referencedAssetIDs)
+        let oldAssetIDs = currentProjectManifest.referencedAssetIDs
+        let newAssetIDs = consumedProjectManifest.referencedAssetIDs
         
         let diffAssetIDs = oldAssetIDs.subtracting(newAssetIDs)
         
@@ -350,7 +350,7 @@ class ProjectEditor {
         let newHistoryEntryID = try consumeHistoryEntry(
             entryID: entry.id)
         
-        _ = undoHistoryEntries.dropFirst()
+        undoHistoryEntries.removeFirst()
         
         let newHistoryEntry = HistoryEntry(id: newHistoryEntryID)
         redoHistoryEntries.insert(newHistoryEntry, at: 0)
@@ -363,7 +363,7 @@ class ProjectEditor {
         let newHistoryEntryID = try consumeHistoryEntry(
             entryID: entry.id)
         
-        _ = redoHistoryEntries.dropFirst()
+        redoHistoryEntries.removeFirst()
         
         let newHistoryEntry = HistoryEntry(id: newHistoryEntryID)
         undoHistoryEntries.insert(newHistoryEntry, at: 0)

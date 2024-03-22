@@ -54,4 +54,12 @@ struct FileUrlHelper {
             directoryHint: .isDirectory)
     }
     
+    func projectAssetURL(
+        projectID: String,
+        assetID: String
+    ) -> URL {
+        projectURL(for: projectID)
+            .appending(path: assetID)
+    }
+    
 }
