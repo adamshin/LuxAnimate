@@ -26,8 +26,8 @@ class ProjectEditor {
     private let fileManager = FileManager.default
     private let fileUrlHelper = FileUrlHelper()
     
-    private let encoder = JSONEncoder()
-    private let decoder = JSONDecoder()
+    private let encoder = JSONFileEncoder()
+    private let decoder = JSONFileDecoder()
     
     private(set) var currentProjectManifest: ProjectManifest
     
@@ -250,6 +250,8 @@ class ProjectEditor {
         
         // Trim undo history
         trimUndoHistoryToLimit()
+        
+        print("Applied Edit")
     }
     
     // MARK: - Undo/Redo
@@ -297,11 +299,11 @@ class ProjectEditor {
             to: createdHistoryEntryProjectManifestURL)
         
         // Move asset files from consumed entry to project
-        let fileURLs = try fileManager.contentsOfDirectory(
-            at: createdHistoryEntryURL,
+        let consumedEntryFileURLs = try fileManager.contentsOfDirectory(
+            at: consumedHistoryEntryURL,
             includingPropertiesForKeys: nil)
             
-        for fileURL in fileURLs {
+        for fileURL in consumedEntryFileURLs {
             let fileName = fileURL.lastPathComponent
             if fileName == FileUrlHelper.projectManifestFileName { continue }
             
@@ -354,6 +356,8 @@ class ProjectEditor {
         
         let newHistoryEntry = HistoryEntry(id: newHistoryEntryID)
         redoHistoryEntries.insert(newHistoryEntry, at: 0)
+        
+        print("Applied Undo. Undo \(undoHistoryEntries.count), Redo \(redoHistoryEntries.count)")
     }
     
     func applyRedo() throws {
@@ -367,6 +371,8 @@ class ProjectEditor {
         
         let newHistoryEntry = HistoryEntry(id: newHistoryEntryID)
         undoHistoryEntries.insert(newHistoryEntry, at: 0)
+        
+        print("Applied Redo. Undo \(undoHistoryEntries.count), Redo \(redoHistoryEntries.count)")
     }
     
 }

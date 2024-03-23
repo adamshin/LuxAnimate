@@ -20,6 +20,7 @@ class EditorVC: UIViewController {
     private let redoButton = UIBarButtonItem(title: "Redo")
     private let addDrawingButton = UIBarButtonItem(title: "Add Drawing")
     private let deleteDrawingButton = UIBarButtonItem(title: "Delete Drawing")
+    private let duplicateDrawingButton = UIBarButtonItem(title: "Duplicate Drawing")
     
     private let infoLabel = UILabel()
     private var imageViews: [UIImageView] = []
@@ -87,6 +88,8 @@ class EditorVC: UIViewController {
             addDrawingButton,
             UIBarButtonItem.fixedSpace(buttonSpacing),
             deleteDrawingButton,
+            UIBarButtonItem.fixedSpace(buttonSpacing),
+            duplicateDrawingButton,
         ]
         
         undoButton.target = self
@@ -100,6 +103,9 @@ class EditorVC: UIViewController {
         
         deleteDrawingButton.target = self
         deleteDrawingButton.action = #selector(onSelectDeleteDrawing)
+        
+        duplicateDrawingButton.target = self
+        duplicateDrawingButton.action = #selector(onSelectDuplicateDrawing)
     }
     
     // MARK: - UI
@@ -124,9 +130,14 @@ class EditorVC: UIViewController {
             let url = FileUrlHelper().projectAssetURL(
                 projectID: projectID,
                 assetID: drawing.assetID)
-            let data = try? Data(contentsOf: url)
-            let image = UIImage(data: data ?? Data())
-            imageView.image = image
+            
+            Task(priority: .medium) {
+                let data = try? Data(contentsOf: url)
+                let image = UIImage(data: data ?? Data())
+                await MainActor.run {
+                    imageView.image = image
+                }
+            }
         }
     }
     
@@ -137,18 +148,24 @@ class EditorVC: UIViewController {
     }
     
     @objc private func onSelectUndo() {
-        do {
-            try editor?.applyUndo()
-        } catch { }
+        guard let editor else { return }
         
+        do {
+            try editor.applyUndo()
+        } catch { 
+            print(error)
+        }
         updateUI()
     }
     
     @objc private func onSelectRedo() {
-        do {
-            try editor?.applyRedo()
-        } catch { }
+        guard let editor else { return }
         
+        do {
+            try editor.applyRedo()
+        } catch {
+            print(error)
+        }
         updateUI()
     }
     
@@ -165,6 +182,10 @@ class EditorVC: UIViewController {
     
     @objc private func onSelectDeleteDrawing() {
         deleteLastDrawing()
+    }
+    
+    @objc private func onSelectDuplicateDrawing() {
+        duplicateLastDrawing()
     }
     
     // MARK: - Editing
@@ -190,7 +211,6 @@ class EditorVC: UIViewController {
         } catch {
             print(error)
         }
-        
         updateUI()
     }
     
@@ -212,7 +232,36 @@ class EditorVC: UIViewController {
         } catch {
             print(error)
         }
+        updateUI()
+    }
+    
+    private func duplicateLastDrawing() {
+        guard let editor else { return }
         
+        guard let image = imageViews.compactMap({ $0.image }).last
+        else { return }
+        
+        guard let pngData = image.pngData()
+        else { return }
+        
+        let newAssetID = UUID().uuidString
+        let newAsset = ProjectEditor.NewAsset(
+            id: newAssetID,
+            data: pngData)
+        
+        let drawing = ProjectManifest.Drawing(assetID: newAssetID)
+        
+        var projectManifest = editor.currentProjectManifest
+        projectManifest.referencedAssetIDs.insert(newAssetID)
+        projectManifest.drawings.append(drawing)
+        
+        do {
+            try editor.applyEdit(
+                newProjectManifest: projectManifest,
+                newAssets: [newAsset])
+        } catch {
+            print(error)
+        }
         updateUI()
     }
     

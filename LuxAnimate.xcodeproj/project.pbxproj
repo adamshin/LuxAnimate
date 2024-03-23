@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		660CD1302BA92FF500C8C7B5 /* ProjectEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660CD12F2BA92FF500C8C7B5 /* ProjectEditor.swift */; };
+		660CD1332BAE4D0E00C8C7B5 /* JSONFileCoders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660CD1322BAE4D0E00C8C7B5 /* JSONFileCoders.swift */; };
 		667BF74B2BA655CB003E3430 /* FileUrlHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667BF74A2BA655CB003E3430 /* FileUrlHelper.swift */; };
 		66D0843D2BA3840C00EB8556 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0843C2BA3840C00EB8556 /* AppDelegate.swift */; };
 		66D0843F2BA3840C00EB8556 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0843E2BA3840C00EB8556 /* SceneDelegate.swift */; };
@@ -33,6 +34,7 @@
 
 /* Begin PBXFileReference section */
 		660CD12F2BA92FF500C8C7B5 /* ProjectEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectEditor.swift; sourceTree = "<group>"; };
+		660CD1322BAE4D0E00C8C7B5 /* JSONFileCoders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONFileCoders.swift; sourceTree = "<group>"; };
 		667BF74A2BA655CB003E3430 /* FileUrlHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileUrlHelper.swift; sourceTree = "<group>"; };
 		66D084392BA3840C00EB8556 /* LuxAnimate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LuxAnimate.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66D0843C2BA3840C00EB8556 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -69,6 +71,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		660CD1312BAE4CFA00C8C7B5 /* Coding */ = {
+			isa = PBXGroup;
+			children = (
+				660CD1322BAE4D0E00C8C7B5 /* JSONFileCoders.swift */,
+			);
+			path = Coding;
+			sourceTree = "<group>";
+		};
 		667BF7492BA655B6003E3430 /* Filesystem */ = {
 			isa = PBXGroup;
 			children = (
@@ -212,6 +222,7 @@
 		66D0847F2BA3ED7E00EB8556 /* Logic */ = {
 			isa = PBXGroup;
 			children = (
+				660CD1312BAE4CFA00C8C7B5 /* Coding */,
 				66D084802BA3FDF200EB8556 /* Library */,
 				66D084902BA5702C00EB8556 /* Editor */,
 				667BF7492BA655B6003E3430 /* Filesystem */,
@@ -330,6 +341,7 @@
 				66D084762BA3CEC300EB8556 /* UIView+Extensions.swift in Sources */,
 				66D0847D2BA3D79300EB8556 /* LibraryVC.swift in Sources */,
 				66D084572BA3CDF700EB8556 /* AppVC.swift in Sources */,
+				660CD1332BAE4D0E00C8C7B5 /* JSONFileCoders.swift in Sources */,
 				66D0843F2BA3840C00EB8556 /* SceneDelegate.swift in Sources */,
 				66D0848F2BA56FB400EB8556 /* EditorVC.swift in Sources */,
 				66D084702BA3CEC300EB8556 /* Math.swift in Sources */,
