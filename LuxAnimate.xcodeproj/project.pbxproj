@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		660CD1302BA92FF500C8C7B5 /* ProjectEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660CD12F2BA92FF500C8C7B5 /* ProjectEditor.swift */; };
 		660CD1332BAE4D0E00C8C7B5 /* JSONFileCoders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660CD1322BAE4D0E00C8C7B5 /* JSONFileCoders.swift */; };
+		663259472BB6698800460F70 /* libjxl.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 663259462BB6698800460F70 /* libjxl.xcframework */; };
+		6632594C2BB66C1A00460F70 /* JXLCoderShim.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6632594B2BB66C1A00460F70 /* JXLCoderShim.mm */; };
+		6632594E2BB6725B00460F70 /* JXLCoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6632594D2BB6725B00460F70 /* JXLCoder.swift */; };
 		667BF74B2BA655CB003E3430 /* FileUrlHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667BF74A2BA655CB003E3430 /* FileUrlHelper.swift */; };
 		66D0843D2BA3840C00EB8556 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0843C2BA3840C00EB8556 /* AppDelegate.swift */; };
 		66D0843F2BA3840C00EB8556 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0843E2BA3840C00EB8556 /* SceneDelegate.swift */; };
@@ -35,6 +38,11 @@
 /* Begin PBXFileReference section */
 		660CD12F2BA92FF500C8C7B5 /* ProjectEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectEditor.swift; sourceTree = "<group>"; };
 		660CD1322BAE4D0E00C8C7B5 /* JSONFileCoders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONFileCoders.swift; sourceTree = "<group>"; };
+		663259462BB6698800460F70 /* libjxl.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libjxl.xcframework; sourceTree = "<group>"; };
+		663259492BB66A3300460F70 /* JXLCoderShim.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JXLCoderShim.h; sourceTree = "<group>"; };
+		6632594A2BB66BB300460F70 /* BridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BridgingHeader.h; sourceTree = "<group>"; };
+		6632594B2BB66C1A00460F70 /* JXLCoderShim.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = JXLCoderShim.mm; sourceTree = "<group>"; };
+		6632594D2BB6725B00460F70 /* JXLCoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JXLCoder.swift; sourceTree = "<group>"; };
 		667BF74A2BA655CB003E3430 /* FileUrlHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileUrlHelper.swift; sourceTree = "<group>"; };
 		66D084392BA3840C00EB8556 /* LuxAnimate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LuxAnimate.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66D0843C2BA3840C00EB8556 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -65,6 +73,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				663259472BB6698800460F70 /* libjxl.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -77,6 +86,24 @@
 				660CD1322BAE4D0E00C8C7B5 /* JSONFileCoders.swift */,
 			);
 			path = Coding;
+			sourceTree = "<group>";
+		};
+		663259452BB6696500460F70 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				663259462BB6698800460F70 /* libjxl.xcframework */,
+			);
+			path = Frameworks;
+			sourceTree = "<group>";
+		};
+		663259482BB669AE00460F70 /* JXL */ = {
+			isa = PBXGroup;
+			children = (
+				6632594D2BB6725B00460F70 /* JXLCoder.swift */,
+				663259492BB66A3300460F70 /* JXLCoderShim.h */,
+				6632594B2BB66C1A00460F70 /* JXLCoderShim.mm */,
+			);
+			path = JXL;
 			sourceTree = "<group>";
 		};
 		667BF7492BA655B6003E3430 /* Filesystem */ = {
@@ -112,6 +139,7 @@
 				66D0846B2BA3CEC300EB8556 /* Utilities */,
 				66D084522BA3CD1F00EB8556 /* System */,
 				66D084542BA3CD3F00EB8556 /* Resources */,
+				663259452BB6696500460F70 /* Frameworks */,
 			);
 			path = LuxAnimate;
 			sourceTree = "<group>";
@@ -122,6 +150,7 @@
 				66D0843C2BA3840C00EB8556 /* AppDelegate.swift */,
 				66D0843E2BA3840C00EB8556 /* SceneDelegate.swift */,
 				66D0844A2BA3840D00EB8556 /* Info.plist */,
+				6632594A2BB66BB300460F70 /* BridgingHeader.h */,
 			);
 			path = System;
 			sourceTree = "<group>";
@@ -226,6 +255,7 @@
 				66D084802BA3FDF200EB8556 /* Library */,
 				66D084902BA5702C00EB8556 /* Editor */,
 				667BF7492BA655B6003E3430 /* Filesystem */,
+				663259482BB669AE00460F70 /* JXL */,
 			);
 			path = Logic;
 			sourceTree = "<group>";
@@ -286,6 +316,7 @@
 				TargetAttributes = {
 					66D084382BA3840C00EB8556 = {
 						CreatedOnToolsVersion = 15.3;
+						LastSwiftMigration = 1530;
 					};
 				};
 			};
@@ -344,7 +375,9 @@
 				660CD1332BAE4D0E00C8C7B5 /* JSONFileCoders.swift in Sources */,
 				66D0843F2BA3840C00EB8556 /* SceneDelegate.swift in Sources */,
 				66D0848F2BA56FB400EB8556 /* EditorVC.swift in Sources */,
+				6632594E2BB6725B00460F70 /* JXLCoder.swift in Sources */,
 				66D084702BA3CEC300EB8556 /* Math.swift in Sources */,
+				6632594C2BB66C1A00460F70 /* JXLCoderShim.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -421,6 +454,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OBJC_BRIDGING_HEADER = LuxAnimate/System/BridgingHeader.h;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -477,6 +511,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OBJC_BRIDGING_HEADER = LuxAnimate/System/BridgingHeader.h;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -486,6 +521,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 28XM46LW7H;
@@ -510,6 +546,7 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 2;
 			};
@@ -520,6 +557,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 28XM46LW7H;
