@@ -58,6 +58,8 @@ struct JXLCoder {
         context.draw(cgImage,
             in: CGRect(x: 0, y: 0, width: width, height: height))
         
+        // TODO: un-premultiply alpha!
+        
         guard let rawData = context.data else {
             throw ImageDataError.internal
         }
@@ -75,8 +77,7 @@ struct JXLCoder {
         image: UIImage,
         lossless: Bool,
         quality _quality: Int,
-        effort _effort: Int,
-        decodingSpeed: Int
+        effort _effort: Int
     ) throws -> Data {
         
         let quality = clamp(_quality, min: 0, max: 100)

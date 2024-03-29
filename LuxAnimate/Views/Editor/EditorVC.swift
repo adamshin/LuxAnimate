@@ -190,13 +190,13 @@ class EditorVC: UIViewController {
     
     // MARK: - Editing
     
-    private func addDrawing(pngData: Data) {
+    private func addDrawing(imageData: Data) {
         guard let editor else { return }
         
         let newAssetID = UUID().uuidString
         let newAsset = ProjectEditor.NewAsset(
             id: newAssetID,
-            data: pngData)
+            data: imageData)
         
         let drawing = ProjectManifest.Drawing(assetID: newAssetID)
         
@@ -236,18 +236,23 @@ class EditorVC: UIViewController {
     }
     
     private func duplicateLastDrawing() {
+        /*
         guard let editor else { return }
         
         guard let image = imageViews.compactMap({ $0.image }).last
         else { return }
         
-        guard let pngData = image.pngData()
+        guard let imageData = try? JXLCoder.encode(
+            image: image,
+            lossless: true,
+            quality: 100,
+            effort: 1)
         else { return }
         
         let newAssetID = UUID().uuidString
         let newAsset = ProjectEditor.NewAsset(
             id: newAssetID,
-            data: pngData)
+            data: imageData)
         
         let drawing = ProjectManifest.Drawing(assetID: newAssetID)
         
@@ -263,6 +268,7 @@ class EditorVC: UIViewController {
             print(error)
         }
         updateUI()
+         */
     }
     
 }
@@ -282,10 +288,16 @@ extension EditorVC: PHPickerViewControllerDelegate {
         result.itemProvider.loadObject(ofClass: UIImage.self)
         { [weak self] object, error in
             guard let image = object as? UIImage else { return }
-            guard let pngData = image.pngData() else { return }
+            
+            guard let imageData = try? JXLCoder.encode(
+                image: image,
+                lossless: true,
+                quality: 100,
+                effort: 7)
+            else { return }
             
             DispatchQueue.main.async {
-                self?.addDrawing(pngData: pngData)
+                self?.addDrawing(imageData: imageData)
             }
         }
     }
