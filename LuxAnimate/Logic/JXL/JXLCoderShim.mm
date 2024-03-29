@@ -4,13 +4,9 @@
 
 #include "JXLCoderShim.h"
 
-#include <jxl/encode.h>
 #include <jxl/encode_cxx.h>
-#include <jxl/decode.h>
 #include <jxl/decode_cxx.h>
-#include <jxl/resizable_parallel_runner.h>
 #include <jxl/resizable_parallel_runner_cxx.h>
-#include <jxl/thread_parallel_runner.h>
 #include <jxl/thread_parallel_runner_cxx.h>
 
 #include <vector>

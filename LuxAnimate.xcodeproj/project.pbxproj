@@ -9,9 +9,9 @@
 /* Begin PBXBuildFile section */
 		660CD1302BA92FF500C8C7B5 /* ProjectEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660CD12F2BA92FF500C8C7B5 /* ProjectEditor.swift */; };
 		660CD1332BAE4D0E00C8C7B5 /* JSONFileCoders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660CD1322BAE4D0E00C8C7B5 /* JSONFileCoders.swift */; };
-		663259472BB6698800460F70 /* libjxl.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 663259462BB6698800460F70 /* libjxl.xcframework */; };
 		6632594C2BB66C1A00460F70 /* JXLCoderShim.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6632594B2BB66C1A00460F70 /* JXLCoderShim.mm */; };
 		6632594E2BB6725B00460F70 /* JXLCoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6632594D2BB6725B00460F70 /* JXLCoder.swift */; };
+		6632595F2BB6E94E00460F70 /* libjxl.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6632595E2BB6E94E00460F70 /* libjxl.xcframework */; };
 		667BF74B2BA655CB003E3430 /* FileUrlHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667BF74A2BA655CB003E3430 /* FileUrlHelper.swift */; };
 		66D0843D2BA3840C00EB8556 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0843C2BA3840C00EB8556 /* AppDelegate.swift */; };
 		66D0843F2BA3840C00EB8556 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0843E2BA3840C00EB8556 /* SceneDelegate.swift */; };
@@ -38,11 +38,11 @@
 /* Begin PBXFileReference section */
 		660CD12F2BA92FF500C8C7B5 /* ProjectEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectEditor.swift; sourceTree = "<group>"; };
 		660CD1322BAE4D0E00C8C7B5 /* JSONFileCoders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONFileCoders.swift; sourceTree = "<group>"; };
-		663259462BB6698800460F70 /* libjxl.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libjxl.xcframework; sourceTree = "<group>"; };
 		663259492BB66A3300460F70 /* JXLCoderShim.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JXLCoderShim.h; sourceTree = "<group>"; };
 		6632594A2BB66BB300460F70 /* BridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BridgingHeader.h; sourceTree = "<group>"; };
 		6632594B2BB66C1A00460F70 /* JXLCoderShim.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = JXLCoderShim.mm; sourceTree = "<group>"; };
 		6632594D2BB6725B00460F70 /* JXLCoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JXLCoder.swift; sourceTree = "<group>"; };
+		6632595E2BB6E94E00460F70 /* libjxl.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libjxl.xcframework; sourceTree = "<group>"; };
 		667BF74A2BA655CB003E3430 /* FileUrlHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileUrlHelper.swift; sourceTree = "<group>"; };
 		66D084392BA3840C00EB8556 /* LuxAnimate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LuxAnimate.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66D0843C2BA3840C00EB8556 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -73,7 +73,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				663259472BB6698800460F70 /* libjxl.xcframework in Frameworks */,
+				6632595F2BB6E94E00460F70 /* libjxl.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -91,7 +91,7 @@
 		663259452BB6696500460F70 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				663259462BB6698800460F70 /* libjxl.xcframework */,
+				6632595E2BB6E94E00460F70 /* libjxl.xcframework */,
 			);
 			path = Frameworks;
 			sourceTree = "<group>";
