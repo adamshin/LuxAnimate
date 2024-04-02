@@ -1,2 +1,2 @@
 
-#import "JXLCoderShim.h"
+#import "JXLEncoderShim.h"

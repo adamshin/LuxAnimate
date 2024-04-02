@@ -242,7 +242,7 @@ class EditorVC: UIViewController {
         guard let image = imageViews.compactMap({ $0.image }).last
         else { return }
         
-        guard let imageData = try? JXLCoder.encode(
+        guard let imageData = try? JXLEncoder.encode(
             image: image,
             lossless: true,
             quality: 100,
@@ -289,7 +289,7 @@ extension EditorVC: PHPickerViewControllerDelegate {
         { [weak self] object, error in
             guard let image = object as? UIImage else { return }
             
-            guard let imageData = try? JXLCoder.encode(
+            guard let imageData = try? JXLEncoder.encode(
                 image: image,
                 lossless: true,
                 quality: 100,

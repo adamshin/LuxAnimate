@@ -1,17 +1,15 @@
 //
-//  JXLCoderShim.mm
+//  JXLEncoderShim.mm
 //
 
-#include "JXLCoderShim.h"
+#import "JXLEncoderShim.h"
 
-#include <jxl/encode_cxx.h>
-#include <jxl/decode_cxx.h>
-#include <jxl/resizable_parallel_runner_cxx.h>
-#include <jxl/thread_parallel_runner_cxx.h>
+#import <jxl/encode_cxx.h>
+#import <jxl/resizable_parallel_runner_cxx.h>
 
-#include <vector>
+#import <vector>
 
-@implementation JXLCoderShim
+@implementation JXLEncoderShim
 
 + (NSData *)encodeImageWithData:(NSData *)imageData
                           width:(NSInteger)width
@@ -21,18 +19,21 @@
                          effort:(NSInteger)effort
 {
     auto enc = JxlEncoderMake(nullptr);
-    
-    auto runner = JxlThreadParallelRunnerMake(
-        nullptr,
-        JxlThreadParallelRunnerDefaultNumWorkerThreads());
+    auto runner = JxlResizableParallelRunnerMake(nullptr);
     
     if (JXL_ENC_SUCCESS != JxlEncoderSetParallelRunner(
         enc.get(),
-        JxlThreadParallelRunner,
+        JxlResizableParallelRunner,
         runner.get())
     ) {
         return NULL;
     }
+    
+    JxlResizableParallelRunnerSetThreads(
+        runner.get(),
+        JxlResizableParallelRunnerSuggestThreads(
+            width,
+            height));
     
     JxlPixelFormat pixelFormat = {
         4,

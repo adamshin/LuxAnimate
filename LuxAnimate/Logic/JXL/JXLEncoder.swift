@@ -1,10 +1,10 @@
 //
-//  JXLCoder.swift
+//  JXLEncoder.swift
 //
 
 import UIKit
 
-struct JXLCoder {
+struct JXLEncoder {
     
     enum ImageDataError: Error {
         case invalidInput
@@ -85,7 +85,7 @@ struct JXLCoder {
         
         let imageData = try imageData(from: image)
         
-        let outputData = JXLCoderShim.encodeImage(
+        let outputData = JXLEncoderShim.encodeImage(
             with: imageData.data,
             width: imageData.width,
             height: imageData.height,

@@ -1,10 +1,10 @@
 //
-//  JXLCoderShim.h
+//  JXLEncoderShim.h
 //
 
 #import <Foundation/Foundation.h>
 
-@interface JXLCoderShim: NSObject
+@interface JXLEncoderShim: NSObject
 
 + (NSData *)encodeImageWithData:(NSData *)imageData
                           width:(NSInteger)width
