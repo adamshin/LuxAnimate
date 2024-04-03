@@ -32,7 +32,11 @@ extension Vector2 {
     }
 
     func dot(_ v: Vector2) -> Scalar {
-        x * v.x + y * v.y
+        return x * v.x + y * v.y
+    }
+
+    func cross(_ v: Vector2) -> Scalar {
+        return x * v.y - y * v.x
     }
 
     func normalized() -> Vector2 {
@@ -50,12 +54,12 @@ extension Vector2 {
     }
 
     func angle(with v: Vector2) -> Scalar {
-        let a = self
-        let b = v
+        let t1 = normalized()
+        let t2 = v.normalized()
+        let cross = t1.cross(t2)
+        let dot = max(-1, min(1, t1.dot(t2)))
         
-        let dotProduct = a.dot(b)
-        let magnitudeProduct = a.length() * b.length()
-        return acos(dotProduct / magnitudeProduct)
+        return atan2(cross, dot)
     }
 
     static prefix func - (v: Vector2) -> Vector2 {

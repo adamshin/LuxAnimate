@@ -22,6 +22,7 @@
 		6662D8972BBDBFFC00B4C1D4 /* Scalar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6662D8922BBDBFFC00B4C1D4 /* Scalar.swift */; };
 		6662D8982BBDBFFC00B4C1D4 /* Spline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6662D8932BBDBFFC00B4C1D4 /* Spline.swift */; };
 		6662D8992BBDBFFC00B4C1D4 /* Vector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6662D8942BBDBFFC00B4C1D4 /* Vector.swift */; };
+		6662D89D2BBDF46F00B4C1D4 /* Geometry+UIKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6662D89C2BBDF46F00B4C1D4 /* Geometry+UIKit.swift */; };
 		667BF74B2BA655CB003E3430 /* FileUrlHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667BF74A2BA655CB003E3430 /* FileUrlHelper.swift */; };
 		66D0843D2BA3840C00EB8556 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0843C2BA3840C00EB8556 /* AppDelegate.swift */; };
 		66D0843F2BA3840C00EB8556 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0843E2BA3840C00EB8556 /* SceneDelegate.swift */; };
@@ -64,6 +65,7 @@
 		6662D8922BBDBFFC00B4C1D4 /* Scalar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Scalar.swift; sourceTree = "<group>"; };
 		6662D8932BBDBFFC00B4C1D4 /* Spline.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Spline.swift; sourceTree = "<group>"; };
 		6662D8942BBDBFFC00B4C1D4 /* Vector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Vector.swift; sourceTree = "<group>"; };
+		6662D89C2BBDF46F00B4C1D4 /* Geometry+UIKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Geometry+UIKit.swift"; sourceTree = "<group>"; };
 		667BF74A2BA655CB003E3430 /* FileUrlHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileUrlHelper.swift; sourceTree = "<group>"; };
 		66D084392BA3840C00EB8556 /* LuxAnimate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LuxAnimate.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66D0843C2BA3840C00EB8556 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -156,6 +158,7 @@
 				6662D8942BBDBFFC00B4C1D4 /* Vector.swift */,
 				6662D8932BBDBFFC00B4C1D4 /* Spline.swift */,
 				6662D8912BBDBFFC00B4C1D4 /* BSpline.swift */,
+				6662D89C2BBDF46F00B4C1D4 /* Geometry+UIKit.swift */,
 			);
 			path = Geometry;
 			sourceTree = "<group>";
@@ -419,6 +422,7 @@
 				667BF74B2BA655CB003E3430 /* FileUrlHelper.swift in Sources */,
 				6662D8962BBDBFFC00B4C1D4 /* BSpline.swift in Sources */,
 				66D0846D2BA3CEC300EB8556 /* CGPoint+Extensions.swift in Sources */,
+				6662D89D2BBDF46F00B4C1D4 /* Geometry+UIKit.swift in Sources */,
 				66D084712BA3CEC300EB8556 /* PassthroughView.swift in Sources */,
 				66D084842BA3FE2E00EB8556 /* LibraryContentVC.swift in Sources */,
 				6662D8972BBDBFFC00B4C1D4 /* Scalar.swift in Sources */,

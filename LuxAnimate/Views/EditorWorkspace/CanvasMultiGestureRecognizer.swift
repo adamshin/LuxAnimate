@@ -3,31 +3,35 @@
 //
 
 import UIKit
+import UIKit.UIGestureRecognizerSubclass
 
-protocol CanvasMultiGestureRecognizerPanDelegate: AnyObject {
+// MARK: - CanvasMultiGestureRecognizerDelegate
+
+protocol CanvasMultiGestureRecognizerGestureDelegate: AnyObject {
     
-    func onBeginPan()
+    func onBeginGesture()
     
-    func onUpdatePan(
+    func onUpdateGesture(
         initialAnchorLocation: Vector,
         translation: Vector?,
         rotation: Scalar?,
         scale: Scalar?)
     
-    func onEndPan()
+    func onEndGesture()
     
 }
 
+// MARK: - CanvasMultiGestureRecognizer
+
 class CanvasMultiGestureRecognizer: UIGestureRecognizer {
     
-    weak var panDelegate: CanvasMultiGestureRecognizerPanDelegate?
+    weak var gestureDelegate: CanvasMultiGestureRecognizerGestureDelegate?
     
-    private var panState: CanvasMultiGestureRecognizerState?
+    private var internalState: CanvasMultiGestureRecognizerInternalState?
 
     init() {
         super.init(target: nil, action: nil)
-        
-        setPanState(CanvasMultiGestureRecognizerWaitingState())
+        setInternalState(CanvasMultiGestureRecognizerWaitingState())
     }
     
     // MARK: - Gesture Lifecycle
@@ -35,75 +39,73 @@ class CanvasMultiGestureRecognizer: UIGestureRecognizer {
     override func touchesBegan(
         _ touches: Set<UITouch>, with event: UIEvent
     ) {
-        panState?.touchesBegan(
+        internalState?.touchesBegan(
             touches: touches, event: event)
     }
     
     override func touchesMoved(
         _ touches: Set<UITouch>, with event: UIEvent
     ) { 
-        panState?.touchesMoved(
+        internalState?.touchesMoved(
             touches: touches, event: event)
     }
     
     override func touchesEnded(
         _ touches: Set<UITouch>, with event: UIEvent
     ) {
-        panState?.touchesEnded(
+        internalState?.touchesEnded(
             touches: touches, event: event)
     }
     
     override func touchesCancelled(
         _ touches: Set<UITouch>, with event: UIEvent
     ) {
-        panState?.touchesCancelled(
+        internalState?.touchesCancelled(
             touches: touches, event: event)
     }
     
-    // MARK: - State
-    
-    private func setPanState(_ newState: CanvasMultiGestureRecognizerState) {
-        panState?.onStateEnd()
-        
-        panState = newState
-        
-        newState.delegate = self
-        newState.onStateBegin()
+    override func reset() {
+        super.reset()
+        setInternalState(CanvasMultiGestureRecognizerWaitingState())
     }
     
 }
 
-// MARK: - State Delegate
+// MARK: - Gesture State Delegate
 
-extension CanvasMultiGestureRecognizer: CanvasMultiGestureRecognizerStateDelegate {
+extension CanvasMultiGestureRecognizer: CanvasMultiGestureRecognizerInternalStateDelegate {
     
-    func setState(_ newState: CanvasMultiGestureRecognizerState) {
-        setPanState(newState)
+    func setInternalState(_ newState: CanvasMultiGestureRecognizerInternalState) {
+        internalState?.onEnd()
+        internalState = newState
+        
+        newState.delegate = self
+        newState.onBegin()
     }
     
-    func onGestureBegan() { state = .began }
-    func onGestureEnded() { state = .ended }
-    func onGestureFailed() { state = .failed }
-    
-    func onBeginPan() {
-        panDelegate?.onBeginPan()
+    func setGestureRecognizerState(_ newState: UIGestureRecognizer.State) {
+        state = newState
     }
     
-    func onUpdatePan(
+    func onBeginGesture() {
+        gestureDelegate?.onBeginGesture()
+    }
+    
+    func onUpdateGesture(
         initialAnchorLocation: Vector,
         translation: Vector?,
         rotation: Scalar?,
         scale: Scalar?
     ) {
-        panDelegate?.onUpdatePan(
+        gestureDelegate?.onUpdateGesture(
             initialAnchorLocation: initialAnchorLocation,
             translation: translation,
             rotation: rotation,
             scale: scale)
     }
     
-    func onEndPan() {
-        panDelegate?.onEndPan()
+    func onEndGesture() {
+        gestureDelegate?.onEndGesture()
     }
     
 }

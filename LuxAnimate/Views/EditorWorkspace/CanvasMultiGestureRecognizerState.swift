@@ -5,37 +5,38 @@
 import UIKit
 
 private let translationDistanceThreshold: Scalar = 100
-private let scaleDistanceThreshold: Scalar = 100
-private let rotationDistanceThreshold: Scalar = 100
-private let rotationAngleThreshold: Scalar = .pi / 4
 
-protocol CanvasMultiGestureRecognizerStateDelegate: AnyObject {
+private let rotationDistanceThreshold: Scalar = 100
+private let rotationMaxAngleThreshold: Scalar = .pi / 4
+
+private let scaleDistanceThreshold: Scalar = 100
+
+protocol CanvasMultiGestureRecognizerInternalStateDelegate: AnyObject {
     
     var view: UIView? { get }
     var numberOfTouches: Int { get }
     
-    func setState(_ newState: CanvasMultiGestureRecognizerState)
+    func setInternalState(_ newState: CanvasMultiGestureRecognizerInternalState)
+    func setGestureRecognizerState(_ newState: UIGestureRecognizer.State)
     
-    func onGestureBegan()
-    func onGestureEnded()
-    func onGestureFailed()
+    func onBeginGesture()
     
-    func onBeginPan()
-    func onUpdatePan(
+    func onUpdateGesture(
         initialAnchorLocation: Vector,
         translation: Vector?,
         rotation: Scalar?,
         scale: Scalar?)
-    func onEndPan()
+    
+    func onEndGesture()
     
 }
 
-protocol CanvasMultiGestureRecognizerState: AnyObject {
+protocol CanvasMultiGestureRecognizerInternalState: AnyObject {
     
-    var delegate: CanvasMultiGestureRecognizerStateDelegate? { get set }
+    var delegate: CanvasMultiGestureRecognizerInternalStateDelegate? { get set }
     
-    func onStateBegin()
-    func onStateEnd()
+    func onBegin()
+    func onEnd()
     
     func touchesBegan(touches: Set<UITouch>, event: UIEvent)
     func touchesMoved(touches: Set<UITouch>, event: UIEvent)
@@ -44,10 +45,10 @@ protocol CanvasMultiGestureRecognizerState: AnyObject {
     
 }
 
-extension CanvasMultiGestureRecognizerState {
+extension CanvasMultiGestureRecognizerInternalState {
     
-    func onStateBegin() { }
-    func onStateEnd() { }
+    func onBegin() { }
+    func onEnd() { }
     
     func touchesBegan(touches: Set<UITouch>, event: UIEvent) { }
     func touchesMoved(touches: Set<UITouch>, event: UIEvent) { }
@@ -58,80 +59,45 @@ extension CanvasMultiGestureRecognizerState {
 
 // MARK: - Waiting
 
-class CanvasMultiGestureRecognizerWaitingState: CanvasMultiGestureRecognizerState {
+class CanvasMultiGestureRecognizerWaitingState: CanvasMultiGestureRecognizerInternalState {
     
-    weak var delegate: CanvasMultiGestureRecognizerStateDelegate?
+    weak var delegate: CanvasMultiGestureRecognizerInternalStateDelegate?
     
-    var activeTouches: [UITouch] = []
+    var currentTouches: [UITouch] = []
     
     func touchesBegan(
         touches: Set<UITouch>, event: UIEvent
     ) {
         if touches.contains(where: { $0.type != .direct }) {
-            delegate?.setState(
-                CanvasMultiGestureRecognizerInvalidState())
+            delegate?.setGestureRecognizerState(.failed)
         }
         
-        for touch in touches {
-            activeTouches.append(touch)
+        currentTouches += touches
+        
+        if currentTouches.count >= 2 {
+            let touch1 = currentTouches[0]
+            let touch2 = currentTouches[1]
             
-            if activeTouches.count >= 2 {
-                let touch1 = activeTouches[0]
-                let touch2 = activeTouches[1]
-                
-                delegate?.setState(
-                    CanvasMultiGestureRecognizerActiveState(
-                        touch1: touch1,
-                        touch2: touch2))
-            }
+            delegate?.setInternalState(
+                CanvasMultiGestureRecognizerActiveState(
+                    touch1: touch1,
+                    touch2: touch2))
         }
     }
     
     func touchesEnded(touches: Set<UITouch>, event: UIEvent) {
-        delegate?.setState(CanvasMultiGestureRecognizerWaitingState())
+        delegate?.setGestureRecognizerState(.failed)
     }
     
     func touchesCancelled(touches: Set<UITouch>, event: UIEvent) {
-        delegate?.setState(CanvasMultiGestureRecognizerWaitingState())
-    }
-    
-}
-
-// MARK: - Invalid
-
-class CanvasMultiGestureRecognizerInvalidState: CanvasMultiGestureRecognizerState {
-    
-    weak var delegate: CanvasMultiGestureRecognizerStateDelegate?
-    
-    func touchesEnded(
-        touches: Set<UITouch>, event: UIEvent
-    ) {
-        handleTouchEnd(touchCount: touches.count)
-    }
-    
-    func touchesCancelled(
-        touches: Set<UITouch>, event: UIEvent
-    ) {
-        handleTouchEnd(touchCount: touches.count)
-    }
-    
-    private func handleTouchEnd(touchCount: Int) {
-        let previousTouchCount = delegate?.numberOfTouches ?? 0
-        let remainingTouchCount = previousTouchCount - touchCount
-        
-        if remainingTouchCount <= 0 {
-            delegate?.onGestureFailed()
-            
-            delegate?.setState(
-                CanvasMultiGestureRecognizerWaitingState())
-        }
+        delegate?.setGestureRecognizerState(.failed)
     }
     
 }
 
 // MARK: - Active
 
-class CanvasMultiGestureRecognizerActiveState: CanvasMultiGestureRecognizerState {
+class CanvasMultiGestureRecognizerActiveState: CanvasMultiGestureRecognizerInternalState {
         
     struct TranslationState {
         var offset: Vector
@@ -143,7 +109,7 @@ class CanvasMultiGestureRecognizerActiveState: CanvasMultiGestureRecognizerState
         var baseDistance: Scalar
     }
     
-    weak var delegate: CanvasMultiGestureRecognizerStateDelegate?
+    weak var delegate: CanvasMultiGestureRecognizerInternalStateDelegate?
     
     private let touch1: UITouch
     private let touch2: UITouch
@@ -169,23 +135,32 @@ class CanvasMultiGestureRecognizerActiveState: CanvasMultiGestureRecognizerState
         let touch1CurrentPos = Vector(touch1.location(in: delegate?.view))
         let touch2CurrentPos = Vector(touch2.location(in: delegate?.view))
         
-        let initialAnchorLocation =
+        let initialAnchorPos =
             (touch1InitialPos + touch2InitialPos) / 2
-        let currentAnchorLocation =
+        let currentAnchorPos =
             (touch1CurrentPos + touch2CurrentPos) / 2
         
         let initialTouchDifference = touch2InitialPos - touch1InitialPos
         let currentTouchDifference = touch2CurrentPos - touch1CurrentPos
         
+//        let initialTouchAngle = atan2(
+//            -initialTouchDifference.y,
+//            initialTouchDifference.x)
+//        
+//        let currentTouchAngle = atan2(
+//            -currentTouchDifference.y,
+//            currentTouchDifference.x)
+        
         let initialTouchDistance = initialTouchDifference.length()
         let currentTouchDistance = currentTouchDifference.length()
         
+        // Output values
         let translation: Vector?
         var rotation: Scalar?
         var scale: Scalar?
         
         // Translation
-        let translationRaw = currentAnchorLocation - initialAnchorLocation
+        let translationRaw = currentAnchorPos - initialAnchorPos
         
         if translationState == nil {
 //            print("Translation raw: \(translationRaw.length())")
@@ -207,18 +182,18 @@ class CanvasMultiGestureRecognizerActiveState: CanvasMultiGestureRecognizerState
             translation = nil
         }
         
-        // Rotation. TODO: Fix math here
-        let rotationAngleRaw = initialTouchDifference
-            .angle(with: currentTouchDifference)
+        // Rotation
+        let rotationAngleRaw = currentTouchDifference
+            .angle(with: initialTouchDifference)
         
         if rotationState == nil {
-//            print("Rotation raw: \(rotationAngleRaw * .degreesPerRadian)")
+//            print(String(format: "Rotation raw: %0.2f", rotationAngleRaw * .degreesPerRadian))
             let distanceAngleThreshold =
                 rotationDistanceThreshold /
                 currentTouchDistance
             
             let currentAngleThreshold = min(
-                rotationAngleThreshold,
+                rotationMaxAngleThreshold,
                 distanceAngleThreshold)
             
 //            print("Threshold: \(currentAngleThreshold * .degreesPerRadian)")
@@ -272,8 +247,8 @@ class CanvasMultiGestureRecognizerActiveState: CanvasMultiGestureRecognizerState
         
         // Finalize
         if hasGestureBegun {
-            delegate?.onUpdatePan(
-                initialAnchorLocation: initialAnchorLocation,
+            delegate?.onUpdateGesture(
+                initialAnchorLocation: initialAnchorPos,
                 translation: translation,
                 rotation: rotation,
                 scale: scale)
@@ -281,11 +256,10 @@ class CanvasMultiGestureRecognizerActiveState: CanvasMultiGestureRecognizerState
     }
     
     func touchesEnded(touches: Set<UITouch>, event: UIEvent) {
-        delegate?.onGestureEnded()
-        delegate?.onEndPan()
-        
-        delegate?.setState(
-            CanvasMultiGestureRecognizerWaitingState())
+        if touches.contains(touch1) || touches.contains(touch2) {
+            delegate?.onEndGesture()
+            delegate?.setGestureRecognizerState(.ended)
+        }
     }
     
     func touchesCancelled(touches: Set<UITouch>, event: UIEvent) {
@@ -294,20 +268,11 @@ class CanvasMultiGestureRecognizerActiveState: CanvasMultiGestureRecognizerState
     
     private func beginGestureIfNecessary() {
         if !hasGestureBegun {
-            delegate?.onGestureBegan()
-            delegate?.onBeginPan()
             hasGestureBegun = true
+            
+            delegate?.onBeginGesture()
+            delegate?.setGestureRecognizerState(.began)
         }
     }
     
-}
-
-// MARK: - Geometry
-
-private extension Vector2 {
-    init(_ p: CGPoint) { self.init(x: p.x, y: p.y) }
-}
-
-private extension CGPoint {
-    init(_ v: Vector2) { self.init(x: v.x, y: v.y) }
 }

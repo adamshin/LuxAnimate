@@ -22,8 +22,13 @@ class EditorWorkspaceView: UIView {
             origin: .zero,
             size: canvasSize)
         
+        let imageView = UIImageView(image: UIImage(named: "pika"))
+        canvasView.addSubview(imageView)
+        imageView.pinEdges()
+        imageView.contentMode = .scaleAspectFill
+        
         addGestureRecognizer(panGesture)
-        panGesture.panDelegate = self
+        panGesture.gestureDelegate = self
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -40,13 +45,13 @@ class EditorWorkspaceView: UIView {
 
 // MARK: - Delegates
 
-extension EditorWorkspaceView: CanvasMultiGestureRecognizerPanDelegate {
+extension EditorWorkspaceView: CanvasMultiGestureRecognizerGestureDelegate {
     
-    func onBeginPan() {
+    func onBeginGesture() {
 //        print("Begin pan")
     }
     
-    func onUpdatePan(
+    func onUpdateGesture(
         initialAnchorLocation: Vector,
         translation: Vector?,
         rotation: Scalar?,
@@ -55,7 +60,7 @@ extension EditorWorkspaceView: CanvasMultiGestureRecognizerPanDelegate {
 //        print("Update pan")
     }
     
-    func onEndPan() {
+    func onEndGesture() {
 //        print("End pan")
     }
     
