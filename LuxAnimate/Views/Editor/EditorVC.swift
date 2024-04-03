@@ -132,8 +132,9 @@ class EditorVC: UIViewController {
                 assetID: drawing.assetID)
             
             Task(priority: .medium) {
-                let data = try? Data(contentsOf: url)
-                let image = UIImage(data: data ?? Data())
+                let data = try Data(contentsOf: url)
+                let image = try JXLDecoder.decode(data: data)
+                
                 await MainActor.run {
                     imageView.image = image
                 }

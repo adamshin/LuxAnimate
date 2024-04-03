@@ -38,7 +38,7 @@
     JxlPixelFormat pixelFormat = {
         4,
         JXL_TYPE_UINT8,
-        JXL_NATIVE_ENDIAN, 
+        JXL_BIG_ENDIAN,
         0
     };
     

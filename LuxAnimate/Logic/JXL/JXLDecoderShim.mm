@@ -10,6 +10,17 @@
 #import <vector>
 
 @implementation JXLDecoderShimOutput
+
+- (id)init
+{
+    self = [super init];
+    self.data = [[NSData alloc] init];
+    self.width = 0;
+    self.height = 0;
+    
+    return self;
+}
+
 @end
 
 @implementation JXLDecoderShim
@@ -22,7 +33,6 @@
     if (JXL_DEC_SUCCESS != JxlDecoderSubscribeEvents(
         dec.get(),
         JXL_DEC_BASIC_INFO |
-//        JXL_DEC_COLOR_ENCODING |
         JXL_DEC_FULL_IMAGE)
     ) {
         return NULL;
@@ -36,11 +46,18 @@
         return NULL;
     }
     
+    if (JXL_DEC_SUCCESS != JxlDecoderSetUnpremultiplyAlpha(
+        dec.get(),
+        JXL_TRUE)
+    ) {
+        return NULL;
+    }
+    
     JxlBasicInfo info;
     JxlPixelFormat format = {
         4,
-        JXL_TYPE_FLOAT,
-        JXL_NATIVE_ENDIAN,
+        JXL_TYPE_UINT8,
+        JXL_BIG_ENDIAN,
         0
     };
     
@@ -53,10 +70,13 @@
     
     JXLDecoderShimOutput *output = [[JXLDecoderShimOutput alloc] init];
     
-    for (;;) {
+    while (true) {
         JxlDecoderStatus status = JxlDecoderProcessInput(dec.get());
         
-        if (status == JXL_DEC_ERROR) {
+        if (status == JXL_DEC_SUCCESS) {
+            return output;
+            
+        } else if (status == JXL_DEC_ERROR) {
             fprintf(stderr, "Decoder error\n");
             return NULL;
             
@@ -79,25 +99,6 @@
             output.width = info.xsize;
             output.height = info.ysize;
             
-            // Don't care about color profile. Assuming sRGB
-            
-//        } else if (status == JXL_DEC_COLOR_ENCODING) {
-//            size_t icc_size;
-//            if (JXL_DEC_SUCCESS != JxlDecoderGetICCProfileSize(
-//                dec.get(), 
-//                JXL_COLOR_PROFILE_TARGET_DATA,
-//                &icc_size)
-//            ) {
-//                fprintf(stderr, "JxlDecoderGetICCProfileSize failed\n");
-//                return false;
-//            }
-//            icc_profile->resize(icc_size);
-//            if (JXL_DEC_SUCCESS != JxlDecoderGetColorAsICCProfile(
-//                                                                  dec.get(), JXL_COLOR_PROFILE_TARGET_DATA,
-//                                                                  icc_profile->data(), icc_profile->size())) {
-//                                                                      fprintf(stderr, "JxlDecoderGetColorAsICCProfile failed\n");
-//                                                                      return false;
-//                                                                  }
         } else if (status == JXL_DEC_NEED_IMAGE_OUT_BUFFER) {
             size_t bufferSize;
             if (JXL_DEC_SUCCESS !=
@@ -122,14 +123,9 @@
                 fprintf(stderr, "JxlDecoderSetImageOutBuffer failed\n");
                 return NULL;
             }
+            
         } else if (status == JXL_DEC_FULL_IMAGE) {
-            // Nothing to do. Do not yet return. If the image is an animation, more
-            // full frames may be decoded. This example only keeps the last one.
-        } else if (status == JXL_DEC_SUCCESS) {
-            // All decoding successfully finished.
-            // It's not required to call JxlDecoderReleaseInput(dec.get()) here since
-            // the decoder will be destroyed.
-            return output;
+            
         } else {
             fprintf(stderr, "Unknown decoder status\n");
             return NULL;

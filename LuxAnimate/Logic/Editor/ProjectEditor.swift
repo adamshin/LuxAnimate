@@ -250,8 +250,6 @@ class ProjectEditor {
         
         // Trim undo history
         trimUndoHistoryToLimit()
-        
-        print("Applied Edit")
     }
     
     // MARK: - Undo/Redo
@@ -356,8 +354,6 @@ class ProjectEditor {
         
         let newHistoryEntry = HistoryEntry(id: newHistoryEntryID)
         redoHistoryEntries.insert(newHistoryEntry, at: 0)
-        
-        print("Applied Undo. Undo \(undoHistoryEntries.count), Redo \(redoHistoryEntries.count)")
     }
     
     func applyRedo() throws {
@@ -371,8 +367,6 @@ class ProjectEditor {
         
         let newHistoryEntry = HistoryEntry(id: newHistoryEntryID)
         undoHistoryEntries.insert(newHistoryEntry, at: 0)
-        
-        print("Applied Redo. Undo \(undoHistoryEntries.count), Redo \(redoHistoryEntries.count)")
     }
     
 }
