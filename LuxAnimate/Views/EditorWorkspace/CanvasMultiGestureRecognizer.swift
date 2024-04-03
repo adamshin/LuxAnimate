@@ -13,9 +13,9 @@ protocol CanvasMultiGestureRecognizerGestureDelegate: AnyObject {
     
     func onUpdateGesture(
         initialAnchorLocation: Vector,
-        translation: Vector?,
-        rotation: Scalar?,
-        scale: Scalar?)
+        translation: Vector,
+        rotation: Scalar,
+        scale: Scalar)
     
     func onEndGesture()
     
@@ -69,18 +69,24 @@ class CanvasMultiGestureRecognizer: UIGestureRecognizer {
         setInternalState(CanvasMultiGestureRecognizerWaitingState())
     }
     
+    // MARK: - State
+    
+    private func setInternalState(_ newState: CanvasMultiGestureRecognizerInternalState) {
+        internalState?.onEnd()
+        internalState = newState
+        
+        newState.delegate = self
+        newState.onBegin()
+    }
+    
 }
 
 // MARK: - Gesture State Delegate
 
 extension CanvasMultiGestureRecognizer: CanvasMultiGestureRecognizerInternalStateDelegate {
     
-    func setInternalState(_ newState: CanvasMultiGestureRecognizerInternalState) {
-        internalState?.onEnd()
-        internalState = newState
-        
-        newState.delegate = self
-        newState.onBegin()
+    func setState(_ newState: CanvasMultiGestureRecognizerInternalState) {
+        setInternalState(newState)
     }
     
     func setGestureRecognizerState(_ newState: UIGestureRecognizer.State) {
@@ -93,9 +99,9 @@ extension CanvasMultiGestureRecognizer: CanvasMultiGestureRecognizerInternalStat
     
     func onUpdateGesture(
         initialAnchorLocation: Vector,
-        translation: Vector?,
-        rotation: Scalar?,
-        scale: Scalar?
+        translation: Vector,
+        rotation: Scalar,
+        scale: Scalar
     ) {
         gestureDelegate?.onUpdateGesture(
             initialAnchorLocation: initialAnchorLocation,

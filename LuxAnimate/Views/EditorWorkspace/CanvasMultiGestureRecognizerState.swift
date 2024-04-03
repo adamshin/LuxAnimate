@@ -4,28 +4,28 @@
 
 import UIKit
 
-private let translationDistanceThreshold: Scalar = 100
+private let translationDistanceThreshold: Scalar = 10
 
-private let rotationDistanceThreshold: Scalar = 100
-private let rotationMaxAngleThreshold: Scalar = .pi / 4
+private let rotationDistanceThreshold: Scalar = 40
+private let rotationMaxAngleThreshold: Scalar = .pi / 8
 
-private let scaleDistanceThreshold: Scalar = 100
+private let scaleDistanceThreshold: Scalar = 20
 
 protocol CanvasMultiGestureRecognizerInternalStateDelegate: AnyObject {
     
     var view: UIView? { get }
     var numberOfTouches: Int { get }
     
-    func setInternalState(_ newState: CanvasMultiGestureRecognizerInternalState)
+    func setState(_ newState: CanvasMultiGestureRecognizerInternalState)
     func setGestureRecognizerState(_ newState: UIGestureRecognizer.State)
     
     func onBeginGesture()
     
     func onUpdateGesture(
         initialAnchorLocation: Vector,
-        translation: Vector?,
-        rotation: Scalar?,
-        scale: Scalar?)
+        translation: Vector,
+        rotation: Scalar,
+        scale: Scalar)
     
     func onEndGesture()
     
@@ -78,7 +78,16 @@ class CanvasMultiGestureRecognizerWaitingState: CanvasMultiGestureRecognizerInte
             let touch1 = currentTouches[0]
             let touch2 = currentTouches[1]
             
-            delegate?.setInternalState(
+            let touch1Pos = Vector(touch1.location(in: delegate?.view))
+            let touch2Pos = Vector(touch2.location(in: delegate?.view))
+            let difference = touch2Pos - touch1Pos
+            
+            guard difference.length() > 10 else {
+                delegate?.setGestureRecognizerState(.failed)
+                return
+            }
+            
+            delegate?.setState(
                 CanvasMultiGestureRecognizerActiveState(
                     touch1: touch1,
                     touch2: touch2))
@@ -143,29 +152,19 @@ class CanvasMultiGestureRecognizerActiveState: CanvasMultiGestureRecognizerInter
         let initialTouchDifference = touch2InitialPos - touch1InitialPos
         let currentTouchDifference = touch2CurrentPos - touch1CurrentPos
         
-//        let initialTouchAngle = atan2(
-//            -initialTouchDifference.y,
-//            initialTouchDifference.x)
-//        
-//        let currentTouchAngle = atan2(
-//            -currentTouchDifference.y,
-//            currentTouchDifference.x)
-        
         let initialTouchDistance = initialTouchDifference.length()
         let currentTouchDistance = currentTouchDifference.length()
         
         // Output values
-        let translation: Vector?
-        var rotation: Scalar?
-        var scale: Scalar?
+        let translation: Vector
+        var rotation: Scalar
+        var scale: Scalar
         
         // Translation
         let translationRaw = currentAnchorPos - initialAnchorPos
         
         if translationState == nil {
-//            print("Translation raw: \(translationRaw.length())")
             if translationRaw.length() > translationDistanceThreshold {
-//                print("Translation triggered")
                 let offset =
                     translationRaw.inverse.normalized() *
                     translationDistanceThreshold
@@ -177,17 +176,17 @@ class CanvasMultiGestureRecognizerActiveState: CanvasMultiGestureRecognizerInter
         
         if let translationState {
             translation = translationRaw + translationState.offset
-//            print("Translation: \(translation!.length())")
         } else {
-            translation = nil
+            translation = .zero
         }
         
         // Rotation
         let rotationAngleRaw = currentTouchDifference
             .angle(with: initialTouchDifference)
         
+//        print(String(format: "Angle: %0.2f", rotationAngleRaw * .degreesPerRadian))
+        
         if rotationState == nil {
-//            print(String(format: "Rotation raw: %0.2f", rotationAngleRaw * .degreesPerRadian))
             let distanceAngleThreshold =
                 rotationDistanceThreshold /
                 currentTouchDistance
@@ -196,10 +195,7 @@ class CanvasMultiGestureRecognizerActiveState: CanvasMultiGestureRecognizerInter
                 rotationMaxAngleThreshold,
                 distanceAngleThreshold)
             
-//            print("Threshold: \(currentAngleThreshold * .degreesPerRadian)")
-            
             if abs(rotationAngleRaw) > currentAngleThreshold {
-//                print("Rotation triggered")
                 let offset = if rotationAngleRaw > 0 {
                     -currentAngleThreshold
                 } else {
@@ -212,26 +208,21 @@ class CanvasMultiGestureRecognizerActiveState: CanvasMultiGestureRecognizerInter
         
         if let rotationState {
             rotation = rotationAngleRaw + rotationState.offset
-//            print("Rotation: \(rotation! * .degreesPerRadian)")
         } else {
-            rotation = nil
+            rotation = 0
         }
         
         // Scale
         let scaleDistanceRaw = currentTouchDistance - initialTouchDistance
         
         if scaleState == nil {
-//            print("Current distance: \(currentTouchDistance)")
-//            print("Distance diff: \(scaleDistanceRaw)")
             if abs(scaleDistanceRaw) > scaleDistanceThreshold {
                 let offset = if scaleDistanceRaw > 0 {
-                    -scaleDistanceThreshold
-                } else {
                     scaleDistanceThreshold
+                } else {
+                    -scaleDistanceThreshold
                 }
-                let baseDistance = initialTouchDistance - offset
-                
-//                print("Scale triggered. Base distance: \(baseDistance)")
+                let baseDistance = max(initialTouchDistance + offset, 10)
                 
                 scaleState = ScaleState(baseDistance: baseDistance)
                 beginGestureIfNecessary()
@@ -240,9 +231,8 @@ class CanvasMultiGestureRecognizerActiveState: CanvasMultiGestureRecognizerInter
         
         if let scaleState {
             scale = currentTouchDistance / scaleState.baseDistance
-//            print("Scale: \(scale!)")
         } else {
-            scale = nil
+            scale = 1
         }
         
         // Finalize

@@ -54,10 +54,10 @@ extension Vector2 {
     }
 
     func angle(with v: Vector2) -> Scalar {
-        let t1 = normalized()
-        let t2 = v.normalized()
+        let t1 = self
+        let t2 = v
         let cross = t1.cross(t2)
-        let dot = max(-1, min(1, t1.dot(t2)))
+        let dot = t1.dot(t2)
         
         return atan2(cross, dot)
     }
