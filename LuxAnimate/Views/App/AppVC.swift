@@ -11,7 +11,8 @@ class AppVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        addChild(libraryVC, to: view)
+//        addChild(libraryVC, to: view)
+        addChild(EditorWorkspaceVC(), to: view)
     }
     
     override var prefersStatusBarHidden: Bool { true }
