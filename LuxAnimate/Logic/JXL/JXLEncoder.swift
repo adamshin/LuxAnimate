@@ -3,6 +3,7 @@
 //
 
 import UIKit
+import Accelerate
 
 struct JXLEncoder {
     
@@ -87,19 +88,63 @@ struct JXLEncoder {
                 x: 0, y: 0,
                 width: width, height: height))
         
-        // TODO: un-premultiply alpha!
-        
         guard let rawData = context.data else {
             throw ImageDataError.internal
         }
+        
         let data = Data(
             bytes: rawData,
             count: height * bytesPerRow)
         
-        return ImageData(
-            data: data,
+        let dataAdjusted = try unpremultiplyAlpha(
+            input: data,
             width: width,
             height: height)
+        
+        return ImageData(
+            data: dataAdjusted,
+            width: width,
+            height: height)
+    }
+    
+    private static func unpremultiplyAlpha(
+        input: Data,
+        width: Int,
+        height: Int
+    ) throws -> Data {
+        
+        let bytesPerPixel = 4
+        let rowByteCount = width * bytesPerPixel
+        let byteCount = width * height * bytesPerPixel
+        
+        guard input.count == byteCount else {
+            throw ImageDataError.internal
+        }
+        
+        var input = input
+        var output = Data(count: byteCount)
+        
+        input.withUnsafeMutableBytes { inputBytes in
+            output.withUnsafeMutableBytes { outputBytes in
+                var inputBuffer = vImage_Buffer(
+                    data: inputBytes.baseAddress,
+                    height: vImagePixelCount(height),
+                    width: vImagePixelCount(width),
+                    rowBytes: rowByteCount)
+                
+                var outputBuffer = vImage_Buffer(
+                    data: outputBytes.baseAddress,
+                    height: vImagePixelCount(height),
+                    width: vImagePixelCount(width),
+                    rowBytes: rowByteCount)
+                
+                vImageUnpremultiplyData_RGBA8888(
+                    &inputBuffer,
+                    &outputBuffer,
+                    vImage_Flags(kvImageNoFlags))
+            }
+        }
+        return output
     }
     
 }
