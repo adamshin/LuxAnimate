@@ -9,7 +9,7 @@ private let canvasSize = CGSize(width: 500, height: 500)
 private let minScale: Scalar = 0.5
 private let maxScale: Scalar = 10.0
 
-private let rotationSnapThreshold: Scalar = 5 * .radiansPerDegree
+private let rotationSnapThreshold: Scalar = 8 * .radiansPerDegree
 
 class EditorWorkspaceView: UIView {
     
