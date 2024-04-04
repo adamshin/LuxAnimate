@@ -4,9 +4,6 @@
 
 import Foundation
 
-private let rotationSnapThreshold: Scalar =
-    5 * .radiansPerDegree
-
 struct CanvasTransform {
     
     var translation: Vector2 = .zero
@@ -55,14 +52,32 @@ extension CanvasTransform {
         applyTranslation(anchor)
     }
     
-    mutating func snapRotation() {
+    mutating func snapTranslationToKeepRectInOrigin(
+        x: Scalar, y: Scalar,
+        width: Scalar, height: Scalar
+    ) {
+        let matrix = matrix()
+        let matrixInverse = matrix.inverse()
+        
+        let targetPointInRectSpace = matrixInverse * Vector.zero
+        
+        let closestRectPointInRectSpace = Vector(
+            x: clamp(targetPointInRectSpace.x, min: x, max: x + width),
+            y: clamp(targetPointInRectSpace.y, min: y, max: y + height))
+        
+        let closestRectPointInViewSpace = matrix * closestRectPointInRectSpace
+        
+        applyTranslation(-closestRectPointInViewSpace)
+    }
+    
+    mutating func snapRotation(threshold: Scalar) {
         let snapAngles: [Scalar] = (0...4)
             .map { Scalar($0) / 4 * .twoPi }
         
         for snapAngle in snapAngles {
             let distance = snapAngle - rotation
-            if abs(distance) < rotationSnapThreshold {
-                rotation = snapAngle
+            if abs(distance) < threshold {
+                applyRotation(distance, anchor: .zero)
                 break
             }
         }

@@ -7,7 +7,9 @@ import UIKit
 private let canvasSize = CGSize(width: 500, height: 500)
 
 private let minScale: Scalar = 0.5
-private let maxScale: Scalar = 5.0
+private let maxScale: Scalar = 10.0
+
+private let rotationSnapThreshold: Scalar = 5 * .radiansPerDegree
 
 class EditorWorkspaceView: UIView {
     
@@ -34,11 +36,13 @@ class EditorWorkspaceView: UIView {
         
         canvasView.image = UIImage(named: "pika")
         canvasView.contentMode = .scaleAspectFill
+        canvasView.clipsToBounds = true
         
         addGestureRecognizer(multiGesture)
         multiGesture.gestureDelegate = self
         
         addGestureRecognizer(panGesture)
+        panGesture.maximumNumberOfTouches = 1
         panGesture.addTarget(self, action: #selector(onPan))
     }
     
@@ -84,7 +88,7 @@ class EditorWorkspaceView: UIView {
         let matrix = transform.matrix()
         
         if animated {
-            UIView.animate(springDuration: 0.2) {
+            UIView.animate(springDuration: 0.25) {
                 canvasView.transform = matrix.cgAffineTransform
             }
         } else {
@@ -93,7 +97,15 @@ class EditorWorkspaceView: UIView {
     }
     
     private func snapCanvasTransform() {
-        baseCanvasTransform.snapRotation()
+        baseCanvasTransform.snapRotation(
+            threshold: rotationSnapThreshold)
+        
+        baseCanvasTransform.snapTranslationToKeepRectInOrigin(
+            x: -canvasSize.width / 2,
+            y: -canvasSize.height / 2,
+            width: canvasSize.width,
+            height: canvasSize.height)
+        
         setCanvasTransform(baseCanvasTransform, animated: true)
     }
     
@@ -124,7 +136,11 @@ class EditorWorkspaceView: UIView {
         
         newTransform.applyTranslation(translation)
         
-        // TODO: Adjust translation so image rect always stays onscreen
+//        newTransform.snapTranslationToKeepRectInOrigin(
+//            x: -canvasSize.width / 2,
+//            y: -canvasSize.height / 2,
+//            width: canvasSize.width, 
+//            height: canvasSize.height)
         
         self.modifiedCanvasTransform = newTransform
         setCanvasTransform(newTransform)
