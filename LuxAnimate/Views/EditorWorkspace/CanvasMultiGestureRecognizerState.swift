@@ -22,7 +22,7 @@ protocol CanvasMultiGestureRecognizerInternalStateDelegate: AnyObject {
     func onBeginGesture()
     
     func onUpdateGesture(
-        initialAnchorLocation: Vector,
+        anchorLocation: Vector,
         translation: Vector,
         rotation: Scalar,
         scale: Scalar)
@@ -144,9 +144,9 @@ class CanvasMultiGestureRecognizerActiveState: CanvasMultiGestureRecognizerInter
         let touch1CurrentPos = Vector(touch1.location(in: delegate?.view))
         let touch2CurrentPos = Vector(touch2.location(in: delegate?.view))
         
-        let initialAnchorPos =
+        let initialCenterPos =
             (touch1InitialPos + touch2InitialPos) / 2
-        let currentAnchorPos =
+        let currentCenterPos =
             (touch1CurrentPos + touch2CurrentPos) / 2
         
         let initialTouchDifference = touch2InitialPos - touch1InitialPos
@@ -161,7 +161,7 @@ class CanvasMultiGestureRecognizerActiveState: CanvasMultiGestureRecognizerInter
         var scale: Scalar
         
         // Translation
-        let translationRaw = currentAnchorPos - initialAnchorPos
+        let translationRaw = currentCenterPos - initialCenterPos
         
         if translationState == nil {
             if translationRaw.length() > translationDistanceThreshold {
@@ -181,10 +181,8 @@ class CanvasMultiGestureRecognizerActiveState: CanvasMultiGestureRecognizerInter
         }
         
         // Rotation
-        let rotationAngleRaw = currentTouchDifference
-            .angle(with: initialTouchDifference)
-        
-//        print(String(format: "Angle: %0.2f", rotationAngleRaw * .degreesPerRadian))
+        let rotationAngleRaw = initialTouchDifference
+            .angle(to: currentTouchDifference)
         
         if rotationState == nil {
             let distanceAngleThreshold =
@@ -238,7 +236,7 @@ class CanvasMultiGestureRecognizerActiveState: CanvasMultiGestureRecognizerInter
         // Finalize
         if hasGestureBegun {
             delegate?.onUpdateGesture(
-                initialAnchorLocation: initialAnchorPos,
+                anchorLocation: initialCenterPos,
                 translation: translation,
                 rotation: rotation,
                 scale: scale)

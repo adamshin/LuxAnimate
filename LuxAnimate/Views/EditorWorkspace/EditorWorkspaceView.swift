@@ -10,11 +10,11 @@ class EditorWorkspaceView: UIView {
     
     enum CanvasState {
         
-        case normal(transform: CanvasTransform)
+        case normal(transform: Matrix3)
         
         case gesture(
-            baseTransform: CanvasTransform,
-            gestureTransform: CanvasTransform)
+            baseTransform: Matrix3,
+            gestureTransform: Matrix3)
         
     }
     
@@ -22,7 +22,7 @@ class EditorWorkspaceView: UIView {
     private let multiGesture = CanvasMultiGestureRecognizer()
     
     private var canvasState: CanvasState =
-        .normal(transform: CanvasTransform())
+        .normal(transform: .identity)
     
     // MARK: - Initializer
     
@@ -60,25 +60,8 @@ class EditorWorkspaceView: UIView {
     
     // MARK: - Transform
     
-    private func applyTransformToCanvasView(
-        _ transform: CanvasTransform
-    ) {
-        var affineTransform = CGAffineTransform.identity
-        
-        affineTransform = affineTransform.translatedBy(
-            x: transform.translation.x,
-            y: transform.translation.y)
-        
-        affineTransform = affineTransform.rotated(
-            by: -transform.rotation)
-        
-        affineTransform = affineTransform.scaledBy(
-            x: transform.scale,
-            y: transform.scale)
-        
-        canvasView.transform = affineTransform
-        
-        print(transform.translation)
+    private func setCanvasTransform(_ transform: Matrix3) {
+        canvasView.transform = transform.cgAffineTransform
     }
     
 }
@@ -93,11 +76,11 @@ extension EditorWorkspaceView: CanvasMultiGestureRecognizerGestureDelegate {
         
         canvasState = .gesture(
             baseTransform: transform,
-            gestureTransform: CanvasTransform())
+            gestureTransform: .identity)
     }
     
     func onUpdateGesture(
-        initialAnchorLocation: Vector,
+        anchorLocation: Vector,
         translation: Vector,
         rotation: Scalar,
         scale: Scalar
@@ -108,19 +91,23 @@ extension EditorWorkspaceView: CanvasMultiGestureRecognizerGestureDelegate {
         ) = canvasState
         else { return }
         
-        let newGestureTransform = CanvasTransform(
+        let anchorLocationRelativeToCenter = Vector(
+            anchorLocation.x - bounds.width / 2,
+            anchorLocation.x - bounds.width / 2)
+        
+        let gestureTransform = gestureTransform(
+            anchorLocation: anchorLocationRelativeToCenter,
             translation: translation,
             rotation: rotation,
             scale: scale)
         
-        let canvasTransform = baseTransform
-            .applying(newGestureTransform)
+        let transform = gestureTransform * baseTransform
         
         canvasState = .gesture(
             baseTransform: baseTransform,
-            gestureTransform: newGestureTransform)
+            gestureTransform: gestureTransform)
         
-        applyTransformToCanvasView(canvasTransform)
+        setCanvasTransform(transform)
     }
     
     func onEndGesture() { 
@@ -130,10 +117,35 @@ extension EditorWorkspaceView: CanvasMultiGestureRecognizerGestureDelegate {
         ) = canvasState
         else { return }
         
-        let canvasTransform = baseTransform
-            .applying(gestureTransform)
-        
-        canvasState = .normal(transform: canvasTransform)
+        let transform = gestureTransform * baseTransform
+        canvasState = .normal(transform: transform)
     }
     
+}
+
+// MARK: - Gesture Transform
+
+private func gestureTransform(
+    anchorLocation: Vector,
+    translation: Vector,
+    rotation: Scalar,
+    scale: Scalar
+) -> Matrix3 {
+    
+    // Move anchor to origin
+    let t1 = Matrix3(translation: -anchorLocation)
+    
+    // Scale
+    var t2 = Matrix3(scale: Vector2(scale, scale))
+    
+    // Rotate
+    let t3 = Matrix3(rotation: rotation)
+    
+    // Move anchor back
+    let t4 = Matrix3(translation: anchorLocation)
+    
+    // Translate
+    let t5 = Matrix3(translation: translation)
+    
+    return t5 * t4 * t3 * t2 * t1
 }
