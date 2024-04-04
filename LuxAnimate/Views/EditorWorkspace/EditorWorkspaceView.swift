@@ -11,23 +11,13 @@ private let maxScale: Scalar = 5.0
 
 class EditorWorkspaceView: UIView {
     
-    enum CanvasState {
-        
-        case normal(transform: CanvasTransform)
-        
-        case gesture(
-            baseTransform: CanvasTransform,
-            modifiedTransform: CanvasTransform)
-        
-    }
-    
     private let canvasView = UIImageView()
     
     private let multiGesture = CanvasMultiGestureRecognizer()
     private let panGesture = UIPanGestureRecognizer()
     
-    private var canvasState: CanvasState =
-        .normal(transform: CanvasTransform())
+    private var baseCanvasTransform = CanvasTransform()
+    private var modifiedCanvasTransform: CanvasTransform?
     
     // MARK: - Initializer
     
@@ -87,20 +77,30 @@ class EditorWorkspaceView: UIView {
     
     // MARK: - Transform
     
-    private func setCanvasTransform(_ transform: CanvasTransform) {
+    private func setCanvasTransform(
+        _ transform: CanvasTransform,
+        animated: Bool = false
+    ) {
         let matrix = transform.matrix()
-        canvasView.transform = matrix.cgAffineTransform
+        
+        if animated {
+            UIView.animate(springDuration: 0.2) {
+                canvasView.transform = matrix.cgAffineTransform
+            }
+        } else {
+            canvasView.transform = matrix.cgAffineTransform
+        }
+    }
+    
+    private func snapCanvasTransform() {
+        baseCanvasTransform.snapRotation()
+        setCanvasTransform(baseCanvasTransform, animated: true)
     }
     
     // MARK: - Gestures
     
     private func beginGesture() {
-        guard case let .normal(transform) = canvasState
-        else { return }
-        
-        canvasState = .gesture(
-            baseTransform: transform,
-            modifiedTransform: transform)
+        modifiedCanvasTransform = baseCanvasTransform
     }
     
     private func updateGesture(
@@ -109,36 +109,34 @@ class EditorWorkspaceView: UIView {
         rotation: Scalar,
         scale: Scalar
     ) {
-        guard case let .gesture(baseTransform, _) = canvasState
-        else { return }
-        
         let anchor = Vector(
             anchorLocation.x - bounds.width / 2,
             anchorLocation.y - bounds.height / 2)
-//        let anchor = anchorLocation
         
-        let clampedScale = clamp(scale,
-            min: minScale / baseTransform.scale,
-            max: maxScale / baseTransform.scale)
+        var newTransform = baseCanvasTransform
         
-        var modifiedTransform = baseTransform
+        newTransform.applyScale(scale,
+            min: minScale,
+            max: maxScale,
+            anchor: anchor)
         
-        modifiedTransform.applyScale(clampedScale, anchor: anchor)
-        modifiedTransform.applyRotation(rotation, anchor: anchor)
-        modifiedTransform.applyTranslation(translation)
+        newTransform.applyRotation(rotation, anchor: anchor)
         
-        canvasState = .gesture(
-            baseTransform: baseTransform,
-            modifiedTransform: modifiedTransform)
+        newTransform.applyTranslation(translation)
         
-        setCanvasTransform(modifiedTransform)
+        // TODO: Adjust translation so image rect always stays onscreen
+        
+        self.modifiedCanvasTransform = newTransform
+        setCanvasTransform(newTransform)
     }
     
     func endGesture() {
-        guard case let .gesture(_, modifiedTransform) = canvasState
-        else { return }
+        guard let modifiedCanvasTransform else { return }
         
-        canvasState = .normal(transform: modifiedTransform)
+        baseCanvasTransform = modifiedCanvasTransform
+        self.modifiedCanvasTransform = nil
+        
+        snapCanvasTransform()
     }
     
 }

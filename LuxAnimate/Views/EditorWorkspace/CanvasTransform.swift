@@ -4,6 +4,9 @@
 
 import Foundation
 
+private let rotationSnapThreshold: Scalar =
+    5 * .radiansPerDegree
+
 struct CanvasTransform {
     
     var translation: Vector2 = .zero
@@ -15,23 +18,54 @@ struct CanvasTransform {
 extension CanvasTransform {
     
     mutating func applyTranslation(
-        _ d: Vector2
+        _ dTranslation: Vector2
     ) {
-        translation += d
+        translation += dTranslation
     }
     
-    mutating func applyRotation(_ d: Scalar, anchor: Vector2) {
+    mutating func applyRotation(
+        _ dRotation: Scalar,
+        anchor: Vector2
+    ) {
         applyTranslation(-anchor)
-        rotation += d
-        translation = translation.rotated(by: d)
+        
+        rotation = wrap(rotation + dRotation, to: .twoPi)
+        translation = translation.rotated(by: dRotation)
+        
         applyTranslation(anchor)
     }
     
-    mutating func applyScale(_ d: Scalar, anchor: Vector2) {
+    mutating func applyScale(
+        _ dScale: Scalar,
+        min: Scalar,
+        max: Scalar,
+        anchor: Vector2
+    ) {
+        let newScale = clamp(
+            scale * dScale,
+            min: min,
+            max: max)
+        let scaleFactor = newScale / scale
+        
         applyTranslation(-anchor)
-        scale *= d
-        translation *= d
+        
+        scale *= scaleFactor
+        translation *= scaleFactor
+        
         applyTranslation(anchor)
+    }
+    
+    mutating func snapRotation() {
+        let snapAngles: [Scalar] = (0...4)
+            .map { Scalar($0) / 4 * .twoPi }
+        
+        for snapAngle in snapAngles {
+            let distance = snapAngle - rotation
+            if abs(distance) < rotationSnapThreshold {
+                rotation = snapAngle
+                break
+            }
+        }
     }
     
     func matrix() -> Matrix3 {
