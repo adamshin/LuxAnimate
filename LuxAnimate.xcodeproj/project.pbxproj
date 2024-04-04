@@ -10,6 +10,7 @@
 		660CD1302BA92FF500C8C7B5 /* ProjectEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660CD12F2BA92FF500C8C7B5 /* ProjectEditor.swift */; };
 		660CD1332BAE4D0E00C8C7B5 /* JSONFileCoders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660CD1322BAE4D0E00C8C7B5 /* JSONFileCoders.swift */; };
 		6614C1D12BB8AD93000FCC78 /* JXLDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6614C1D02BB8AD93000FCC78 /* JXLDecoder.swift */; };
+		661B18962BBF3C4B009F0961 /* EditorVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 661B18952BBF3C4B009F0961 /* EditorVC.swift */; };
 		6632594C2BB66C1A00460F70 /* JXLEncoderShim.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6632594B2BB66C1A00460F70 /* JXLEncoderShim.mm */; };
 		6632594E2BB6725B00460F70 /* JXLEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6632594D2BB6725B00460F70 /* JXLEncoder.swift */; };
 		6632595F2BB6E94E00460F70 /* libjxl.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6632595E2BB6E94E00460F70 /* libjxl.xcframework */; };
@@ -43,13 +44,14 @@
 		66D084892BA4060E00EB8556 /* ProjectManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D084872BA4060E00EB8556 /* ProjectManifest.swift */; };
 		66D0848A2BA4060E00EB8556 /* PixelSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D084882BA4060E00EB8556 /* PixelSize.swift */; };
 		66D0848C2BA55B4300EB8556 /* LibraryManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0848B2BA55B4300EB8556 /* LibraryManifest.swift */; };
-		66D0848F2BA56FB400EB8556 /* EditorVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0848E2BA56FB400EB8556 /* EditorVC.swift */; };
+		66D0848F2BA56FB400EB8556 /* OldEditorVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0848E2BA56FB400EB8556 /* OldEditorVC.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		660CD12F2BA92FF500C8C7B5 /* ProjectEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectEditor.swift; sourceTree = "<group>"; };
 		660CD1322BAE4D0E00C8C7B5 /* JSONFileCoders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONFileCoders.swift; sourceTree = "<group>"; };
 		6614C1D02BB8AD93000FCC78 /* JXLDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JXLDecoder.swift; sourceTree = "<group>"; };
+		661B18952BBF3C4B009F0961 /* EditorVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorVC.swift; sourceTree = "<group>"; };
 		663259492BB66A3300460F70 /* JXLEncoderShim.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JXLEncoderShim.h; sourceTree = "<group>"; };
 		6632594A2BB66BB300460F70 /* BridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BridgingHeader.h; sourceTree = "<group>"; };
 		6632594B2BB66C1A00460F70 /* JXLEncoderShim.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = JXLEncoderShim.mm; sourceTree = "<group>"; };
@@ -88,7 +90,7 @@
 		66D084872BA4060E00EB8556 /* ProjectManifest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProjectManifest.swift; sourceTree = "<group>"; };
 		66D084882BA4060E00EB8556 /* PixelSize.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PixelSize.swift; sourceTree = "<group>"; };
 		66D0848B2BA55B4300EB8556 /* LibraryManifest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryManifest.swift; sourceTree = "<group>"; };
-		66D0848E2BA56FB400EB8556 /* EditorVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorVC.swift; sourceTree = "<group>"; };
+		66D0848E2BA56FB400EB8556 /* OldEditorVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OldEditorVC.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -338,7 +340,8 @@
 		66D0848D2BA56E7800EB8556 /* Editor */ = {
 			isa = PBXGroup;
 			children = (
-				66D0848E2BA56FB400EB8556 /* EditorVC.swift */,
+				661B18952BBF3C4B009F0961 /* EditorVC.swift */,
+				66D0848E2BA56FB400EB8556 /* OldEditorVC.swift */,
 			);
 			path = Editor;
 			sourceTree = "<group>";
@@ -451,11 +454,12 @@
 				6662D88F2BBD1F2200B4C1D4 /* CanvasMultiGestureRecognizerState.swift in Sources */,
 				660CD1332BAE4D0E00C8C7B5 /* JSONFileCoders.swift in Sources */,
 				66D0843F2BA3840C00EB8556 /* SceneDelegate.swift in Sources */,
-				66D0848F2BA56FB400EB8556 /* EditorVC.swift in Sources */,
+				66D0848F2BA56FB400EB8556 /* OldEditorVC.swift in Sources */,
 				6632594E2BB6725B00460F70 /* JXLEncoder.swift in Sources */,
 				66D084702BA3CEC300EB8556 /* Math.swift in Sources */,
 				6632594C2BB66C1A00460F70 /* JXLEncoderShim.mm in Sources */,
 				6614C1D12BB8AD93000FCC78 /* JXLDecoder.swift in Sources */,
+				661B18962BBF3C4B009F0961 /* EditorVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -598,7 +602,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -635,7 +638,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;

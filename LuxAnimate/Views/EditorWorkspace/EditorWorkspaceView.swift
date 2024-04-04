@@ -4,12 +4,17 @@
 
 import UIKit
 
-private let canvasSize = CGSize(width: 500, height: 500)
+private let canvasSize = CGSize(
+    width: 1920,
+    height: 1080)
 
-private let minScale: Scalar = 0.5
+private let minScale: Scalar = 0.1
 private let maxScale: Scalar = 10.0
 
-private let rotationSnapThreshold: Scalar = 8 * .radiansPerDegree
+private let scalePixelateThreshold: Scalar = 1.0
+
+private let rotationSnapThreshold: Scalar = 
+    8 * .radiansPerDegree
 
 class EditorWorkspaceView: UIView {
     
@@ -25,7 +30,7 @@ class EditorWorkspaceView: UIView {
     
     init() {
         super.init(frame: .zero)
-        backgroundColor = UIColor(white: 0.3, alpha: 1)
+        backgroundColor = .editorBackground
         
         addSubview(canvasView)
         canvasView.backgroundColor = .white
@@ -34,7 +39,7 @@ class EditorWorkspaceView: UIView {
             origin: .zero,
             size: canvasSize)
         
-        canvasView.image = UIImage(named: "pika")
+        canvasView.image = .sampleCanvas
         canvasView.contentMode = .scaleAspectFill
         canvasView.clipsToBounds = true
         
@@ -43,6 +48,7 @@ class EditorWorkspaceView: UIView {
         
         addGestureRecognizer(panGesture)
         panGesture.maximumNumberOfTouches = 1
+        panGesture.delegate = self
         panGesture.addTarget(self, action: #selector(onPan))
     }
     
@@ -85,10 +91,16 @@ class EditorWorkspaceView: UIView {
         _ transform: CanvasTransform,
         animated: Bool = false
     ) {
+        if transform.scale >= scalePixelateThreshold {
+            canvasView.layer.magnificationFilter = .nearest
+        } else {
+            canvasView.layer.magnificationFilter = .linear
+        }
+        
         let matrix = transform.matrix()
         
         if animated {
-            UIView.animate(springDuration: 0.25) {
+            UIView.animate(springDuration: 0.3) {
                 canvasView.transform = matrix.cgAffineTransform
             }
         } else {
@@ -136,23 +148,35 @@ class EditorWorkspaceView: UIView {
         
         newTransform.applyTranslation(translation)
         
-//        newTransform.snapTranslationToKeepRectInOrigin(
-//            x: -canvasSize.width / 2,
-//            y: -canvasSize.height / 2,
-//            width: canvasSize.width, 
-//            height: canvasSize.height)
-        
         self.modifiedCanvasTransform = newTransform
         setCanvasTransform(newTransform)
     }
     
-    func endGesture() {
+    private func endGesture() {
         guard let modifiedCanvasTransform else { return }
         
         baseCanvasTransform = modifiedCanvasTransform
         self.modifiedCanvasTransform = nil
         
         snapCanvasTransform()
+    }
+    
+    // MARK: - Interface
+    
+    func fitCanvasToBounds(animated: Bool) {
+        guard modifiedCanvasTransform == nil else { return }
+        
+        let xScaleToFit = bounds.width / canvasSize.width
+        let yScaleToFit = bounds.height / canvasSize.height
+        
+        let scale = min(xScaleToFit, yScaleToFit)
+        
+        baseCanvasTransform = CanvasTransform(
+            translation: .zero,
+            rotation: 0,
+            scale: scale)
+        
+        setCanvasTransform(baseCanvasTransform, animated: animated)
     }
     
 }
@@ -180,6 +204,20 @@ extension EditorWorkspaceView: CanvasMultiGestureRecognizerGestureDelegate {
     
     func onEndGesture() { 
         endGesture()
+    }
+    
+}
+
+extension EditorWorkspaceView: UIGestureRecognizerDelegate {
+    
+    func gestureRecognizer(
+        _ gestureRecognizer: UIGestureRecognizer,
+        shouldReceive touch: UITouch
+    ) -> Bool {
+        if gestureRecognizer == panGesture {
+            return touch.type == .direct
+        }
+        return true
     }
     
 }

@@ -12,7 +12,7 @@ class AppVC: UIViewController {
         super.viewDidLoad()
         
 //        addChild(libraryVC, to: view)
-        addChild(EditorWorkspaceVC(), to: view)
+        addChild(EditorVC(projectID: ""), to: view)
     }
     
     override var prefersStatusBarHidden: Bool { true }
