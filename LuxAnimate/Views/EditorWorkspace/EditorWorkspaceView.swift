@@ -7,7 +7,7 @@ import UIKit
 private let canvasSize = CGSize(width: 500, height: 500)
 
 private let minScale: Scalar = 0.5
-private let maxScale: Scalar = 3.0
+private let maxScale: Scalar = 5.0
 
 class EditorWorkspaceView: UIView {
     
@@ -22,7 +22,9 @@ class EditorWorkspaceView: UIView {
     }
     
     private let canvasView = UIImageView()
+    
     private let multiGesture = CanvasMultiGestureRecognizer()
+    private let panGesture = UIPanGestureRecognizer()
     
     private var canvasState: CanvasState =
         .normal(transform: CanvasTransform())
@@ -45,6 +47,9 @@ class EditorWorkspaceView: UIView {
         
         addGestureRecognizer(multiGesture)
         multiGesture.gestureDelegate = self
+        
+        addGestureRecognizer(panGesture)
+        panGesture.addTarget(self, action: #selector(onPan))
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -59,6 +64,27 @@ class EditorWorkspaceView: UIView {
             y: bounds.midY)
     }
     
+    // MARK: - Handlers
+    
+    @objc private func onPan() {
+        switch panGesture.state {
+        case .began:
+            beginGesture()
+            
+        case .changed:
+            let translation = Vector(panGesture.translation(in: self))
+            
+            updateGesture(
+                anchorLocation: .zero,
+                translation: translation,
+                rotation: 0,
+                scale: 1)
+            
+        default:
+            endGesture()
+        }
+    }
+    
     // MARK: - Transform
     
     private func setCanvasTransform(_ transform: CanvasTransform) {
@@ -66,13 +92,9 @@ class EditorWorkspaceView: UIView {
         canvasView.transform = matrix.cgAffineTransform
     }
     
-}
-
-// MARK: - Delegates
-
-extension EditorWorkspaceView: CanvasMultiGestureRecognizerGestureDelegate {
+    // MARK: - Gestures
     
-    func onBeginGesture() {
+    private func beginGesture() {
         guard case let .normal(transform) = canvasState
         else { return }
         
@@ -81,7 +103,7 @@ extension EditorWorkspaceView: CanvasMultiGestureRecognizerGestureDelegate {
             modifiedTransform: transform)
     }
     
-    func onUpdateGesture(
+    private func updateGesture(
         anchorLocation: Vector,
         translation: Vector,
         rotation: Scalar,
@@ -112,11 +134,38 @@ extension EditorWorkspaceView: CanvasMultiGestureRecognizerGestureDelegate {
         setCanvasTransform(modifiedTransform)
     }
     
-    func onEndGesture() { 
+    func endGesture() {
         guard case let .gesture(_, modifiedTransform) = canvasState
         else { return }
         
         canvasState = .normal(transform: modifiedTransform)
+    }
+    
+}
+
+// MARK: - Delegates
+
+extension EditorWorkspaceView: CanvasMultiGestureRecognizerGestureDelegate {
+    
+    func onBeginGesture() {
+        beginGesture()
+    }
+    
+    func onUpdateGesture(
+        anchorLocation: Vector,
+        translation: Vector,
+        rotation: Scalar,
+        scale: Scalar
+    ) {
+        updateGesture(
+            anchorLocation: anchorLocation,
+            translation: translation,
+            rotation: rotation,
+            scale: scale)
+    }
+    
+    func onEndGesture() { 
+        endGesture()
     }
     
 }
