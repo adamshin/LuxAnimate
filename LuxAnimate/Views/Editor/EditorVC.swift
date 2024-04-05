@@ -34,7 +34,7 @@ class EditorVC: UIViewController {
         addChild(workspaceVC, to: view)
         
         let topBar = UIView()
-        view.addSubview(topBar)
+//        view.addSubview(topBar)
         topBar.pinEdges([.horizontal, .top])
         topBar.pinHeight(to: 48)
         topBar.backgroundColor = .editorBar
@@ -48,7 +48,7 @@ class EditorVC: UIViewController {
         topBarShadow.pinHeight(to: 0.5)
         
         let bottomBar = UIView()
-        view.addSubview(bottomBar)
+//        view.addSubview(bottomBar)
         bottomBar.pinEdges([.horizontal, .bottom])
         bottomBar.pinHeight(to: 48)
         bottomBar.backgroundColor = .editorBar
@@ -70,7 +70,7 @@ class EditorVC: UIViewController {
             self?.onSelectResetCanvas()
         }
         
-        topBar.addSubview(resetButton)
+//        topBar.addSubview(resetButton)
         resetButton.pin(.centerY)
         resetButton.pinEdges(.trailing, padding: 24)
     }

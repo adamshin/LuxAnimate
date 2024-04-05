@@ -11,6 +11,8 @@ private let rotationMaxAngleThreshold: Scalar = .pi / 8
 
 private let scaleDistanceThreshold: Scalar = 20
 
+private let pinchFlickVelocityThreshold: Scalar = 2000
+
 protocol CanvasMultiGestureRecognizerInternalStateDelegate: AnyObject {
     
     var view: UIView? { get }
@@ -27,7 +29,7 @@ protocol CanvasMultiGestureRecognizerInternalStateDelegate: AnyObject {
         rotation: Scalar,
         scale: Scalar)
     
-    func onEndGesture()
+    func onEndGesture(pinchFlickIn: Bool)
     
 }
 
@@ -111,11 +113,17 @@ class CanvasMultiGestureRecognizerActiveState: CanvasMultiGestureRecognizerInter
     struct TranslationState {
         var offset: Vector
     }
+    
     struct RotationState {
         var offset: Scalar
     }
+    
     struct ScaleState {
-        var baseDistance: Scalar
+        var baseTouchDistance: Scalar
+        
+        var lastTimestamp: TimeInterval?
+        var lastTouchDistance: Scalar?
+        var pinchVelocity: Scalar?
     }
     
     weak var delegate: CanvasMultiGestureRecognizerInternalStateDelegate?
@@ -220,15 +228,35 @@ class CanvasMultiGestureRecognizerActiveState: CanvasMultiGestureRecognizerInter
                 } else {
                     -scaleDistanceThreshold
                 }
-                let baseDistance = max(initialTouchDistance + offset, 10)
+                let baseTouchDistance = max(initialTouchDistance + offset, 10)
                 
-                scaleState = ScaleState(baseDistance: baseDistance)
+                scaleState = ScaleState(
+                    baseTouchDistance: baseTouchDistance,
+                    lastTimestamp: nil,
+                    lastTouchDistance: nil,
+                    pinchVelocity: nil)
+                
                 beginGestureIfNecessary()
             }
         }
         
         if let scaleState {
-            scale = currentTouchDistance / scaleState.baseDistance
+            let currentTimestamp = max(touch1.timestamp, touch2.timestamp)
+            
+            if let lastTimestamp = scaleState.lastTimestamp,
+                let lastTouchDistance = scaleState.lastTouchDistance
+            {
+                let timeDelta = currentTimestamp - lastTimestamp
+                let touchDistanceDelta = currentTouchDistance - lastTouchDistance
+                let pinchVelocity = touchDistanceDelta / timeDelta
+                
+                self.scaleState?.pinchVelocity = pinchVelocity
+            }
+            self.scaleState?.lastTimestamp = currentTimestamp
+            self.scaleState?.lastTouchDistance = currentTouchDistance
+            
+            scale = currentTouchDistance / scaleState.baseTouchDistance
+            
         } else {
             scale = 1
         }
@@ -244,10 +272,24 @@ class CanvasMultiGestureRecognizerActiveState: CanvasMultiGestureRecognizerInter
     }
     
     func touchesEnded(touches: Set<UITouch>, event: UIEvent) {
-        if touches.contains(touch1) || touches.contains(touch2) {
-            delegate?.onEndGesture()
-            delegate?.setGestureRecognizerState(.ended)
+        guard touches.contains(touch1) || touches.contains(touch2)
+        else { return }
+        
+        let pinchFlickIn: Bool
+        if let pinchVelocity = scaleState?.pinchVelocity {
+//            print(String(format: "Pinch velocity: %0.2f", pinchVelocity))
+            
+            if pinchVelocity < -pinchFlickVelocityThreshold {
+                pinchFlickIn = true
+            } else {
+                pinchFlickIn = false
+            }
+        } else {
+            pinchFlickIn = false
         }
+        
+        delegate?.onEndGesture(pinchFlickIn: pinchFlickIn)
+        delegate?.setGestureRecognizerState(.ended)
     }
     
     func touchesCancelled(touches: Set<UITouch>, event: UIEvent) {

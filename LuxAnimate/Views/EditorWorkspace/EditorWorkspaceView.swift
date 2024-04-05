@@ -81,7 +81,7 @@ class EditorWorkspaceView: UIView {
                 scale: 1)
             
         default:
-            endGesture()
+            endGesture(pinchFlickIn: false)
         }
     }
     
@@ -89,7 +89,8 @@ class EditorWorkspaceView: UIView {
     
     private func setCanvasTransform(
         _ transform: CanvasTransform,
-        animated: Bool = false
+        animated: Bool = false,
+        animDuration: CGFloat = 0.3
     ) {
         if transform.scale >= scalePixelateThreshold {
             canvasView.layer.magnificationFilter = .nearest
@@ -100,7 +101,7 @@ class EditorWorkspaceView: UIView {
         let matrix = transform.matrix()
         
         if animated {
-            UIView.animate(springDuration: 0.3) {
+            UIView.animate(springDuration: animDuration) {
                 canvasView.transform = matrix.cgAffineTransform
             }
         } else {
@@ -152,31 +153,48 @@ class EditorWorkspaceView: UIView {
         setCanvasTransform(newTransform)
     }
     
-    private func endGesture() {
+    private func endGesture(pinchFlickIn: Bool) {
         guard let modifiedCanvasTransform else { return }
         
-        baseCanvasTransform = modifiedCanvasTransform
-        self.modifiedCanvasTransform = nil
-        
-        snapCanvasTransform()
+        if pinchFlickIn {
+            baseCanvasTransform = canvasTransformFittingToBounds()
+            self.modifiedCanvasTransform = nil
+            
+            setCanvasTransform(
+                baseCanvasTransform,
+                animated: true,
+                animDuration: 0.4)
+            
+        } else {
+            baseCanvasTransform = modifiedCanvasTransform
+            self.modifiedCanvasTransform = nil
+            
+            snapCanvasTransform()
+        }
     }
     
     // MARK: - Interface
     
-    func fitCanvasToBounds(animated: Bool) {
-        guard modifiedCanvasTransform == nil else { return }
-        
+    func canvasTransformFittingToBounds() -> CanvasTransform {
         let xScaleToFit = bounds.width / canvasSize.width
         let yScaleToFit = bounds.height / canvasSize.height
         
         let scale = min(xScaleToFit, yScaleToFit)
         
-        baseCanvasTransform = CanvasTransform(
+        return CanvasTransform(
             translation: .zero,
             rotation: 0,
             scale: scale)
+    }
+    
+    func fitCanvasToBounds(animated: Bool) {
+        guard modifiedCanvasTransform == nil else { return }
         
-        setCanvasTransform(baseCanvasTransform, animated: animated)
+        baseCanvasTransform = canvasTransformFittingToBounds()
+        
+        setCanvasTransform(
+            baseCanvasTransform,
+            animated: animated)
     }
     
 }
@@ -202,8 +220,8 @@ extension EditorWorkspaceView: CanvasMultiGestureRecognizerGestureDelegate {
             scale: scale)
     }
     
-    func onEndGesture() { 
-        endGesture()
+    func onEndGesture(pinchFlickIn: Bool) {
+        endGesture(pinchFlickIn: pinchFlickIn)
     }
     
 }

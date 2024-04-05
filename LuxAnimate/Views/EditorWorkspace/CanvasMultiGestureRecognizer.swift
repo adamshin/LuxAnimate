@@ -17,7 +17,7 @@ protocol CanvasMultiGestureRecognizerGestureDelegate: AnyObject {
         rotation: Scalar,
         scale: Scalar)
     
-    func onEndGesture()
+    func onEndGesture(pinchFlickIn: Bool)
     
 }
 
@@ -110,8 +110,8 @@ extension CanvasMultiGestureRecognizer: CanvasMultiGestureRecognizerInternalStat
             scale: scale)
     }
     
-    func onEndGesture() {
-        gestureDelegate?.onEndGesture()
+    func onEndGesture(pinchFlickIn: Bool) {
+        gestureDelegate?.onEndGesture(pinchFlickIn: pinchFlickIn)
     }
     
 }
