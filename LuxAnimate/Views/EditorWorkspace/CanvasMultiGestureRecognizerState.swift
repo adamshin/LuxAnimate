@@ -11,7 +11,7 @@ private let rotationMaxAngleThreshold: Scalar = .pi / 8
 
 private let scaleDistanceThreshold: Scalar = 20
 
-private let pinchFlickVelocityThreshold: Scalar = 2000
+private let pinchFlickVelocityThreshold: Scalar = 1800
 
 protocol CanvasMultiGestureRecognizerInternalStateDelegate: AnyObject {
     
