@@ -6,13 +6,13 @@ import UIKit
 
 protocol LibraryContentVCDelegate: AnyObject {
     func onSelectCreateProject()
-    func onSelectProject(_ project: LibraryManager.Project)
+    func onSelectProject(_ project: LibraryManager.LibraryProject)
 }
 
 extension LibraryContentVC {
     
     struct Item {
-        var project: LibraryManager.Project
+        var project: LibraryManager.LibraryProject
     }
     
 }

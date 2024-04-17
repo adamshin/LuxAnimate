@@ -6,7 +6,7 @@ import Foundation
 
 struct LibraryManager {
     
-    struct Project {
+    struct LibraryProject {
         var id: String
         var url: URL
         var name: String
@@ -63,10 +63,10 @@ struct LibraryManager {
     
     // MARK: - Projects
     
-    func getProjects() throws -> [Project] {
+    func getProjects() throws -> [LibraryProject] {
         let libraryManifest = try getLibraryManifest()
         
-        var projects: [Project] = []
+        var projects: [LibraryProject] = []
         
         for manifestProject in libraryManifest.projects {
             let projectID = manifestProject.id
@@ -81,11 +81,11 @@ struct LibraryManager {
             else { continue }
             
             guard let projectManifest = try? decoder.decode(
-                ProjectManifest.self,
+                Project.Manifest.self,
                 from: projectManifestData)
             else { continue }
             
-            let project = Project(
+            let project = LibraryProject(
                 id: projectID,
                 url: projectURL,
                 name: projectManifest.name)
@@ -108,15 +108,24 @@ struct LibraryManager {
             withIntermediateDirectories: false)
         
         let now = Date()
-        let canvasSize = PixelSize(width: 1000, height: 1000)
         
-        let projectManifest = ProjectManifest(
+        let metadata = Project.Metadata(
+            contentFrameWidth: 1920,
+            contentFrameHeight: 1920,
+            viewportAspectRatioWidth: 16,
+            viewportAspectRatioHeight: 9,
+            frameRate: 24)
+        
+        let projectManifest = Project.Manifest(
             name: "New Project",
             createdAt: now,
             modifiedAt: now,
-            canvasSize: canvasSize,
-            referencedAssetIDs: [],
-            drawings: [])
+            metadata: metadata,
+            timeline: Project.Timeline(
+                animationLayers: [],
+                drawings: []), 
+            assets: Project.Assets(
+                assetIDs: []))
         
         let projectManifestData = try encoder.encode(projectManifest)
         try projectManifestData.write(to: projectManifestURL)

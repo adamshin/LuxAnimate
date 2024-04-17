@@ -25,7 +25,7 @@ class OldEditorVC: UIViewController {
     private let infoLabel = UILabel()
     private var imageViews: [UIImageView] = []
     
-    // MARK: - Initializer
+    // MARK: - Init
     
     init(projectID: String) {
         self.projectID = projectID
@@ -118,7 +118,7 @@ class OldEditorVC: UIViewController {
         infoLabel.text = """
             Name: \(projectManifest.name)
             Created: \(projectManifest.createdAt)
-            Drawings: \(projectManifest.drawings.count)
+            Drawings: \(projectManifest.timeline.drawings.count)
             """
         
         undoButton.isEnabled = editor.isUndoAvailable
@@ -126,20 +126,20 @@ class OldEditorVC: UIViewController {
         
         imageViews.forEach { $0.image = nil }
         
-        for (drawing, imageView) in zip(projectManifest.drawings, imageViews) {
-            let url = FileUrlHelper().projectAssetURL(
-                projectID: projectID,
-                assetID: drawing.assetID)
-            
-            Task(priority: .medium) {
-                let data = try Data(contentsOf: url)
-                let image = try JXLDecoder.decode(data: data)
-                
-                await MainActor.run {
-                    imageView.image = image
-                }
-            }
-        }
+//        for (drawing, imageView) in zip(projectManifest.timeline.drawings, imageViews) {
+//            let url = FileUrlHelper().projectAssetURL(
+//                projectID: projectID,
+//                assetID: drawing.imageAssetID)
+//            
+//            Task(priority: .medium) {
+//                let data = try Data(contentsOf: url)
+//                let image = try JXLDecoder.decode(data: data)
+//                
+//                await MainActor.run {
+//                    imageView.image = image
+//                }
+//            }
+//        }
     }
     
     // MARK: - Handlers
@@ -192,48 +192,48 @@ class OldEditorVC: UIViewController {
     // MARK: - Editing
     
     private func addDrawing(imageData: Data) {
-        guard let editor else { return }
+//        guard let editor else { return }
+//        
+//        let newAssetID = UUID().uuidString
+//        let newAsset = ProjectEditor.NewAsset(
+//            id: newAssetID,
+//            data: imageData)
         
-        let newAssetID = UUID().uuidString
-        let newAsset = ProjectEditor.NewAsset(
-            id: newAssetID,
-            data: imageData)
+//        let drawing = Project.Drawing(assetID: newAssetID)
         
-        let drawing = ProjectManifest.Drawing(assetID: newAssetID)
+//        var projectManifest = editor.currentProjectManifest
+//        projectManifest.assetIDs.insert(newAssetID)
+//        projectManifest.drawings.append(drawing)
         
-        var projectManifest = editor.currentProjectManifest
-        projectManifest.referencedAssetIDs.insert(newAssetID)
-        projectManifest.drawings.append(drawing)
-        
-        do {
-            try editor.applyEdit(
-                newProjectManifest: projectManifest,
-                newAssets: [newAsset])
-        } catch {
-            print(error)
-        }
+//        do {
+//            try editor.applyEdit(
+//                newProjectManifest: projectManifest,
+//                newAssets: [newAsset])
+//        } catch {
+//            print(error)
+//        }
         updateUI()
     }
     
     private func deleteLastDrawing() {
-        guard let editor else { return }
-        
-        var projectManifest = editor.currentProjectManifest
-        
-        guard let lastDrawing = projectManifest.drawings.last
-        else { return }
-        
-        projectManifest.drawings.removeLast()
-        projectManifest.referencedAssetIDs.remove(lastDrawing.assetID)
-        
-        do {
-            try editor.applyEdit(
-                newProjectManifest: projectManifest,
-                newAssets: [])
-        } catch {
-            print(error)
-        }
-        updateUI()
+//        guard let editor else { return }
+//        
+//        var projectManifest = editor.currentProjectManifest
+//        
+//        guard let lastDrawing = projectManifest.timeline.drawings.last
+//        else { return }
+//        
+//        projectManifest.timeline.drawings.removeLast()
+//        projectManifest.assets.assetIDs.remove(lastDrawing.imageAssetID)
+//        
+//        do {
+//            try editor.applyEdit(
+//                newProjectManifest: projectManifest,
+//                newAssets: [])
+//        } catch {
+//            print(error)
+//        }
+//        updateUI()
     }
     
     private func duplicateLastDrawing() {
@@ -258,7 +258,7 @@ class OldEditorVC: UIViewController {
         let drawing = ProjectManifest.Drawing(assetID: newAssetID)
         
         var projectManifest = editor.currentProjectManifest
-        projectManifest.referencedAssetIDs.insert(newAssetID)
+        projectManifest.assetIDs.insert(newAssetID)
         projectManifest.drawings.append(drawing)
         
         do {

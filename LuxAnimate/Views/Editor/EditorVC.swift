@@ -10,7 +10,7 @@ class EditorVC: UIViewController {
     
     private let workspaceVC = EditorWorkspaceVC()
     
-    // MARK: - Initializer
+    // MARK: - Init
     
     init(projectID: String) {
         self.projectID = projectID

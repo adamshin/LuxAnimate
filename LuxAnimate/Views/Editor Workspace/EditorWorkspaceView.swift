@@ -18,7 +18,7 @@ private let rotationSnapThreshold: Scalar =
 
 class EditorWorkspaceView: UIView {
     
-    private let canvasView = UIImageView()
+    let canvasView = UIView()
     
     private let multiGesture = CanvasMultiGestureRecognizer()
     private let panGesture = UIPanGestureRecognizer()
@@ -26,7 +26,7 @@ class EditorWorkspaceView: UIView {
     private var baseCanvasTransform = CanvasTransform()
     private var modifiedCanvasTransform: CanvasTransform?
     
-    // MARK: - Initializer
+    // MARK: - Init
     
     init() {
         super.init(frame: .zero)
@@ -39,8 +39,6 @@ class EditorWorkspaceView: UIView {
             origin: .zero,
             size: canvasSize)
         
-        canvasView.image = .sampleCanvas
-        canvasView.contentMode = .scaleAspectFill
         canvasView.clipsToBounds = true
         
         addGestureRecognizer(multiGesture)
@@ -92,11 +90,11 @@ class EditorWorkspaceView: UIView {
         animated: Bool = false,
         animDuration: CGFloat = 0.3
     ) {
-        if transform.scale >= scalePixelateThreshold {
-            canvasView.layer.magnificationFilter = .nearest
-        } else {
-            canvasView.layer.magnificationFilter = .linear
-        }
+//        if transform.scale >= scalePixelateThreshold {
+//            canvasView.layer.magnificationFilter = .nearest
+//        } else {
+//            canvasView.layer.magnificationFilter = .linear
+//        }
         
         let matrix = transform.matrix()
         

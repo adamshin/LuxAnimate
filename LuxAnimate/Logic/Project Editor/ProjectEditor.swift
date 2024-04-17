@@ -29,12 +29,12 @@ class ProjectEditor {
     private let encoder = JSONFileEncoder()
     private let decoder = JSONFileDecoder()
     
-    private(set) var currentProjectManifest: ProjectManifest
+    private(set) var currentProjectManifest: Project.Manifest
     
     private var undoHistoryEntries: [HistoryEntry]
     private var redoHistoryEntries: [HistoryEntry]
     
-    // MARK: - Initializer
+    // MARK: - Init
     
     init(projectID: String) throws {
         self.projectID = projectID
@@ -46,7 +46,7 @@ class ProjectEditor {
             contentsOf: projectManifestURL)
         
         currentProjectManifest = try decoder.decode(
-            ProjectManifest.self,
+            Project.Manifest.self,
             from: projectManifestData)
         
         undoHistoryEntries = []
@@ -65,9 +65,8 @@ class ProjectEditor {
     // MARK: - Edit History
     
     private func historyDirectoryURL() -> URL {
-        fileUrlHelper
-            .projectCacheDirectoryURL(for: projectID)
-            .appending(path: "history")
+        fileUrlHelper.projectHistoryDirectoryURL(
+            for: projectID)
     }
     
     private func historyEntryURL(entryID: String) -> URL {
@@ -191,7 +190,7 @@ class ProjectEditor {
     // MARK: - Edit
     
     func applyEdit(
-        newProjectManifest: ProjectManifest,
+        newProjectManifest: Project.Manifest,
         newAssets: [NewAsset]
     ) throws {
         // Setup
@@ -233,8 +232,8 @@ class ProjectEditor {
         
         // Find assets referenced in the old manifest but not the
         // new one. Move these to the new history entry
-        let oldAssetIDs = oldProjectManifest.referencedAssetIDs
-        let newAssetIDs = newProjectManifest.referencedAssetIDs
+        let oldAssetIDs = oldProjectManifest.assets.assetIDs
+        let newAssetIDs = newProjectManifest.assets.assetIDs
         
         let diffAssetIDs = oldAssetIDs.subtracting(newAssetIDs)
         
@@ -278,7 +277,7 @@ class ProjectEditor {
             contentsOf: consumedProjectManifestURL)
         
         let consumedProjectManifest = try decoder.decode(
-            ProjectManifest.self,
+            Project.Manifest.self,
             from: consumedProjectManifestData)
         
         // Create new history entry
@@ -328,8 +327,8 @@ class ProjectEditor {
         
         // Find assets referenced in the old manifest but not the
         // new one. Move these to the new history entry directory
-        let oldAssetIDs = currentProjectManifest.referencedAssetIDs
-        let newAssetIDs = consumedProjectManifest.referencedAssetIDs
+        let oldAssetIDs = currentProjectManifest.assets.assetIDs
+        let newAssetIDs = consumedProjectManifest.assets.assetIDs
         
         let diffAssetIDs = oldAssetIDs.subtracting(newAssetIDs)
         

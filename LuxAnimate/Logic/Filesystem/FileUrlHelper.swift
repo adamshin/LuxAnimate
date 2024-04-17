@@ -48,8 +48,14 @@ struct FileUrlHelper {
             .appending(path: Self.projectManifestFileName)
     }
     
-    func projectCacheDirectoryURL(for projectID: String) -> URL {
+    func historyDirectoryURL() -> URL {
         cacheDirectoryURL.appending(
+            path: "history",
+            directoryHint: .isDirectory)
+    }
+    
+    func projectHistoryDirectoryURL(for projectID: String) -> URL {
+        historyDirectoryURL().appending(
             path: projectID,
             directoryHint: .isDirectory)
     }
