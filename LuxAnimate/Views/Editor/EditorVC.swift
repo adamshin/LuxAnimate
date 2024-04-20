@@ -3,18 +3,30 @@
 //
 
 import UIKit
+import MetalKit
+
+private let canvasWidth = 200
+private let canvasHeight = 200
 
 class EditorVC: UIViewController {
     
     private let projectID: String
     
-    private let workspaceVC = EditorWorkspaceVC()
+    private let metalView = FrameEditorMetalView()
+    
+    private let testRenderer = TestRenderer(
+        canvasWidth: canvasWidth,
+        canvasHeight: canvasHeight)
+    
+    private let viewTextureRenderer = MetalViewTextureRenderer()
     
     // MARK: - Init
     
     init(projectID: String) {
         self.projectID = projectID
         super.init(nibName: nil, bundle: nil)
+        
+//        renderer.delegate = self
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -25,64 +37,64 @@ class EditorVC: UIViewController {
         super.viewDidLoad()
         
         setupUI()
-        updateUI()
+        render()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        metalView.frame = CGRect(
+            origin: .zero,
+            size: CGSize(
+                width: CGFloat(canvasWidth),
+                height: CGFloat(canvasWidth)))
+        
+        metalView.center = CGPoint(
+            x: view.frame.midX,
+            y: view.frame.midY)
     }
     
     // MARK: - Setup
     
     private func setupUI() {
-        addChild(workspaceVC, to: view)
+        view.backgroundColor = .systemGray
         
-        let topBar = UIView()
-//        view.addSubview(topBar)
-        topBar.pinEdges([.horizontal, .top])
-        topBar.pinHeight(to: 48)
-        topBar.backgroundColor = .editorBar
-        topBar.clipsToBounds = false
+        view.addSubview(metalView)
         
-        let topBarShadow = UIView()
-        topBarShadow.backgroundColor = .editorBarShadow
-        topBar.addSubview(topBarShadow)
-        topBarShadow.pinEdges(.horizontal)
-        topBarShadow.pin(.top, toAnchor: .bottom)
-        topBarShadow.pinHeight(to: 0.5)
+        metalView.setDrawableSize(
+            CGSize(width: canvasWidth, height: canvasHeight))
         
-        let bottomBar = UIView()
-//        view.addSubview(bottomBar)
-        bottomBar.pinEdges([.horizontal, .bottom])
-        bottomBar.pinHeight(to: 48)
-        bottomBar.backgroundColor = .editorBar
-        bottomBar.clipsToBounds = false
-        
-        let bottomBarShadow = UIView()
-        bottomBarShadow.backgroundColor = .editorBarShadow
-        bottomBar.addSubview(bottomBarShadow)
-        bottomBarShadow.pinEdges(.horizontal)
-        bottomBarShadow.pin(.bottom, toAnchor: .top)
-        bottomBarShadow.pinHeight(to: 0.5)
-        
-        let resetButton = UIButton(type: .system)
-        resetButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .medium)
-        resetButton.titleLabel?.tintColor = .editorLabel
-        resetButton.setTitle("Reset", for: .normal)
-        
-        resetButton.addHandler { [weak self] in
-            self?.onSelectResetCanvas()
-        }
-        
-//        topBar.addSubview(resetButton)
-        resetButton.pin(.centerY)
-        resetButton.pinEdges(.trailing, padding: 24)
+        metalView.delegate = self
     }
     
-    // MARK: - UI
+    // MARK: - Render
     
-    private func updateUI() { }
+    private func render() {
+        testRenderer.draw()
+        
+        let framebuffer = testRenderer.getFramebuffer()
+        
+        viewTextureRenderer.draw(
+            texture: framebuffer,
+            to: metalView.metalLayer)
+    }
     
-    // MARK: - Handlers
+}
+
+// MARK: - Delegates
+
+extension EditorVC: FrameEditorMetalViewDelegate {
     
-    @objc private func onSelectResetCanvas() {
-        workspaceVC.fitCanvasToBounds()
+    func draw(in layer: CAMetalLayer) {
+        render()
+    }
+    
+}
+
+extension EditorVC: FrameSceneRendererDelegate {
+    
+    func textureForDrawing(drawingID: String) -> MTLTexture? {
+        return nil
     }
     
 }

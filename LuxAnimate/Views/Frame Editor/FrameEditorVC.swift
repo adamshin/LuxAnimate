@@ -21,12 +21,11 @@ class FrameEditorVC: UIViewController {
     // MARK: - Init
     
     init() {
-        let drawableSize = CGSize(
-            width: viewportSize.width * viewportPixelScale,
-            height: viewportSize.height * viewportPixelScale)
+//        let drawableSize = CGSize(
+//            width: viewportSize.width * viewportPixelScale,
+//            height: viewportSize.height * viewportPixelScale)
         
-        metalView = FrameEditorMetalView(
-            drawableSize: drawableSize)
+        metalView = FrameEditorMetalView()
         
         frameEditor = FrameEditor()
         

@@ -6,6 +6,8 @@ import Foundation
 
 struct FrameScene {
     
+    // TODO: Figure out how grouped layers will be rendered
+    
     struct Layer {
         var width: Scalar
         var height: Scalar
@@ -19,8 +21,10 @@ struct FrameScene {
     
     enum LayerContent {
         case drawing(Project.Drawing)
-        case group([Layer])
     }
+    
+    var width: Scalar
+    var height: Scalar
     
     var layers: [Layer]
     

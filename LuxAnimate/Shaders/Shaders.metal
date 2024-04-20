@@ -88,7 +88,7 @@ fragment float4 textureFragmentShader(
     texture2d<float> texture [[texture(0)]],
     float4 dst [[color(0)]])
 {
-    sampler s(address::clamp_to_zero, filter::linear);
+    sampler s(address::clamp_to_edge, filter::linear);
     float4 src = texture.sample(s, in.texCoord);
     return blendNormal(src, dst);
 }

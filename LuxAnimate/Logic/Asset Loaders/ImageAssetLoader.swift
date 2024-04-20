@@ -7,6 +7,10 @@ import Metal
 
 struct ImageAssetLoader {
     
+    enum Error: Swift.Error {
+        case emptyData
+    }
+    
     static func load(
         projectID: String,
         assetID: String
@@ -17,10 +21,37 @@ struct ImageAssetLoader {
             assetID: assetID)
         
         let data = try Data(contentsOf: url)
-        let image = try JXLDecoder.decode(data: data)
+        let decOutput = try JXLDecoder.decode(data: data)
         
-        // TODO: Return metal texture!
-        fatalError()
+        let texDescriptor = MTLTextureDescriptor()
+        texDescriptor.width = decOutput.width
+        texDescriptor.height = decOutput.height
+        texDescriptor.pixelFormat = .rgba8Unorm
+        texDescriptor.storageMode = .private
+        texDescriptor.usage = [.shaderRead]
+        
+        let texture = MetalInterface.shared.device
+            .makeTexture(descriptor: texDescriptor)!
+        
+        let region = MTLRegionMake2D(
+            0, 0,
+            decOutput.width,
+            decOutput.height)
+        
+        let bytesPerRow = decOutput.width * 4
+        
+        try decOutput.data.withUnsafeBytes { data in
+            guard let bytes = data.baseAddress else {
+                throw Error.emptyData
+            }
+            texture.replace(
+                region: region,
+                mipmapLevel: 0,
+                withBytes: bytes,
+                bytesPerRow: bytesPerRow)
+        }
+        
+        return texture
     }
     
 }

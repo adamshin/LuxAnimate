@@ -6,6 +6,8 @@ import Metal
 
 struct MetalInterface {
     
+    static let shared = MetalInterface()
+    
     let device: MTLDevice
     let commandQueue: MTLCommandQueue
     

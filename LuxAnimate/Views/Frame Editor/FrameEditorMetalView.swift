@@ -6,7 +6,7 @@ import UIKit
 import Metal
 
 protocol FrameEditorMetalViewDelegate: AnyObject {
-    func render(in layer: CAMetalLayer)
+    func draw(in layer: CAMetalLayer)
 }
 
 class FrameEditorMetalView: UIView {
@@ -21,26 +21,25 @@ class FrameEditorMetalView: UIView {
         layer as! CAMetalLayer
     }
     
-    init(drawableSize: CGSize) {
+    init() {
         super.init(frame: .zero)
         
-        metalLayer.contentsGravity = .bottomLeft
-        metalLayer.framebufferOnly = false
-        
-        metalLayer.drawableSize = drawableSize
         metalLayer.pixelFormat = .bgra8Unorm
+        metalLayer.colorspace = CGColorSpace(name: CGColorSpace.sRGB)
+        metalLayer.contentsGravity = .resize
+        metalLayer.drawableSize = .zero
         
         metalLayer.delegate = self
     }
     
     required init?(coder: NSCoder) { fatalError() }
     
-    override func draw(_ rect: CGRect) {
-        render()
+    func setDrawableSize(_ drawableSize: CGSize) {
+        metalLayer.drawableSize = drawableSize
     }
     
-    private func render() {
-        delegate?.render(in: metalLayer)
+    override func draw(_ rect: CGRect) {
+        delegate?.draw(in: metalLayer)
     }
     
 }
@@ -50,7 +49,7 @@ class FrameEditorMetalView: UIView {
 extension FrameEditorMetalView {
     
     override func display(_ layer: CALayer) {
-        render()
+        delegate?.draw(in: metalLayer)
     }
     
 }

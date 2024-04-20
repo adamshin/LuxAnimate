@@ -21,11 +21,11 @@ enum Project {
     // MARK: - Metadata
     
     struct Metadata: Codable {
-        var contentFrameWidth: Int
-        var contentFrameHeight: Int
+        var contentWidth: Int
+        var contentHeight: Int
         
-        var viewportAspectRatioWidth: Int
-        var viewportAspectRatioHeight: Int
+        var viewportWidth: Int
+        var viewportHeight: Int
         
         var frameRate: Int
     }
@@ -40,6 +40,10 @@ enum Project {
     struct AnimationLayer: Codable {
         var id: String
         var name: String
+        
+        var width: Scalar
+        var height: Scalar
+        var pixelScale: Scalar
         
         var drawingLayers: [DrawingLayer]
     }

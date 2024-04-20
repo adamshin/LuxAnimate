@@ -10,7 +10,6 @@
 		660CD1302BA92FF500C8C7B5 /* ProjectEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660CD12F2BA92FF500C8C7B5 /* ProjectEditor.swift */; };
 		660CD1332BAE4D0E00C8C7B5 /* JSONFileCoders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660CD1322BAE4D0E00C8C7B5 /* JSONFileCoders.swift */; };
 		6614C1D12BB8AD93000FCC78 /* JXLDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6614C1D02BB8AD93000FCC78 /* JXLDecoder.swift */; };
-		661B18962BBF3C4B009F0961 /* EditorVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 661B18952BBF3C4B009F0961 /* EditorVC.swift */; };
 		6632594C2BB66C1A00460F70 /* JXLEncoderShim.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6632594B2BB66C1A00460F70 /* JXLEncoderShim.mm */; };
 		6632594E2BB6725B00460F70 /* JXLEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6632594D2BB6725B00460F70 /* JXLEncoder.swift */; };
 		6632595F2BB6E94E00460F70 /* libjxl.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6632595E2BB6E94E00460F70 /* libjxl.xcframework */; };
@@ -19,7 +18,6 @@
 		664B59452BC5A9D1003FA90E /* StrokeGestureRecognizerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664B59412BC5A9D1003FA90E /* StrokeGestureRecognizerState.swift */; };
 		664B59462BC5A9D1003FA90E /* StrokeGestureRecognizerStroke.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664B59422BC5A9D1003FA90E /* StrokeGestureRecognizerStroke.swift */; };
 		664B59692BC5AA1E003FA90E /* MetalInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664B59652BC5AA1E003FA90E /* MetalInterface.swift */; };
-		664B596A2BC5AA1E003FA90E /* MetalTextureBlitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664B59662BC5AA1E003FA90E /* MetalTextureBlitter.swift */; };
 		664B596F2BC5AA25003FA90E /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 664B596C2BC5AA25003FA90E /* Shaders.metal */; };
 		664B59752BC5ACC1003FA90E /* FrameEditorVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664B59742BC5ACC1003FA90E /* FrameEditorVC.swift */; };
 		664B597B2BC5D609003FA90E /* FrameEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664B597A2BC5D609003FA90E /* FrameEditor.swift */; };
@@ -35,7 +33,7 @@
 		6662D8A32BBE1A3700B4C1D4 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6662D8A22BBE1A3700B4C1D4 /* Geometry.swift */; };
 		6662D8A62BBE5F9400B4C1D4 /* CanvasTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6662D8A52BBE5F9400B4C1D4 /* CanvasTransform.swift */; };
 		667BF74B2BA655CB003E3430 /* FileUrlHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667BF74A2BA655CB003E3430 /* FileUrlHelper.swift */; };
-		66B2BE3E2BCB21820072AC1B /* FrameEditorAssetLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B2BE3D2BCB21820072AC1B /* FrameEditorAssetLoader.swift */; };
+		66B2BE3E2BCB21820072AC1B /* FrameSceneAssetLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B2BE3D2BCB21820072AC1B /* FrameSceneAssetLoader.swift */; };
 		66B2BE402BCB2A380072AC1B /* FrameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B2BE3F2BCB2A380072AC1B /* FrameScene.swift */; };
 		66B2BE422BCB55FF0072AC1B /* SharedModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B2BE412BCB55FF0072AC1B /* SharedModels.swift */; };
 		66D0843D2BA3840C00EB8556 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0843C2BA3840C00EB8556 /* AppDelegate.swift */; };
@@ -56,7 +54,10 @@
 		66D084842BA3FE2E00EB8556 /* LibraryContentVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D084832BA3FE2E00EB8556 /* LibraryContentVC.swift */; };
 		66D084892BA4060E00EB8556 /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D084872BA4060E00EB8556 /* Project.swift */; };
 		66D0848C2BA55B4300EB8556 /* LibraryManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0848B2BA55B4300EB8556 /* LibraryManifest.swift */; };
-		66D0848F2BA56FB400EB8556 /* OldEditorVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0848E2BA56FB400EB8556 /* OldEditorVC.swift */; };
+		66E5234E2BD1CB2100794751 /* FrameSceneRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E5234D2BD1CB2100794751 /* FrameSceneRenderer.swift */; };
+		66E523522BD341A500794751 /* EditorVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E523512BD341A500794751 /* EditorVC.swift */; };
+		66E523542BD37C1E00794751 /* TestRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E523532BD37C1E00794751 /* TestRenderer.swift */; };
+		66E523562BD37D8B00794751 /* MetalViewTextureRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E523552BD37D8B00794751 /* MetalViewTextureRenderer.swift */; };
 		66F0B8A42BD064A000352A0E /* ImageAssetLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F0B8A32BD064A000352A0E /* ImageAssetLoader.swift */; };
 /* End PBXBuildFile section */
 
@@ -64,7 +65,6 @@
 		660CD12F2BA92FF500C8C7B5 /* ProjectEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectEditor.swift; sourceTree = "<group>"; };
 		660CD1322BAE4D0E00C8C7B5 /* JSONFileCoders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONFileCoders.swift; sourceTree = "<group>"; };
 		6614C1D02BB8AD93000FCC78 /* JXLDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JXLDecoder.swift; sourceTree = "<group>"; };
-		661B18952BBF3C4B009F0961 /* EditorVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorVC.swift; sourceTree = "<group>"; };
 		663259492BB66A3300460F70 /* JXLEncoderShim.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JXLEncoderShim.h; sourceTree = "<group>"; };
 		6632594A2BB66BB300460F70 /* BridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BridgingHeader.h; sourceTree = "<group>"; };
 		6632594B2BB66C1A00460F70 /* JXLEncoderShim.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = JXLEncoderShim.mm; sourceTree = "<group>"; };
@@ -75,7 +75,6 @@
 		664B59412BC5A9D1003FA90E /* StrokeGestureRecognizerState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StrokeGestureRecognizerState.swift; sourceTree = "<group>"; };
 		664B59422BC5A9D1003FA90E /* StrokeGestureRecognizerStroke.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StrokeGestureRecognizerStroke.swift; sourceTree = "<group>"; };
 		664B59652BC5AA1E003FA90E /* MetalInterface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetalInterface.swift; sourceTree = "<group>"; };
-		664B59662BC5AA1E003FA90E /* MetalTextureBlitter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetalTextureBlitter.swift; sourceTree = "<group>"; };
 		664B596C2BC5AA25003FA90E /* Shaders.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
 		664B596D2BC5AA25003FA90E /* ShaderTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
 		664B59742BC5ACC1003FA90E /* FrameEditorVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameEditorVC.swift; sourceTree = "<group>"; };
@@ -93,7 +92,7 @@
 		6662D8A22BBE1A3700B4C1D4 /* Geometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
 		6662D8A52BBE5F9400B4C1D4 /* CanvasTransform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasTransform.swift; sourceTree = "<group>"; };
 		667BF74A2BA655CB003E3430 /* FileUrlHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileUrlHelper.swift; sourceTree = "<group>"; };
-		66B2BE3D2BCB21820072AC1B /* FrameEditorAssetLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameEditorAssetLoader.swift; sourceTree = "<group>"; };
+		66B2BE3D2BCB21820072AC1B /* FrameSceneAssetLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameSceneAssetLoader.swift; sourceTree = "<group>"; };
 		66B2BE3F2BCB2A380072AC1B /* FrameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameScene.swift; sourceTree = "<group>"; };
 		66B2BE412BCB55FF0072AC1B /* SharedModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedModels.swift; sourceTree = "<group>"; };
 		66D084392BA3840C00EB8556 /* LuxAnimate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LuxAnimate.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -116,7 +115,10 @@
 		66D084832BA3FE2E00EB8556 /* LibraryContentVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryContentVC.swift; sourceTree = "<group>"; };
 		66D084872BA4060E00EB8556 /* Project.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Project.swift; sourceTree = "<group>"; };
 		66D0848B2BA55B4300EB8556 /* LibraryManifest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryManifest.swift; sourceTree = "<group>"; };
-		66D0848E2BA56FB400EB8556 /* OldEditorVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OldEditorVC.swift; sourceTree = "<group>"; };
+		66E5234D2BD1CB2100794751 /* FrameSceneRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameSceneRenderer.swift; sourceTree = "<group>"; };
+		66E523512BD341A500794751 /* EditorVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorVC.swift; sourceTree = "<group>"; };
+		66E523532BD37C1E00794751 /* TestRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestRenderer.swift; sourceTree = "<group>"; };
+		66E523552BD37D8B00794751 /* MetalViewTextureRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalViewTextureRenderer.swift; sourceTree = "<group>"; };
 		66F0B8A32BD064A000352A0E /* ImageAssetLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageAssetLoader.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -183,7 +185,6 @@
 			isa = PBXGroup;
 			children = (
 				664B59652BC5AA1E003FA90E /* MetalInterface.swift */,
-				664B59662BC5AA1E003FA90E /* MetalTextureBlitter.swift */,
 			);
 			path = Rendering;
 			sourceTree = "<group>";
@@ -210,7 +211,8 @@
 			isa = PBXGroup;
 			children = (
 				664B597A2BC5D609003FA90E /* FrameEditor.swift */,
-				66B2BE3D2BCB21820072AC1B /* FrameEditorAssetLoader.swift */,
+				66B2BE3D2BCB21820072AC1B /* FrameSceneAssetLoader.swift */,
+				66E5234D2BD1CB2100794751 /* FrameSceneRenderer.swift */,
 				66B2BE3F2BCB2A380072AC1B /* FrameScene.swift */,
 			);
 			path = "Frame Editor";
@@ -445,8 +447,9 @@
 		66D0848D2BA56E7800EB8556 /* Editor */ = {
 			isa = PBXGroup;
 			children = (
-				661B18952BBF3C4B009F0961 /* EditorVC.swift */,
-				66D0848E2BA56FB400EB8556 /* OldEditorVC.swift */,
+				66E523512BD341A500794751 /* EditorVC.swift */,
+				66E523532BD37C1E00794751 /* TestRenderer.swift */,
+				66E523552BD37D8B00794751 /* MetalViewTextureRenderer.swift */,
 			);
 			path = Editor;
 			sourceTree = "<group>";
@@ -550,15 +553,16 @@
 				667BF74B2BA655CB003E3430 /* FileUrlHelper.swift in Sources */,
 				664B59462BC5A9D1003FA90E /* StrokeGestureRecognizerStroke.swift in Sources */,
 				66D0846D2BA3CEC300EB8556 /* CGPoint+Extensions.swift in Sources */,
+				66E523542BD37C1E00794751 /* TestRenderer.swift in Sources */,
 				664B593F2BC5A9AA003FA90E /* AppConfig.swift in Sources */,
 				6662D89D2BBDF46F00B4C1D4 /* Geometry+UIKit.swift in Sources */,
+				66E523562BD37D8B00794751 /* MetalViewTextureRenderer.swift in Sources */,
 				66D084712BA3CEC300EB8556 /* PassthroughView.swift in Sources */,
 				66D084842BA3FE2E00EB8556 /* LibraryContentVC.swift in Sources */,
 				664B59752BC5ACC1003FA90E /* FrameEditorVC.swift in Sources */,
-				664B596A2BC5AA1E003FA90E /* MetalTextureBlitter.swift in Sources */,
 				66D0846F2BA3CEC300EB8556 /* Indirect.swift in Sources */,
 				660CD1302BA92FF500C8C7B5 /* ProjectEditor.swift in Sources */,
-				66B2BE3E2BCB21820072AC1B /* FrameEditorAssetLoader.swift in Sources */,
+				66B2BE3E2BCB21820072AC1B /* FrameSceneAssetLoader.swift in Sources */,
 				6662D88B2BBD0B0900B4C1D4 /* EditorWorkspaceView.swift in Sources */,
 				6662D8892BBD039700B4C1D4 /* EditorWorkspaceVC.swift in Sources */,
 				66D084782BA3CEC300EB8556 /* UIViewController+Extensions.swift in Sources */,
@@ -579,13 +583,13 @@
 				660CD1332BAE4D0E00C8C7B5 /* JSONFileCoders.swift in Sources */,
 				664B597B2BC5D609003FA90E /* FrameEditor.swift in Sources */,
 				66D0843F2BA3840C00EB8556 /* SceneDelegate.swift in Sources */,
+				66E523522BD341A500794751 /* EditorVC.swift in Sources */,
 				66B2BE422BCB55FF0072AC1B /* SharedModels.swift in Sources */,
-				66D0848F2BA56FB400EB8556 /* OldEditorVC.swift in Sources */,
 				6632594E2BB6725B00460F70 /* JXLEncoder.swift in Sources */,
 				66D084702BA3CEC300EB8556 /* Math.swift in Sources */,
 				6632594C2BB66C1A00460F70 /* JXLEncoderShim.mm in Sources */,
 				6614C1D12BB8AD93000FCC78 /* JXLDecoder.swift in Sources */,
-				661B18962BBF3C4B009F0961 /* EditorVC.swift in Sources */,
+				66E5234E2BD1CB2100794751 /* FrameSceneRenderer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -756,7 +760,7 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 2;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -791,7 +795,7 @@
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 2;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};

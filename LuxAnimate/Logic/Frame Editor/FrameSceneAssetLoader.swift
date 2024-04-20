@@ -1,11 +1,11 @@
 //
-//  FrameEditorAssetLoader.swift
+//  FrameSceneAssetLoader.swift
 //
 
 import Foundation
 import Metal
 
-class FrameEditorAssetLoader {
+class FrameSceneAssetLoader {
     
     struct LoadedImageAsset {
         var texture: MTLTexture
@@ -38,8 +38,8 @@ class FrameEditorAssetLoader {
             case .drawing(let drawing):
                 return [drawing]
                 
-            case .group(let childLayers):
-                return drawings(from: childLayers)
+//            case .group(let childLayers):
+//                return drawings(from: childLayers)
             }
         }
     }
