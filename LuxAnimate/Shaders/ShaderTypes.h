@@ -7,28 +7,66 @@
 
 #include <simd/simd.h>
 
-typedef enum VertexBufferIndex
+// MARK: - General
+
+typedef enum
 {
-    VertexBufferIndexVertices = 0,
-    VertexBufferIndexFrameData = 1,
-} VertexBufferIndex;
+    ShaderBlendModeNormal = 0,
+} ShaderBlendMode;
+
+// MARK: - Sprite
+
+typedef enum
+{
+    SpriteVertexBufferIndexVertices = 0,
+    SpriteVertexBufferIndexUniforms = 1,
+} SpriteVertexBufferIndex;
+
+typedef enum
+{
+    SpriteFragmentBufferIndexUniforms = 0,
+} SpriteFragmentBufferIndex;
 
 typedef struct
 {
     simd_float2 viewportSize;
-} FrameData;
+} SpriteVertexUniforms;
 
 typedef struct
 {
-    simd_float2 position;
-    simd_float4 color;
-} ColorVertex;
+    float alpha;
+    ShaderBlendMode blendMode;
+} SpriteFragmentUniforms;
 
 typedef struct
 {
     simd_float2 position;
     simd_float2 texCoord;
-} TextureVertex;
+} SpriteVertex;
+
+// MARK: - Brush
+
+/*
+typedef enum BrushVertexBufferIndex
+{
+    BrushVertexBufferIndexVertices = 0,
+    BrushVertexBufferIndexUniforms = 1,
+} BrushVertexBufferIndex;
+
+typedef enum
+{
+    BrushFragmentBufferIndexUniforms = 0,
+} BrushFragmentBufferIndex;
+
+typedef struct
+{
+    simd_float2 viewportSize;
+} BrushVertexUniforms;
+
+typedef struct
+{
+    RenderBlendMode blendMode;
+} BrushFragmentUniforms;
 
 typedef struct
 {
@@ -37,5 +75,6 @@ typedef struct
     simd_float4 color;
     float alpha;
 } BrushVertex;
+ */
 
 #endif

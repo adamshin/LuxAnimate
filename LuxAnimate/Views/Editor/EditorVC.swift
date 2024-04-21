@@ -5,8 +5,8 @@
 import UIKit
 import MetalKit
 
-private let canvasWidth = 200
-private let canvasHeight = 200
+private let canvasWidth = 1920
+private let canvasHeight = 1080
 
 class EditorVC: UIViewController {
     
@@ -46,8 +46,10 @@ class EditorVC: UIViewController {
         metalView.frame = CGRect(
             origin: .zero,
             size: CGSize(
-                width: CGFloat(canvasWidth),
-                height: CGFloat(canvasWidth)))
+                width: CGFloat(canvasWidth) / UIScreen.main.scale,
+                height: CGFloat(canvasHeight) / UIScreen.main.scale
+            )
+        )
         
         metalView.center = CGPoint(
             x: view.frame.midX,
@@ -57,7 +59,7 @@ class EditorVC: UIViewController {
     // MARK: - Setup
     
     private func setupUI() {
-        view.backgroundColor = .systemGray
+        view.backgroundColor = .editorBackground
         
         view.addSubview(metalView)
         

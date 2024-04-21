@@ -12,8 +12,8 @@ class MetalViewTextureRenderer {
     init() {
         // Render pipeline
         let library = MetalInterface.shared.device.makeDefaultLibrary()!
-        let vertexFuction = library.makeFunction(name: "textureVertexShader")
-        let fragmentFunction = library.makeFunction(name: "textureFragmentShader")
+        let vertexFuction = library.makeFunction(name: "spriteVertexShader")
+        let fragmentFunction = library.makeFunction(name: "spriteFragmentShader")
         
         let pipelineDescriptor = MTLRenderPipelineDescriptor()
         pipelineDescriptor.vertexFunction = vertexFuction
@@ -42,35 +42,36 @@ class MetalViewTextureRenderer {
         renderEncoder.setRenderPipelineState(pipelineState)
         
         let vertexPositions: [(Float, Float)] = [
-            (0, 0), (0, 1),
-            (1, 0), (1, 1)
+            (0, 0), (1, 0),
+            (0, 1), (1, 1)
         ]
         let vertices = vertexPositions.map {
-            TextureVertex(
+            SpriteVertex(
                 position: .init(x: $0.0, y: $0.1),
                 texCoord: .init(x: $0.0, y: $0.1))
         }
         
-        let vertexBuffer = MetalInterface.shared.device.makeBuffer(
-            bytes: vertices,
-            length: vertices.count * MemoryLayout<TextureVertex>.stride)
+        var vertexUniforms = SpriteVertexUniforms(
+            viewportSize: .init(1, 1))
         
-        var frameData = FrameData(viewportSize: .init(1, 1))
+        var fragmentUniforms = SpriteFragmentUniforms(
+            alpha: 1.0,
+            blendMode: ShaderBlendModeNormal)
         
-        let frameDataBuffer = MetalInterface.shared.device.makeBuffer(
-            bytes: &frameData,
-            length: MemoryLayout<FrameData>.size,
-            options: [])
+        renderEncoder.setVertexBytes(
+            vertices,
+            length: MemoryLayout<SpriteVertex>.stride * vertices.count,
+            index: Int(SpriteVertexBufferIndexVertices.rawValue))
         
-        renderEncoder.setVertexBuffer(
-            vertexBuffer,
-            offset: 0,
-            index: Int(VertexBufferIndexVertices.rawValue))
+        renderEncoder.setVertexBytes(
+            &vertexUniforms,
+            length: MemoryLayout<SpriteVertexUniforms>.stride,
+            index: Int(SpriteVertexBufferIndexUniforms.rawValue))
         
-        renderEncoder.setVertexBuffer(
-            frameDataBuffer,
-            offset: 0,
-            index: Int(VertexBufferIndexFrameData.rawValue))
+        renderEncoder.setFragmentBytes(
+            &fragmentUniforms,
+            length: MemoryLayout<SpriteFragmentUniforms>.stride,
+            index: Int(SpriteFragmentBufferIndexUniforms.rawValue))
         
         renderEncoder.setFragmentTexture(texture, index: 0)
         

@@ -46,8 +46,8 @@ class FrameSceneRenderer {
         
         // Render pipeline
         let library = MetalInterface.shared.device.makeDefaultLibrary()!
-        let vertexFuction = library.makeFunction(name: "textureVertexShader")
-        let fragmentFunction = library.makeFunction(name: "textureFragmentShader")
+        let vertexFuction = library.makeFunction(name: "spriteVertexShader")
+        let fragmentFunction = library.makeFunction(name: "spriteFragmentShader")
         
         let pipelineDescriptor = MTLRenderPipelineDescriptor()
         pipelineDescriptor.vertexFunction = vertexFuction
@@ -166,7 +166,7 @@ class FrameSceneRenderer {
         }
         
         let metalVertices = vertices.map {
-            TextureVertex(
+            SpriteVertex(
                 position: .init(
                     x: Float($0.position.x),
                     y: Float($0.position.y)),
@@ -177,26 +177,26 @@ class FrameSceneRenderer {
         
         let vertexBuffer = MetalInterface.shared.device.makeBuffer(
             bytes: metalVertices,
-            length: metalVertices.count * MemoryLayout<TextureVertex>.stride)
+            length: metalVertices.count * MemoryLayout<SpriteVertex>.stride)
         
-        var frameData = FrameData(viewportSize: .init(
+        var spriteUniforms = SpriteVertexUniforms(viewportSize: .init(
             Float(sceneWidth),
             Float(sceneHeight)))
         
-        let frameDataBuffer = MetalInterface.shared.device.makeBuffer(
-            bytes: &frameData,
-            length: MemoryLayout<FrameData>.size,
+        let spriteUniformsBuffer = MetalInterface.shared.device.makeBuffer(
+            bytes: &spriteUniforms,
+            length: MemoryLayout<SpriteVertexUniforms>.size,
             options: [])
         
         renderEncoder.setVertexBuffer(
             vertexBuffer,
             offset: 0,
-            index: Int(VertexBufferIndexVertices.rawValue))
+            index: Int(SpriteVertexBufferIndexVertices.rawValue))
         
         renderEncoder.setVertexBuffer(
-            frameDataBuffer,
+            spriteUniformsBuffer,
             offset: 0,
-            index: Int(VertexBufferIndexFrameData.rawValue))
+            index: Int(SpriteVertexBufferIndexUniforms.rawValue))
         
         renderEncoder.setFragmentTexture(texture, index: 0)
         

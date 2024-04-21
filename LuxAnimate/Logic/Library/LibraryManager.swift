@@ -112,8 +112,8 @@ struct LibraryManager {
         let metadata = Project.Metadata(
             contentWidth: 1920,
             contentHeight: 1920,
-            viewportWidth: 16,
-            viewportHeight: 9,
+            viewportWidth: 1920,
+            viewportHeight: 1080,
             frameRate: 24)
         
         let projectManifest = Project.Manifest(
