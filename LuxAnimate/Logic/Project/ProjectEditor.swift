@@ -35,7 +35,7 @@ extension ProjectEditor {
         
         // TODO: generate preview image sizes!
         
-        let asset = ProjectEditSession.NewAsset(
+        let fullAsset = ProjectEditSession.NewAsset(
             id: UUID().uuidString,
             data: imageData)
         
@@ -45,18 +45,18 @@ extension ProjectEditor {
             animationLayerID: "",
             drawingLayerID: "",
             assets: .init(
-                full: asset.id,
+                full: fullAsset.id,
                 previewMedium: "",
                 previewSmall: ""))
         
         var projectManifest = editSession.currentProjectManifest
         
         projectManifest.timeline.drawings.append(drawing)
-        projectManifest.assets.assetIDs.insert(asset.id)
+        projectManifest.assets.assetIDs.insert(fullAsset.id)
         
         try editSession.applyEdit(
             newProjectManifest: projectManifest,
-            newAssets: [asset])
+            newAssets: [fullAsset])
     }
     
 }

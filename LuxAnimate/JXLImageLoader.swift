@@ -1,11 +1,11 @@
 //
-//  JXLImageLoader.swift
+//  JXLTextureLoader.swift
 //
 
 import Foundation
 import Metal
 
-struct JXLImageLoader {
+struct JXLTextureLoader {
     
     enum Error: Swift.Error {
         case emptyData

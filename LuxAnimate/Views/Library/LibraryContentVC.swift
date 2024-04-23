@@ -79,7 +79,7 @@ extension LibraryContentVC: UITableViewDataSource {
         let item = items[indexPath.row]
         
         return tableView.dequeue(UITableViewCell.self) {
-            $0.textLabel?.text = item.project.name
+            $0.textLabel?.text = "\(item.project.name) - \(item.project.id)"
         }
     }
     

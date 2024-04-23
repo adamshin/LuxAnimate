@@ -157,6 +157,7 @@ class ProjectEditSession {
     ) throws {
         let url = assetURLInProject(assetID: asset.id)
         try asset.data.write(to: url)
+        print("Wrote asset to project directory: \(url)")
     }
     
     private func moveAssetInProjectToHistoryEntry(
@@ -171,6 +172,8 @@ class ProjectEditSession {
             entryID: entryID)
         
         try fileManager.moveItem(at: srcURL, to: dstURL)
+        
+        print("Moved asset to history directory: \(dstURL)")
     }
     
     private func moveAssetInHistoryEntryToProject(
@@ -193,6 +196,9 @@ class ProjectEditSession {
         newProjectManifest: Project.Manifest,
         newAssets: [NewAsset]
     ) throws {
+        
+        print("Applying edit")
+        
         // Setup
         let oldProjectManifest = self.currentProjectManifest
         
@@ -249,6 +255,8 @@ class ProjectEditSession {
         
         // Trim undo history
         trimUndoHistoryToLimit()
+        
+        print("Done applying edit")
     }
     
     // MARK: - Undo/Redo

@@ -117,6 +117,7 @@ struct LibraryManager {
             frameRate: 24)
         
         let projectManifest = Project.Manifest(
+            id: projectID,
             name: "New Project",
             createdAt: now,
             modifiedAt: now,

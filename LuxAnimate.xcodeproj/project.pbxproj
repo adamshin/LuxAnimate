@@ -19,6 +19,7 @@
 		66311CDD2BD7403100D53489 /* SpriteRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66311CDC2BD7403100D53489 /* SpriteRenderer.swift */; };
 		66311CE22BD740D900D53489 /* JXLImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66311CE12BD740D900D53489 /* JXLImageLoader.swift */; };
 		66311CE42BD76C0000D53489 /* EditorDrawingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66311CE32BD76C0000D53489 /* EditorDrawingVC.swift */; };
+		66311CE82BD78B6D00D53489 /* UIImageDataExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66311CE72BD78B6D00D53489 /* UIImageDataExtractor.swift */; };
 		6632594C2BB66C1A00460F70 /* JXLEncoderShim.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6632594B2BB66C1A00460F70 /* JXLEncoderShim.mm */; };
 		6632594E2BB6725B00460F70 /* JXLEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6632594D2BB6725B00460F70 /* JXLEncoder.swift */; };
 		6632595F2BB6E94E00460F70 /* libjxl.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6632595E2BB6E94E00460F70 /* libjxl.xcframework */; };
@@ -79,6 +80,7 @@
 		66311CDC2BD7403100D53489 /* SpriteRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteRenderer.swift; sourceTree = "<group>"; };
 		66311CE12BD740D900D53489 /* JXLImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = JXLImageLoader.swift; path = LuxAnimate/JXLImageLoader.swift; sourceTree = SOURCE_ROOT; };
 		66311CE32BD76C0000D53489 /* EditorDrawingVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorDrawingVC.swift; sourceTree = "<group>"; };
+		66311CE72BD78B6D00D53489 /* UIImageDataExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageDataExtractor.swift; sourceTree = "<group>"; };
 		663259492BB66A3300460F70 /* JXLEncoderShim.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JXLEncoderShim.h; sourceTree = "<group>"; };
 		6632594A2BB66BB300460F70 /* BridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BridgingHeader.h; sourceTree = "<group>"; };
 		6632594B2BB66C1A00460F70 /* JXLEncoderShim.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = JXLEncoderShim.mm; sourceTree = "<group>"; };
@@ -166,9 +168,10 @@
 		66311CD42BD7252D00D53489 /* Graphics */ = {
 			isa = PBXGroup;
 			children = (
-				66311CDF2BD740CB00D53489 /* Image Loader */,
+				66311CDF2BD740CB00D53489 /* Texture Loader */,
 				66311CD92BD73E5F00D53489 /* Image Resizer */,
 				66311CDE2BD740BC00D53489 /* Rendering */,
+				66311CE72BD78B6D00D53489 /* UIImageDataExtractor.swift */,
 			);
 			path = Graphics;
 			sourceTree = "<group>";
@@ -192,12 +195,12 @@
 			path = Rendering;
 			sourceTree = "<group>";
 		};
-		66311CDF2BD740CB00D53489 /* Image Loader */ = {
+		66311CDF2BD740CB00D53489 /* Texture Loader */ = {
 			isa = PBXGroup;
 			children = (
 				66311CE12BD740D900D53489 /* JXLImageLoader.swift */,
 			);
-			path = "Image Loader";
+			path = "Texture Loader";
 			sourceTree = "<group>";
 		};
 		66311CE52BD7898000D53489 /* Shared */ = {
@@ -565,6 +568,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				66311CE82BD78B6D00D53489 /* UIImageDataExtractor.swift in Sources */,
 				66D084892BA4060E00EB8556 /* Project.swift in Sources */,
 				66F0B8A42BD064A000352A0E /* ImageAssetLoader.swift in Sources */,
 				66D0848C2BA55B4300EB8556 /* LibraryManifest.swift in Sources */,

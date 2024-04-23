@@ -10,6 +10,8 @@ class EditorDrawingVC: UIViewController {
     private let canvasView = MovableCanvasView()
     private let metalView = MetalView()
     
+    private let backButton = UIButton(type: .system)
+    
     private let canvasViewSize: Size
     
     private let drawingRenderer: TestDrawingRenderer
@@ -34,7 +36,8 @@ class EditorDrawingVC: UIViewController {
             projectID: projectManifest.id,
             assetID: drawing.assets.full)
         
-        let texture = try! JXLImageLoader.load(url: url)
+        print("Loading asset: \(url)")
+        let texture = try! JXLTextureLoader.load(url: url)
         
         canvasViewSize = Size(
             viewportSize.width / 2,
@@ -49,6 +52,7 @@ class EditorDrawingVC: UIViewController {
         layerRenderer = MetalLayerTextureRenderer()
         
         super.init(nibName: nil, bundle: nil)
+        modalPresentationStyle = .fullScreen
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -65,6 +69,8 @@ class EditorDrawingVC: UIViewController {
     // MARK: - Setup
     
     private func setupUI() {
+        view.backgroundColor = .editorBackground
+        
         view.addSubview(canvasView)
         canvasView.pinEdges()
         canvasView.delegate = self
@@ -72,6 +78,19 @@ class EditorDrawingVC: UIViewController {
         canvasView.contentView.addSubview(metalView)
         metalView.pinEdges()
         metalView.delegate = self
+        
+        view.addSubview(backButton)
+        backButton.pinEdges(
+            [.top, .leading],
+            to: view.safeAreaLayoutGuide,
+            padding: 12)
+        
+        backButton.setTitle("Back", for: .normal)
+        backButton.titleLabel?.font = .systemFont(
+            ofSize: 17, weight: .regular)
+        backButton.addHandler { [weak self] in
+            self?.dismiss(animated: true)
+        }
     }
     
     // MARK: - Rendering
