@@ -24,7 +24,7 @@ protocol CanvasMultiGestureRecognizerInternalStateDelegate: AnyObject {
     func onBeginGesture()
     
     func onUpdateGesture(
-        anchorLocation: Vector,
+        anchorPosition: Vector,
         translation: Vector,
         rotation: Scalar,
         scale: Scalar)
@@ -264,7 +264,7 @@ class CanvasMultiGestureRecognizerActiveState: CanvasMultiGestureRecognizerInter
         // Finalize
         if hasGestureBegun {
             delegate?.onUpdateGesture(
-                anchorLocation: initialCenterPos,
+                anchorPosition: initialCenterPos,
                 translation: translation,
                 rotation: rotation,
                 scale: scale)

@@ -4,6 +4,7 @@
 
 import UIKit
 
+/*
 private let canvasSize = CGSize(
     width: 1920,
     height: 1080)
@@ -111,7 +112,7 @@ class EditorWorkspaceView: UIView {
         baseCanvasTransform.snapRotation(
             threshold: rotationSnapThreshold)
         
-        baseCanvasTransform.snapTranslationToKeepRectInOrigin(
+        baseCanvasTransform.snapTranslationToKeepRectContainingOrigin(
             x: -canvasSize.width / 2,
             y: -canvasSize.height / 2,
             width: canvasSize.width,
@@ -237,3 +238,4 @@ extension EditorWorkspaceView: UIGestureRecognizerDelegate {
     }
     
 }
+ */

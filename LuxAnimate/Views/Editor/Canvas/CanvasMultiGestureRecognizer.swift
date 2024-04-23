@@ -12,7 +12,7 @@ protocol CanvasMultiGestureRecognizerGestureDelegate: AnyObject {
     func onBeginGesture()
     
     func onUpdateGesture(
-        anchorLocation: Vector,
+        anchorPosition: Vector,
         translation: Vector,
         rotation: Scalar,
         scale: Scalar)
@@ -98,13 +98,13 @@ extension CanvasMultiGestureRecognizer: CanvasMultiGestureRecognizerInternalStat
     }
     
     func onUpdateGesture(
-        anchorLocation: Vector,
+        anchorPosition: Vector,
         translation: Vector,
         rotation: Scalar,
         scale: Scalar
     ) {
         gestureDelegate?.onUpdateGesture(
-            anchorLocation: anchorLocation,
+            anchorPosition: anchorPosition,
             translation: translation,
             rotation: rotation,
             scale: scale)

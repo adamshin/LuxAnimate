@@ -58,8 +58,8 @@ extension LibraryVC: LibraryContentVCDelegate {
         }
     }
     
-    func onSelectProject(_ project: LibraryManager.LibraryProject) {
-        let vc = EditorVC(projectID: project.id)
+    func onSelectProject(id: String) {
+        let vc = EditorVC(projectID: id)
         present(vc, animated: true)
     }
     

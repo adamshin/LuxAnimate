@@ -6,7 +6,7 @@ import UIKit
 
 protocol LibraryContentVCDelegate: AnyObject {
     func onSelectCreateProject()
-    func onSelectProject(_ project: LibraryManager.LibraryProject)
+    func onSelectProject(id: String)
 }
 
 extension LibraryContentVC {
@@ -94,7 +94,7 @@ extension LibraryContentVC: UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         
         let item = items[indexPath.row]
-        delegate?.onSelectProject(item.project)
+        delegate?.onSelectProject(id: item.project.id)
     }
     
 }

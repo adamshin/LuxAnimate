@@ -3,30 +3,24 @@
 //
 
 import UIKit
-import MetalKit
-
-private let canvasWidth = 1920
-private let canvasHeight = 1080
 
 class EditorVC: UIViewController {
     
+    private let contentVC = EditorContentVC()
+    
     private let projectID: String
-    
-    private let metalView = FrameEditorMetalView()
-    
-    private let testRenderer = TestRenderer(
-        canvasWidth: canvasWidth,
-        canvasHeight: canvasHeight)
-    
-    private let viewTextureRenderer = MetalViewTextureRenderer()
+    private let projectEditor: ProjectEditor
     
     // MARK: - Init
     
     init(projectID: String) {
         self.projectID = projectID
+        
+        projectEditor = try! ProjectEditor(projectID: projectID)
+        
         super.init(nibName: nil, bundle: nil)
         
-//        renderer.delegate = self
+        modalPresentationStyle = .fullScreen
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -37,66 +31,54 @@ class EditorVC: UIViewController {
         super.viewDidLoad()
         
         setupUI()
-        render()
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-        metalView.frame = CGRect(
-            origin: .zero,
-            size: CGSize(
-                width: CGFloat(canvasWidth) / UIScreen.main.scale,
-                height: CGFloat(canvasHeight) / UIScreen.main.scale
-            )
-        )
-        
-        metalView.center = CGPoint(
-            x: view.frame.midX,
-            y: view.frame.midY)
+        updateUI()
     }
     
     // MARK: - Setup
     
     private func setupUI() {
-        view.backgroundColor = .editorBackground
+        contentVC.delegate = self
         
-        view.addSubview(metalView)
-        
-        metalView.setDrawableSize(
-            CGSize(width: canvasWidth, height: canvasHeight))
-        
-        metalView.delegate = self
+        let navController = UINavigationController(
+            rootViewController: contentVC)
+        addChild(navController, to: view)
     }
     
-    // MARK: - Render
+    // MARK: - UI
     
-    private func render() {
-        testRenderer.draw()
+    private func updateUI() {
+        let projectName = projectEditor
+            .currentProjectManifest
+            .name
         
-        let framebuffer = testRenderer.getFramebuffer()
+        let drawings = projectEditor
+            .currentProjectManifest
+            .timeline
+            .drawings
+        .map { 
+            EditorContentVC.Drawing(id: $0.id)
+        }
         
-        viewTextureRenderer.draw(
-            texture: framebuffer,
-            to: metalView.metalLayer)
+        contentVC.update(projectName: projectName)
+        contentVC.update(drawings: drawings)
     }
     
 }
 
 // MARK: - Delegates
 
-extension EditorVC: FrameEditorMetalViewDelegate {
+extension EditorVC: EditorContentVCDelegate {
     
-    func draw(in layer: CAMetalLayer) {
-        render()
+    func onSelectBack() {
+        dismiss(animated: true)
     }
     
-}
-
-extension EditorVC: FrameSceneRendererDelegate {
+    func onSelectCreateDrawing() {
+        // TODO
+    }
     
-    func textureForDrawing(drawingID: String) -> MTLTexture? {
-        return nil
+    func onSelectDrawing(id: String) {
+        // TODO
     }
     
 }

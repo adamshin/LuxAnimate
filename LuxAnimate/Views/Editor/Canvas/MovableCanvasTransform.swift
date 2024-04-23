@@ -1,10 +1,10 @@
 //
-//  CanvasTransform.swift
+//  MovableCanvasTransform.swift
 //
 
 import Foundation
 
-struct CanvasTransform {
+struct MovableCanvasTransform {
     
     var translation: Vector2 = .zero
     var rotation: Scalar = 0
@@ -12,7 +12,7 @@ struct CanvasTransform {
     
 }
 
-extension CanvasTransform {
+extension MovableCanvasTransform {
     
     mutating func applyTranslation(
         _ dTranslation: Vector2
@@ -52,7 +52,7 @@ extension CanvasTransform {
         applyTranslation(anchor)
     }
     
-    mutating func snapTranslationToKeepRectInOrigin(
+    mutating func snapTranslationToKeepRectContainingOrigin(
         x: Scalar, y: Scalar,
         width: Scalar, height: Scalar
     ) {
@@ -92,3 +92,4 @@ extension CanvasTransform {
     }
     
 }
+
