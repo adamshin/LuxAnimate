@@ -24,7 +24,7 @@ class MovableCanvasView: UIView {
     
     weak var delegate: MovableCanvasViewDelegate?
     
-    let contentView = MovableCanvasExtendedHitAreaView()
+    let canvasContentView = MovableCanvasExtendedHitAreaView()
     
     private let multiGesture = CanvasMultiGestureRecognizer()
     private let panGesture = UIPanGestureRecognizer()
@@ -38,10 +38,10 @@ class MovableCanvasView: UIView {
         super.init(frame: .zero)
         backgroundColor = .clear
         
-        addSubview(contentView)
-        contentView.frame = .zero
-        contentView.clipsToBounds = true
-        contentView.backgroundColor = .white
+        addSubview(canvasContentView)
+        canvasContentView.frame = .zero
+        canvasContentView.clipsToBounds = true
+        canvasContentView.backgroundColor = .white
         
         addGestureRecognizer(multiGesture)
         multiGesture.gestureDelegate = self
@@ -61,9 +61,11 @@ class MovableCanvasView: UIView {
         
         let canvasSize = delegate?.contentSize(self) ?? .zero
         
-        contentView.frame = CGRect(
-            center: bounds.center,
+        canvasContentView.bounds = CGRect(
+            origin: .zero,
             size: CGSize(canvasSize))
+        
+        canvasContentView.center = bounds.center
     }
     
     // MARK: - Transform
@@ -77,10 +79,10 @@ class MovableCanvasView: UIView {
         
         if animated {
             UIView.animate(springDuration: animDuration) {
-                contentView.transform = matrix.cgAffineTransform
+                canvasContentView.transform = matrix.cgAffineTransform
             }
         } else {
-            contentView.transform = matrix.cgAffineTransform
+            canvasContentView.transform = matrix.cgAffineTransform
         }
         
         delegate?.onUpdateTransform(self, transform)
@@ -211,6 +213,8 @@ class MovableCanvasView: UIView {
     }
     
     func fitCanvasToBounds(animated: Bool) {
+        layoutIfNeeded()
+        
         guard activeGestureCanvasTransform == nil else { return }
         
         baseCanvasTransform = canvasTransformFittingToBounds()

@@ -14,8 +14,8 @@ class EditorDrawingVC: UIViewController {
     
     private let canvasViewSize: Size
     
-    private let drawingRenderer: TestDrawingRenderer
-    private let layerRenderer: MetalLayerTextureRenderer
+//    private let drawingRenderer: TestDrawingRenderer
+//    private let layerRenderer: MetalLayerTextureRenderer
     
     // MARK: - Init
     
@@ -43,13 +43,13 @@ class EditorDrawingVC: UIViewController {
             viewportSize.width / 2,
             viewportSize.height / 2)
         
-        drawingRenderer = TestDrawingRenderer(
-            framebufferSize: viewportPixelSize,
-            viewportSize: viewportSize,
-            drawingSize: drawingSize,
-            drawingTexture: texture)
-        
-        layerRenderer = MetalLayerTextureRenderer()
+//        drawingRenderer = TestDrawingRenderer(
+//            framebufferSize: viewportPixelSize,
+//            viewportSize: viewportSize,
+//            drawingSize: drawingSize,
+//            drawingTexture: texture)
+//        
+//        layerRenderer = MetalLayerTextureRenderer()
         
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
@@ -75,9 +75,9 @@ class EditorDrawingVC: UIViewController {
         canvasView.pinEdges()
         canvasView.delegate = self
         
-        canvasView.contentView.addSubview(metalView)
-        metalView.pinEdges()
-        metalView.delegate = self
+//        canvasView.contentView.addSubview(metalView)
+//        metalView.pinEdges()
+//        metalView.delegate = self
         
         view.addSubview(backButton)
         backButton.pinEdges(
@@ -96,11 +96,11 @@ class EditorDrawingVC: UIViewController {
     // MARK: - Rendering
     
     private func render() {
-        drawingRenderer.draw()
-        
-        layerRenderer.draw(
-            texture: drawingRenderer.getFramebuffer(),
-            to: metalView.metalLayer)
+//        drawingRenderer.draw()
+//        
+//        layerRenderer.draw(
+//            texture: drawingRenderer.getFramebuffer(),
+//            to: metalView.metalLayer)
     }
     
 }
