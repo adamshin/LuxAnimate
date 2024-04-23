@@ -26,11 +26,11 @@ class FrameRenderer {
 //        
 //        // Render pipeline
 //        let library = metalInterface.device.makeDefaultLibrary()!
-//        let vertexFuction = library.makeFunction(name: "textureVertexShader")
+//        let vertexFunction = library.makeFunction(name: "textureVertexShader")
 //        let fragmentFunction = library.makeFunction(name: "textureFragmentShader")
 //        
 //        let pipelineDescriptor = MTLRenderPipelineDescriptor()
-//        pipelineDescriptor.vertexFunction = vertexFuction
+//        pipelineDescriptor.vertexFunction = vertexFunction
 //        pipelineDescriptor.fragmentFunction = fragmentFunction
 //        
 //        let attachment = pipelineDescriptor.colorAttachments[0]!

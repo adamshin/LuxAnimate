@@ -11,11 +11,12 @@ private let rotationSnapThreshold: Scalar =
 
 protocol MovableCanvasViewDelegate: AnyObject {
     
-    func canvasSize() -> CGSize
-    func minScale() -> Scalar
-    func maxScale() -> Scalar
+    func contentSize(_ v: MovableCanvasView) -> Size
+    func minScale(_ v: MovableCanvasView) -> Scalar
+    func maxScale(_ v: MovableCanvasView) -> Scalar
     
     func onUpdateTransform(
+        _ v: MovableCanvasView,
         _ transform: MovableCanvasTransform)
 }
 
@@ -23,7 +24,7 @@ class MovableCanvasView: UIView {
     
     weak var delegate: MovableCanvasViewDelegate?
     
-    let canvasView = MovableCanvasExtendedHitAreaView()
+    let contentView = MovableCanvasExtendedHitAreaView()
     
     private let multiGesture = CanvasMultiGestureRecognizer()
     private let panGesture = UIPanGestureRecognizer()
@@ -37,10 +38,10 @@ class MovableCanvasView: UIView {
         super.init(frame: .zero)
         backgroundColor = .clear
         
-        addSubview(canvasView)
-        canvasView.frame = .zero
-        canvasView.clipsToBounds = true
-        canvasView.backgroundColor = .white
+        addSubview(contentView)
+        contentView.frame = .zero
+        contentView.clipsToBounds = true
+        contentView.backgroundColor = .white
         
         addGestureRecognizer(multiGesture)
         multiGesture.gestureDelegate = self
@@ -58,11 +59,11 @@ class MovableCanvasView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        let canvasSize = delegate?.canvasSize() ?? .zero
+        let canvasSize = delegate?.contentSize(self) ?? .zero
         
-        canvasView.frame = CGRect(
+        contentView.frame = CGRect(
             center: bounds.center,
-            size: canvasSize)
+            size: CGSize(canvasSize))
     }
     
     // MARK: - Transform
@@ -76,19 +77,19 @@ class MovableCanvasView: UIView {
         
         if animated {
             UIView.animate(springDuration: animDuration) {
-                canvasView.transform = matrix.cgAffineTransform
+                contentView.transform = matrix.cgAffineTransform
             }
         } else {
-            canvasView.transform = matrix.cgAffineTransform
+            contentView.transform = matrix.cgAffineTransform
         }
         
-        delegate?.onUpdateTransform(transform)
+        delegate?.onUpdateTransform(self, transform)
     }
     
     private func canvasTransformFittingToBounds()
     -> MovableCanvasTransform {
         
-        guard let canvasSize = delegate?.canvasSize()
+        guard let canvasSize = delegate?.contentSize(self)
         else { return MovableCanvasTransform() }
         
         let xScaleToFit = bounds.width / canvasSize.width
@@ -106,7 +107,7 @@ class MovableCanvasView: UIView {
         _ transform: MovableCanvasTransform
     ) -> MovableCanvasTransform {
         
-        guard let canvasSize = delegate?.canvasSize()
+        guard let canvasSize = delegate?.contentSize(self)
         else { return MovableCanvasTransform() }
         
         var snappedTransform = transform
@@ -157,8 +158,8 @@ class MovableCanvasView: UIView {
         rotation: Scalar,
         scale: Scalar
     ) {
-        let minScale = delegate?.minScale() ?? 1
-        let maxScale = delegate?.maxScale() ?? 1
+        let minScale = delegate?.minScale(self) ?? 1
+        let maxScale = delegate?.maxScale(self) ?? 1
         
         let anchor = Vector(
             anchorPosition.x - bounds.width / 2,

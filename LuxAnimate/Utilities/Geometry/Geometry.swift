@@ -16,6 +16,24 @@ extension Scalar {
     static let radiansPerDegree = pi / 180
 }
 
+// MARK: - Size
+
+typealias Size = Size2
+
+struct Size2 {
+    var width, height: Scalar
+}
+
+extension Size2 {
+    
+    static let zero = Size2(0, 0)
+    
+    init(_ width: Scalar, _ height: Scalar) {
+        self.init(width: width, height: height)
+    }
+    
+}
+
 // MARK: - Vector
 
 typealias Vector = Vector2

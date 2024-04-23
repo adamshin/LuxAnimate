@@ -9,21 +9,28 @@ class EditorVC: UIViewController {
     private let contentVC = EditorContentVC()
     
     private let projectID: String
-    private let projectEditor: ProjectEditor
+    private let editor: ProjectEditor
     
     // MARK: - Init
     
     init(projectID: String) {
         self.projectID = projectID
         
-        projectEditor = try! ProjectEditor(projectID: projectID)
+        editor = ProjectEditor(projectID: projectID)
         
         super.init(nibName: nil, bundle: nil)
-        
         modalPresentationStyle = .fullScreen
+        
+        do {
+            try editor.startEditSession()
+        } catch { }
     }
     
     required init?(coder: NSCoder) { fatalError() }
+    
+    deinit {
+        editor.endEditSession()
+    }
     
     // MARK: - Lifecycle
     
@@ -47,15 +54,14 @@ class EditorVC: UIViewController {
     // MARK: - UI
     
     private func updateUI() {
-        let projectName = projectEditor
-            .currentProjectManifest
-            .name
+        guard let projectManifest = editor.projectManifest
+        else { return }
         
-        let drawings = projectEditor
-            .currentProjectManifest
-            .timeline
-            .drawings
-        .map { 
+        let projectName = projectManifest.name
+        
+        let drawings = projectManifest
+            .timeline.drawings
+        .map {
             EditorContentVC.Drawing(id: $0.id)
         }
         

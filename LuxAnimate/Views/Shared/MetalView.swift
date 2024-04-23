@@ -1,17 +1,17 @@
 //
-//  FrameEditorMetalView.swift
+//  MetalView.swift
 //
 
 import UIKit
 import Metal
 
-protocol FrameEditorMetalViewDelegate: AnyObject {
+protocol MetalViewDelegate: AnyObject {
     func draw(in layer: CAMetalLayer)
 }
 
-class FrameEditorMetalView: UIView {
+class MetalView: UIView {
     
-    weak var delegate: FrameEditorMetalViewDelegate?
+    weak var delegate: MetalViewDelegate?
     
     override class var layerClass: AnyClass {
         CAMetalLayer.self
@@ -46,7 +46,7 @@ class FrameEditorMetalView: UIView {
 
 // MARK: - CALayerDelegate
 
-extension FrameEditorMetalView {
+extension MetalView {
     
     override func display(_ layer: CALayer) {
         delegate?.draw(in: metalLayer)

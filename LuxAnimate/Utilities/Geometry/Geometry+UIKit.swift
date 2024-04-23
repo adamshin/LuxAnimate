@@ -24,6 +24,14 @@ extension CGPoint {
     
 }
 
+extension CGSize {
+    
+    init(_ s: Size2) {
+        self.init(width: s.width, height: s.height)
+    }
+    
+}
+
 extension Matrix3 {
     
     var cgAffineTransform: CGAffineTransform {

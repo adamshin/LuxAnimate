@@ -9,8 +9,7 @@ struct FrameScene {
     // TODO: Figure out how grouped layers will be rendered
     
     struct Layer {
-        var width: Scalar
-        var height: Scalar
+        var size: Size
         var transform: Matrix3
         
         var alpha: Double
@@ -23,8 +22,7 @@ struct FrameScene {
         case drawing(Project.Drawing)
     }
     
-    var width: Scalar
-    var height: Scalar
+    var size: Size
     
     var layers: [Layer]
     

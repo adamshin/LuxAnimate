@@ -1,12 +1,12 @@
 //
-//  ProjectEditor.swift
+//  ProjectEditSession.swift
 //
 
 import Foundation
 
 private let undoHistoryLimit = 100
 
-extension ProjectEditor {
+extension ProjectEditSession {
     
     struct NewAsset {
         var id: String
@@ -19,7 +19,7 @@ extension ProjectEditor {
     
 }
 
-class ProjectEditor {
+class ProjectEditSession {
     
     private let projectID: String
     

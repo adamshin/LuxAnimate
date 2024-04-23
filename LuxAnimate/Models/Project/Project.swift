@@ -9,6 +9,7 @@ enum Project {
     // MARK: - Manifest
     
     struct Manifest: Codable {
+        var id: String
         var name: String
         var createdAt: Date
         var modifiedAt: Date
