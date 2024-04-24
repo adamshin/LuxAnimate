@@ -47,7 +47,7 @@ struct TestDrawingRenderer {
         spriteRenderer.drawSprite(
             commandBuffer: commandBuffer,
             destination: framebuffer,
-            clearColor: Color(0, 0, 0, 1),
+            clearColor: Color(1, 1, 1, 1),
             viewportSize: viewportSize,
             texture: drawingTexture,
             size: drawingSize,

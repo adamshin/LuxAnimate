@@ -74,10 +74,7 @@ class EditorVC: UIViewController {
     
     private func createDrawing(imageData: Data) {
         do {
-            print("Creating drawing")
             try editor.createDrawing(imageData: imageData)
-            print("Done creating drawing")
-            
             updateUI()
             
         } catch { }
@@ -115,7 +112,7 @@ extension EditorVC: EditorContentVCDelegate {
         let vc = EditorDrawingVC(
             projectManifest: projectManifest,
             drawing: drawing,
-            drawingSize: Size(500, 500))
+            drawingSize: Size(1000, 1000))
         
         present(vc, animated: true)
     }
@@ -136,12 +133,10 @@ extension EditorVC: PHPickerViewControllerDelegate {
         { [weak self] object, error in
             guard let image = object as? UIImage else { return }
             
-            print("Extracting image data")
             guard let extractedData = try?
                 UIImageDataExtractor.imageData(from: image)
             else { return }
             
-            print("Encoding JXL image")
             guard let imageData = try? JXLEncoder.encode(
                 input: .init(
                     data: extractedData.data,
@@ -151,7 +146,6 @@ extension EditorVC: PHPickerViewControllerDelegate {
                 quality: 100,
                 effort: 1)
             else { return }
-            print("Done encoding")
             
             DispatchQueue.main.async {
                 self?.createDrawing(imageData: imageData)

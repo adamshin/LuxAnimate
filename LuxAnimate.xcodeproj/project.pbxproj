@@ -20,7 +20,6 @@
 		66311CE22BD740D900D53489 /* JXLImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66311CE12BD740D900D53489 /* JXLImageLoader.swift */; };
 		66311CE42BD76C0000D53489 /* EditorDrawingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66311CE32BD76C0000D53489 /* EditorDrawingVC.swift */; };
 		66311CE82BD78B6D00D53489 /* UIImageDataExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66311CE72BD78B6D00D53489 /* UIImageDataExtractor.swift */; };
-		66311CEA2BD867F200D53489 /* TestVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66311CE92BD867F200D53489 /* TestVC.swift */; };
 		6632594C2BB66C1A00460F70 /* JXLEncoderShim.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6632594B2BB66C1A00460F70 /* JXLEncoderShim.mm */; };
 		6632594E2BB6725B00460F70 /* JXLEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6632594D2BB6725B00460F70 /* JXLEncoder.swift */; };
 		6632595F2BB6E94E00460F70 /* libjxl.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6632595E2BB6E94E00460F70 /* libjxl.xcframework */; };
@@ -82,7 +81,6 @@
 		66311CE12BD740D900D53489 /* JXLImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = JXLImageLoader.swift; path = LuxAnimate/JXLImageLoader.swift; sourceTree = SOURCE_ROOT; };
 		66311CE32BD76C0000D53489 /* EditorDrawingVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorDrawingVC.swift; sourceTree = "<group>"; };
 		66311CE72BD78B6D00D53489 /* UIImageDataExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageDataExtractor.swift; sourceTree = "<group>"; };
-		66311CE92BD867F200D53489 /* TestVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestVC.swift; sourceTree = "<group>"; };
 		663259492BB66A3300460F70 /* JXLEncoderShim.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JXLEncoderShim.h; sourceTree = "<group>"; };
 		6632594A2BB66BB300460F70 /* BridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BridgingHeader.h; sourceTree = "<group>"; };
 		6632594B2BB66C1A00460F70 /* JXLEncoderShim.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = JXLEncoderShim.mm; sourceTree = "<group>"; };
@@ -477,7 +475,6 @@
 				66E523512BD341A500794751 /* EditorVC.swift */,
 				66311CD52BD7270000D53489 /* EditorContentVC.swift */,
 				66311CE32BD76C0000D53489 /* EditorDrawingVC.swift */,
-				66311CE92BD867F200D53489 /* TestVC.swift */,
 			);
 			path = Editor;
 			sourceTree = "<group>";
@@ -591,7 +588,6 @@
 				66D084712BA3CEC300EB8556 /* PassthroughView.swift in Sources */,
 				66D084842BA3FE2E00EB8556 /* LibraryContentVC.swift in Sources */,
 				66D0846F2BA3CEC300EB8556 /* Indirect.swift in Sources */,
-				66311CEA2BD867F200D53489 /* TestVC.swift in Sources */,
 				660CD1302BA92FF500C8C7B5 /* ProjectEditSession.swift in Sources */,
 				66B2BE3E2BCB21820072AC1B /* FrameSceneAssetLoader.swift in Sources */,
 				66D084782BA3CEC300EB8556 /* UIViewController+Extensions.swift in Sources */,

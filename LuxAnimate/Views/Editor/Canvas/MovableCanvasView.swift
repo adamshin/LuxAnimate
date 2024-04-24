@@ -59,13 +59,17 @@ class MovableCanvasView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        let canvasSize = delegate?.contentSize(self) ?? .zero
+        let canvasSize = delegate?.contentSize(self) ?? Size(1, 1)
         
         canvasContentView.bounds = CGRect(
             origin: .zero,
             size: CGSize(canvasSize))
-        
         canvasContentView.center = bounds.center
+        
+        let canvasTransform =
+            activeGestureCanvasTransform ??
+            baseCanvasTransform
+        delegate?.onUpdateTransform(self, canvasTransform)
     }
     
     // MARK: - Transform

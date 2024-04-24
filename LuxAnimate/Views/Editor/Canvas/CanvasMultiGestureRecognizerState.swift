@@ -276,9 +276,8 @@ class CanvasMultiGestureRecognizerActiveState: CanvasMultiGestureRecognizerInter
         else { return }
         
         let pinchFlickIn: Bool
+        
         if let pinchVelocity = scaleState?.pinchVelocity {
-//            print(String(format: "Pinch velocity: %0.2f", pinchVelocity))
-            
             if pinchVelocity < -pinchFlickVelocityThreshold {
                 pinchFlickIn = true
             } else {

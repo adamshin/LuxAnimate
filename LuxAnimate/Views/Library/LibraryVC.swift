@@ -53,9 +53,7 @@ extension LibraryVC: LibraryContentVCDelegate {
             _ = try libraryManager.createProject()
             reloadData()
             
-        } catch { 
-            print(error)
-        }
+        } catch { }
     }
     
     func onSelectProject(id: String) {
