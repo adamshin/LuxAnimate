@@ -17,6 +17,17 @@ enum BlendMode {
     case normal
 }
 
+enum SampleMode {
+    case nearest
+    case linear
+}
+
+enum ColorMode {
+    case none
+    case multiply
+    case brush
+}
+
 // MARK: - Extensions
 
 extension Color {
@@ -32,11 +43,28 @@ extension Color {
 }
 
 extension BlendMode {
-    
-    var shaderBlendMode: ShaderBlendMode {
+    var shaderValue: ShaderBlendMode {
         switch self {
         case .normal: ShaderBlendModeNormal
         }
     }
-    
+}
+
+extension SampleMode {
+    var shaderValue: ShaderSampleMode {
+        switch self {
+        case .nearest: ShaderSampleModeNearest
+        case .linear: ShaderSampleModeLinear
+        }
+    }
+}
+
+extension ColorMode {
+    var shaderValue: ShaderColorMode {
+        switch self {
+        case .none: ShaderColorModeNone
+        case .multiply: ShaderColorModeMultiply
+        case .brush: ShaderColorModeBrush
+        }
+    }
 }

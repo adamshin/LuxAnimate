@@ -7,6 +7,8 @@ import Metal
 
 struct ImageResizer {
     
+    private let spriteRenderer = SpriteRenderer()
+    
     static func resize(
         imageData: Data,
         width: Int,
@@ -14,6 +16,14 @@ struct ImageResizer {
         targetWidth: Int,
         targetHeight: Int
     ) throws -> Data {
+        
+        let renderTarget = RenderTarget(
+            size: PixelSize(
+                width: targetWidth,
+                height: targetHeight))
+        
+        // TODO
+        
         return Data()
     }
     

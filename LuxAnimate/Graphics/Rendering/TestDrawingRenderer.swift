@@ -7,37 +7,26 @@ import Metal
 
 struct TestDrawingRenderer {
     
-    private let framebufferSize: PixelSize
+    let renderTarget: RenderTarget
+    
     private let viewportSize: Size
     private let drawingSize: Size
     
-    private let framebuffer: MTLTexture
     private let drawingTexture: MTLTexture
     
-    private let spriteRenderer = SpriteRenderer(
-        pixelFormat: .rgba8Unorm)
+    private let spriteRenderer = SpriteRenderer()
     
     init(
-        framebufferSize: PixelSize,
+        renderTargetSize: PixelSize,
         viewportSize: Size,
         drawingSize: Size,
         drawingTexture: MTLTexture
     ) {
-        self.framebufferSize = framebufferSize
         self.viewportSize = viewportSize
         self.drawingSize = drawingSize
         self.drawingTexture = drawingTexture
         
-        // Framebuffer
-        let texDescriptor = MTLTextureDescriptor()
-        texDescriptor.width = framebufferSize.width
-        texDescriptor.height = framebufferSize.height
-        texDescriptor.pixelFormat = .rgba8Unorm
-        texDescriptor.storageMode = .private
-        texDescriptor.usage = [.renderTarget, .shaderRead]
-        
-        framebuffer = MetalInterface.shared.device
-            .makeTexture(descriptor: texDescriptor)!
+        renderTarget = RenderTarget(size: renderTargetSize)
     }
     
     func draw() {
@@ -46,7 +35,7 @@ struct TestDrawingRenderer {
         
         spriteRenderer.drawSprite(
             commandBuffer: commandBuffer,
-            destination: framebuffer,
+            destination: renderTarget.texture,
             clearColor: Color(1, 1, 1, 1),
             viewportSize: viewportSize,
             texture: drawingTexture,
@@ -56,10 +45,6 @@ struct TestDrawingRenderer {
                 viewportSize.height / 2))
         
         commandBuffer.commit()
-    }
-    
-    func getFramebuffer() -> MTLTexture {
-        framebuffer
     }
     
 }

@@ -7,6 +7,8 @@ import Metal
 
 struct AppConfig {
     
+    static let pixelFormat: MTLPixelFormat = .rgba8Unorm
+    
 //    static let canvasFormat = CanvasFormat(
 //        size: PixelSize(
 //            width: 3840,

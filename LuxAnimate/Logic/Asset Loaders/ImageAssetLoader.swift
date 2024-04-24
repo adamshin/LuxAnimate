@@ -26,7 +26,7 @@ struct ImageAssetLoader {
         let texDescriptor = MTLTextureDescriptor()
         texDescriptor.width = decOutput.width
         texDescriptor.height = decOutput.height
-        texDescriptor.pixelFormat = .rgba8Unorm
+        texDescriptor.pixelFormat = AppConfig.pixelFormat
         texDescriptor.storageMode = .private
         texDescriptor.usage = [.shaderRead]
         

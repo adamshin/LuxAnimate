@@ -22,7 +22,7 @@ struct JXLTextureLoader {
         let texDescriptor = MTLTextureDescriptor()
         texDescriptor.width = output.width
         texDescriptor.height = output.height
-        texDescriptor.pixelFormat = .rgba8Unorm
+        texDescriptor.pixelFormat = AppConfig.pixelFormat
         texDescriptor.usage = [.shaderRead]
         
         let texture = MetalInterface.shared.device

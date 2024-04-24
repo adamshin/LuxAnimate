@@ -29,11 +29,11 @@ class FrameSceneRenderer {
             width: lround(sceneSize.width * pixelScale),
             height: lround(sceneSize.height * pixelScale))
         
-        // Framebuffer
+        // RenderTarget
         let texDescriptor = MTLTextureDescriptor()
         texDescriptor.width = canvasSize.width
         texDescriptor.height = canvasSize.height
-        texDescriptor.pixelFormat = .rgba8Unorm
+        texDescriptor.pixelFormat = AppConfig.pixelFormat
         texDescriptor.storageMode = .private
         texDescriptor.usage = [.renderTarget, .shaderRead]
         
@@ -41,7 +41,7 @@ class FrameSceneRenderer {
             .makeTexture(descriptor: texDescriptor)!
     }
     
-    func getFramebuffer() -> MTLTexture { framebuffer }
+    func getRenderTarget() -> MTLTexture { framebuffer }
     
     func render(frameScene: FrameScene) {
         let commandBuffer = MetalInterface.shared.commandQueue

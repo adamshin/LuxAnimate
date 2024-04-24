@@ -7,7 +7,7 @@
 
 using namespace metal;
 
-// MARK: - Transforms
+// MARK: - General
 
 float2 viewportToClipSpace(float2 position, float2 viewportSize) {
     float2 normalizedPosition = position.xy / viewportSize;
@@ -15,8 +15,6 @@ float2 viewportToClipSpace(float2 position, float2 viewportSize) {
     clipSpacePosition.y = -clipSpacePosition.y;
     return clipSpacePosition;
 }
-
-// MARK: - Blending
 
 float4 blendNormal(float4 c1, float4 c2) {
     float a1 = c1.a;
@@ -36,16 +34,80 @@ float4 blend(
     float4 c1,
     float4 c2,
     ShaderBlendMode blendMode
- ) {
-     // TODO: Switch blend mode
-     return blendNormal(c1, c2);
- }
+) {
+    switch (blendMode) {
+        case ShaderBlendModeNormal:
+            return blendNormal(c1, c2);
+        default:
+            return blendNormal(c1, c2);
+    }
+}
+
+sampler samplerForMode(
+    ShaderSampleMode sampleMode
+) {
+    switch (sampleMode) {
+        case ShaderSampleModeNearest:
+            return sampler(
+                address::clamp_to_edge,
+                mag_filter::nearest,
+                min_filter::nearest,
+                mip_filter::none
+            );
+        case ShaderSampleModeLinear:
+            return sampler(
+                address::clamp_to_edge,
+                mag_filter::linear,
+                min_filter::linear,
+                mip_filter::linear
+            );
+        case ShaderSampleModeLinearClampEdgeToZero:
+            return sampler(
+                address::clamp_to_zero,
+                mag_filter::linear,
+                min_filter::linear,
+                mip_filter::linear
+            );
+        default:
+            return sampler(
+                address::clamp_to_edge,
+                mag_filter::nearest,
+                min_filter::nearest,
+                mip_filter::none
+            );
+    }
+}
+
+float4 colorForColorMode(
+    float4 textureColor,
+    float4 vertexColor,
+    ShaderColorMode colorMode
+) {
+    switch (colorMode) {
+        case ShaderColorModeNone:
+            return textureColor;
+            
+        case ShaderColorModeMultiply:
+            return textureColor * vertexColor;
+            
+        case ShaderColorModeBrush: {
+            float4 color = vertexColor;
+            color.a = color.a * textureColor.r;
+            return color;
+        }
+        
+        default:
+            return textureColor;
+    }
+}
 
 // MARK: - Sprite
 
 struct SpriteVertexOutput {
     float4 position [[position]];
     float2 texCoord;
+    float4 color;
+    float alpha;
 };
 
 vertex SpriteVertexOutput spriteVertexShader(
@@ -68,6 +130,8 @@ vertex SpriteVertexOutput spriteVertexShader(
     
     out.position = float4(clipSpacePosition, 0.0, 1.0);
     out.texCoord = in.texCoord;
+    out.color = in.color;
+    out.alpha = in.alpha;
     
     return out;
 }
@@ -86,66 +150,11 @@ fragment float4 spriteFragmentShader(
     float4 dst 
         [[color(0)]])
 {
-    sampler s(
-        address::clamp_to_edge,
-        mag_filter::linear,
-        min_filter::linear,
-        mip_filter::linear
-    );
+    sampler s = samplerForMode(uniforms.sampleMode);
     
-    float4 src = texture.sample(s, in.texCoord);
-    src.a *= uniforms.alpha;
+    float4 color = texture.sample(s, in.texCoord);
+    color = colorForColorMode(color, in.color, uniforms.colorMode);
+    color.a *= in.alpha;
     
-    return blend(src, dst, uniforms.blendMode);
+    return blend(color, dst, uniforms.blendMode);
 }
-
-// MARK: - Brush
-/*
-
-struct BrushVertexOutput {
-    float4 position [[position]];
-    float2 texCoord;
-    float4 color;
-    float alpha;
-};
-
-vertex BrushVertexOutput brushVertexShader(
-    uint vertexID [[vertex_id]],
-    constant BrushVertex *vertices [[buffer(VertexBufferIndexVertices)]],
-    constant FrameData& frameData [[buffer(VertexBufferIndexFrameData)]]
-) {
-    BrushVertex in = vertices[vertexID];
-    
-    BrushVertexOutput out;
-    
-    float2 normalizedPosition = in.position.xy / frameData.viewportSize;
-    float2 clipSpacePosition = normalizedPosition * 2.0 - 1.0;
-    clipSpacePosition.y = -clipSpacePosition.y;
-    out.position = float4(clipSpacePosition, 0.0, 1.0);
-    
-    out.texCoord = in.texCoord;
-    out.color = in.color;
-    out.alpha = in.alpha;
-    
-    return out;
-}
-
-fragment float4 brushFragmentShader(
-    BrushVertexOutput in [[stage_in]],
-    texture2d<float> texture [[texture(0)]],
-    float4 dst [[color(0)]])
-{
-    sampler s(
-        address::clamp_to_zero,
-        mag_filter::linear,
-        min_filter::linear,
-        mip_filter::linear
-    );
-    float4 tex = texture.sample(s, in.texCoord);
-    
-    float4 src = in.color;
-    src.a = src.a * tex.r * in.alpha;
-    
-    return blendNormal(src, dst);
-}
-*/

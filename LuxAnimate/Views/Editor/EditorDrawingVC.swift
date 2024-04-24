@@ -49,7 +49,7 @@ class EditorDrawingVC: UIViewController {
             viewportSize.height)
         
         drawingRenderer = TestDrawingRenderer(
-            framebufferSize: viewportPixelSize,
+            renderTargetSize: viewportPixelSize,
             viewportSize: viewportSize,
             drawingSize: drawingSize,
             drawingTexture: drawingTexture)
@@ -115,7 +115,7 @@ class EditorDrawingVC: UIViewController {
         drawingRenderer.draw()
         
         layerRenderer.draw(
-            texture: drawingRenderer.getFramebuffer(),
+            texture: drawingRenderer.renderTarget.texture,
             to: metalView.metalLayer)
     }
     

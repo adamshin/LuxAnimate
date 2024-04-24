@@ -9,7 +9,9 @@ class SpriteRenderer {
     
     private let pipelineState: MTLRenderPipelineState
     
-    init(pixelFormat: MTLPixelFormat) {
+    init(
+        pixelFormat: MTLPixelFormat = AppConfig.pixelFormat
+    ) {
         let library = MetalInterface.shared.device
             .makeDefaultLibrary()!
         
@@ -40,7 +42,10 @@ class SpriteRenderer {
         rotation: Scalar = 0,
         scale: Scalar = 1,
         alpha: Double = 1,
-        blendMode: BlendMode = .normal
+        blendMode: BlendMode = .normal,
+        sampleMode: SampleMode = .linear,
+        colorMode: ColorMode = .none,
+        color: Color = .init(1, 1, 1, 1)
     ) {
         let renderPassDescriptor = MTLRenderPassDescriptor()
         
@@ -78,7 +83,14 @@ class SpriteRenderer {
                     y: Float(tp.y)),
                 texCoord: .init(
                     x: Float(p.x),
-                    y: Float(p.y)))
+                    y: Float(p.y)),
+                color: .init(
+                    Float(color.r),
+                    Float(color.g),
+                    Float(color.b),
+                    Float(color.a)),
+                alpha: Float(alpha)
+            )
         }
         
         var vertexUniforms = SpriteVertexUniforms(
@@ -87,8 +99,9 @@ class SpriteRenderer {
                 Float(viewportSize.height)))
         
         var fragmentUniforms = SpriteFragmentUniforms(
-            alpha: Float(alpha),
-            blendMode: blendMode.shaderBlendMode)
+            blendMode: blendMode.shaderValue,
+            sampleMode: sampleMode.shaderValue,
+            colorMode: colorMode.shaderValue)
         
         renderEncoder.setVertexBytes(
             vertices,

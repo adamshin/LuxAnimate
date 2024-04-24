@@ -14,6 +14,20 @@ typedef enum
     ShaderBlendModeNormal = 0,
 } ShaderBlendMode;
 
+typedef enum
+{
+    ShaderSampleModeNearest = 0,
+    ShaderSampleModeLinear = 1,
+    ShaderSampleModeLinearClampEdgeToZero = 2,
+} ShaderSampleMode;
+
+typedef enum
+{
+    ShaderColorModeNone = 0,
+    ShaderColorModeMultiply = 1,
+    ShaderColorModeBrush = 2,
+} ShaderColorMode;
+
 // MARK: - Sprite
 
 typedef enum
@@ -34,39 +48,10 @@ typedef struct
 
 typedef struct
 {
-    float alpha;
     ShaderBlendMode blendMode;
+    ShaderSampleMode sampleMode;
+    ShaderColorMode colorMode;
 } SpriteFragmentUniforms;
-
-typedef struct
-{
-    simd_float2 position;
-    simd_float2 texCoord;
-} SpriteVertex;
-
-// MARK: - Brush
-
-/*
-typedef enum BrushVertexBufferIndex
-{
-    BrushVertexBufferIndexVertices = 0,
-    BrushVertexBufferIndexUniforms = 1,
-} BrushVertexBufferIndex;
-
-typedef enum
-{
-    BrushFragmentBufferIndexUniforms = 0,
-} BrushFragmentBufferIndex;
-
-typedef struct
-{
-    simd_float2 viewportSize;
-} BrushVertexUniforms;
-
-typedef struct
-{
-    RenderBlendMode blendMode;
-} BrushFragmentUniforms;
 
 typedef struct
 {
@@ -74,7 +59,6 @@ typedef struct
     simd_float2 texCoord;
     simd_float4 color;
     float alpha;
-} BrushVertex;
- */
+} SpriteVertex;
 
 #endif

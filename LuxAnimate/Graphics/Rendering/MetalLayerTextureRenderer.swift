@@ -26,7 +26,8 @@ class MetalLayerTextureRenderer {
             viewportSize: Size(1, 1),
             texture: texture,
             size: Size(1, 1),
-            position: .init(0.5, 0.5))
+            position: .init(0.5, 0.5),
+            sampleMode: .nearest)
         
         commandBuffer.present(drawable)
         commandBuffer.commit()
