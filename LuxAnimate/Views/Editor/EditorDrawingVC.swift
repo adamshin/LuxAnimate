@@ -6,7 +6,7 @@ import UIKit
 import Metal
 
 private let minScaleLevel: Scalar = 0.1
-private let maxScaleLevel: Scalar = 50.0
+private let maxScaleLevel: Scalar = 30
 private let scalePixelateThreshold: Scalar = 1.0
 
 class EditorDrawingVC: UIViewController {
@@ -45,8 +45,8 @@ class EditorDrawingVC: UIViewController {
         drawingTexture = try! JXLTextureLoader.load(url: url)
         
         canvasViewSize = Size(
-            viewportSize.width / 2,
-            viewportSize.height / 2)
+            viewportSize.width,
+            viewportSize.height)
         
         drawingRenderer = TestDrawingRenderer(
             framebufferSize: viewportPixelSize,
@@ -55,6 +55,8 @@ class EditorDrawingVC: UIViewController {
             drawingTexture: drawingTexture)
         
         layerRenderer = MetalLayerTextureRenderer()
+        
+        metalView.setDrawableSize(CGSize(viewportSize))
         
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
@@ -89,6 +91,9 @@ class EditorDrawingVC: UIViewController {
         canvasView.canvasContentView.addSubview(metalView)
         metalView.pinEdges()
         metalView.delegate = self
+        
+        metalView.metalLayer.shouldRasterize = true
+        metalView.metalLayer.rasterizationScale = 1
         
         view.addSubview(backButton)
         backButton.pinEdges(
@@ -135,11 +140,13 @@ extension EditorDrawingVC: MovableCanvasViewDelegate {
     func onUpdateTransform(
         _ v: MovableCanvasView,
         _ transform: MovableCanvasTransform
-    ) { 
+    ) {
         if transform.scale >= scalePixelateThreshold {
             metalView.layer.magnificationFilter = .nearest
+            metalView.layer.minificationFilter = .nearest
         } else {
             metalView.layer.magnificationFilter = .linear
+            metalView.layer.minificationFilter = .linear
         }
     }
     
