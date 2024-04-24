@@ -98,6 +98,7 @@ struct ImageResizer {
             sampleMode: .linear)
         
         commandBuffer.commit()
+        commandBuffer.waitUntilCompleted()
         
         let bytesPerPixel = 4
         let bytesPerRow = bytesPerPixel * targetWidth
