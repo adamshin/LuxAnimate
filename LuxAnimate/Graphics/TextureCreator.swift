@@ -1,27 +1,25 @@
 //
-//  JXLTextureLoader.swift
+//  TextureCreator.swift
 //
 
 import Foundation
 import Metal
 
-struct JXLTextureLoader {
+struct TextureCreator {
     
     enum Error: Swift.Error {
         case emptyData
     }
     
-    static func load(
-        url: URL,
-        usage: MTLTextureUsage = .shaderRead
+    static func createTexture(
+        imageData: Data,
+        width: Int,
+        height: Int
     ) throws -> MTLTexture {
         
-        let data = try Data(contentsOf: url)
-        let output = try JXLDecoder.decode(data: data)
-        
         let texDescriptor = MTLTextureDescriptor()
-        texDescriptor.width = output.width
-        texDescriptor.height = output.height
+        texDescriptor.width = width
+        texDescriptor.height = height
         texDescriptor.pixelFormat = AppConfig.pixelFormat
         texDescriptor.usage = [.shaderRead]
         
@@ -29,16 +27,14 @@ struct JXLTextureLoader {
             .makeTexture(descriptor: texDescriptor)!
         
         let bytesPerPixel = 4
-        let bytesPerRow = output.width * bytesPerPixel
+        let bytesPerRow = width * bytesPerPixel
         
-        try output.data.withUnsafeBytes { bytes in
+        try imageData.withUnsafeBytes { bytes in
             guard let baseAddress = bytes.baseAddress
             else { throw Error.emptyData }
             
             let region = MTLRegionMake2D(
-                0, 0,
-                output.width,
-                output.height)
+                0, 0, width, height)
             
             texture.replace(
                 region: region,

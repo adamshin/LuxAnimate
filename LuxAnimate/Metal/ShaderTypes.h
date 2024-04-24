@@ -12,6 +12,7 @@
 typedef enum
 {
     ShaderBlendModeNormal = 0,
+    ShaderBlendModeReplace = 1,
 } ShaderBlendMode;
 
 typedef enum

@@ -16,8 +16,8 @@ class MetalLayerTextureRenderer {
     ) {
         guard let drawable = layer.nextDrawable() else { return }
         
-        let commandBuffer = MetalInterface.shared.commandQueue
-            .makeCommandBuffer()!
+        let commandBuffer = MetalInterface.shared
+            .commandQueue.makeCommandBuffer()!
         
         spriteRenderer.drawSprites(
             commandBuffer: commandBuffer,

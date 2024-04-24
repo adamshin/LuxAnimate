@@ -1,5 +1,5 @@
 //
-//  MetalInterface.swift
+//  Metal.swift
 //
 
 import Metal
@@ -21,6 +21,51 @@ struct MetalInterface {
 }
 
 // MARK: - Shader Types
+
+enum BlendMode {
+    case normal
+    case replace
+}
+
+enum SampleMode {
+    case nearest
+    case linear
+}
+
+enum ColorMode {
+    case none
+    case multiply
+    case brush
+}
+
+
+extension BlendMode {
+    var shaderValue: ShaderBlendMode {
+        switch self {
+        case .normal: ShaderBlendModeNormal
+        case .replace: ShaderBlendModeReplace
+        }
+    }
+}
+
+extension SampleMode {
+    var shaderValue: ShaderSampleMode {
+        switch self {
+        case .nearest: ShaderSampleModeNearest
+        case .linear: ShaderSampleModeLinear
+        }
+    }
+}
+
+extension ColorMode {
+    var shaderValue: ShaderColorMode {
+        switch self {
+        case .none: ShaderColorModeNone
+        case .multiply: ShaderColorModeMultiply
+        case .brush: ShaderColorModeBrush
+        }
+    }
+}
 
 extension SpriteVertex {
     

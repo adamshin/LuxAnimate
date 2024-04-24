@@ -30,8 +30,8 @@ struct TestDrawingRenderer {
     }
     
     func draw() {
-        let commandBuffer = MetalInterface.shared.commandQueue
-            .makeCommandBuffer()!
+        let commandBuffer = MetalInterface.shared
+            .commandQueue.makeCommandBuffer()!
         
         spriteRenderer.drawSprites(
             commandBuffer: commandBuffer,

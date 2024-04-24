@@ -8,12 +8,6 @@ import Metal
 struct AppConfig {
     
     static let pixelFormat: MTLPixelFormat = .rgba8Unorm
-    
-//    static let canvasFormat = CanvasFormat(
-//        size: PixelSize(
-//            width: 3840,
-//            height: 3840),
-//        pixelFormat: .bgra8Unorm)
 
 //    static let brushConfig = Brush.Configuration(
 //        stampTextureName: "brush2.png",

@@ -38,6 +38,10 @@ float4 blend(
     switch (blendMode) {
         case ShaderBlendModeNormal:
             return blendNormal(c1, c2);
+            
+        case ShaderBlendModeReplace:
+            return c1;
+            
         default:
             return blendNormal(c1, c2);
     }

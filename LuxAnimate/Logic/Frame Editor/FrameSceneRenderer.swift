@@ -44,8 +44,8 @@ class FrameSceneRenderer {
     func getRenderTarget() -> MTLTexture { framebuffer }
     
     func render(frameScene: FrameScene) {
-        let commandBuffer = MetalInterface.shared.commandQueue
-            .makeCommandBuffer()!
+        let commandBuffer = MetalInterface.shared
+            .commandQueue.makeCommandBuffer()!
         
 //        for layer in frameScene.layers {
 //            renderLayer(
