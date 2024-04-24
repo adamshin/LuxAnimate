@@ -33,16 +33,19 @@ struct TestDrawingRenderer {
         let commandBuffer = MetalInterface.shared.commandQueue
             .makeCommandBuffer()!
         
-        spriteRenderer.drawSprite(
+        spriteRenderer.drawSprites(
             commandBuffer: commandBuffer,
-            destination: renderTarget.texture,
+            target: renderTarget.texture,
             clearColor: Color(1, 1, 1, 1),
             viewportSize: viewportSize,
             texture: drawingTexture,
-            size: drawingSize,
-            position: .init(
-                viewportSize.width / 2,
-                viewportSize.height / 2))
+            sprites: [
+                SpriteRenderer.Sprite(
+                    size: drawingSize,
+                    position: Vector(
+                        viewportSize.width / 2,
+                        viewportSize.height / 2))
+            ])
         
         commandBuffer.commit()
     }

@@ -5,7 +5,7 @@
 import Foundation
 import Metal
 
-class RenderTarget {
+struct RenderTarget {
     
     let texture: MTLTexture
     

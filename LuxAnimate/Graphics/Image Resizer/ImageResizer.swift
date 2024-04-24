@@ -17,10 +17,10 @@ struct ImageResizer {
         targetHeight: Int
     ) throws -> Data {
         
-        let renderTarget = RenderTarget(
-            size: PixelSize(
-                width: targetWidth,
-                height: targetHeight))
+//        let renderTarget = RenderTarget(
+//            size: PixelSize(
+//                width: targetWidth,
+//                height: targetHeight))
         
         // TODO
         

@@ -5,7 +5,15 @@
 import Foundation
 import Metal
 
-class SpriteRenderer {
+struct SpriteRenderer {
+    
+    struct Sprite {
+        var size: Size
+        var position: Vector
+        var rotation: Scalar = 0
+        var scale: Scalar = 1
+        var alpha: Double = 1
+    }
     
     private let pipelineState: MTLRenderPipelineState
     
@@ -31,17 +39,13 @@ class SpriteRenderer {
             .makeRenderPipelineState(descriptor: pipelineDescriptor)
     }
     
-    func drawSprite(
+    func drawSprites(
         commandBuffer: any MTLCommandBuffer,
-        destination: MTLTexture,
+        target: MTLTexture,
         clearColor: Color?,
         viewportSize: Size,
         texture: MTLTexture,
-        size: Size,
-        position: Vector,
-        rotation: Scalar = 0,
-        scale: Scalar = 1,
-        alpha: Double = 1,
+        sprites: [Sprite],
         blendMode: BlendMode = .normal,
         sampleMode: SampleMode = .linear,
         colorMode: ColorMode = .none,
@@ -50,7 +54,7 @@ class SpriteRenderer {
         let renderPassDescriptor = MTLRenderPassDescriptor()
         
         let attachment = renderPassDescriptor.colorAttachments[0]!
-        attachment.texture = destination
+        attachment.texture = target
         attachment.storeAction = .store
         
         attachment.loadAction = clearColor != nil ?
@@ -64,33 +68,29 @@ class SpriteRenderer {
         
         renderEncoder.setRenderPipelineState(pipelineState)
         
-        var t = Matrix3.identity
-        t = Matrix3(translation: .init(-0.5, -0.5)) * t
-        t = Matrix3(scale: .init(size.width, size.height)) * t
-        t = Matrix3(scale: .init(scale, scale)) * t
-        t = Matrix3(rotation: rotation) * t
-        t = Matrix3(translation: position) * t
+        var vertices: [SpriteVertex] = []
         
-        let vertexPositions: [Vector] = [
-            .init(0, 0), .init(1, 0),
-            .init(0, 1), .init(1, 1)
-        ]
-        let vertices = vertexPositions.map { p in
-            let tp = t * p
-            return SpriteVertex(
-                position: .init(
-                    x: Float(tp.x),
-                    y: Float(tp.y)),
-                texCoord: .init(
-                    x: Float(p.x),
-                    y: Float(p.y)),
-                color: .init(
-                    Float(color.r),
-                    Float(color.g),
-                    Float(color.b),
-                    Float(color.a)),
-                alpha: Float(alpha)
-            )
+        for s in sprites {
+            var t = Matrix3.identity
+            t = Matrix3(translation: .init(-0.5, -0.5)) * t
+            t = Matrix3(scale: .init(s.size.width, s.size.height)) * t
+            t = Matrix3(scale: .init(s.scale, s.scale)) * t
+            t = Matrix3(rotation: s.rotation) * t
+            t = Matrix3(translation: s.position) * t
+            
+            let quadPositions: [Vector] = [
+                .init(0, 0), .init(1, 0), .init(1, 1),
+                .init(0, 0), .init(1, 1), .init(0, 1),
+            ]
+            let spriteVertices = quadPositions.map { p in
+                let tp = t * p
+                return SpriteVertex(
+                    position: tp,
+                    texCoord: p,
+                    color: color,
+                    alpha: s.alpha)
+            }
+            vertices += spriteVertices
         }
         
         var vertexUniforms = SpriteVertexUniforms(
@@ -121,7 +121,7 @@ class SpriteRenderer {
         renderEncoder.setFragmentTexture(texture, index: 0)
         
         renderEncoder.drawPrimitives(
-            type: .triangleStrip,
+            type: .triangle,
             vertexStart: 0,
             vertexCount: vertices.count)
          

@@ -19,14 +19,17 @@ class MetalLayerTextureRenderer {
         let commandBuffer = MetalInterface.shared.commandQueue
             .makeCommandBuffer()!
         
-        spriteRenderer.drawSprite(
+        spriteRenderer.drawSprites(
             commandBuffer: commandBuffer,
-            destination: drawable.texture,
+            target: drawable.texture,
             clearColor: Color(0, 0, 0, 1),
             viewportSize: Size(1, 1),
             texture: texture,
-            size: Size(1, 1),
-            position: .init(0.5, 0.5),
+            sprites: [
+                SpriteRenderer.Sprite(
+                    size: Size(1, 1),
+                    position: Vector(0.5, 0.5))
+            ],
             sampleMode: .nearest)
         
         commandBuffer.present(drawable)
