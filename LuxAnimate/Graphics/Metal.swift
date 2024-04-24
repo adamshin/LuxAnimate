@@ -30,6 +30,7 @@ enum BlendMode {
 enum SampleMode {
     case nearest
     case linear
+    case linearClampEdgeToZero
 }
 
 enum ColorMode {
@@ -53,6 +54,7 @@ extension SampleMode {
         switch self {
         case .nearest: ShaderSampleModeNearest
         case .linear: ShaderSampleModeLinear
+        case .linearClampEdgeToZero: ShaderSampleModeLinearClampEdgeToZero
         }
     }
 }
