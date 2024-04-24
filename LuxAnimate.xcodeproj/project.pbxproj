@@ -170,6 +170,7 @@
 		66311CD42BD7252D00D53489 /* Graphics */ = {
 			isa = PBXGroup;
 			children = (
+				664B59652BC5AA1E003FA90E /* Metal.swift */,
 				66B491B22BD9993F008A2A2E /* TextureCreator.swift */,
 				66311CDA2BD73FAF00D53489 /* ImageResizer.swift */,
 				66311CE72BD78B6D00D53489 /* UIImageDataExtractor.swift */,
@@ -235,14 +236,13 @@
 			path = "Stroke Gesture";
 			sourceTree = "<group>";
 		};
-		664B59682BC5AA1E003FA90E /* Metal */ = {
+		664B59682BC5AA1E003FA90E /* Shaders */ = {
 			isa = PBXGroup;
 			children = (
-				664B59652BC5AA1E003FA90E /* Metal.swift */,
 				664B596D2BC5AA25003FA90E /* ShaderTypes.h */,
 				664B596C2BC5AA25003FA90E /* Shaders.metal */,
 			);
-			path = Metal;
+			path = Shaders;
 			sourceTree = "<group>";
 		};
 		664B59792BC5D5DD003FA90E /* Frame Editor */ = {
@@ -322,7 +322,7 @@
 				66D0847F2BA3ED7E00EB8556 /* Logic */,
 				66311CDE2BD740BC00D53489 /* Rendering */,
 				66311CD42BD7252D00D53489 /* Graphics */,
-				664B59682BC5AA1E003FA90E /* Metal */,
+				664B59682BC5AA1E003FA90E /* Shaders */,
 				66D0846B2BA3CEC300EB8556 /* Utilities */,
 				66D084522BA3CD1F00EB8556 /* System */,
 				663259452BB6696500460F70 /* Frameworks */,

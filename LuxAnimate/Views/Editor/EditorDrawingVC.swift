@@ -38,11 +38,14 @@ class EditorDrawingVC: UIViewController {
             width: projectManifest.metadata.viewportWidth,
             height: projectManifest.metadata.viewportHeight)
         
-        let url = FileUrlHelper().projectAssetURL(
+        let assetURL = FileUrlHelper().projectAssetURL(
             projectID: projectManifest.id,
-            assetID: drawing.assets.full)
+//            assetID: drawing.assets.full)
+            assetID: drawing.assets.previewSmall)
         
-        drawingTexture = try! JXLTextureLoader.load(url: url)
+        print(assetURL)
+        
+        drawingTexture = try! JXLTextureLoader.load(url: assetURL)
         
         canvasViewSize = Size(
             viewportSize.width,

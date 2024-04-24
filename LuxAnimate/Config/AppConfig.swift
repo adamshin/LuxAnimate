@@ -8,6 +8,9 @@ import Metal
 struct AppConfig {
     
     static let pixelFormat: MTLPixelFormat = .rgba8Unorm
+    
+    static let assetPreviewMediumSize = 1200
+    static let assetPreviewSmallSize = 10//300
 
 //    static let brushConfig = Brush.Configuration(
 //        stampTextureName: "brush2.png",

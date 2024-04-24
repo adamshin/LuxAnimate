@@ -29,8 +29,8 @@ struct TextureCreator {
         let bytesPerPixel = 4
         let bytesPerRow = width * bytesPerPixel
         
-        try imageData.withUnsafeBytes { bytes in
-            guard let baseAddress = bytes.baseAddress
+        try imageData.withUnsafeBytes { pointer in
+            guard let baseAddress = pointer.baseAddress
             else { throw Error.emptyData }
             
             let region = MTLRegionMake2D(

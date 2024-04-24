@@ -72,9 +72,17 @@ class EditorVC: UIViewController {
     
     // MARK: - Logic
     
-    private func createDrawing(imageData: Data) {
+    private func createDrawing(
+        imageData: Data,
+        imageWidth: Int,
+        imageHeight: Int
+    ) {
         do {
-            try editor.createDrawing(imageData: imageData)
+            try editor.createDrawing(
+                imageData: imageData,
+                imageWidth: imageWidth,
+                imageHeight: imageHeight)
+            
             updateUI()
             
         } catch { }
@@ -137,18 +145,11 @@ extension EditorVC: PHPickerViewControllerDelegate {
                 UIImageDataExtractor.imageData(from: image)
             else { return }
             
-            guard let imageData = try? JXLEncoder.encode(
-                input: .init(
-                    data: extractedData.data,
-                    width: extractedData.width,
-                    height: extractedData.height),
-                lossless: true,
-                quality: 100,
-                effort: 1)
-            else { return }
-            
             DispatchQueue.main.async {
-                self?.createDrawing(imageData: imageData)
+                self?.createDrawing(
+                    imageData: extractedData.data,
+                    imageWidth: extractedData.width,
+                    imageHeight: extractedData.height)
             }
         }
     }
