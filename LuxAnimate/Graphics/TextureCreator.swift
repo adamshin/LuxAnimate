@@ -14,7 +14,8 @@ struct TextureCreator {
     static func createTexture(
         imageData: Data,
         width: Int,
-        height: Int
+        height: Int,
+        mipMapped: Bool
     ) throws -> MTLTexture {
         
         let texDescriptor = MTLTextureDescriptor()
@@ -22,6 +23,15 @@ struct TextureCreator {
         texDescriptor.height = height
         texDescriptor.pixelFormat = AppConfig.pixelFormat
         texDescriptor.usage = [.shaderRead]
+        
+        if mipMapped {
+            let widthLevels = ceil(log2(Double(width)))
+            let heightLevels = ceil(log2(Double(height)))
+            let mipCount = max(heightLevels, widthLevels)
+            texDescriptor.mipmapLevelCount = Int(mipCount)
+        } else {
+            texDescriptor.mipmapLevelCount = 1
+        }
         
         let texture = MetalInterface.shared.device
             .makeTexture(descriptor: texDescriptor)!
@@ -41,6 +51,17 @@ struct TextureCreator {
                 mipmapLevel: 0,
                 withBytes: baseAddress,
                 bytesPerRow: bytesPerRow)
+        }
+        
+        if mipMapped {
+            let commandBuffer = MetalInterface.shared
+                .commandQueue.makeCommandBuffer()!
+            
+            let encoder = commandBuffer.makeBlitCommandEncoder()!
+            encoder.generateMipmaps(for: texture)
+            encoder.endEncoding()
+            
+            commandBuffer.commit()
         }
         
         return texture

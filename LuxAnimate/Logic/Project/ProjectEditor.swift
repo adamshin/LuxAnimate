@@ -40,14 +40,14 @@ extension ProjectEditor {
         guard let editSession else { return }
         
         // Resize images
-        let previewMediumImageData = try imageResizer.resize2(
+        let previewMediumImageData = try imageResizer.resize(
             imageData: imageData,
             width: imageWidth,
             height: imageHeight,
             targetWidth: AppConfig.assetPreviewMediumSize,
             targetHeight: AppConfig.assetPreviewMediumSize)
         
-        let previewSmallImageData = try imageResizer.resize2(
+        let previewSmallImageData = try imageResizer.resize(
             imageData: imageData,
             width: imageWidth,
             height: imageHeight,

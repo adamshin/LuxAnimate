@@ -40,9 +40,9 @@ class EditorDrawingVC: UIViewController {
         
         let assetURL = FileUrlHelper().projectAssetURL(
             projectID: projectManifest.id,
-//            assetID: drawing.assets.full)
+            assetID: drawing.assets.full)
 //            assetID: drawing.assets.previewMedium)
-            assetID: drawing.assets.previewSmall)
+//            assetID: drawing.assets.previewSmall)
         
         print(assetURL)
         

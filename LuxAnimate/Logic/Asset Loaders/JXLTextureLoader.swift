@@ -21,7 +21,8 @@ struct JXLTextureLoader {
         return try TextureCreator.createTexture(
             imageData: output.data,
             width: output.width,
-            height: output.height)
+            height: output.height,
+            mipMapped: false)
     }
     
 }
