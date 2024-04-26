@@ -19,6 +19,7 @@ protocol CanvasMultiGestureRecognizerInternalStateDelegate: AnyObject {
     var numberOfTouches: Int { get }
     
     func setState(_ newState: CanvasMultiGestureRecognizerInternalState)
+    
     func setGestureRecognizerState(_ newState: UIGestureRecognizer.State)
     
     func onBeginGesture()

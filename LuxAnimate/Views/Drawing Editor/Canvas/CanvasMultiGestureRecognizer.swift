@@ -31,6 +31,7 @@ class CanvasMultiGestureRecognizer: UIGestureRecognizer {
 
     init() {
         super.init(target: nil, action: nil)
+        
         setInternalState(CanvasMultiGestureRecognizerWaitingState())
     }
     

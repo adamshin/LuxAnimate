@@ -16,7 +16,7 @@ struct BrushStrokeGestureConfig {
     
 }
 
-protocol BrushStrokeGestureRecognizerStrokeDelegate: AnyObject {
+protocol BrushStrokeGestureRecognizerGestureDelegate: AnyObject {
     
     func onBeginBrushStroke()
     
@@ -29,14 +29,14 @@ protocol BrushStrokeGestureRecognizerStrokeDelegate: AnyObject {
 
 class BrushStrokeGestureRecognizer: UIGestureRecognizer {
     
-    weak var strokeDelegate: BrushStrokeGestureRecognizerStrokeDelegate?
+    weak var gestureDelegate: BrushStrokeGestureRecognizerGestureDelegate?
     
-    var strokeState: BrushStrokeGestureRecognizerState?
+    private var internalState: BrushStrokeGestureRecognizerInternalState?
     
     init() {
         super.init(target: nil, action: nil)
         
-        setStrokeState(BrushStrokeGestureRecognizerWaitingState())
+        setinternalState(BrushStrokeGestureRecognizerWaitingState())
     }
     
     // MARK: - Gesture Lifecycle
@@ -44,44 +44,48 @@ class BrushStrokeGestureRecognizer: UIGestureRecognizer {
     override func touchesBegan(
         _ touches: Set<UITouch>, with event: UIEvent
     ) {
-        strokeState?.touchesBegan(
+        internalState?.touchesBegan(
             touches: touches, event: event)
     }
     
     override func touchesMoved(
         _ touches: Set<UITouch>, with event: UIEvent
     ) { 
-        strokeState?.touchesMoved(
+        internalState?.touchesMoved(
             touches: touches, event: event)
     }
     
     override func touchesEnded(
         _ touches: Set<UITouch>, with event: UIEvent
     ) {
-        strokeState?.touchesEnded(
+        internalState?.touchesEnded(
             touches: touches, event: event)
     }
     
     override func touchesCancelled(
         _ touches: Set<UITouch>, with event: UIEvent
     ) {
-        strokeState?.touchesCancelled(
+        internalState?.touchesCancelled(
             touches: touches, event: event)
     }
     
     override func touchesEstimatedPropertiesUpdated(
         _ touches: Set<UITouch>
     ) {
-        strokeState?.touchesEstimatedPropertiesUpdated(
+        internalState?.touchesEstimatedPropertiesUpdated(
             touches: touches)
+    }
+    
+    override func reset() {
+        super.reset()
+        setinternalState(BrushStrokeGestureRecognizerWaitingState())
     }
     
     // MARK: - State
     
-    private func setStrokeState(_ newState: BrushStrokeGestureRecognizerState) {
-        strokeState?.onStateEnd()
-        
-        strokeState = newState
+    private func setinternalState(_ newState: BrushStrokeGestureRecognizerInternalState) {
+        internalState?.onStateEnd()
+        internalState = newState
         
         newState.delegate = self
         newState.onStateBegin()
@@ -91,24 +95,26 @@ class BrushStrokeGestureRecognizer: UIGestureRecognizer {
 
 // MARK: - State Delegate
 
-extension BrushStrokeGestureRecognizer: BrushStrokeGestureRecognizerStateDelegate {
+extension BrushStrokeGestureRecognizer: BrushStrokeGestureRecognizerInternalStateDelegate {
     
-    func setState(_ newState: BrushStrokeGestureRecognizerState) {
-        setStrokeState(newState)
+    func setState(_ newState: BrushStrokeGestureRecognizerInternalState) {
+        setinternalState(newState)
     }
     
-    func onGestureBegan() { state = .began }
-    func onGestureEnded() { state = .ended }
-    func onGestureFailed() { state = .failed }
+    func setGestureRecognizerState(_ newState: UIGestureRecognizer.State) {
+        state = newState
+    }
     
     func onBeginBrushStroke() {
-        strokeDelegate?.onBeginBrushStroke()
+        gestureDelegate?.onBeginBrushStroke()
     }
+    
     func onUpdateBrushStroke(_ stroke: BrushStrokeGestureRecognizer.Stroke) {
-        strokeDelegate?.onUpdateBrushStroke(stroke)
+        gestureDelegate?.onUpdateBrushStroke(stroke)
     }
+    
     func onEndBrushStroke() {
-        strokeDelegate?.onEndBrushStroke()
+        gestureDelegate?.onEndBrushStroke()
     }
     
 }

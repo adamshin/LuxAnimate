@@ -72,7 +72,7 @@ class DrawingEditorCanvasVC: UIViewController {
         metalView.metalLayer.rasterizationScale = 1
         
         let strokeGesture = BrushStrokeGestureRecognizer()
-        strokeGesture.strokeDelegate = self
+        strokeGesture.gestureDelegate = self
         canvasView.canvasContentView
             .addGestureRecognizer(strokeGesture)
     }
@@ -132,7 +132,7 @@ extension DrawingEditorCanvasVC: MetalViewDelegate {
     
 }
 
-extension DrawingEditorCanvasVC: BrushStrokeGestureRecognizerStrokeDelegate {
+extension DrawingEditorCanvasVC: BrushStrokeGestureRecognizerGestureDelegate {
     
     func onBeginBrushStroke() {
         delegate?.onBeginBrushStroke(self)

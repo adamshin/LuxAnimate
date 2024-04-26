@@ -1,19 +1,17 @@
 //
-//  BrushStrokeGestureRecognizerState.swift
+//  BrushStrokeGestureRecognizerInternalState.swift
 //
 
 import UIKit
 
-protocol BrushStrokeGestureRecognizerStateDelegate: AnyObject {
+protocol BrushStrokeGestureRecognizerInternalStateDelegate: AnyObject {
     
     var view: UIView? { get }
     var numberOfTouches: Int { get }
     
-    func setState(_ newState: BrushStrokeGestureRecognizerState)
+    func setState(_ newState: BrushStrokeGestureRecognizerInternalState)
     
-    func onGestureBegan()
-    func onGestureEnded()
-    func onGestureFailed()
+    func setGestureRecognizerState(_ newState: UIGestureRecognizer.State)
     
     func onBeginBrushStroke()
     func onUpdateBrushStroke(_ stroke: BrushStrokeGestureRecognizer.Stroke)
@@ -21,9 +19,9 @@ protocol BrushStrokeGestureRecognizerStateDelegate: AnyObject {
     
 }
 
-protocol BrushStrokeGestureRecognizerState: AnyObject {
+protocol BrushStrokeGestureRecognizerInternalState: AnyObject {
     
-    var delegate: BrushStrokeGestureRecognizerStateDelegate? { get set }
+    var delegate: BrushStrokeGestureRecognizerInternalStateDelegate? { get set }
     
     func onStateBegin()
     func onStateEnd()
@@ -37,7 +35,7 @@ protocol BrushStrokeGestureRecognizerState: AnyObject {
     
 }
 
-extension BrushStrokeGestureRecognizerState {
+extension BrushStrokeGestureRecognizerInternalState {
     
     func onStateBegin() { }
     func onStateEnd() { }
@@ -53,13 +51,13 @@ extension BrushStrokeGestureRecognizerState {
 
 // MARK: - Waiting
 
-class BrushStrokeGestureRecognizerWaitingState: BrushStrokeGestureRecognizerState {
+class BrushStrokeGestureRecognizerWaitingState: BrushStrokeGestureRecognizerInternalState {
     
-    weak var delegate: BrushStrokeGestureRecognizerStateDelegate?
+    weak var delegate: BrushStrokeGestureRecognizerInternalStateDelegate?
     
     func touchesBegan(
         touches: Set<UITouch>, event: UIEvent
-    ) {
+    ) { 
         guard let touch = touches.first, touches.count == 1 else {
             delegate?.setState(
                 BrushStrokeGestureRecognizerInvalidState())
@@ -85,9 +83,9 @@ class BrushStrokeGestureRecognizerWaitingState: BrushStrokeGestureRecognizerStat
 
 // MARK: - Pre Active
 
-class BrushStrokeGestureRecognizerPreActiveState: BrushStrokeGestureRecognizerState {
+class BrushStrokeGestureRecognizerPreActiveState: BrushStrokeGestureRecognizerInternalState {
     
-    weak var delegate: BrushStrokeGestureRecognizerStateDelegate?
+    weak var delegate: BrushStrokeGestureRecognizerInternalStateDelegate?
     
     private var stroke: BrushStrokeGestureRecognizer.Stroke
     private var activationTimer: Timer?
@@ -141,7 +139,7 @@ class BrushStrokeGestureRecognizerPreActiveState: BrushStrokeGestureRecognizerSt
         delegate?.onBeginBrushStroke()
         delegate?.onUpdateBrushStroke(stroke)
         
-        delegate?.onGestureEnded()
+        delegate?.setGestureRecognizerState(.ended)
         
         delegate?.setState(
             BrushStrokeGestureRecognizerPostActiveState(
@@ -153,7 +151,7 @@ class BrushStrokeGestureRecognizerPreActiveState: BrushStrokeGestureRecognizerSt
     ) {
         guard touches.contains(stroke.touch) else { return }
         
-        delegate?.onGestureFailed()
+        delegate?.setGestureRecognizerState(.failed)
         
         delegate?.setState(
             BrushStrokeGestureRecognizerWaitingState())
@@ -181,7 +179,7 @@ class BrushStrokeGestureRecognizerPreActiveState: BrushStrokeGestureRecognizerSt
         delegate?.onBeginBrushStroke()
         delegate?.onUpdateBrushStroke(stroke)
         
-        delegate?.onGestureBegan()
+        delegate?.setGestureRecognizerState(.began)
         
         delegate?.setState(
             BrushStrokeGestureRecognizerActiveState(
@@ -192,9 +190,9 @@ class BrushStrokeGestureRecognizerPreActiveState: BrushStrokeGestureRecognizerSt
 
 // MARK: - Active
 
-class BrushStrokeGestureRecognizerActiveState: BrushStrokeGestureRecognizerState {
+class BrushStrokeGestureRecognizerActiveState: BrushStrokeGestureRecognizerInternalState {
     
-    weak var delegate: BrushStrokeGestureRecognizerStateDelegate?
+    weak var delegate: BrushStrokeGestureRecognizerInternalStateDelegate?
     
     private var stroke: BrushStrokeGestureRecognizer.Stroke
     
@@ -221,7 +219,7 @@ class BrushStrokeGestureRecognizerActiveState: BrushStrokeGestureRecognizerState
         
         delegate?.onUpdateBrushStroke(stroke)
         
-        delegate?.onGestureEnded()
+        delegate?.setGestureRecognizerState(.ended)
         
         delegate?.setState(
             BrushStrokeGestureRecognizerPostActiveState(
@@ -245,9 +243,9 @@ class BrushStrokeGestureRecognizerActiveState: BrushStrokeGestureRecognizerState
 
 // MARK: - Post Active
 
-class BrushStrokeGestureRecognizerPostActiveState: BrushStrokeGestureRecognizerState {
+class BrushStrokeGestureRecognizerPostActiveState: BrushStrokeGestureRecognizerInternalState {
     
-    weak var delegate: BrushStrokeGestureRecognizerStateDelegate?
+    weak var delegate: BrushStrokeGestureRecognizerInternalStateDelegate?
     
     private var stroke: BrushStrokeGestureRecognizer.Stroke
     private var finalizationTimer: Timer?
@@ -294,9 +292,9 @@ class BrushStrokeGestureRecognizerPostActiveState: BrushStrokeGestureRecognizerS
 
 // MARK: - Invalid
 
-class BrushStrokeGestureRecognizerInvalidState: BrushStrokeGestureRecognizerState {
+class BrushStrokeGestureRecognizerInvalidState: BrushStrokeGestureRecognizerInternalState {
     
-    weak var delegate: BrushStrokeGestureRecognizerStateDelegate?
+    weak var delegate: BrushStrokeGestureRecognizerInternalStateDelegate?
     
     func touchesEnded(
         touches: Set<UITouch>, event: UIEvent
@@ -315,7 +313,7 @@ class BrushStrokeGestureRecognizerInvalidState: BrushStrokeGestureRecognizerStat
         let remainingTouchCount = previousTouchCount - touchCount
         
         if remainingTouchCount <= 0 {
-            delegate?.onGestureFailed()
+            delegate?.setGestureRecognizerState(.failed)
             
             delegate?.setState(
                 BrushStrokeGestureRecognizerWaitingState())
