@@ -83,14 +83,23 @@ class MovableCanvasView: UIView {
     private func setCanvasTransform(
         _ transform: MovableCanvasTransform,
         animated: Bool = false,
-        animDuration: CGFloat = 0.3
+        animDuration: CGFloat = 0.4
     ) {
         let matrix = transform.matrix()
         
         if animated {
-            UIView.animate(springDuration: animDuration) {
-                canvasContentView.transform = matrix.cgAffineTransform
+            let timingFunction = CAMediaTimingFunction(
+                controlPoints: 0.2, 0.0, 0.1, 1.0)
+            
+            CATransaction.begin()
+            CATransaction.setAnimationTimingFunction(timingFunction)
+
+            UIView.animate(withDuration: animDuration) {
+                self.canvasContentView.transform = matrix.cgAffineTransform
             }
+            
+            CATransaction.commit()
+            
         } else {
             canvasContentView.transform = matrix.cgAffineTransform
         }
@@ -202,7 +211,7 @@ class MovableCanvasView: UIView {
             setCanvasTransform(
                 baseCanvasTransform,
                 animated: true,
-                animDuration: 0.4)
+                animDuration: 0.6)
             
         } else {
             self.activeGestureCanvasTransform = nil
