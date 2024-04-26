@@ -89,7 +89,7 @@ class MovableCanvasView: UIView {
         
         if animated {
             let timingFunction = CAMediaTimingFunction(
-                controlPoints: 0.2, 0.0, 0.1, 1.0)
+                controlPoints: 0.1, 0.0, 0.1, 1.0)
             
             CATransaction.begin()
             CATransaction.setAnimationTimingFunction(timingFunction)
@@ -211,7 +211,7 @@ class MovableCanvasView: UIView {
             setCanvasTransform(
                 baseCanvasTransform,
                 animated: true,
-                animDuration: 0.6)
+                animDuration: 0.5)
             
         } else {
             self.activeGestureCanvasTransform = nil
