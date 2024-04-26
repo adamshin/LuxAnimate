@@ -4,6 +4,18 @@
 
 import UIKit
 
+private let brushConfig = Brush.Configuration(
+    stampTextureName: "brush1.png",
+    stampSize: 100,
+    stampSpacing: 0.0,
+    stampAlpha: 1.0,
+    pressureScaling: 1.0,
+    taperLength: 0.1,
+    taperRoundness: 1.0)
+
+private let brushColor: Color = .brushBlue
+private let brushScale: Double = 0.2
+
 protocol DrawingEditorVCDelegate: AnyObject {
     
     func onEditDrawing(
@@ -28,7 +40,7 @@ class DrawingEditorVC: UIViewController {
     private let drawingRenderer: DrawingEditorFrameRenderer
     
     private let brush = try! Brush(
-        configuration: AppConfig.brushConfig)
+        configuration: brushConfig)
     
     // MARK: - Init
     
@@ -124,8 +136,8 @@ extension DrawingEditorVC: DrawingEditorCanvasVCDelegate {
     ) {
         brushEngine.beginStroke(
             brush: brush,
-            color: .brushBlack,
-            scale: 0.5,
+            color: brushColor,
+            scale: brushScale,
             smoothingLevel: 0.2)
     }
     

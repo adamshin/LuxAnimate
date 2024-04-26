@@ -22,8 +22,6 @@ struct LibraryManager {
     
     private func createLibraryDirectoryIfNeeded() throws {
         let url = fileUrlHelper.libraryDirectoryURL
-        print(url)
-        
         if fileManager.fileExists(atPath: url.path()) {
             return
         }
