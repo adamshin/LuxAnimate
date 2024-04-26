@@ -24,7 +24,7 @@ class MetalView: UIView {
     init() {
         super.init(frame: .zero)
         
-        metalLayer.pixelFormat = .bgra8Unorm
+        metalLayer.pixelFormat = AppConfig.metalLayerPixelFormat
         metalLayer.colorspace = CGColorSpace(name: CGColorSpace.sRGB)
         metalLayer.contentsGravity = .resize
         metalLayer.drawableSize = .zero

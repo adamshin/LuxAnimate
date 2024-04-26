@@ -9,8 +9,7 @@ class DrawingEditorFrameRenderer {
     
     private let backgroundColor: Color
     
-    let renderTarget: RenderTarget
-    private var drawingTexture: MTLTexture?
+    let texture: MTLTexture
     
     private let spriteRenderer = SpriteRenderer()
     
@@ -19,38 +18,37 @@ class DrawingEditorFrameRenderer {
         backgroundColor: Color
     ) {
         self.backgroundColor = backgroundColor
-        renderTarget = RenderTarget(size: drawingSize)
+        
+        let texDesc = MTLTextureDescriptor()
+        texDesc.width = drawingSize.width
+        texDesc.height = drawingSize.height
+        texDesc.pixelFormat = AppConfig.pixelFormat
+        texDesc.storageMode = .private
+        texDesc.usage = [.renderTarget, .shaderRead]
+        
+        texture = MetalInterface.shared.device
+            .makeTexture(descriptor: texDesc)!
     }
     
-    func setDrawingTexture(_ drawingTexture: MTLTexture) {
-        self.drawingTexture = drawingTexture
-    }
-    
-    func draw(
-        activeDrawingTexture: MTLTexture?
-    ) {
+    func draw(drawingTexture: MTLTexture) {
         let commandBuffer = MetalInterface.shared
             .commandQueue.makeCommandBuffer()!
         
         ClearColorRenderer.drawClearColor(
             commandBuffer: commandBuffer,
-            target: renderTarget.texture,
+            target: texture,
             color: backgroundColor)
         
-        if let currentDrawingTexture = 
-            activeDrawingTexture ?? drawingTexture
-        {
-            spriteRenderer.drawSprites(
-                commandBuffer: commandBuffer,
-                target: renderTarget.texture,
-                viewportSize: Size(1, 1),
-                texture: currentDrawingTexture,
-                sprites: [
-                    SpriteRenderer.Sprite(
-                        size: Size(1, 1),
-                        position: Vector(0.5, 0.5))
-                ])
-        }
+        spriteRenderer.drawSprites(
+            commandBuffer: commandBuffer,
+            target: texture,
+            viewportSize: Size(1, 1),
+            texture: drawingTexture,
+            sprites: [
+                SpriteRenderer.Sprite(
+                    size: Size(1, 1),
+                    position: Vector(0.5, 0.5))
+            ])
         
         commandBuffer.commit()
     }

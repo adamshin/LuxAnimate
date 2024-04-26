@@ -1,10 +1,10 @@
 //
-//  StrokeGestureRecognizerStroke.swift
+//  BrushStrokeGestureRecognizerStroke.swift
 //
 
 import UIKit
 
-extension StrokeGestureRecognizer {
+extension BrushStrokeGestureRecognizer {
     
     struct Stroke {
         var touch: UITouch
@@ -45,7 +45,7 @@ extension StrokeGestureRecognizer {
     
 }
 
-extension StrokeGestureRecognizer.Stroke {
+extension BrushStrokeGestureRecognizer.Stroke {
     
     init(touch: UITouch) {
         self.touch = touch
@@ -66,8 +66,8 @@ extension StrokeGestureRecognizer.Stroke {
             let sampleTimestamp = startTimestamp + sample.timeOffset
             let sampleAge = event.timestamp - sampleTimestamp
                                          
-            let ageThreshold = AppConfig
-                .strokeGestureEstimateFinalizationDelay
+            let ageThreshold = BrushStrokeGestureConfig
+                .estimateFinalizationDelay
             
             if sample.hasEstimatedValues, sampleAge > ageThreshold {
                 sample.isForceEstimated = false
@@ -136,7 +136,7 @@ extension StrokeGestureRecognizer.Stroke {
         touch: UITouch,
         event: UIEvent,
         view: UIView?
-    ) -> ([StrokeGestureRecognizer.Sample], [StrokeGestureRecognizer.Sample]) {
+    ) -> ([BrushStrokeGestureRecognizer.Sample], [BrushStrokeGestureRecognizer.Sample]) {
         
         let touches = event.coalescedTouches(for: touch) ?? []
         let predictedTouches = event.predictedTouches(for: touch) ?? []
@@ -148,7 +148,7 @@ extension StrokeGestureRecognizer.Stroke {
             extractSample(touch: $0, view: view, isPredicted: true)
         }
         
-        if AppConfig.strokeGestureUsePredictedTouches {
+        if BrushStrokeGestureConfig.usePredictedTouches {
             return (samples, predictedSamples)
         } else {
             return (samples, [])
@@ -159,11 +159,11 @@ extension StrokeGestureRecognizer.Stroke {
         touch: UITouch,
         view: UIView?,
         isPredicted: Bool
-    ) -> StrokeGestureRecognizer.Sample {
+    ) -> BrushStrokeGestureRecognizer.Sample {
         
         let timeOffset = touch.timestamp - startTimestamp
         
-        return StrokeGestureRecognizer.Sample(
+        return BrushStrokeGestureRecognizer.Sample(
             timeOffset: timeOffset,
             isPredicted: isPredicted,
             position: touch.preciseLocation(in: view),

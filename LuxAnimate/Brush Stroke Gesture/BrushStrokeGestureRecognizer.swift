@@ -1,30 +1,42 @@
 //
-//  StrokeGestureRecognizer.swift
+//  BrushStrokeGestureRecognizer.swift
 //
 
 import UIKit
 
-protocol StrokeGestureRecognizerStrokeDelegate: AnyObject {
+struct BrushStrokeGestureConfig {
     
-    func onBeginStroke()
+    static let pencilOnly = false
+    static let usePredictedTouches = true
     
-    func onUpdateStroke(
-        _ stroke: StrokeGestureRecognizer.Stroke)
+    static let fingerActivationDelay: TimeInterval = 0.25
+    static let fingerActivationDistance: CGFloat = 10
     
-    func onEndStroke()
+    static let estimateFinalizationDelay: TimeInterval = 0.1
     
 }
 
-class StrokeGestureRecognizer: UIGestureRecognizer {
+protocol BrushStrokeGestureRecognizerStrokeDelegate: AnyObject {
     
-    weak var strokeDelegate: StrokeGestureRecognizerStrokeDelegate?
+    func onBeginBrushStroke()
     
-    var strokeState: StrokeGestureRecognizerState?
+    func onUpdateBrushStroke(
+        _ stroke: BrushStrokeGestureRecognizer.Stroke)
+    
+    func onEndBrushStroke()
+    
+}
+
+class BrushStrokeGestureRecognizer: UIGestureRecognizer {
+    
+    weak var strokeDelegate: BrushStrokeGestureRecognizerStrokeDelegate?
+    
+    var strokeState: BrushStrokeGestureRecognizerState?
     
     init() {
         super.init(target: nil, action: nil)
         
-        setStrokeState(StrokeGestureRecognizerWaitingState())
+        setStrokeState(BrushStrokeGestureRecognizerWaitingState())
     }
     
     // MARK: - Gesture Lifecycle
@@ -66,7 +78,7 @@ class StrokeGestureRecognizer: UIGestureRecognizer {
     
     // MARK: - State
     
-    private func setStrokeState(_ newState: StrokeGestureRecognizerState) {
+    private func setStrokeState(_ newState: BrushStrokeGestureRecognizerState) {
         strokeState?.onStateEnd()
         
         strokeState = newState
@@ -79,9 +91,9 @@ class StrokeGestureRecognizer: UIGestureRecognizer {
 
 // MARK: - State Delegate
 
-extension StrokeGestureRecognizer: StrokeGestureRecognizerStateDelegate {
+extension BrushStrokeGestureRecognizer: BrushStrokeGestureRecognizerStateDelegate {
     
-    func setState(_ newState: StrokeGestureRecognizerState) {
+    func setState(_ newState: BrushStrokeGestureRecognizerState) {
         setStrokeState(newState)
     }
     
@@ -89,14 +101,14 @@ extension StrokeGestureRecognizer: StrokeGestureRecognizerStateDelegate {
     func onGestureEnded() { state = .ended }
     func onGestureFailed() { state = .failed }
     
-    func onBeginStroke() {
-        strokeDelegate?.onBeginStroke()
+    func onBeginBrushStroke() {
+        strokeDelegate?.onBeginBrushStroke()
     }
-    func onUpdateStroke(_ stroke: StrokeGestureRecognizer.Stroke) {
-        strokeDelegate?.onUpdateStroke(stroke)
+    func onUpdateBrushStroke(_ stroke: BrushStrokeGestureRecognizer.Stroke) {
+        strokeDelegate?.onUpdateBrushStroke(stroke)
     }
-    func onEndStroke() {
-        strokeDelegate?.onEndStroke()
+    func onEndBrushStroke() {
+        strokeDelegate?.onEndBrushStroke()
     }
     
 }

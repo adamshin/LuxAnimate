@@ -2,7 +2,6 @@
 //  TextureCreator.swift
 //
 
-import Foundation
 import Metal
 
 struct TextureCreator {

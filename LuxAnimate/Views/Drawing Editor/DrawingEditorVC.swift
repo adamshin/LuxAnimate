@@ -21,10 +21,14 @@ class DrawingEditorVC: UIViewController {
     private let canvasVC: DrawingEditorCanvasVC
     private let toolFrameVC: DrawingEditorToolFrameVC
     
-    private let drawingRenderer: DrawingEditorFrameRenderer
-    private let layerRenderer: MetalLayerTextureRenderer
+    private let drawingID: String
+    private let canvasSize: PixelSize
+    private let brushEngine: BrushEngine
     
-    private let drawingTexture: MTLTexture
+    private let drawingRenderer: DrawingEditorFrameRenderer
+    
+    private let brush = try! Brush(
+        configuration: AppConfig.brushConfig)
     
     // MARK: - Init
     
@@ -33,24 +37,31 @@ class DrawingEditorVC: UIViewController {
         drawing: Project.Drawing
     ) {
         canvasVC = DrawingEditorCanvasVC(
-            drawingSize: drawing.size)
+            canvasSize: drawing.size)
         
         toolFrameVC = DrawingEditorToolFrameVC()
+        
+        drawingID = drawing.id
+        canvasSize = drawing.size
+        brushEngine = BrushEngine(canvasSize: drawing.size)
         
         drawingRenderer = DrawingEditorFrameRenderer(
             drawingSize: drawing.size,
             backgroundColor: .white)
         
-        layerRenderer = MetalLayerTextureRenderer()
+        super.init(nibName: nil, bundle: nil)
+        modalPresentationStyle = .fullScreen
         
+        brushEngine.delegate = self
+        
+        // Instantiate canvas
         let assetURL = FileUrlHelper().projectAssetURL(
             projectID: projectID,
             assetID: drawing.assetIDs.full)
         
-        drawingTexture = try! JXLTextureLoader.load(url: assetURL)
+        let assetTexture = try! JXLTextureLoader.load(url: assetURL)
         
-        super.init(nibName: nil, bundle: nil)
-        modalPresentationStyle = .fullScreen
+        brushEngine.setCanvasContents(assetTexture)
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -61,7 +72,6 @@ class DrawingEditorVC: UIViewController {
         super.viewDidLoad()
         
         setupUI()
-        setupRendering()
     }
     
     // MARK: - Setup
@@ -76,18 +86,29 @@ class DrawingEditorVC: UIViewController {
         toolFrameVC.delegate = self
     }
     
-    private func setupRendering() {
-        drawingRenderer.setDrawingTexture(drawingTexture)
+    // MARK: - Logic
+    
+    private func saveEdit() {
+        do {
+            let imageData = try TextureDataReader
+                .read(brushEngine.canvasTexture)
+            
+            delegate?.onEditDrawing(
+                self,
+                drawingID: drawingID,
+                imageData: imageData,
+                imageSize: canvasSize)
+            
+        } catch { }
     }
     
     // MARK: - Rendering
     
     private func render() {
-        drawingRenderer.draw(activeDrawingTexture: nil)
+        let drawingTexture = brushEngine.canvasTexture
+        drawingRenderer.draw(drawingTexture: drawingTexture)
         
-        layerRenderer.draw(
-            texture: drawingRenderer.renderTarget.texture,
-            to: canvasVC.metalView.metalLayer)
+        canvasVC.drawTextureToCanvas(drawingRenderer.texture)
     }
     
 }
@@ -96,7 +117,36 @@ class DrawingEditorVC: UIViewController {
 
 extension DrawingEditorVC: DrawingEditorCanvasVCDelegate {
     
-    func needsDrawLayer(_ vc: DrawingEditorCanvasVC) {
+    func onBeginBrushStroke(
+        _ vc: DrawingEditorCanvasVC
+    ) {
+        brushEngine.beginStroke(
+            brush: brush,
+            color: .brushBlack,
+            scale: 0.5,
+            smoothingLevel: 0.2)
+    }
+    
+    func onUpdateBrushStroke(
+        _ vc: DrawingEditorCanvasVC,
+        _ stroke: BrushStrokeGestureRecognizer.Stroke
+    ) {
+        let inputStroke = BrushEngineGestureAdapter
+            .convert(stroke)
+        
+        brushEngine.updateStroke(inputStroke: inputStroke)
+    }
+    
+    func onEndBrushStroke(
+        _ vc: DrawingEditorCanvasVC
+    ) {
+        brushEngine.endStroke()
+    }
+    
+    
+    func needsDrawLayer(
+        _ vc: DrawingEditorCanvasVC
+    ) {
         render()
     }
     
@@ -106,6 +156,18 @@ extension DrawingEditorVC: DrawingEditorToolFrameVCDelegate {
     
     func onSelectBack(_ vc: DrawingEditorToolFrameVC) {
         dismiss(animated: true)
+    }
+    
+}
+
+extension DrawingEditorVC: BrushEngineDelegate {
+    
+    func onUpdateCanvas(_ engine: BrushEngine) {
+        render()
+    }
+    
+    func onFinalizeStroke(_ engine: BrushEngine) {
+        saveEdit()
     }
     
 }

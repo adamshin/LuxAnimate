@@ -64,26 +64,7 @@ struct ImageResizer {
         commandBuffer.commit()
         commandBuffer.waitUntilCompleted()
         
-        let bytesPerPixel = 4
-        let bytesPerRow = bytesPerPixel * targetWidth
-        let size = bytesPerRow * targetHeight
-        
-        let region = MTLRegionMake2D(
-            0, 0, targetWidth, targetHeight)
-        
-        var data = Data(repeating: 0, count: size)
-        
-        data.withUnsafeMutableBytes { pointer in
-            guard let baseAddress = pointer.baseAddress
-            else { return }
-            
-            renderTarget.getBytes(
-                baseAddress,
-                bytesPerRow: bytesPerRow,
-                from: region,
-                mipmapLevel: 0)
-        }
-        
+        let data = try TextureDataReader.read(renderTarget)
         return data
     }
     

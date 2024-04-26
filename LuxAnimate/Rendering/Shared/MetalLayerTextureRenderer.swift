@@ -5,10 +5,10 @@
 import Foundation
 import MetalKit
 
-class MetalLayerTextureRenderer {
+struct MetalLayerTextureRenderer {
     
     private let spriteRenderer = SpriteRenderer(
-        pixelFormat: .bgra8Unorm)
+        pixelFormat: AppConfig.metalLayerPixelFormat)
     
     func draw(
         texture: MTLTexture,

@@ -1,10 +1,10 @@
 //
-//  FrameEditor.swift
+//  DrawingEditor.swift
 //
 
 import Foundation
 
-class FrameEditor {
+class DrawingEditor {
     
     // Scene logic, rendering?
     

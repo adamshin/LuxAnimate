@@ -32,6 +32,12 @@ class MovableCanvasView: UIView {
     private var baseCanvasTransform = MovableCanvasTransform()
     private var activeGestureCanvasTransform: MovableCanvasTransform?
     
+    var singleFingerPanEnabled: Bool = true {
+        didSet {
+            panGesture.isEnabled = singleFingerPanEnabled
+        }
+    }
+    
     // MARK: - Init
     
     init() {

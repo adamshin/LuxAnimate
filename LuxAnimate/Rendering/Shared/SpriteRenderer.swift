@@ -48,8 +48,10 @@ struct SpriteRenderer {
         blendMode: BlendMode = .normal,
         sampleMode: SampleMode = .linear,
         colorMode: ColorMode = .none,
-        color: Color = .init(1, 1, 1, 1)
+        color: Color = .white
     ) {
+        guard !sprites.isEmpty else { return }
+        
         let renderPassDescriptor = MTLRenderPassDescriptor()
         
         let attachment = renderPassDescriptor.colorAttachments[0]!
@@ -88,6 +90,10 @@ struct SpriteRenderer {
             vertices += spriteVertices
         }
         
+        let vertexBuffer = MetalInterface.shared.device.makeBuffer(
+            bytes: vertices,
+            length: vertices.count * MemoryLayout<SpriteVertex>.stride)
+        
         var vertexUniforms = SpriteVertexUniforms(
             viewportSize: .init(
                 Float(viewportSize.width),
@@ -98,9 +104,9 @@ struct SpriteRenderer {
             sampleMode: sampleMode.shaderValue,
             colorMode: colorMode.shaderValue)
         
-        renderEncoder.setVertexBytes(
-            vertices,
-            length: MemoryLayout<SpriteVertex>.stride * vertices.count,
+        renderEncoder.setVertexBuffer(
+            vertexBuffer,
+            offset: 0,
             index: Int(SpriteVertexBufferIndexVertices.rawValue))
         
         renderEncoder.setVertexBytes(

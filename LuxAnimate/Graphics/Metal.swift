@@ -85,10 +85,10 @@ extension SpriteVertex {
                 x: Float(texCoord.x),
                 y: Float(texCoord.y)),
             color: .init(
-                Float(color.r),
-                Float(color.g),
-                Float(color.b),
-                Float(color.a)),
+                Float(color.r) / 255,
+                Float(color.g) / 255,
+                Float(color.b) / 255,
+                Float(color.a) / 255),
             alpha: Float(alpha))
     }
     

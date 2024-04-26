@@ -1,29 +1,29 @@
 //
-//  StrokeGestureRecognizerState.swift
+//  BrushStrokeGestureRecognizerState.swift
 //
 
 import UIKit
 
-protocol StrokeGestureRecognizerStateDelegate: AnyObject {
+protocol BrushStrokeGestureRecognizerStateDelegate: AnyObject {
     
     var view: UIView? { get }
     var numberOfTouches: Int { get }
     
-    func setState(_ newState: StrokeGestureRecognizerState)
+    func setState(_ newState: BrushStrokeGestureRecognizerState)
     
     func onGestureBegan()
     func onGestureEnded()
     func onGestureFailed()
     
-    func onBeginStroke()
-    func onUpdateStroke(_ stroke: StrokeGestureRecognizer.Stroke)
-    func onEndStroke()
+    func onBeginBrushStroke()
+    func onUpdateBrushStroke(_ stroke: BrushStrokeGestureRecognizer.Stroke)
+    func onEndBrushStroke()
     
 }
 
-protocol StrokeGestureRecognizerState: AnyObject {
+protocol BrushStrokeGestureRecognizerState: AnyObject {
     
-    var delegate: StrokeGestureRecognizerStateDelegate? { get set }
+    var delegate: BrushStrokeGestureRecognizerStateDelegate? { get set }
     
     func onStateBegin()
     func onStateEnd()
@@ -37,7 +37,7 @@ protocol StrokeGestureRecognizerState: AnyObject {
     
 }
 
-extension StrokeGestureRecognizerState {
+extension BrushStrokeGestureRecognizerState {
     
     func onStateBegin() { }
     func onStateEnd() { }
@@ -53,31 +53,31 @@ extension StrokeGestureRecognizerState {
 
 // MARK: - Waiting
 
-class StrokeGestureRecognizerWaitingState: StrokeGestureRecognizerState {
+class BrushStrokeGestureRecognizerWaitingState: BrushStrokeGestureRecognizerState {
     
-    weak var delegate: StrokeGestureRecognizerStateDelegate?
+    weak var delegate: BrushStrokeGestureRecognizerStateDelegate?
     
     func touchesBegan(
         touches: Set<UITouch>, event: UIEvent
     ) {
         guard let touch = touches.first, touches.count == 1 else {
             delegate?.setState(
-                StrokeGestureRecognizerInvalidState())
+                BrushStrokeGestureRecognizerInvalidState())
             return
         }
         
-        if AppConfig.strokeGesturePencilOnly, touch.type != .pencil {
+        if BrushStrokeGestureConfig.pencilOnly, touch.type != .pencil {
             delegate?.setState(
-                StrokeGestureRecognizerInvalidState())
+                BrushStrokeGestureRecognizerInvalidState())
             return
         }
         
-        var stroke = StrokeGestureRecognizer.Stroke(touch: touch)
+        var stroke = BrushStrokeGestureRecognizer.Stroke(touch: touch)
         
         stroke.update(event: event, view: delegate?.view)
         
         delegate?.setState(
-            StrokeGestureRecognizerPreActiveState(
+            BrushStrokeGestureRecognizerPreActiveState(
                 stroke: stroke))
     }
     
@@ -85,14 +85,14 @@ class StrokeGestureRecognizerWaitingState: StrokeGestureRecognizerState {
 
 // MARK: - Pre Active
 
-class StrokeGestureRecognizerPreActiveState: StrokeGestureRecognizerState {
+class BrushStrokeGestureRecognizerPreActiveState: BrushStrokeGestureRecognizerState {
     
-    weak var delegate: StrokeGestureRecognizerStateDelegate?
+    weak var delegate: BrushStrokeGestureRecognizerStateDelegate?
     
-    private var stroke: StrokeGestureRecognizer.Stroke
+    private var stroke: BrushStrokeGestureRecognizer.Stroke
     private var activationTimer: Timer?
     
-    init(stroke: StrokeGestureRecognizer.Stroke) {
+    init(stroke: BrushStrokeGestureRecognizer.Stroke) {
         self.stroke = stroke
         self.activationTimer = nil
     }
@@ -104,7 +104,7 @@ class StrokeGestureRecognizerPreActiveState: StrokeGestureRecognizerState {
     func onStateBegin() {
         if stroke.touch.type == .direct {
             activationTimer = Timer.scheduledTimer(
-                withTimeInterval: AppConfig.strokeGestureFingerActivationDelay,
+                withTimeInterval: BrushStrokeGestureConfig.fingerActivationDelay,
                 repeats: false)
             { [weak self] _ in
                 self?.activateStroke()
@@ -118,7 +118,7 @@ class StrokeGestureRecognizerPreActiveState: StrokeGestureRecognizerState {
         touches: Set<UITouch>, event: UIEvent
     ) {
         delegate?.setState(
-            StrokeGestureRecognizerInvalidState())
+            BrushStrokeGestureRecognizerInvalidState())
     }
     
     func touchesMoved(
@@ -138,13 +138,13 @@ class StrokeGestureRecognizerPreActiveState: StrokeGestureRecognizerState {
         stroke.hasTouchEnded = true
         stroke.predictedSamples = []
         
-        delegate?.onBeginStroke()
-        delegate?.onUpdateStroke(stroke)
+        delegate?.onBeginBrushStroke()
+        delegate?.onUpdateBrushStroke(stroke)
         
         delegate?.onGestureEnded()
         
         delegate?.setState(
-            StrokeGestureRecognizerPostActiveState(
+            BrushStrokeGestureRecognizerPostActiveState(
                 stroke: stroke))
     }
     
@@ -156,7 +156,7 @@ class StrokeGestureRecognizerPreActiveState: StrokeGestureRecognizerState {
         delegate?.onGestureFailed()
         
         delegate?.setState(
-            StrokeGestureRecognizerWaitingState())
+            BrushStrokeGestureRecognizerWaitingState())
     }
     
     func touchesEstimatedPropertiesUpdated(
@@ -172,19 +172,19 @@ class StrokeGestureRecognizerPreActiveState: StrokeGestureRecognizerState {
         
         let d = s1.position.distance(to: s2.position)
         
-        if d >= AppConfig.strokeGestureFingerActivationDistance {
+        if d >= BrushStrokeGestureConfig.fingerActivationDistance {
             activateStroke()
         }
     }
     
     private func activateStroke() {
-        delegate?.onBeginStroke()
-        delegate?.onUpdateStroke(stroke)
+        delegate?.onBeginBrushStroke()
+        delegate?.onUpdateBrushStroke(stroke)
         
         delegate?.onGestureBegan()
         
         delegate?.setState(
-            StrokeGestureRecognizerActiveState(
+            BrushStrokeGestureRecognizerActiveState(
                 stroke: stroke))
     }
     
@@ -192,13 +192,13 @@ class StrokeGestureRecognizerPreActiveState: StrokeGestureRecognizerState {
 
 // MARK: - Active
 
-class StrokeGestureRecognizerActiveState: StrokeGestureRecognizerState {
+class BrushStrokeGestureRecognizerActiveState: BrushStrokeGestureRecognizerState {
     
-    weak var delegate: StrokeGestureRecognizerStateDelegate?
+    weak var delegate: BrushStrokeGestureRecognizerStateDelegate?
     
-    private var stroke: StrokeGestureRecognizer.Stroke
+    private var stroke: BrushStrokeGestureRecognizer.Stroke
     
-    init(stroke: StrokeGestureRecognizer.Stroke) {
+    init(stroke: BrushStrokeGestureRecognizer.Stroke) {
         self.stroke = stroke
     }
     
@@ -208,7 +208,7 @@ class StrokeGestureRecognizerActiveState: StrokeGestureRecognizerState {
         guard touches.contains(stroke.touch) else { return }
         
         stroke.update(event: event, view: delegate?.view)
-        delegate?.onUpdateStroke(stroke)
+        delegate?.onUpdateBrushStroke(stroke)
     }
     
     func touchesEnded(
@@ -219,12 +219,12 @@ class StrokeGestureRecognizerActiveState: StrokeGestureRecognizerState {
         stroke.hasTouchEnded = true
         stroke.predictedSamples = []
         
-        delegate?.onUpdateStroke(stroke)
+        delegate?.onUpdateBrushStroke(stroke)
         
         delegate?.onGestureEnded()
         
         delegate?.setState(
-            StrokeGestureRecognizerPostActiveState(
+            BrushStrokeGestureRecognizerPostActiveState(
                 stroke: stroke))
     }
     
@@ -238,21 +238,21 @@ class StrokeGestureRecognizerActiveState: StrokeGestureRecognizerState {
         touches: Set<UITouch>
     ) {
         stroke.updateEstimated(touches: touches, view: delegate?.view)
-        delegate?.onUpdateStroke(stroke)
+        delegate?.onUpdateBrushStroke(stroke)
     }
     
 }
 
 // MARK: - Post Active
 
-class StrokeGestureRecognizerPostActiveState: StrokeGestureRecognizerState {
+class BrushStrokeGestureRecognizerPostActiveState: BrushStrokeGestureRecognizerState {
     
-    weak var delegate: StrokeGestureRecognizerStateDelegate?
+    weak var delegate: BrushStrokeGestureRecognizerStateDelegate?
     
-    private var stroke: StrokeGestureRecognizer.Stroke
+    private var stroke: BrushStrokeGestureRecognizer.Stroke
     private var finalizationTimer: Timer?
     
-    init(stroke: StrokeGestureRecognizer.Stroke) {
+    init(stroke: BrushStrokeGestureRecognizer.Stroke) {
         self.stroke = stroke
     }
     
@@ -262,22 +262,22 @@ class StrokeGestureRecognizerPostActiveState: StrokeGestureRecognizerState {
     
     func onStateBegin() {
         finalizationTimer = Timer.scheduledTimer(
-            withTimeInterval: AppConfig.strokeGestureEstimateFinalizationDelay,
+            withTimeInterval: BrushStrokeGestureConfig.estimateFinalizationDelay,
             repeats: false)
         { [weak self] _ in
             self?.delegate?.setState(
-                StrokeGestureRecognizerWaitingState())
+                BrushStrokeGestureRecognizerWaitingState())
         }
     }
     
     func onStateEnd() {
-        delegate?.onEndStroke()
+        delegate?.onEndBrushStroke()
     }
     
     func touchesBegan(
         touches: Set<UITouch>, event: UIEvent
     ) {
-        let proxyState = StrokeGestureRecognizerWaitingState()
+        let proxyState = BrushStrokeGestureRecognizerWaitingState()
         proxyState.delegate = delegate
         
         proxyState.touchesBegan(touches: touches, event: event)
@@ -287,16 +287,16 @@ class StrokeGestureRecognizerPostActiveState: StrokeGestureRecognizerState {
         touches: Set<UITouch>
     ) {
         stroke.updateEstimated(touches: touches, view: delegate?.view)
-        delegate?.onUpdateStroke(stroke)
+        delegate?.onUpdateBrushStroke(stroke)
     }
     
 }
 
 // MARK: - Invalid
 
-class StrokeGestureRecognizerInvalidState: StrokeGestureRecognizerState {
+class BrushStrokeGestureRecognizerInvalidState: BrushStrokeGestureRecognizerState {
     
-    weak var delegate: StrokeGestureRecognizerStateDelegate?
+    weak var delegate: BrushStrokeGestureRecognizerStateDelegate?
     
     func touchesEnded(
         touches: Set<UITouch>, event: UIEvent
@@ -318,7 +318,7 @@ class StrokeGestureRecognizerInvalidState: StrokeGestureRecognizerState {
             delegate?.onGestureFailed()
             
             delegate?.setState(
-                StrokeGestureRecognizerWaitingState())
+                BrushStrokeGestureRecognizerWaitingState())
         }
     }
     

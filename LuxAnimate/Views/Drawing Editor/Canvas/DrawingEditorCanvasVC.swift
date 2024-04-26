@@ -10,29 +10,43 @@ private let maxScaleLevel: Scalar = 30
 private let scalePixelateThreshold: Scalar = 1.0
 
 protocol DrawingEditorCanvasVCDelegate: AnyObject {
-    func needsDrawLayer(_ vc: DrawingEditorCanvasVC)
+    
+    func onBeginBrushStroke(
+        _ vc: DrawingEditorCanvasVC)
+    
+    func onUpdateBrushStroke(
+        _ vc: DrawingEditorCanvasVC,
+        _ stroke: BrushStrokeGestureRecognizer.Stroke)
+    
+    func onEndBrushStroke(
+        _ vc: DrawingEditorCanvasVC)
+    
+    func needsDrawLayer(
+        _ vc: DrawingEditorCanvasVC)
+    
 }
 
 class DrawingEditorCanvasVC: UIViewController {
     
     weak var delegate: DrawingEditorCanvasVCDelegate?
         
-    let metalView = MetalView()
-    
+    private let metalView = MetalView()
     private let canvasView = MovableCanvasView()
+    
+    private let layerRenderer = MetalLayerTextureRenderer()
     
     private let canvasViewSize: Size
     
     // MARK: - Init
     
-    init(drawingSize: PixelSize) {
+    init(canvasSize: PixelSize) {
         canvasViewSize = Size(
-            Scalar(drawingSize.width),
-            Scalar(drawingSize.height))
+            Scalar(canvasSize.width),
+            Scalar(canvasSize.height))
         
         metalView.setDrawableSize(CGSize(
-            width: drawingSize.width,
-            height: drawingSize.height))
+            width: canvasSize.width,
+            height: canvasSize.height))
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -43,8 +57,24 @@ class DrawingEditorCanvasVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .editorBackground
         
-        setupUI()
+        view.addSubview(canvasView)
+        canvasView.pinEdges()
+        canvasView.delegate = self
+        canvasView.singleFingerPanEnabled = false
+        
+        canvasView.canvasContentView.addSubview(metalView)
+        metalView.pinEdges()
+        metalView.delegate = self
+        
+        metalView.metalLayer.shouldRasterize = true
+        metalView.metalLayer.rasterizationScale = 1
+        
+        let strokeGesture = BrushStrokeGestureRecognizer()
+        strokeGesture.strokeDelegate = self
+        canvasView.canvasContentView
+            .addGestureRecognizer(strokeGesture)
     }
     
     override func viewIsAppearing(_ animated: Bool) {
@@ -53,22 +83,12 @@ class DrawingEditorCanvasVC: UIViewController {
         canvasView.fitCanvasToBounds(animated: false)
     }
     
-    // MARK: - Setup
+    // MARK: Interface
     
-    private func setupUI() {
-        view.clipsToBounds = true
-        view.backgroundColor = .editorBackground
-        
-        view.addSubview(canvasView)
-        canvasView.pinEdges()
-        canvasView.delegate = self
-        
-        canvasView.canvasContentView.addSubview(metalView)
-        metalView.pinEdges()
-        metalView.delegate = self
-        
-        metalView.metalLayer.shouldRasterize = true
-        metalView.metalLayer.rasterizationScale = 1
+    func drawTextureToCanvas(_ texture: MTLTexture) {
+        layerRenderer.draw(
+            texture: texture,
+            to: metalView.metalLayer)
     }
     
 }
@@ -108,6 +128,24 @@ extension DrawingEditorCanvasVC: MetalViewDelegate {
     
     func draw(in layer: CAMetalLayer) {
         delegate?.needsDrawLayer(self)
+    }
+    
+}
+
+extension DrawingEditorCanvasVC: BrushStrokeGestureRecognizerStrokeDelegate {
+    
+    func onBeginBrushStroke() {
+        delegate?.onBeginBrushStroke(self)
+    }
+    
+    func onUpdateBrushStroke(
+        _ stroke: BrushStrokeGestureRecognizer.Stroke
+    ) {
+        delegate?.onUpdateBrushStroke(self, stroke)
+    }
+    
+    func onEndBrushStroke() {
+        delegate?.onEndBrushStroke(self)
     }
     
 }

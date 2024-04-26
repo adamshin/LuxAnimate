@@ -99,6 +99,7 @@ class DrawingEditorTitleBarView: UIView {
         leftStack.addArrangedSubview(backButton)
         leftStack.setCustomSpacing(8, after: backButton)
         
+        /*
         let separator = UIView()
         separator.pinWidth(to: 16)
 //        separator.pinWidth(to: 32)
@@ -163,6 +164,7 @@ class DrawingEditorTitleBarView: UIView {
 //        circle.backgroundColor = .white.withAlphaComponent(0.2)
 //        addSubview(circle)
 //        circle.pinCenter(to: rightStack.arrangedSubviews[0])
+         */
     }
     
     required init?(coder: NSCoder) { fatalError() }
