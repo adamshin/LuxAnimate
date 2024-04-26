@@ -50,7 +50,6 @@ class EditorContentVC: UIViewController {
         tableView.dataSource = self
         tableView.delegate = self
         
-        navigationItem.title = ""
         navigationItem.leftBarButtonItem = backButton
         navigationItem.rightBarButtonItem = createDrawingButton
     }
