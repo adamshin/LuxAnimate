@@ -8,9 +8,9 @@ private let brushConfig = Brush.Configuration(
     stampTextureName: "brush1.png",
     stampSize: 100,
     stampSpacing: 0.0,
-    stampAlpha: 1.0,
-    pressureScaling: 1.0,
-    taperLength: 0.1,
+    stampAlpha: 1,
+    pressureScaling: 0,
+    taperLength: 0,
     taperRoundness: 1.0)
 
 private let brushColor: Color = .brushBlue

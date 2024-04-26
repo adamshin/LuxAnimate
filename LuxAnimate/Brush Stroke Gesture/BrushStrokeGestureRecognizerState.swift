@@ -26,11 +26,12 @@ protocol BrushStrokeGestureRecognizerInternalState: AnyObject {
     func onStateBegin()
     func onStateEnd()
     
+    func resetGesture()
+    
     func touchesBegan(touches: Set<UITouch>, event: UIEvent)
     func touchesMoved(touches: Set<UITouch>, event: UIEvent)
     func touchesEnded(touches: Set<UITouch>, event: UIEvent)
     func touchesCancelled(touches: Set<UITouch>, event: UIEvent)
-    
     func touchesEstimatedPropertiesUpdated(touches: Set<UITouch>)
     
 }
@@ -54,6 +55,8 @@ extension BrushStrokeGestureRecognizerInternalState {
 class BrushStrokeGestureRecognizerWaitingState: BrushStrokeGestureRecognizerInternalState {
     
     weak var delegate: BrushStrokeGestureRecognizerInternalStateDelegate?
+    
+    func resetGesture() { }
     
     func touchesBegan(
         touches: Set<UITouch>, event: UIEvent
@@ -112,6 +115,11 @@ class BrushStrokeGestureRecognizerPreActiveState: BrushStrokeGestureRecognizerIn
         }
     }
     
+    func resetGesture() {
+        delegate?.setState(
+            BrushStrokeGestureRecognizerWaitingState())
+    }
+    
     func touchesBegan(
         touches: Set<UITouch>, event: UIEvent
     ) {
@@ -139,8 +147,6 @@ class BrushStrokeGestureRecognizerPreActiveState: BrushStrokeGestureRecognizerIn
         delegate?.onBeginBrushStroke()
         delegate?.onUpdateBrushStroke(stroke)
         
-        delegate?.setGestureRecognizerState(.ended)
-        
         delegate?.setState(
             BrushStrokeGestureRecognizerPostActiveState(
                 stroke: stroke))
@@ -152,9 +158,6 @@ class BrushStrokeGestureRecognizerPreActiveState: BrushStrokeGestureRecognizerIn
         guard touches.contains(stroke.touch) else { return }
         
         delegate?.setGestureRecognizerState(.failed)
-        
-        delegate?.setState(
-            BrushStrokeGestureRecognizerWaitingState())
     }
     
     func touchesEstimatedPropertiesUpdated(
@@ -200,6 +203,12 @@ class BrushStrokeGestureRecognizerActiveState: BrushStrokeGestureRecognizerInter
         self.stroke = stroke
     }
     
+    func resetGesture() {
+        delegate?.onEndBrushStroke()
+        delegate?.setState(
+            BrushStrokeGestureRecognizerWaitingState())
+    }
+    
     func touchesMoved(
         touches: Set<UITouch>, event: UIEvent
     ) {
@@ -218,8 +227,6 @@ class BrushStrokeGestureRecognizerActiveState: BrushStrokeGestureRecognizerInter
         stroke.predictedSamples = []
         
         delegate?.onUpdateBrushStroke(stroke)
-        
-        delegate?.setGestureRecognizerState(.ended)
         
         delegate?.setState(
             BrushStrokeGestureRecognizerPostActiveState(
@@ -259,6 +266,8 @@ class BrushStrokeGestureRecognizerPostActiveState: BrushStrokeGestureRecognizerI
     }
     
     func onStateBegin() {
+        delegate?.setGestureRecognizerState(.ended)
+        
         finalizationTimer = Timer.scheduledTimer(
             withTimeInterval: BrushStrokeGestureConfig.estimateFinalizationDelay,
             repeats: false)
@@ -271,6 +280,8 @@ class BrushStrokeGestureRecognizerPostActiveState: BrushStrokeGestureRecognizerI
     func onStateEnd() {
         delegate?.onEndBrushStroke()
     }
+    
+    func resetGesture() { }
     
     func touchesBegan(
         touches: Set<UITouch>, event: UIEvent
@@ -296,6 +307,11 @@ class BrushStrokeGestureRecognizerInvalidState: BrushStrokeGestureRecognizerInte
     
     weak var delegate: BrushStrokeGestureRecognizerInternalStateDelegate?
     
+    func resetGesture() {
+        delegate?.setState(
+            BrushStrokeGestureRecognizerWaitingState())
+    }
+    
     func touchesEnded(
         touches: Set<UITouch>, event: UIEvent
     ) {
@@ -314,9 +330,6 @@ class BrushStrokeGestureRecognizerInvalidState: BrushStrokeGestureRecognizerInte
         
         if remainingTouchCount <= 0 {
             delegate?.setGestureRecognizerState(.failed)
-            
-            delegate?.setState(
-                BrushStrokeGestureRecognizerWaitingState())
         }
     }
     

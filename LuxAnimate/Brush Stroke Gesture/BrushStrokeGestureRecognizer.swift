@@ -36,7 +36,7 @@ class BrushStrokeGestureRecognizer: UIGestureRecognizer {
     init() {
         super.init(target: nil, action: nil)
         
-        setinternalState(BrushStrokeGestureRecognizerWaitingState())
+        setInternalState(BrushStrokeGestureRecognizerWaitingState())
     }
     
     // MARK: - Gesture Lifecycle
@@ -78,12 +78,12 @@ class BrushStrokeGestureRecognizer: UIGestureRecognizer {
     
     override func reset() {
         super.reset()
-        setinternalState(BrushStrokeGestureRecognizerWaitingState())
+        internalState?.resetGesture()
     }
     
     // MARK: - State
     
-    private func setinternalState(_ newState: BrushStrokeGestureRecognizerInternalState) {
+    private func setInternalState(_ newState: BrushStrokeGestureRecognizerInternalState) {
         internalState?.onStateEnd()
         internalState = newState
         
@@ -98,7 +98,7 @@ class BrushStrokeGestureRecognizer: UIGestureRecognizer {
 extension BrushStrokeGestureRecognizer: BrushStrokeGestureRecognizerInternalStateDelegate {
     
     func setState(_ newState: BrushStrokeGestureRecognizerInternalState) {
-        setinternalState(newState)
+        setInternalState(newState)
     }
     
     func setGestureRecognizerState(_ newState: UIGestureRecognizer.State) {
