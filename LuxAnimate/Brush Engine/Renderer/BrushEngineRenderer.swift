@@ -56,8 +56,14 @@ class BrushEngineRenderer {
     }
     
     func update(
-        stroke: BrushStrokeEngine.OutputStroke
+        stroke: BrushStrokeEngine.OutputStroke,
+        brushMode: BrushEngine.BrushMode
     ) {
+        let erase = switch brushMode {
+        case .brush: false
+        case .erase: true
+        }
+        
         let viewportSize = Size(
             Scalar(canvasSize.width),
             Scalar(canvasSize.height))
@@ -73,7 +79,8 @@ class BrushEngineRenderer {
             startIndex: drawnFinalizedStampCount,
             endIndex: finalizedStampCount,
             brush: stroke.brush,
-            color: stroke.color)
+            color: stroke.color,
+            erase: erase)
         
         try? textureBlitter.blit(
             from: partialStrokeCanvasTexture,
@@ -87,7 +94,8 @@ class BrushEngineRenderer {
             endIndex: stroke.stamps.count,
             brush: stroke.brush,
             color: AppConfig.brushRenderDebug ? 
-                Color.debugRed : stroke.color)
+                Color.debugRed : stroke.color,
+            erase: erase)
         
         drawnFinalizedStampCount = finalizedStampCount
     }

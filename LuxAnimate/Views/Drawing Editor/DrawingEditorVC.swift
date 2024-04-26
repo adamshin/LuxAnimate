@@ -136,6 +136,7 @@ extension DrawingEditorVC: DrawingEditorCanvasVCDelegate {
     ) {
         brushEngine.beginStroke(
             brush: brush,
+            brushMode: .brush,
             color: brushColor,
             scale: brushScale,
             smoothingLevel: 0.2)

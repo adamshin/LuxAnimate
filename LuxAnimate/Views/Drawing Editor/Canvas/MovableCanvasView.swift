@@ -211,7 +211,7 @@ class MovableCanvasView: UIView {
             setCanvasTransform(
                 baseCanvasTransform,
                 animated: true,
-                animDuration: 0.5)
+                animDuration: 0.4)
             
         } else {
             self.activeGestureCanvasTransform = nil

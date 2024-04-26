@@ -24,6 +24,7 @@ struct MetalInterface {
 
 enum BlendMode {
     case normal
+    case erase
     case replace
 }
 
@@ -44,6 +45,7 @@ extension BlendMode {
     var shaderValue: ShaderBlendMode {
         switch self {
         case .normal: ShaderBlendModeNormal
+        case .erase: ShaderBlendModeErase
         case .replace: ShaderBlendModeReplace
         }
     }

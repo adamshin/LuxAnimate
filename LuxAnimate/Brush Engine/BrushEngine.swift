@@ -4,6 +4,15 @@
 
 import Metal
 
+extension BrushEngine {
+    
+    enum BrushMode {
+        case brush
+        case erase
+    }
+    
+}
+
 protocol BrushEngineDelegate: AnyObject {
     func onUpdateCanvas(_ engine: BrushEngine)
     func onFinalizeStroke(_ engine: BrushEngine)
@@ -16,6 +25,7 @@ class BrushEngine {
     private let renderer: BrushEngineRenderer
     private let displayLink = BrushEngineDisplayLink()
     
+    private var brushMode: BrushMode = .brush
     private var strokeEngine: BrushStrokeEngine?
     
     // MARK: - Initializer
@@ -43,10 +53,12 @@ class BrushEngine {
     
     func beginStroke(
         brush: Brush,
+        brushMode: BrushMode,
         color: Color,
         scale: Double,
         smoothingLevel: Double
     ) {
+        self.brushMode = brushMode
         renderer.resetStroke()
         
         strokeEngine = BrushStrokeEngine(
@@ -66,7 +78,10 @@ class BrushEngine {
         guard let strokeEngine else { return }
         
         strokeEngine.process()
-        renderer.update(stroke: strokeEngine.outputStroke)
+        
+        renderer.update(
+            stroke: strokeEngine.outputStroke,
+            brushMode: brushMode)
         
         self.strokeEngine = nil
         
@@ -80,7 +95,10 @@ class BrushEngine {
         guard let strokeEngine else { return }
         
         strokeEngine.process()
-        renderer.update(stroke: strokeEngine.outputStroke)
+        
+        renderer.update(
+            stroke: strokeEngine.outputStroke,
+            brushMode: brushMode)
         
         delegate?.onUpdateCanvas(self)
     }

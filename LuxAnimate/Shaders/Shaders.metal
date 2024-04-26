@@ -30,6 +30,11 @@ float4 blendNormal(float4 c1, float4 c2) {
     );
 }
 
+float4 blendErase(float4 c1, float4 c2) {
+    c2.a *= (1 - c1.a);
+    return c2;
+}
+
 float4 blend(
     float4 c1,
     float4 c2,
@@ -38,6 +43,9 @@ float4 blend(
     switch (blendMode) {
         case ShaderBlendModeNormal:
             return blendNormal(c1, c2);
+            
+        case ShaderBlendModeErase:
+            return blendErase(c1, c2);
             
         case ShaderBlendModeReplace:
             return c1;
