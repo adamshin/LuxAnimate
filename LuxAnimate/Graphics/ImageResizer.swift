@@ -51,7 +51,6 @@ struct ImageResizer {
         spriteRenderer.drawSprites(
             commandBuffer: commandBuffer,
             target: renderTarget,
-            clearColor: Color(0, 0, 0, 0),
             viewportSize: Size(1, 1),
             texture: imageTexture,
             sprites: [

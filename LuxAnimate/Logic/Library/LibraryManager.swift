@@ -22,6 +22,7 @@ struct LibraryManager {
     
     private func createLibraryDirectoryIfNeeded() throws {
         let url = fileUrlHelper.libraryDirectoryURL
+        print(url)
         
         if fileManager.fileExists(atPath: url.path()) {
             return
@@ -110,10 +111,8 @@ struct LibraryManager {
         let now = Date()
         
         let metadata = Project.Metadata(
-            contentWidth: 1920,
-            contentHeight: 1920,
-            viewportWidth: 1920,
-            viewportHeight: 1080,
+            contentSize: PixelSize(width: 1920, height: 1920),
+            viewportSize: PixelSize(width: 1920, height: 1080),
             frameRate: 24)
         
         let projectManifest = Project.Manifest(
@@ -122,11 +121,8 @@ struct LibraryManager {
             createdAt: now,
             modifiedAt: now,
             metadata: metadata,
-            timeline: Project.Timeline(
-                animationLayers: [],
-                drawings: []), 
-            assets: Project.Assets(
-                assetIDs: []))
+            timeline: Project.Timeline(drawings: []),
+            assetIDs: [])
         
         let projectManifestData = try encoder.encode(projectManifest)
         try projectManifestData.write(to: projectManifestURL)
@@ -137,6 +133,21 @@ struct LibraryManager {
         try setLibraryManifest(libraryManifest)
         
         return projectID
+    }
+    
+    func deleteProject(projectID: String) throws {
+        let projectURL = fileUrlHelper
+            .projectURL(for: projectID)
+        
+        try fileManager.removeItem(at: projectURL)
+        
+        var libraryManifest = try getLibraryManifest()
+        if let projectIndex = libraryManifest.projects
+            .firstIndex(where: { $0.id == projectID })
+        {
+            libraryManifest.projects.remove(at: projectIndex)
+            try setLibraryManifest(libraryManifest)
+        }
     }
     
 }

@@ -16,17 +16,15 @@ enum Project {
         
         var metadata: Metadata
         var timeline: Timeline
-        var assets: Assets
+        
+        var assetIDs: Set<String>
     }
     
     // MARK: - Metadata
     
     struct Metadata: Codable {
-        var contentWidth: Int
-        var contentHeight: Int
-        
-        var viewportWidth: Int
-        var viewportHeight: Int
+        var contentSize: PixelSize
+        var viewportSize: PixelSize
         
         var frameRate: Int
     }
@@ -34,46 +32,25 @@ enum Project {
     // MARK: - Timeline
     
     struct Timeline: Codable {
-        var animationLayers: [AnimationLayer]
         var drawings: [Drawing]
-    }
-    
-    struct AnimationLayer: Codable {
-        var id: String
-        var name: String
-        
-        var width: Scalar
-        var height: Scalar
-        var pixelScale: Scalar
-        
-        var drawingLayers: [DrawingLayer]
-    }
-    
-    struct DrawingLayer: Codable {
-        var id: String
-        var name: String
     }
     
     struct Drawing: Codable {
         var id: String
-        
         var frameIndex: Int
-        var animationLayerID: String
-        var drawingLayerID: String
         
-        var assets: DrawingAssetGroup
+        var size: PixelSize
+        var assetIDs: DrawingAssetIDGroup
     }
     
-    struct DrawingAssetGroup: Codable {
+    struct DrawingAssetIDGroup: Codable {
         var full: String
         var previewMedium: String
         var previewSmall: String
-    }
-    
-    // MARK: - Assets
-    
-    struct Assets: Codable {
-        var assetIDs: Set<String>
+        
+        var all: [String] {[
+            full, previewMedium, previewSmall
+        ]}
     }
     
 }

@@ -5,6 +5,9 @@
 import UIKit
 import PhotosUI
 
+private let defaultImageSize = PixelSize(
+    width: 1920, height: 1080)
+
 class EditorVC: UIViewController {
     
     private let contentVC = EditorContentVC()
@@ -72,20 +75,43 @@ class EditorVC: UIViewController {
     
     // MARK: - Logic
     
-    private func createDrawing(
-        imageData: Data,
-        imageWidth: Int,
-        imageHeight: Int
-    ) {
+    private func createEmptyDrawing() {
+        let imageSize = defaultImageSize
+        let imageData = Self.emptyImageData(
+            imageSize: imageSize)
+        
         do {
             try editor.createDrawing(
+                size: imageSize,
                 imageData: imageData,
-                imageWidth: imageWidth,
-                imageHeight: imageHeight)
+                imageSize: imageSize)
             
             updateUI()
             
         } catch { }
+    }
+    
+    private func editDrawing(
+        drawingID: String,
+        imageData: Data,
+        imageSize: PixelSize
+    ) {
+        do {
+            try editor.editDrawing(
+                drawingID: drawingID,
+                imageData: imageData,
+                imageSize: imageSize)
+            
+            updateUI()
+            
+        } catch { }
+    }
+    
+    private static func emptyImageData(
+        imageSize: PixelSize
+    ) -> Data {
+        let byteCount = imageSize.width * imageSize.height * 4
+        return Data(repeating: 0, count: byteCount)
     }
     
 }
@@ -99,14 +125,7 @@ extension EditorVC: EditorContentVCDelegate {
     }
     
     func onSelectCreateDrawing() {
-        var config = PHPickerConfiguration()
-        config.filter = .images
-        config.selectionLimit = 1
-        
-        let vc = PHPickerViewController(configuration: config)
-        vc.delegate = self
-        
-        present(vc, animated: true)
+        createEmptyDrawing()
     }
     
     func onSelectDrawing(id: String) {
@@ -117,41 +136,29 @@ extension EditorVC: EditorContentVCDelegate {
             .first(where: { $0.id == id })
         else { return }
         
-        let vc = EditorDrawingVC(
-            projectManifest: projectManifest,
-            drawing: drawing,
-            drawingSize: Size(1000, 1000))
+        let vc = DrawingEditorVC(
+            projectID: projectID,
+            drawing: drawing)
+        
+        vc.delegate = self
         
         present(vc, animated: true)
     }
     
 }
 
-extension EditorVC: PHPickerViewControllerDelegate {
+extension EditorVC: DrawingEditorVCDelegate {
     
-    func picker(
-        _ picker: PHPickerViewController,
-        didFinishPicking results: [PHPickerResult]
+    func onEditDrawing(
+        _ vc: DrawingEditorVC,
+        drawingID: String,
+        imageData: Data,
+        imageSize: PixelSize
     ) {
-        picker.dismiss(animated: true)
-        
-        guard let result = results.first else { return }
-        
-        result.itemProvider.loadObject(ofClass: UIImage.self)
-        { [weak self] object, error in
-            guard let image = object as? UIImage else { return }
-            
-            guard let extractedData = try?
-                UIImageDataExtractor.imageData(from: image)
-            else { return }
-            
-            DispatchQueue.main.async {
-                self?.createDrawing(
-                    imageData: extractedData.data,
-                    imageWidth: extractedData.width,
-                    imageHeight: extractedData.height)
-            }
-        }
+        self.editDrawing(
+            drawingID: drawingID,
+            imageData: imageData,
+            imageSize: imageSize)
     }
     
 }

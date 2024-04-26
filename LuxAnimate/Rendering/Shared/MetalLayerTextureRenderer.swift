@@ -22,7 +22,6 @@ class MetalLayerTextureRenderer {
         spriteRenderer.drawSprites(
             commandBuffer: commandBuffer,
             target: drawable.texture,
-            clearColor: Color(0, 0, 0, 1),
             viewportSize: Size(1, 1),
             texture: texture,
             sprites: [
@@ -30,6 +29,7 @@ class MetalLayerTextureRenderer {
                     size: Size(1, 1),
                     position: Vector(0.5, 0.5))
             ],
+            blendMode: .replace,
             sampleMode: .nearest)
         
         commandBuffer.present(drawable)

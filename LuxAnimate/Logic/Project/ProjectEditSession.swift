@@ -233,8 +233,8 @@ class ProjectEditSession {
         
         // Find assets referenced in the old manifest but not the
         // new one. Move these to the new history entry
-        let oldAssetIDs = oldProjectManifest.assets.assetIDs
-        let newAssetIDs = newProjectManifest.assets.assetIDs
+        let oldAssetIDs = oldProjectManifest.assetIDs
+        let newAssetIDs = newProjectManifest.assetIDs
         
         let diffAssetIDs = oldAssetIDs.subtracting(newAssetIDs)
         
@@ -328,8 +328,8 @@ class ProjectEditSession {
         
         // Find assets referenced in the old manifest but not the
         // new one. Move these to the new history entry directory
-        let oldAssetIDs = currentProjectManifest.assets.assetIDs
-        let newAssetIDs = consumedProjectManifest.assets.assetIDs
+        let oldAssetIDs = currentProjectManifest.assetIDs
+        let newAssetIDs = consumedProjectManifest.assetIDs
         
         let diffAssetIDs = oldAssetIDs.subtracting(newAssetIDs)
         

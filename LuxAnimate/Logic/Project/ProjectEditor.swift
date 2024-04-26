@@ -33,24 +33,91 @@ class ProjectEditor {
 extension ProjectEditor {
     
     func createDrawing(
+        size: PixelSize,
         imageData: Data,
-        imageWidth: Int,
-        imageHeight: Int
+        imageSize: PixelSize
     ) throws {
         guard let editSession else { return }
+        
+        let createdAssets = try createDrawingAssets(
+            imageData: imageData,
+            imageSize: imageSize)
+        
+        let drawing = Project.Drawing(
+            id: UUID().uuidString,
+            frameIndex: 0,
+            size: size,
+            assetIDs: createdAssets.assetIDs)
+        
+        var projectManifest = editSession.currentProjectManifest
+        
+        projectManifest.timeline.drawings.append(drawing)
+        
+        for assetID in createdAssets.assetIDs.all {
+            projectManifest.assetIDs.insert(assetID)
+        }
+        
+        try editSession.applyEdit(
+            newProjectManifest: projectManifest,
+            newAssets: createdAssets.newAssets)
+    }
+    
+    func editDrawing(
+        drawingID: String,
+        imageData: Data,
+        imageSize: PixelSize
+    ) throws {
+        guard let editSession else { return }
+        
+        let createdAssets = try createDrawingAssets(
+            imageData: imageData,
+            imageSize: imageSize)
+        
+        var projectManifest = editSession.currentProjectManifest
+        
+        guard let drawingIndex = projectManifest.timeline.drawings
+            .firstIndex(where: { $0.id == drawingID })
+        else { return }
+        
+        let drawing = projectManifest.timeline.drawings[drawingIndex]
+        for assetID in drawing.assetIDs.all {
+            projectManifest.assetIDs.remove(assetID)
+        }
+        
+        projectManifest.timeline.drawings[drawingIndex]
+            .assetIDs = createdAssets.assetIDs
+        
+        for assetID in createdAssets.assetIDs.all {
+            projectManifest.assetIDs.insert(assetID)
+        }
+        
+        try editSession.applyEdit(
+            newProjectManifest: projectManifest,
+            newAssets: createdAssets.newAssets)
+    }
+    
+    private struct CreatedDrawingAssets {
+        var assetIDs: Project.DrawingAssetIDGroup
+        var newAssets: [ProjectEditSession.NewAsset]
+    }
+    
+    private func createDrawingAssets(
+        imageData: Data,
+        imageSize: PixelSize
+    ) throws -> CreatedDrawingAssets {
         
         // Resize images
         let previewMediumImageData = try imageResizer.resize(
             imageData: imageData,
-            width: imageWidth,
-            height: imageHeight,
+            width: imageSize.width,
+            height: imageSize.height,
             targetWidth: AppConfig.assetPreviewMediumSize,
             targetHeight: AppConfig.assetPreviewMediumSize)
         
         let previewSmallImageData = try imageResizer.resize(
             imageData: imageData,
-            width: imageWidth,
-            height: imageHeight,
+            width: imageSize.width,
+            height: imageSize.height,
             targetWidth: AppConfig.assetPreviewSmallSize,
             targetHeight: AppConfig.assetPreviewSmallSize)
         
@@ -58,8 +125,8 @@ extension ProjectEditor {
         let fullEncodedData = try! JXLEncoder.encode(
             input: .init(
                 data: imageData,
-                width: imageWidth,
-                height: imageHeight),
+                width: imageSize.width,
+                height: imageSize.height),
             lossless: true,
             quality: 100,
             effort: 1)
@@ -82,7 +149,7 @@ extension ProjectEditor {
             quality: 90,
             effort: 1)
         
-        // Apply edit
+        // Create assets
         let fullAsset = ProjectEditSession.NewAsset(
             id: UUID().uuidString,
             data: fullEncodedData)
@@ -95,23 +162,11 @@ extension ProjectEditor {
             id: UUID().uuidString,
             data: previewSmallEncodedData)
         
-        let drawing = Project.Drawing(
-            id: UUID().uuidString,
-            frameIndex: 0,
-            animationLayerID: "",
-            drawingLayerID: "",
-            assets: .init(
+        return CreatedDrawingAssets(
+            assetIDs: Project.DrawingAssetIDGroup(
                 full: fullAsset.id,
                 previewMedium: previewMediumAsset.id,
-                previewSmall: previewSmallAsset.id))
-        
-        var projectManifest = editSession.currentProjectManifest
-        
-        projectManifest.timeline.drawings.append(drawing)
-        projectManifest.assets.assetIDs.insert(fullAsset.id)
-        
-        try editSession.applyEdit(
-            newProjectManifest: projectManifest,
+                previewSmall: previewSmallAsset.id),
             newAssets: [
                 fullAsset,
                 previewMediumAsset,

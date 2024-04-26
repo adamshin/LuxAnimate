@@ -42,7 +42,6 @@ struct SpriteRenderer {
     func drawSprites(
         commandBuffer: any MTLCommandBuffer,
         target: MTLTexture,
-        clearColor: Color?,
         viewportSize: Size,
         texture: MTLTexture,
         sprites: [Sprite],
@@ -56,11 +55,7 @@ struct SpriteRenderer {
         let attachment = renderPassDescriptor.colorAttachments[0]!
         attachment.texture = target
         attachment.storeAction = .store
-        
-        attachment.loadAction = clearColor != nil ?
-            .clear : .load
-        attachment.clearColor = clearColor?.mtlClearColor ??
-            MTLClearColorMake(0, 0, 0, 1)
+        attachment.loadAction = .load
         
         let renderEncoder = commandBuffer
             .makeRenderCommandEncoder(
