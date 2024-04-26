@@ -74,6 +74,8 @@ class DrawingEditorVC: UIViewController {
         setupUI()
     }
     
+    override var prefersStatusBarHidden: Bool { true }
+    
     // MARK: - Setup
     
     private func setupUI() {

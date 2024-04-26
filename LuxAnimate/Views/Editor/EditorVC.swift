@@ -45,6 +45,8 @@ class EditorVC: UIViewController {
         updateUI()
     }
     
+    override var prefersStatusBarHidden: Bool { true }
+    
     // MARK: - Setup
     
     private func setupUI() {
