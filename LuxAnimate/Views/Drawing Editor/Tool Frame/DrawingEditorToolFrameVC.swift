@@ -6,6 +6,7 @@ import UIKit
 
 protocol DrawingEditorToolFrameVCDelegate: AnyObject {
     func onSelectBack(_ vc: DrawingEditorToolFrameVC)
+    func onSelectClear(_ vc: DrawingEditorToolFrameVC)
 }
 
 class DrawingEditorToolFrameVC: UIViewController {
@@ -57,6 +58,10 @@ extension DrawingEditorToolFrameVC: DrawingEditorTitleBarVCDelegate {
     
     func onSelectBack(_ vc: DrawingEditorTitleBarVC) {
         delegate?.onSelectBack(self)
+    }
+    
+    func onSelectClear(_ vc: DrawingEditorTitleBarVC) {
+        delegate?.onSelectClear(self)
     }
     
     func onSelectBrush(_ vc: DrawingEditorTitleBarVC) {

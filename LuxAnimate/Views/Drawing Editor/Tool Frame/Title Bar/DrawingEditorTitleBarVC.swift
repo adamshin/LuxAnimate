@@ -7,6 +7,7 @@ import UIKit
 protocol DrawingEditorTitleBarVCDelegate: AnyObject {
     func onSelectBack(_ vc: DrawingEditorTitleBarVC)
     func onSelectBrush(_ vc: DrawingEditorTitleBarVC)
+    func onSelectClear(_ vc: DrawingEditorTitleBarVC)
 }
 
 class DrawingEditorTitleBarVC: UIViewController {
@@ -25,6 +26,10 @@ class DrawingEditorTitleBarVC: UIViewController {
         bodyView.backButton.addHandler { [weak self] in
             guard let self else { return }
             self.delegate?.onSelectBack(self)
+        }
+        bodyView.clearButton.addHandler { [weak self] in
+            guard let self else { return }
+            self.delegate?.onSelectClear(self)
         }
         bodyView.brushButton.addHandler { [weak self] in
             guard let self else { return }

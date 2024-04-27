@@ -101,6 +101,29 @@ class DrawingEditorVC: UIViewController {
     
     // MARK: - Logic
     
+    private func clearCanvas() {
+        do {
+            let byteCount = canvasSize.width * canvasSize.height * 4
+            let imageData = Data(repeating: 0, count: byteCount)
+            
+            let texture = try TextureCreator.createTexture(
+                imageData: imageData,
+                width: canvasSize.width,
+                height: canvasSize.height,
+                mipMapped: false)
+            
+            brushEngine.setCanvasContents(texture)
+            render()
+            
+            delegate?.onEditDrawing(
+                self,
+                drawingID: drawingID,
+                imageData: imageData,
+                imageSize: canvasSize)
+            
+        } catch { }
+    }
+    
     private func saveEdit() {
         do {
             let imageData = try TextureDataReader
@@ -175,6 +198,10 @@ extension DrawingEditorVC: DrawingEditorToolFrameVCDelegate {
     
     func onSelectBack(_ vc: DrawingEditorToolFrameVC) {
         dismiss(animated: true)
+    }
+    
+    func onSelectClear(_ vc: DrawingEditorToolFrameVC) {
+        clearCanvas()
     }
     
 }

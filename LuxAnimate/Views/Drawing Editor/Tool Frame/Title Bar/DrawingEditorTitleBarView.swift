@@ -30,6 +30,17 @@ class DrawingEditorTitleBarView: UIView {
         return button
     }()
     
+    let clearButton = {
+        let button = UIButton(type: .system)
+        let image = UIImage(
+            systemName: "clear",
+            withConfiguration: iconConfig)
+        button.setImage(image, for: .normal)
+        button.tintColor = .editorLabel
+        button.pinWidth(to: buttonWidth)
+        return button
+    }()
+    
     let brushButton = {
         let button = UIButton(type: .system)
         let image = UIImage(
@@ -77,6 +88,7 @@ class DrawingEditorTitleBarView: UIView {
         leftStack.addArrangedSubview(backButton)
         leftStack.setCustomSpacing(8, after: backButton)
         
+        rightStack.addArrangedSubview(clearButton)
         rightStack.addArrangedSubview(brushButton)
     }
     
