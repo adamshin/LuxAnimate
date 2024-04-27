@@ -13,7 +13,7 @@ private let brushConfig = Brush.Configuration(
     taperLength: 0.05,
     taperRoundness: 1.0)
 
-private let brushColor: Color = .brushBlue
+private let brushColor: Color = .brushBlack
 
 protocol DrawingEditorVCDelegate: AnyObject {
     

@@ -6,6 +6,8 @@ import UIKit
 
 class DrawingEditorBrushOptionsView: PassthroughView {
     
+    let bgButton = UIButton()
+    
     let sizeRowView = EditorSliderRowView(
         title: "Size",
         valueStyle: .percentage,
@@ -20,13 +22,17 @@ class DrawingEditorBrushOptionsView: PassthroughView {
     init() {
         super.init(frame: .zero)
         
+        addSubview(bgButton)
+        bgButton.backgroundColor = .clear
+        bgButton.pinEdges()
+        
         let card = CardView()
         card.backgroundColor = .editorBar
         card.layer.cornerRadius = 24
         card.layer.cornerCurve = .continuous
         
         addSubview(card)
-        card.pinEdges(padding: 12)
+        card.pinEdges([.top, .trailing], padding: 12)
         card.pinWidth(to: 320)
         
         let contentStack = UIStackView()

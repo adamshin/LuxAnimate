@@ -15,10 +15,14 @@ class DrawingEditorBrushOptionsVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setVisible(false)
+        bodyView.bgButton.addHandler { [weak self] in
+            self?.setVisible(false)
+        }
         
         bodyView.sizeRowView.value = 0.2
         bodyView.smoothingRowView.value = 0
+        
+        setVisible(false)
     }
     
     func setVisible(_ visible: Bool) {

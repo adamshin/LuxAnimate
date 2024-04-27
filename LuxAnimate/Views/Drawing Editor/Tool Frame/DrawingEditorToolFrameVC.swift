@@ -29,7 +29,7 @@ class DrawingEditorToolFrameVC: UIViewController {
         
         let brushOptionsContainer = PassthroughView()
         view.addSubview(brushOptionsContainer)
-        brushOptionsContainer.pinEdges(.trailing)
+        brushOptionsContainer.pinEdges([.horizontal, .bottom])
         brushOptionsContainer.pin(.top, to: titleBarContainer, toAnchor: .bottom)
         
         let strokeBlockerView = UIView()
