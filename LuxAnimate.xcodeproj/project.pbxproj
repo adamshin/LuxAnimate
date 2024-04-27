@@ -62,6 +62,9 @@
 		6662D89D2BBDF46F00B4C1D4 /* Geometry+UIKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6662D89C2BBDF46F00B4C1D4 /* Geometry+UIKit.swift */; };
 		6662D8A32BBE1A3700B4C1D4 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6662D8A22BBE1A3700B4C1D4 /* Geometry.swift */; };
 		667BF74B2BA655CB003E3430 /* FileUrlHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667BF74A2BA655CB003E3430 /* FileUrlHelper.swift */; };
+		66A05B722BDC6D2000434245 /* DrawingEditorBrushOptionsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A05B712BDC6D2000434245 /* DrawingEditorBrushOptionsVC.swift */; };
+		66A05B742BDC6D2D00434245 /* DrawingEditorBrushOptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A05B732BDC6D2D00434245 /* DrawingEditorBrushOptionsView.swift */; };
+		66A05B772BDC76E400434245 /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A05B762BDC76E400434245 /* CardView.swift */; };
 		66B2BE422BCB55FF0072AC1B /* SharedModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B2BE412BCB55FF0072AC1B /* SharedModels.swift */; };
 		66B491B32BD9993F008A2A2E /* TextureCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B491B22BD9993F008A2A2E /* TextureCreator.swift */; };
 		66D0843D2BA3840C00EB8556 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0843C2BA3840C00EB8556 /* AppDelegate.swift */; };
@@ -146,6 +149,9 @@
 		6662D89C2BBDF46F00B4C1D4 /* Geometry+UIKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Geometry+UIKit.swift"; sourceTree = "<group>"; };
 		6662D8A22BBE1A3700B4C1D4 /* Geometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
 		667BF74A2BA655CB003E3430 /* FileUrlHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileUrlHelper.swift; sourceTree = "<group>"; };
+		66A05B712BDC6D2000434245 /* DrawingEditorBrushOptionsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingEditorBrushOptionsVC.swift; sourceTree = "<group>"; };
+		66A05B732BDC6D2D00434245 /* DrawingEditorBrushOptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingEditorBrushOptionsView.swift; sourceTree = "<group>"; };
+		66A05B762BDC76E400434245 /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
 		66B2BE412BCB55FF0072AC1B /* SharedModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedModels.swift; sourceTree = "<group>"; };
 		66B491B22BD9993F008A2A2E /* TextureCreator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextureCreator.swift; sourceTree = "<group>"; };
 		66D084392BA3840C00EB8556 /* LuxAnimate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LuxAnimate.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -208,9 +214,9 @@
 		66099BA12BDB18C700243D9F /* Tool Frame */ = {
 			isa = PBXGroup;
 			children = (
+				66A05B782BDC7B6700434245 /* Title Bar */,
+				66A05B792BDC7B7000434245 /* Brush Options */,
 				66099B9F2BDB188700243D9F /* DrawingEditorToolFrameVC.swift */,
-				66099BA22BDB193800243D9F /* DrawingEditorTitleBarVC.swift */,
-				66099BA32BDB193800243D9F /* DrawingEditorTitleBarView.swift */,
 			);
 			path = "Tool Frame";
 			sourceTree = "<group>";
@@ -321,6 +327,7 @@
 		66311CE52BD7898000D53489 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				66A05B762BDC76E400434245 /* CardView.swift */,
 				664B597E2BC71B2F003FA90E /* MetalView.swift */,
 			);
 			path = Shared;
@@ -422,6 +429,24 @@
 				667BF74A2BA655CB003E3430 /* FileUrlHelper.swift */,
 			);
 			path = Filesystem;
+			sourceTree = "<group>";
+		};
+		66A05B782BDC7B6700434245 /* Title Bar */ = {
+			isa = PBXGroup;
+			children = (
+				66099BA22BDB193800243D9F /* DrawingEditorTitleBarVC.swift */,
+				66099BA32BDB193800243D9F /* DrawingEditorTitleBarView.swift */,
+			);
+			path = "Title Bar";
+			sourceTree = "<group>";
+		};
+		66A05B792BDC7B7000434245 /* Brush Options */ = {
+			isa = PBXGroup;
+			children = (
+				66A05B712BDC6D2000434245 /* DrawingEditorBrushOptionsVC.swift */,
+				66A05B732BDC6D2D00434245 /* DrawingEditorBrushOptionsView.swift */,
+			);
+			path = "Brush Options";
 			sourceTree = "<group>";
 		};
 		66D084302BA3840B00EB8556 = {
@@ -691,6 +716,7 @@
 				66099BBE2BDB32F500243D9F /* BrushStrokePressureFilteringProcessor.swift in Sources */,
 				664B596F2BC5AA25003FA90E /* Shaders.metal in Sources */,
 				66D084822BA3FDFC00EB8556 /* LibraryManager.swift in Sources */,
+				66A05B722BDC6D2000434245 /* DrawingEditorBrushOptionsVC.swift in Sources */,
 				667BF74B2BA655CB003E3430 /* FileUrlHelper.swift in Sources */,
 				66311CE22BD740D900D53489 /* JXLTextureLoader.swift in Sources */,
 				664B59462BC5A9D1003FA90E /* BrushStrokeGestureRecognizerStroke.swift in Sources */,
@@ -722,6 +748,7 @@
 				66099BC72BDB33DF00243D9F /* TextureBlitter.swift in Sources */,
 				66311CDD2BD7403100D53489 /* SpriteRenderer.swift in Sources */,
 				66099BBF2BDB32F500243D9F /* BrushStrokeSmoothingProcessor.swift in Sources */,
+				66A05B772BDC76E400434245 /* CardView.swift in Sources */,
 				66D084762BA3CEC300EB8556 /* UIView+Extensions.swift in Sources */,
 				66099BA72BDB195500243D9F /* CircleView.swift in Sources */,
 				66B491B32BD9993F008A2A2E /* TextureCreator.swift in Sources */,
@@ -735,6 +762,7 @@
 				66099BD32BDB527B00243D9F /* BrushEngineDisplayLink.swift in Sources */,
 				660CD1332BAE4D0E00C8C7B5 /* JSONFileCoders.swift in Sources */,
 				664B597B2BC5D609003FA90E /* DrawingEditor.swift in Sources */,
+				66A05B742BDC6D2D00434245 /* DrawingEditorBrushOptionsView.swift in Sources */,
 				66D0843F2BA3840C00EB8556 /* SceneDelegate.swift in Sources */,
 				66E523522BD341A500794751 /* EditorVC.swift in Sources */,
 				66B2BE422BCB55FF0072AC1B /* SharedModels.swift in Sources */,

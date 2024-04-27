@@ -6,15 +6,14 @@ import UIKit
 
 private let brushConfig = Brush.Configuration(
     stampTextureName: "brush1.png",
-    stampSize: 100,
+    stampSize: 50,
     stampSpacing: 0.0,
     stampAlpha: 1,
-    pressureScaling: 0,
-    taperLength: 0,
+    pressureScaling: 0.5,
+    taperLength: 0.05,
     taperRoundness: 1.0)
 
 private let brushColor: Color = .brushBlue
-private let brushScale: Double = 0.2
 
 protocol DrawingEditorVCDelegate: AnyObject {
     
@@ -134,12 +133,17 @@ extension DrawingEditorVC: DrawingEditorCanvasVCDelegate {
     func onBeginBrushStroke(
         _ vc: DrawingEditorCanvasVC
     ) {
+        toolFrameVC.hidePopups()
+        
+        let scale = toolFrameVC.brushSize
+        let smoothingLevel = toolFrameVC.smoothing
+        
         brushEngine.beginStroke(
             brush: brush,
             brushMode: .brush,
             color: brushColor,
-            scale: brushScale,
-            smoothingLevel: 0.2)
+            scale: scale,
+            smoothingLevel: smoothingLevel)
     }
     
     func onUpdateBrushStroke(
