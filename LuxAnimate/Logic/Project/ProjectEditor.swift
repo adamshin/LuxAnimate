@@ -33,7 +33,6 @@ class ProjectEditor {
 extension ProjectEditor {
     
     func createDrawing(
-        size: PixelSize,
         imageData: Data,
         imageSize: PixelSize
     ) throws {
@@ -46,7 +45,6 @@ extension ProjectEditor {
         let drawing = Project.Drawing(
             id: UUID().uuidString,
             frameIndex: 0,
-            size: size,
             assetIDs: createdAssets.assetIDs)
         
         var projectManifest = editSession.currentProjectManifest
@@ -107,14 +105,14 @@ extension ProjectEditor {
     ) throws -> CreatedDrawingAssets {
         
         // Resize images
-        let previewMediumImageData = try imageResizer.resize(
+        let mediumImageData = try imageResizer.resize(
             imageData: imageData,
             width: imageSize.width,
             height: imageSize.height,
             targetWidth: AppConfig.assetPreviewMediumSize,
             targetHeight: AppConfig.assetPreviewMediumSize)
         
-        let previewSmallImageData = try imageResizer.resize(
+        let smallImageData = try imageResizer.resize(
             imageData: imageData,
             width: imageSize.width,
             height: imageSize.height,
@@ -131,18 +129,18 @@ extension ProjectEditor {
             quality: 100,
             effort: 1)
         
-        let previewMediumEncodedData = try! JXLEncoder.encode(
+        let mediumEncodedData = try! JXLEncoder.encode(
             input: .init(
-                data: previewMediumImageData,
+                data: mediumImageData,
                 width: AppConfig.assetPreviewMediumSize,
                 height: AppConfig.assetPreviewMediumSize),
             lossless: false,
             quality: 90,
             effort: 1)
         
-        let previewSmallEncodedData = try! JXLEncoder.encode(
+        let smallEncodedData = try! JXLEncoder.encode(
             input: .init(
-                data: previewSmallImageData,
+                data: smallImageData,
                 width: AppConfig.assetPreviewSmallSize,
                 height: AppConfig.assetPreviewSmallSize),
             lossless: false,
@@ -154,23 +152,23 @@ extension ProjectEditor {
             id: UUID().uuidString,
             data: fullEncodedData)
         
-        let previewMediumAsset = ProjectEditSession.NewAsset(
+        let mediumAsset = ProjectEditSession.NewAsset(
             id: UUID().uuidString,
-            data: previewMediumEncodedData)
+            data: mediumEncodedData)
         
-        let previewSmallAsset = ProjectEditSession.NewAsset(
+        let smallAsset = ProjectEditSession.NewAsset(
             id: UUID().uuidString,
-            data: previewSmallEncodedData)
+            data: smallEncodedData)
         
         return CreatedDrawingAssets(
             assetIDs: Project.DrawingAssetIDGroup(
                 full: fullAsset.id,
-                previewMedium: previewMediumAsset.id,
-                previewSmall: previewSmallAsset.id),
+                medium: mediumAsset.id,
+                small: smallAsset.id),
             newAssets: [
                 fullAsset,
-                previewMediumAsset,
-                previewSmallAsset,
+                mediumAsset,
+                smallAsset,
             ])
     }
     

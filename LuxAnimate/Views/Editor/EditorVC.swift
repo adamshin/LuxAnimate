@@ -5,9 +5,6 @@
 import UIKit
 import PhotosUI
 
-private let defaultImageSize = PixelSize(
-    width: 1920, height: 1080)
-
 class EditorVC: UIViewController {
     
     private let contentVC = EditorContentVC()
@@ -78,19 +75,18 @@ class EditorVC: UIViewController {
     // MARK: - Logic
     
     private func createEmptyDrawing() {
-        let imageSize = defaultImageSize
-        let imageData = Self.emptyImageData(
-            imageSize: imageSize)
-        
-        do {
-            try editor.createDrawing(
-                size: imageSize,
-                imageData: imageData,
-                imageSize: imageSize)
-            
-            updateUI()
-            
-        } catch { }
+//        let imageSize = defaultImageSize
+//        let imageData = Self.emptyImageData(
+//            imageSize: imageSize)
+//        
+//        do {
+//            try editor.createDrawing(
+//                imageData: imageData,
+//                imageSize: imageSize)
+//            
+//            updateUI()
+//            
+//        } catch { }
     }
     
     private func editDrawing(
@@ -131,20 +127,20 @@ extension EditorVC: EditorContentVCDelegate {
     }
     
     func onSelectDrawing(id: String) {
-        guard let projectManifest = editor.projectManifest
-        else { return }
-        
-        guard let drawing = projectManifest.timeline.drawings
-            .first(where: { $0.id == id })
-        else { return }
-        
-        let vc = DrawingEditorVC(
-            projectID: projectID,
-            drawing: drawing)
-        
-        vc.delegate = self
-        
-        present(vc, animated: true)
+//        guard let projectManifest = editor.projectManifest
+//        else { return }
+//        
+//        guard let drawing = projectManifest.timeline.drawings
+//            .first(where: { $0.id == id })
+//        else { return }
+//        
+//        let vc = DrawingEditorVC(
+//            projectID: projectID,
+//            drawing: drawing)
+//        
+//        vc.delegate = self
+//        
+//        present(vc, animated: true)
     }
     
 }

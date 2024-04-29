@@ -12,7 +12,6 @@ enum Project {
         var id: String
         var name: String
         var createdAt: Date
-        var modifiedAt: Date
         
         var metadata: Metadata
         var timeline: Timeline
@@ -23,10 +22,8 @@ enum Project {
     // MARK: - Metadata
     
     struct Metadata: Codable {
-        var contentSize: PixelSize
-        var viewportSize: PixelSize
-        
-        var frameRate: Int
+        var canvasSize: PixelSize
+        var framesPerSecond: Int
     }
     
     // MARK: - Timeline
@@ -39,17 +36,18 @@ enum Project {
         var id: String
         var frameIndex: Int
         
-        var size: PixelSize
         var assetIDs: DrawingAssetIDGroup
     }
     
     struct DrawingAssetIDGroup: Codable {
         var full: String
-        var previewMedium: String
-        var previewSmall: String
+        var medium: String
+        var small: String
         
         var all: [String] {[
-            full, previewMedium, previewSmall
+            full, 
+            medium,
+            small
         ]}
     }
     

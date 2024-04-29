@@ -45,19 +45,21 @@ class DrawingEditorVC: UIViewController {
     
     init(
         projectID: String,
+        canvasSize: PixelSize,
         drawing: Project.Drawing
     ) {
         canvasVC = DrawingEditorCanvasVC(
-            canvasSize: drawing.size)
+            canvasSize: canvasSize)
         
         toolFrameVC = DrawingEditorToolFrameVC()
         
         drawingID = drawing.id
-        canvasSize = drawing.size
-        brushEngine = BrushEngine(canvasSize: drawing.size)
+        self.canvasSize = canvasSize
+        
+        brushEngine = BrushEngine(canvasSize: canvasSize)
         
         drawingRenderer = DrawingEditorFrameRenderer(
-            drawingSize: drawing.size,
+            drawingSize: canvasSize,
             backgroundColor: .white)
         
         super.init(nibName: nil, bundle: nil)

@@ -304,6 +304,7 @@
 		66311CD42BD7252D00D53489 /* Graphics */ = {
 			isa = PBXGroup;
 			children = (
+				664B59682BC5AA1E003FA90E /* Shaders */,
 				664B59652BC5AA1E003FA90E /* Metal.swift */,
 				66B491B22BD9993F008A2A2E /* TextureCreator.swift */,
 				66099BD42BDB568E00243D9F /* TextureDataReader.swift */,
@@ -317,8 +318,8 @@
 		66311CDE2BD740BC00D53489 /* Rendering */ = {
 			isa = PBXGroup;
 			children = (
-				66099B9B2BDB169400243D9F /* Shared */,
 				66099BAC2BDB1E6500243D9F /* Drawing Editor */,
+				66099B9B2BDB169400243D9F /* Shared */,
 			);
 			path = Rendering;
 			sourceTree = "<group>";
@@ -469,13 +470,11 @@
 			isa = PBXGroup;
 			children = (
 				66D084532BA3CD3000EB8556 /* Views */,
-				66D0847E2BA3ED7600EB8556 /* Models */,
 				66D0847F2BA3ED7E00EB8556 /* Logic */,
-				664B59432BC5A9D1003FA90E /* Brush Stroke Gesture */,
+				66D0847E2BA3ED7600EB8556 /* Models */,
 				66099BBB2BDB32F500243D9F /* Brush Engine */,
 				66311CDE2BD740BC00D53489 /* Rendering */,
 				66311CD42BD7252D00D53489 /* Graphics */,
-				664B59682BC5AA1E003FA90E /* Shaders */,
 				66D0846B2BA3CEC300EB8556 /* Utilities */,
 				66D084522BA3CD1F00EB8556 /* System */,
 				663259452BB6696500460F70 /* Frameworks */,
@@ -503,6 +502,7 @@
 				66D0847B2BA3D78900EB8556 /* Library */,
 				66D0848D2BA56E7800EB8556 /* Editor */,
 				66099B9C2BDB16C400243D9F /* Drawing Editor */,
+				664B59432BC5A9D1003FA90E /* Brush Stroke Gesture */,
 				66311CE52BD7898000D53489 /* Shared */,
 			);
 			path = Views;

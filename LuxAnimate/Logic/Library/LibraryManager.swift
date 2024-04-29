@@ -109,15 +109,13 @@ struct LibraryManager {
         let now = Date()
         
         let metadata = Project.Metadata(
-            contentSize: PixelSize(width: 1920, height: 1920),
-            viewportSize: PixelSize(width: 1920, height: 1080),
-            frameRate: 24)
+            canvasSize: PixelSize(width: 1920, height: 1080),
+            framesPerSecond: 24)
         
         let projectManifest = Project.Manifest(
             id: projectID,
             name: "New Project",
             createdAt: now,
-            modifiedAt: now,
             metadata: metadata,
             timeline: Project.Timeline(drawings: []),
             assetIDs: [])
