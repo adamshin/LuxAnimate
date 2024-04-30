@@ -59,8 +59,6 @@ class EditorContentVC: UIViewController {
         
         canvasBoundsReferenceView.isUserInteractionEnabled = false
         canvasOverlayContainer.addSubview(canvasBoundsReferenceView)
-//        canvasBoundsReferenceView.pinEdges(.vertical, padding: 12)
-//        canvasBoundsReferenceView.pinEdges(.horizontal, padding: 12 + 48 + 12)
         canvasBoundsReferenceView.pinEdges()
     }
     

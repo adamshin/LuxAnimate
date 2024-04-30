@@ -6,8 +6,8 @@ import UIKit
 
 class EditorBrushToolOverlayVC: UIViewController {
     
-    private let slider = SliderView1()
-//    private let slider = SliderView2()
+    private let slider1 = SliderView2()
+    private let slider2 = SliderView2()
     
     override func loadView() {
         view = PassthroughView()
@@ -16,9 +16,15 @@ class EditorBrushToolOverlayVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.addSubview(slider)
-        slider.pinEdges(.leading, padding: 12)
-        slider.pin(.centerY)
+        let stack = UIStackView()
+        stack.axis = .vertical
+        stack.spacing = 16
+        view.addSubview(stack)
+        stack.pinEdges(.leading, padding: 12)
+        stack.pin(.centerY)
+        
+        stack.addArrangedSubview(slider1)
+        stack.addArrangedSubview(slider2)
     }
     
 }
@@ -45,9 +51,9 @@ private class SliderView1: UIView {
         
         addSubview(shadowView)
         shadowView.layer.cornerCurve = .continuous
-        shadowView.backgroundColor = UIColor(white: 1, alpha: 0.15)
-//        shadowView.layer.borderWidth = 1
-//        shadowView.layer.borderColor = UIColor(white: 1, alpha: 0.15).cgColor
+//        shadowView.backgroundColor = UIColor(white: 1, alpha: 0.15)
+        shadowView.layer.borderWidth = 1
+        shadowView.layer.borderColor = UIColor(white: 1, alpha: 0.15).cgColor
         
         addSubview(backgroundView)
         backgroundView.layer.cornerCurve = .continuous
@@ -85,6 +91,8 @@ private class SliderView1: UIView {
 
 private class SliderView2: UIView {
     
+    private let shadowWidth: CGFloat = 1
+    
     private let padding: CGFloat = 4
     private let nubHeight: CGFloat = 20
     
@@ -101,11 +109,10 @@ private class SliderView2: UIView {
         
         addSubview(shadowView)
         shadowView.layer.cornerCurve = .continuous
-        shadowView.layer.borderWidth = 1
-        shadowView.layer.borderColor = UIColor(white: 1, alpha: 0.2).cgColor
+        shadowView.backgroundColor = .white.withAlphaComponent(0.2)
         
         addSubview(backgroundView)
-        backgroundView.backgroundColor = UIColor(white: 0.25, alpha: 0.8)
+        backgroundView.backgroundColor = .editorBar.withAlphaComponent(0.9)
         backgroundView.layer.cornerCurve = .continuous
         
         addSubview(nubView)
@@ -120,8 +127,9 @@ private class SliderView2: UIView {
         
         backgroundView.frame = bounds
         
-        shadowView.frame = bounds
-            .insetBy(dx: -1, dy: -1)
+        shadowView.frame = bounds.insetBy(
+            dx: -shadowWidth,
+            dy: -shadowWidth)
         
         nubView.frame = CGRect(
             center: CGPoint(
@@ -132,8 +140,9 @@ private class SliderView2: UIView {
                 height: nubHeight))
         
         let cornerRadius = nubHeight/2 + padding
+        
         backgroundView.layer.cornerRadius = cornerRadius
-        shadowView.layer.cornerRadius = cornerRadius + 1.5
+        shadowView.layer.cornerRadius = cornerRadius + shadowWidth + 0.5
     }
     
 }

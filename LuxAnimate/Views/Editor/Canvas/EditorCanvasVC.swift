@@ -23,13 +23,13 @@ class EditorCanvasVC: UIViewController {
     
     weak var brushGestureDelegate: BrushGestureRecognizerGestureDelegate? {
         didSet {
-            strokeGesture.gestureDelegate = brushGestureDelegate
+            brushGesture.gestureDelegate = brushGestureDelegate
         }
     }
         
     private let metalView = MetalView()
     private let canvasView = MovableCanvasView()
-    private let strokeGesture = BrushGestureRecognizer()
+    private let brushGesture = BrushGestureRecognizer()
     
 //    private let layerRenderer = MetalLayerTextureRenderer()
     
@@ -44,20 +44,20 @@ class EditorCanvasVC: UIViewController {
         view.addSubview(canvasView)
         canvasView.pinEdges()
         canvasView.delegate = self
-        canvasView.singleFingerPanEnabled = false
+//        canvasView.singleFingerPanEnabled = false
         
 //        canvasView.canvasContentView.addSubview(metalView)
 //        metalView.pinEdges()
 //        metalView.delegate = self
-        let imageView = UIImageView(image: .sampleCanvas)
+        let imageView = UIImageView(image: .sampleCanvas2)
         canvasView.canvasContentView.addSubview(imageView)
         imageView.pinEdges()
         
         metalView.metalLayer.shouldRasterize = true
         metalView.metalLayer.rasterizationScale = 1
         
-        canvasView.canvasContentView
-            .addGestureRecognizer(strokeGesture)
+//        canvasView.canvasContentView
+//            .addGestureRecognizer(brushGesture)
         
         setCanvasSize(PixelSize(width: 1920, height: 1080))
     }
