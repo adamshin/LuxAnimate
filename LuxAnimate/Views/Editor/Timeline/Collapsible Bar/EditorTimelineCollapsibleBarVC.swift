@@ -97,7 +97,9 @@ class EditorTimelineCollapsibleBarVC: UIViewController {
             self.contentCoverView.alpha = expanded ? 0 : 1
             self.contentCoverView.isUserInteractionEnabled = !expanded
             
-            self.view.layoutIfNeeded()
+            if animated {
+                self.view.layoutIfNeeded()
+            }
             
             self.delegate?.onModifyConstraints(self)
         }

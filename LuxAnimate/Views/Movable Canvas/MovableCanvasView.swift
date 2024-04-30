@@ -267,9 +267,6 @@ class MovableCanvasView: UIView {
     }
     
     func handleUpdateBoundsReferenceView() {
-        let refView = delegate!.canvasBoundsReferenceView(self)!
-        print(convert(refView.bounds, from: refView))
-        
         setNeedsLayout()
         layoutIfNeeded()
     }
