@@ -4,7 +4,7 @@
 
 import UIKit
 
-private let fitToBoundsInset: CGFloat = 24
+private let fitToBoundsInset: CGFloat = 0
 
 private let rotationSnapThreshold: Scalar =
     8 * .radiansPerDegree

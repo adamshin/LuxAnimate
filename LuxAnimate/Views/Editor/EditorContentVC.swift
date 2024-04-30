@@ -28,7 +28,10 @@ class EditorContentVC: UIViewController {
     private let timelineVC = EditorTimelineVC()
     private let titleBarVC = EditorTitleBarVC()
     
-    private let toolAreaContainer = PassthroughView()
+    private let brushToolOverlayVC = EditorBrushToolOverlayVC()
+    
+    private let canvasOverlayContainer = PassthroughView()
+    private let canvasBoundsReferenceView = UIView()
     
     // MARK: - Lifecycle
     
@@ -49,10 +52,16 @@ class EditorContentVC: UIViewController {
         
         let titleContainer = UIView()
         titleStack.addArrangedSubview(titleContainer)
-        
-        titleStack.addArrangedSubview(toolAreaContainer)
-        
         addChild(titleBarVC, to: titleContainer)
+        
+        titleStack.addArrangedSubview(canvasOverlayContainer)
+        addChild(brushToolOverlayVC, to: canvasOverlayContainer)
+        
+        canvasBoundsReferenceView.isUserInteractionEnabled = false
+        canvasOverlayContainer.addSubview(canvasBoundsReferenceView)
+//        canvasBoundsReferenceView.pinEdges(.vertical, padding: 12)
+//        canvasBoundsReferenceView.pinEdges(.horizontal, padding: 12 + 48 + 12)
+        canvasBoundsReferenceView.pinEdges()
     }
     
     // MARK: - Interface
@@ -68,7 +77,7 @@ class EditorContentVC: UIViewController {
 extension EditorContentVC: EditorCanvasVCDelegate {
     
     func canvasBoundsReferenceView(_ vc: EditorCanvasVC) -> UIView? {
-        toolAreaContainer
+        canvasBoundsReferenceView
     }
     
     func needsDrawCanvas(_ vc: EditorCanvasVC) {

@@ -46,10 +46,12 @@ class EditorCanvasVC: UIViewController {
         canvasView.delegate = self
         canvasView.singleFingerPanEnabled = false
         
-        canvasView.canvasContentView.backgroundColor = .white
 //        canvasView.canvasContentView.addSubview(metalView)
 //        metalView.pinEdges()
 //        metalView.delegate = self
+        let imageView = UIImageView(image: .sampleCanvas)
+        canvasView.canvasContentView.addSubview(imageView)
+        imageView.pinEdges()
         
         metalView.metalLayer.shouldRasterize = true
         metalView.metalLayer.rasterizationScale = 1

@@ -133,19 +133,3 @@ extension EditorVC: EditorContentVCDelegate {
     }
     
 }
-
-extension EditorVC: DrawingEditorVCDelegate {
-    
-    func onEditDrawing(
-        _ vc: DrawingEditorVC,
-        drawingID: String,
-        imageData: Data,
-        imageSize: PixelSize
-    ) {
-        self.editDrawing(
-            drawingID: drawingID,
-            imageData: imageData,
-            imageSize: imageSize)
-    }
-    
-}
