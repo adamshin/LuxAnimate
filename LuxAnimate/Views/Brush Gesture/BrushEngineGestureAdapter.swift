@@ -7,7 +7,7 @@ import Foundation
 struct BrushEngineGestureAdapter {
     
     static func convert(
-        _ stroke: BrushStrokeGestureRecognizer.Stroke
+        _ stroke: BrushGestureRecognizer.Stroke
     ) -> BrushStrokeEngine.InputStroke {
         
         let samples = stroke.samples + stroke.predictedSamples

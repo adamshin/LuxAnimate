@@ -16,7 +16,7 @@ protocol DrawingEditorCanvasVCDelegate: AnyObject {
     
     func onUpdateBrushStroke(
         _ vc: DrawingEditorCanvasVC,
-        _ stroke: BrushStrokeGestureRecognizer.Stroke)
+        _ stroke: BrushGestureRecognizer.Stroke)
     
     func onEndBrushStroke(
         _ vc: DrawingEditorCanvasVC)
@@ -71,7 +71,7 @@ class DrawingEditorCanvasVC: UIViewController {
         metalView.metalLayer.shouldRasterize = true
         metalView.metalLayer.rasterizationScale = 1
         
-        let strokeGesture = BrushStrokeGestureRecognizer()
+        let strokeGesture = BrushGestureRecognizer()
         strokeGesture.gestureDelegate = self
         canvasView.canvasContentView
             .addGestureRecognizer(strokeGesture)
@@ -97,7 +97,7 @@ class DrawingEditorCanvasVC: UIViewController {
 
 extension DrawingEditorCanvasVC: MovableCanvasViewDelegate {
     
-    func contentSize(_ v: MovableCanvasView) -> Size {
+    func canvasSize(_ v: MovableCanvasView) -> Size {
         canvasViewSize
     }
     
@@ -109,7 +109,11 @@ extension DrawingEditorCanvasVC: MovableCanvasViewDelegate {
         maxScaleLevel
     }
     
-    func onUpdateTransform(
+    func canvasBoundsReferenceView(_ v: MovableCanvasView) -> UIView? {
+        nil
+    }
+    
+    func onUpdateCanvasTransform(
         _ v: MovableCanvasView,
         _ transform: MovableCanvasTransform
     ) {
@@ -132,14 +136,14 @@ extension DrawingEditorCanvasVC: MetalViewDelegate {
     
 }
 
-extension DrawingEditorCanvasVC: BrushStrokeGestureRecognizerGestureDelegate {
+extension DrawingEditorCanvasVC: BrushGestureRecognizerGestureDelegate {
     
     func onBeginBrushStroke() {
         delegate?.onBeginBrushStroke(self)
     }
     
     func onUpdateBrushStroke(
-        _ stroke: BrushStrokeGestureRecognizer.Stroke
+        _ stroke: BrushGestureRecognizer.Stroke
     ) {
         delegate?.onUpdateBrushStroke(self, stroke)
     }

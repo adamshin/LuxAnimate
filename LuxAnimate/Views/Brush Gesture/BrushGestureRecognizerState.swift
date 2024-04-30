@@ -1,27 +1,27 @@
 //
-//  BrushStrokeGestureRecognizerInternalState.swift
+//  BrushGestureRecognizerInternalState.swift
 //
 
 import UIKit
 
-protocol BrushStrokeGestureRecognizerInternalStateDelegate: AnyObject {
+protocol BrushGestureRecognizerInternalStateDelegate: AnyObject {
     
     var view: UIView? { get }
     var numberOfTouches: Int { get }
     
-    func setState(_ newState: BrushStrokeGestureRecognizerInternalState)
+    func setState(_ newState: BrushGestureRecognizerInternalState)
     
     func setGestureRecognizerState(_ newState: UIGestureRecognizer.State)
     
     func onBeginBrushStroke()
-    func onUpdateBrushStroke(_ stroke: BrushStrokeGestureRecognizer.Stroke)
+    func onUpdateBrushStroke(_ stroke: BrushGestureRecognizer.Stroke)
     func onEndBrushStroke()
     
 }
 
-protocol BrushStrokeGestureRecognizerInternalState: AnyObject {
+protocol BrushGestureRecognizerInternalState: AnyObject {
     
-    var delegate: BrushStrokeGestureRecognizerInternalStateDelegate? { get set }
+    var delegate: BrushGestureRecognizerInternalStateDelegate? { get set }
     
     func onStateBegin()
     func onStateEnd()
@@ -36,7 +36,7 @@ protocol BrushStrokeGestureRecognizerInternalState: AnyObject {
     
 }
 
-extension BrushStrokeGestureRecognizerInternalState {
+extension BrushGestureRecognizerInternalState {
     
     func onStateBegin() { }
     func onStateEnd() { }
@@ -52,9 +52,9 @@ extension BrushStrokeGestureRecognizerInternalState {
 
 // MARK: - Waiting
 
-class BrushStrokeGestureRecognizerWaitingState: BrushStrokeGestureRecognizerInternalState {
+class BrushGestureRecognizerWaitingState: BrushGestureRecognizerInternalState {
     
-    weak var delegate: BrushStrokeGestureRecognizerInternalStateDelegate?
+    weak var delegate: BrushGestureRecognizerInternalStateDelegate?
     
     func resetGesture() { }
     
@@ -63,22 +63,22 @@ class BrushStrokeGestureRecognizerWaitingState: BrushStrokeGestureRecognizerInte
     ) { 
         guard let touch = touches.first, touches.count == 1 else {
             delegate?.setState(
-                BrushStrokeGestureRecognizerInvalidState())
+                BrushGestureRecognizerInvalidState())
             return
         }
         
         if BrushStrokeGestureConfig.pencilOnly, touch.type != .pencil {
             delegate?.setState(
-                BrushStrokeGestureRecognizerInvalidState())
+                BrushGestureRecognizerInvalidState())
             return
         }
         
-        var stroke = BrushStrokeGestureRecognizer.Stroke(touch: touch)
+        var stroke = BrushGestureRecognizer.Stroke(touch: touch)
         
         stroke.update(event: event, view: delegate?.view)
         
         delegate?.setState(
-            BrushStrokeGestureRecognizerPreActiveState(
+            BrushGestureRecognizerPreActiveState(
                 stroke: stroke))
     }
     
@@ -86,14 +86,14 @@ class BrushStrokeGestureRecognizerWaitingState: BrushStrokeGestureRecognizerInte
 
 // MARK: - Pre Active
 
-class BrushStrokeGestureRecognizerPreActiveState: BrushStrokeGestureRecognizerInternalState {
+class BrushGestureRecognizerPreActiveState: BrushGestureRecognizerInternalState {
     
-    weak var delegate: BrushStrokeGestureRecognizerInternalStateDelegate?
+    weak var delegate: BrushGestureRecognizerInternalStateDelegate?
     
-    private var stroke: BrushStrokeGestureRecognizer.Stroke
+    private var stroke: BrushGestureRecognizer.Stroke
     private var activationTimer: Timer?
     
-    init(stroke: BrushStrokeGestureRecognizer.Stroke) {
+    init(stroke: BrushGestureRecognizer.Stroke) {
         self.stroke = stroke
         self.activationTimer = nil
     }
@@ -117,14 +117,14 @@ class BrushStrokeGestureRecognizerPreActiveState: BrushStrokeGestureRecognizerIn
     
     func resetGesture() {
         delegate?.setState(
-            BrushStrokeGestureRecognizerWaitingState())
+            BrushGestureRecognizerWaitingState())
     }
     
     func touchesBegan(
         touches: Set<UITouch>, event: UIEvent
     ) {
         delegate?.setState(
-            BrushStrokeGestureRecognizerInvalidState())
+            BrushGestureRecognizerInvalidState())
     }
     
     func touchesMoved(
@@ -148,7 +148,7 @@ class BrushStrokeGestureRecognizerPreActiveState: BrushStrokeGestureRecognizerIn
         delegate?.onUpdateBrushStroke(stroke)
         
         delegate?.setState(
-            BrushStrokeGestureRecognizerPostActiveState(
+            BrushGestureRecognizerPostActiveState(
                 stroke: stroke))
     }
     
@@ -185,7 +185,7 @@ class BrushStrokeGestureRecognizerPreActiveState: BrushStrokeGestureRecognizerIn
         delegate?.setGestureRecognizerState(.began)
         
         delegate?.setState(
-            BrushStrokeGestureRecognizerActiveState(
+            BrushGestureRecognizerActiveState(
                 stroke: stroke))
     }
     
@@ -193,20 +193,20 @@ class BrushStrokeGestureRecognizerPreActiveState: BrushStrokeGestureRecognizerIn
 
 // MARK: - Active
 
-class BrushStrokeGestureRecognizerActiveState: BrushStrokeGestureRecognizerInternalState {
+class BrushGestureRecognizerActiveState: BrushGestureRecognizerInternalState {
     
-    weak var delegate: BrushStrokeGestureRecognizerInternalStateDelegate?
+    weak var delegate: BrushGestureRecognizerInternalStateDelegate?
     
-    private var stroke: BrushStrokeGestureRecognizer.Stroke
+    private var stroke: BrushGestureRecognizer.Stroke
     
-    init(stroke: BrushStrokeGestureRecognizer.Stroke) {
+    init(stroke: BrushGestureRecognizer.Stroke) {
         self.stroke = stroke
     }
     
     func resetGesture() {
         delegate?.onEndBrushStroke()
         delegate?.setState(
-            BrushStrokeGestureRecognizerWaitingState())
+            BrushGestureRecognizerWaitingState())
     }
     
     func touchesMoved(
@@ -229,7 +229,7 @@ class BrushStrokeGestureRecognizerActiveState: BrushStrokeGestureRecognizerInter
         delegate?.onUpdateBrushStroke(stroke)
         
         delegate?.setState(
-            BrushStrokeGestureRecognizerPostActiveState(
+            BrushGestureRecognizerPostActiveState(
                 stroke: stroke))
     }
     
@@ -250,14 +250,14 @@ class BrushStrokeGestureRecognizerActiveState: BrushStrokeGestureRecognizerInter
 
 // MARK: - Post Active
 
-class BrushStrokeGestureRecognizerPostActiveState: BrushStrokeGestureRecognizerInternalState {
+class BrushGestureRecognizerPostActiveState: BrushGestureRecognizerInternalState {
     
-    weak var delegate: BrushStrokeGestureRecognizerInternalStateDelegate?
+    weak var delegate: BrushGestureRecognizerInternalStateDelegate?
     
-    private var stroke: BrushStrokeGestureRecognizer.Stroke
+    private var stroke: BrushGestureRecognizer.Stroke
     private var finalizationTimer: Timer?
     
-    init(stroke: BrushStrokeGestureRecognizer.Stroke) {
+    init(stroke: BrushGestureRecognizer.Stroke) {
         self.stroke = stroke
     }
     
@@ -273,7 +273,7 @@ class BrushStrokeGestureRecognizerPostActiveState: BrushStrokeGestureRecognizerI
             repeats: false)
         { [weak self] _ in
             self?.delegate?.setState(
-                BrushStrokeGestureRecognizerWaitingState())
+                BrushGestureRecognizerWaitingState())
         }
     }
     
@@ -286,7 +286,7 @@ class BrushStrokeGestureRecognizerPostActiveState: BrushStrokeGestureRecognizerI
     func touchesBegan(
         touches: Set<UITouch>, event: UIEvent
     ) {
-        let proxyState = BrushStrokeGestureRecognizerWaitingState()
+        let proxyState = BrushGestureRecognizerWaitingState()
         proxyState.delegate = delegate
         
         proxyState.touchesBegan(touches: touches, event: event)
@@ -303,13 +303,13 @@ class BrushStrokeGestureRecognizerPostActiveState: BrushStrokeGestureRecognizerI
 
 // MARK: - Invalid
 
-class BrushStrokeGestureRecognizerInvalidState: BrushStrokeGestureRecognizerInternalState {
+class BrushGestureRecognizerInvalidState: BrushGestureRecognizerInternalState {
     
-    weak var delegate: BrushStrokeGestureRecognizerInternalStateDelegate?
+    weak var delegate: BrushGestureRecognizerInternalStateDelegate?
     
     func resetGesture() {
         delegate?.setState(
-            BrushStrokeGestureRecognizerWaitingState())
+            BrushGestureRecognizerWaitingState())
     }
     
     func touchesEnded(

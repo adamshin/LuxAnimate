@@ -13,7 +13,7 @@ class DrawingEditorToolFrameVC: UIViewController {
     
     weak var delegate: DrawingEditorToolFrameVCDelegate?
     
-    private let titleBarVC = DrawingEditorTitleBarVC()
+    private let titleBarVC = EditorTitleBarVC()
     private let brushOptionsVC = DrawingEditorBrushOptionsVC()
     
     override func loadView() {
@@ -54,17 +54,17 @@ class DrawingEditorToolFrameVC: UIViewController {
     
 }
 
-extension DrawingEditorToolFrameVC: DrawingEditorTitleBarVCDelegate {
+extension DrawingEditorToolFrameVC: EditorTitleBarVCDelegate {
     
-    func onSelectBack(_ vc: DrawingEditorTitleBarVC) {
+    func onSelectBack(_ vc: EditorTitleBarVC) {
         delegate?.onSelectBack(self)
     }
     
-    func onSelectClear(_ vc: DrawingEditorTitleBarVC) {
+    func onSelectClear(_ vc: EditorTitleBarVC) {
         delegate?.onSelectClear(self)
     }
     
-    func onSelectBrush(_ vc: DrawingEditorTitleBarVC) {
+    func onSelectBrush(_ vc: EditorTitleBarVC) {
         brushOptionsVC.toggleVisibility()
     }
     

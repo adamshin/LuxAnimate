@@ -10,28 +10,28 @@ class EditorVC: UIViewController {
     private let contentVC = EditorContentVC()
     
     private let projectID: String
-    private let editor: ProjectEditor
+//    private let editor: ProjectEditor
     
     // MARK: - Init
     
     init(projectID: String) {
         self.projectID = projectID
         
-        editor = ProjectEditor(projectID: projectID)
+//        editor = ProjectEditor(projectID: projectID)
         
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
         
-        do {
-            try editor.startEditSession()
-        } catch { }
+//        do {
+//            try editor.startEditSession()
+//        } catch { }
     }
     
     required init?(coder: NSCoder) { fatalError() }
     
-    deinit {
-        editor.endEditSession()
-    }
+//    deinit {
+//        editor.endEditSession()
+//    }
     
     // MARK: - Lifecycle
     
@@ -49,27 +49,25 @@ class EditorVC: UIViewController {
     private func setupUI() {
         contentVC.delegate = self
         
-        let navController = UINavigationController(
-            rootViewController: contentVC)
-        addChild(navController, to: view)
+        addChild(contentVC, to: view)
     }
     
     // MARK: - UI
     
     private func updateUI() {
-        guard let projectManifest = editor.projectManifest
-        else { return }
-        
-        let projectName = projectManifest.name
-        
-        let drawings = projectManifest
-            .timeline.drawings
-        .map {
-            EditorContentVC.Drawing(id: $0.id)
-        }
-        
-        contentVC.update(projectName: projectName)
-        contentVC.update(drawings: drawings)
+//        guard let projectManifest = editor.projectManifest
+//        else { return }
+//        
+//        let projectName = projectManifest.name
+//        
+//        let drawings = projectManifest
+//            .timeline.drawings
+//        .map {
+//            EditorContentVC.Drawing(id: $0.id)
+//        }
+//        
+//        contentVC.update(projectName: projectName)
+//        contentVC.update(drawings: drawings)
     }
     
     // MARK: - Logic
@@ -94,23 +92,23 @@ class EditorVC: UIViewController {
         imageData: Data,
         imageSize: PixelSize
     ) {
-        do {
-            try editor.editDrawing(
-                drawingID: drawingID,
-                imageData: imageData,
-                imageSize: imageSize)
-            
-            updateUI()
-            
-        } catch { }
+//        do {
+//            try editor.editDrawing(
+//                drawingID: drawingID,
+//                imageData: imageData,
+//                imageSize: imageSize)
+//            
+//            updateUI()
+//            
+//        } catch { }
     }
     
-    private static func emptyImageData(
-        imageSize: PixelSize
-    ) -> Data {
-        let byteCount = imageSize.width * imageSize.height * 4
-        return Data(repeating: 0, count: byteCount)
-    }
+//    private static func emptyImageData(
+//        imageSize: PixelSize
+//    ) -> Data {
+//        let byteCount = imageSize.width * imageSize.height * 4
+//        return Data(repeating: 0, count: byteCount)
+//    }
     
 }
 
@@ -118,29 +116,20 @@ class EditorVC: UIViewController {
 
 extension EditorVC: EditorContentVCDelegate {
     
-    func onSelectBack() {
+    func onSelectBack(_ vc: EditorContentVC) {
         dismiss(animated: true)
     }
     
-    func onSelectCreateDrawing() {
-        createEmptyDrawing()
+    func onSelectBrush(_ vc: EditorContentVC) {
+        //
     }
     
-    func onSelectDrawing(id: String) {
-//        guard let projectManifest = editor.projectManifest
-//        else { return }
-//        
-//        guard let drawing = projectManifest.timeline.drawings
-//            .first(where: { $0.id == id })
-//        else { return }
-//        
-//        let vc = DrawingEditorVC(
-//            projectID: projectID,
-//            drawing: drawing)
-//        
-//        vc.delegate = self
-//        
-//        present(vc, animated: true)
+    func onSelectClear(_ vc: EditorContentVC) {
+        //
+    }
+    
+    func needsDrawCanvas(_ vc: EditorContentVC) {
+        //
     }
     
 }

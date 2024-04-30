@@ -1,20 +1,20 @@
 //
-//  DrawingEditorTitleBarVC.swift
+//  EditorTitleBarVC.swift
 //
 
 import UIKit
 
-protocol DrawingEditorTitleBarVCDelegate: AnyObject {
-    func onSelectBack(_ vc: DrawingEditorTitleBarVC)
-    func onSelectBrush(_ vc: DrawingEditorTitleBarVC)
-    func onSelectClear(_ vc: DrawingEditorTitleBarVC)
+protocol EditorTitleBarVCDelegate: AnyObject {
+    func onSelectBack(_ vc: EditorTitleBarVC)
+    func onSelectBrush(_ vc: EditorTitleBarVC)
+    func onSelectClear(_ vc: EditorTitleBarVC)
 }
 
-class DrawingEditorTitleBarVC: UIViewController {
+class EditorTitleBarVC: UIViewController {
     
-    weak var delegate: DrawingEditorTitleBarVCDelegate?
+    weak var delegate: EditorTitleBarVCDelegate?
     
-    let bodyView = DrawingEditorTitleBarView()
+    let bodyView = EditorTitleBarView()
     
     override func loadView() {
         view = bodyView

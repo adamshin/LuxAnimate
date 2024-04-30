@@ -4,6 +4,8 @@
 
 import UIKit
 
+private let fitToBoundsInset: CGFloat = 24
+
 private let rotationSnapThreshold: Scalar =
     8 * .radiansPerDegree
 
@@ -11,11 +13,13 @@ private let rotationSnapThreshold: Scalar =
 
 protocol MovableCanvasViewDelegate: AnyObject {
     
-    func contentSize(_ v: MovableCanvasView) -> Size
+    func canvasSize(_ v: MovableCanvasView) -> Size
     func minScale(_ v: MovableCanvasView) -> Scalar
     func maxScale(_ v: MovableCanvasView) -> Scalar
     
-    func onUpdateTransform(
+    func canvasBoundsReferenceView(_ v: MovableCanvasView) -> UIView?
+    
+    func onUpdateCanvasTransform(
         _ v: MovableCanvasView,
         _ transform: MovableCanvasTransform)
 }
@@ -31,6 +35,8 @@ class MovableCanvasView: UIView {
     
     private var baseCanvasTransform = MovableCanvasTransform()
     private var activeGestureCanvasTransform: MovableCanvasTransform?
+    
+    private var isCanvasFitToBounds = false
     
     var singleFingerPanEnabled: Bool = true {
         didSet {
@@ -65,17 +71,24 @@ class MovableCanvasView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        let canvasSize = delegate?.contentSize(self) ?? Size(1, 1)
+        let canvasSize = delegate?.canvasSize(self) ?? Size(1, 1)
         
         canvasContentView.bounds = CGRect(
             origin: .zero,
             size: CGSize(canvasSize))
         canvasContentView.center = bounds.center
         
+        if isCanvasFitToBounds,
+            activeGestureCanvasTransform == nil
+        {
+            baseCanvasTransform = canvasTransformFittingToBounds()
+            setCanvasTransform(baseCanvasTransform)
+        }
+        
         let canvasTransform =
             activeGestureCanvasTransform ??
             baseCanvasTransform
-        delegate?.onUpdateTransform(self, canvasTransform)
+        delegate?.onUpdateCanvasTransform(self, canvasTransform)
     }
     
     // MARK: - Transform
@@ -104,22 +117,39 @@ class MovableCanvasView: UIView {
             canvasContentView.transform = matrix.cgAffineTransform
         }
         
-        delegate?.onUpdateTransform(self, transform)
+        delegate?.onUpdateCanvasTransform(self, transform)
     }
     
     private func canvasTransformFittingToBounds()
     -> MovableCanvasTransform {
         
-        guard let canvasSize = delegate?.contentSize(self)
+        guard let canvasSize = delegate?.canvasSize(self)
         else { return MovableCanvasTransform() }
         
-        let xScaleToFit = bounds.width / canvasSize.width
-        let yScaleToFit = bounds.height / canvasSize.height
+        let boundsReferenceView = delegate?
+            .canvasBoundsReferenceView(self)
+            ?? self
+        
+        let referenceBoundsCenter = convert(
+            boundsReferenceView.bounds.center,
+            from: boundsReferenceView)
+        
+        let centerOffset = 
+            Vector(referenceBoundsCenter) -
+            Vector(bounds.center)
+        
+        let availableWidth = boundsReferenceView.bounds.width 
+            - fitToBoundsInset * 2
+        let availableHeight = boundsReferenceView.bounds.height 
+            - fitToBoundsInset * 2
+        
+        let xScaleToFit = availableWidth / canvasSize.width
+        let yScaleToFit = availableHeight / canvasSize.height
         
         let scale = min(xScaleToFit, yScaleToFit)
         
         return MovableCanvasTransform(
-            translation: .zero,
+            translation: centerOffset,
             rotation: 0,
             scale: scale)
     }
@@ -128,7 +158,7 @@ class MovableCanvasView: UIView {
         _ transform: MovableCanvasTransform
     ) -> MovableCanvasTransform {
         
-        guard let canvasSize = delegate?.contentSize(self)
+        guard let canvasSize = delegate?.canvasSize(self)
         else { return MovableCanvasTransform() }
         
         var snappedTransform = transform
@@ -170,6 +200,7 @@ class MovableCanvasView: UIView {
     // MARK: - Multi Gesture
     
     private func beginMultiGesture() {
+        isCanvasFitToBounds = false
         activeGestureCanvasTransform = baseCanvasTransform
     }
     
@@ -205,6 +236,8 @@ class MovableCanvasView: UIView {
         guard let activeGestureCanvasTransform else { return }
         
         if pinchFlickIn {
+            isCanvasFitToBounds = true
+            
             self.activeGestureCanvasTransform = nil
             baseCanvasTransform = canvasTransformFittingToBounds()
             
@@ -227,16 +260,27 @@ class MovableCanvasView: UIView {
     // MARK: - Interface
     
     func setNeedsCanvasSizeUpdate() {
+        isCanvasFitToBounds = false
+        
+        setNeedsLayout()
+        layoutIfNeeded()
+    }
+    
+    func handleUpdateBoundsReferenceView() {
+        let refView = delegate!.canvasBoundsReferenceView(self)!
+        print(convert(refView.bounds, from: refView))
+        
         setNeedsLayout()
         layoutIfNeeded()
     }
     
     func fitCanvasToBounds(animated: Bool) {
+        isCanvasFitToBounds = true
+        
         layoutIfNeeded()
         
-        guard activeGestureCanvasTransform == nil else { return }
-        
         baseCanvasTransform = canvasTransformFittingToBounds()
+        activeGestureCanvasTransform = nil
         
         setCanvasTransform(
             baseCanvasTransform,

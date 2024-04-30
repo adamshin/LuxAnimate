@@ -5,16 +5,12 @@
 import UIKit
 
 protocol EditorContentVCDelegate: AnyObject {
-    func onSelectBack()
-    func onSelectCreateDrawing()
-    func onSelectDrawing(id: String)
-}
-
-extension EditorContentVC {
     
-    struct Drawing {
-        var id: String
-    }
+    func onSelectBack(_ vc: EditorContentVC)
+    func onSelectBrush(_ vc: EditorContentVC)
+    func onSelectClear(_ vc: EditorContentVC)
+    
+    func needsDrawCanvas(_ vc: EditorContentVC)
     
 }
 
@@ -22,91 +18,85 @@ class EditorContentVC: UIViewController {
     
     weak var delegate: EditorContentVCDelegate?
     
-    private let tableView = UITableView()
+    weak var brushGestureDelegate: BrushGestureRecognizerGestureDelegate? {
+        didSet {
+            canvasVC.brushGestureDelegate = brushGestureDelegate
+        }
+    }
     
-    private lazy var backButton = UIBarButtonItem(
-        title: "Back", style: .plain,
-        target: self, action: #selector(onSelectBack))
+    private let canvasVC = EditorCanvasVC()
+    private let timelineVC = EditorTimelineVC()
+    private let titleBarVC = EditorTitleBarVC()
     
-    private lazy var createDrawingButton = UIBarButtonItem(
-        title: "Add Drawing", style: .plain,
-        target: self, action: #selector(onSelectCreateDrawing))
-    
-    private var drawings: [Drawing] = []
+    private let toolAreaContainer = PassthroughView()
     
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
-    }
-    
-    // MARK: - UI
-    
-    private func setupUI() {
-        view.addSubview(tableView)
-        tableView.pinEdges()
-        tableView.register(UITableViewCell.self)
-        tableView.dataSource = self
-        tableView.delegate = self
         
-        navigationItem.leftBarButtonItem = backButton
-        navigationItem.rightBarButtonItem = createDrawingButton
-    }
-    
-    @objc private func onSelectBack() {
-        delegate?.onSelectBack()
-    }
-    
-    @objc private func onSelectCreateDrawing() {
-        delegate?.onSelectCreateDrawing()
+        canvasVC.delegate = self
+        timelineVC.delegate = self
+        titleBarVC.delegate = self
+        
+        addChild(canvasVC, to: view)
+        addChild(timelineVC, to: view)
+        
+        let titleStack = PassthroughStackView()
+        titleStack.axis = .vertical
+        timelineVC.remainderAreaView.addSubview(titleStack)
+        titleStack.pinEdges()
+        
+        let titleContainer = UIView()
+        titleStack.addArrangedSubview(titleContainer)
+        
+        titleStack.addArrangedSubview(toolAreaContainer)
+        
+        addChild(titleBarVC, to: titleContainer)
     }
     
     // MARK: - Interface
     
-    func update(projectName: String) {
-        navigationItem.title = projectName
-    }
-    
-    func update(drawings: [Drawing]) {
-        self.drawings = drawings
-        tableView.reloadData()
+    func setCanvasSize(_ canvasSize: PixelSize) {
+        canvasVC.setCanvasSize(canvasSize)
     }
     
 }
 
-extension EditorContentVC: UITableViewDataSource {
+// MARK: - Delegates
+
+extension EditorContentVC: EditorCanvasVCDelegate {
     
-    func tableView(
-        _ tableView: UITableView,
-        numberOfRowsInSection section: Int
-    ) -> Int {
-        drawings.count
+    func canvasBoundsReferenceView(_ vc: EditorCanvasVC) -> UIView? {
+        toolAreaContainer
     }
     
-    func tableView(
-        _ tableView: UITableView,
-        cellForRowAt indexPath: IndexPath
-    ) -> UITableViewCell {
-        
-        return tableView.dequeue(UITableViewCell.self) {
-            $0.textLabel?.text = "Drawing \(indexPath.row + 1)"
-        }
+    func needsDrawCanvas(_ vc: EditorCanvasVC) {
+        delegate?.needsDrawCanvas(self)
     }
     
 }
 
-extension EditorContentVC: UITableViewDelegate {
+extension EditorContentVC: EditorTimelineVCDelegate {
     
-    func tableView(
-        _ tableView: UITableView,
-        didSelectRowAt indexPath: IndexPath
-    ) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        
-        let drawing = drawings[indexPath.row]
-        delegate?.onSelectDrawing(id: drawing.id)
+    func onModifyConstraints(_ vc: EditorTimelineVC) {
+        canvasVC.handleUpdateBoundsReferenceView()
     }
     
 }
 
+extension EditorContentVC: EditorTitleBarVCDelegate {
+    
+    func onSelectBack(_ vc: EditorTitleBarVC) {
+        delegate?.onSelectBack(self)
+    }
+    
+    func onSelectBrush(_ vc: EditorTitleBarVC) {
+        delegate?.onSelectBrush(self)
+    }
+    
+    func onSelectClear(_ vc: EditorTitleBarVC) {
+        delegate?.onSelectClear(self)
+    }
+    
+}

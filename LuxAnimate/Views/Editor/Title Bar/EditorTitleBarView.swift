@@ -1,5 +1,5 @@
 //
-//  DrawingEditorTitleBarView.swift
+//  EditorTitleBarView.swift
 //
 
 import UIKit
@@ -14,7 +14,7 @@ private let iconConfig = UIImage.SymbolConfiguration(
     weight: .medium,
     scale: .medium)
 
-class DrawingEditorTitleBarView: UIView {
+class EditorTitleBarView: UIView {
     
     let backButton = {
         let button = UIButton(type: .system)

@@ -1,5 +1,5 @@
 //
-//  BrushStrokeGestureRecognizer.swift
+//  BrushGestureRecognizer.swift
 //
 
 import UIKit
@@ -16,27 +16,27 @@ struct BrushStrokeGestureConfig {
     
 }
 
-protocol BrushStrokeGestureRecognizerGestureDelegate: AnyObject {
+protocol BrushGestureRecognizerGestureDelegate: AnyObject {
     
     func onBeginBrushStroke()
     
     func onUpdateBrushStroke(
-        _ stroke: BrushStrokeGestureRecognizer.Stroke)
+        _ stroke: BrushGestureRecognizer.Stroke)
     
     func onEndBrushStroke()
     
 }
 
-class BrushStrokeGestureRecognizer: UIGestureRecognizer {
+class BrushGestureRecognizer: UIGestureRecognizer {
     
-    weak var gestureDelegate: BrushStrokeGestureRecognizerGestureDelegate?
+    weak var gestureDelegate: BrushGestureRecognizerGestureDelegate?
     
-    private var internalState: BrushStrokeGestureRecognizerInternalState?
+    private var internalState: BrushGestureRecognizerInternalState?
     
     init() {
         super.init(target: nil, action: nil)
         
-        setInternalState(BrushStrokeGestureRecognizerWaitingState())
+        setInternalState(BrushGestureRecognizerWaitingState())
     }
     
     // MARK: - Gesture Lifecycle
@@ -83,7 +83,9 @@ class BrushStrokeGestureRecognizer: UIGestureRecognizer {
     
     // MARK: - State
     
-    private func setInternalState(_ newState: BrushStrokeGestureRecognizerInternalState) {
+    private func setInternalState(
+        _ newState: BrushGestureRecognizerInternalState
+    ) {
         internalState?.onStateEnd()
         internalState = newState
         
@@ -95,9 +97,9 @@ class BrushStrokeGestureRecognizer: UIGestureRecognizer {
 
 // MARK: - State Delegate
 
-extension BrushStrokeGestureRecognizer: BrushStrokeGestureRecognizerInternalStateDelegate {
+extension BrushGestureRecognizer: BrushGestureRecognizerInternalStateDelegate {
     
-    func setState(_ newState: BrushStrokeGestureRecognizerInternalState) {
+    func setState(_ newState: BrushGestureRecognizerInternalState) {
         setInternalState(newState)
     }
     
@@ -109,7 +111,7 @@ extension BrushStrokeGestureRecognizer: BrushStrokeGestureRecognizerInternalStat
         gestureDelegate?.onBeginBrushStroke()
     }
     
-    func onUpdateBrushStroke(_ stroke: BrushStrokeGestureRecognizer.Stroke) {
+    func onUpdateBrushStroke(_ stroke: BrushGestureRecognizer.Stroke) {
         gestureDelegate?.onUpdateBrushStroke(stroke)
     }
     

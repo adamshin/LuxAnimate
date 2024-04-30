@@ -1,10 +1,10 @@
 //
-//  BrushStrokeGestureRecognizerStroke.swift
+//  BrushGestureRecognizerStroke.swift
 //
 
 import UIKit
 
-extension BrushStrokeGestureRecognizer {
+extension BrushGestureRecognizer {
     
     struct Stroke {
         var touch: UITouch
@@ -45,7 +45,7 @@ extension BrushStrokeGestureRecognizer {
     
 }
 
-extension BrushStrokeGestureRecognizer.Stroke {
+extension BrushGestureRecognizer.Stroke {
     
     init(touch: UITouch) {
         self.touch = touch
@@ -136,7 +136,7 @@ extension BrushStrokeGestureRecognizer.Stroke {
         touch: UITouch,
         event: UIEvent,
         view: UIView?
-    ) -> ([BrushStrokeGestureRecognizer.Sample], [BrushStrokeGestureRecognizer.Sample]) {
+    ) -> ([BrushGestureRecognizer.Sample], [BrushGestureRecognizer.Sample]) {
         
         let touches = event.coalescedTouches(for: touch) ?? []
         let predictedTouches = event.predictedTouches(for: touch) ?? []
@@ -159,11 +159,11 @@ extension BrushStrokeGestureRecognizer.Stroke {
         touch: UITouch,
         view: UIView?,
         isPredicted: Bool
-    ) -> BrushStrokeGestureRecognizer.Sample {
+    ) -> BrushGestureRecognizer.Sample {
         
         let timeOffset = touch.timestamp - startTimestamp
         
-        return BrushStrokeGestureRecognizer.Sample(
+        return BrushGestureRecognizer.Sample(
             timeOffset: timeOffset,
             isPredicted: isPredicted,
             position: touch.preciseLocation(in: view),

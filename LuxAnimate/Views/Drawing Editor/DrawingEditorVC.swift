@@ -173,7 +173,7 @@ extension DrawingEditorVC: DrawingEditorCanvasVCDelegate {
     
     func onUpdateBrushStroke(
         _ vc: DrawingEditorCanvasVC,
-        _ stroke: BrushStrokeGestureRecognizer.Stroke
+        _ stroke: BrushGestureRecognizer.Stroke
     ) {
         let inputStroke = BrushEngineGestureAdapter
             .convert(stroke)
