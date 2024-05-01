@@ -41,6 +41,7 @@
 		6622326B2BE07FB000C8813F /* TimelineTrackCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662232632BE07D6500C8813F /* TimelineTrackCell.swift */; };
 		6622326C2BE07FB000C8813F /* TimelineTrackVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662232642BE07D6500C8813F /* TimelineTrackVC.swift */; };
 		6622326F2BE0AF5D00C8813F /* EditorBrushToolOverlayVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6622326E2BE0AF5D00C8813F /* EditorBrushToolOverlayVC.swift */; };
+		662232712BE1B79300C8813F /* ToolOverlaySlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662232702BE1B79300C8813F /* ToolOverlaySlider.swift */; };
 		66311CD02BD6CD6E00D53489 /* MovableCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66311CCF2BD6CD6E00D53489 /* MovableCanvasView.swift */; };
 		66311CD22BD713BE00D53489 /* MovableCanvasTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66311CD12BD713BE00D53489 /* MovableCanvasTransform.swift */; };
 		66311CD62BD7270000D53489 /* EditorContentVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66311CD52BD7270000D53489 /* EditorContentVC.swift */; };
@@ -129,6 +130,7 @@
 		662232642BE07D6500C8813F /* TimelineTrackVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineTrackVC.swift; sourceTree = "<group>"; };
 		662232662BE07D6500C8813F /* EditorTimelineVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorTimelineVC.swift; sourceTree = "<group>"; };
 		6622326E2BE0AF5D00C8813F /* EditorBrushToolOverlayVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorBrushToolOverlayVC.swift; sourceTree = "<group>"; };
+		662232702BE1B79300C8813F /* ToolOverlaySlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolOverlaySlider.swift; sourceTree = "<group>"; };
 		66311CCF2BD6CD6E00D53489 /* MovableCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovableCanvasView.swift; sourceTree = "<group>"; };
 		66311CD12BD713BE00D53489 /* MovableCanvasTransform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovableCanvasTransform.swift; sourceTree = "<group>"; };
 		66311CD52BD7270000D53489 /* EditorContentVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorContentVC.swift; sourceTree = "<group>"; };
@@ -317,12 +319,12 @@
 			path = "Collapsible Bar";
 			sourceTree = "<group>";
 		};
-		6622325C2BE07CE100C8813F /* Tools */ = {
+		6622325C2BE07CE100C8813F /* Tool Overlay */ = {
 			isa = PBXGroup;
 			children = (
 				6622326D2BE0AF0F00C8813F /* Brush */,
 			);
-			path = Tools;
+			path = "Tool Overlay";
 			sourceTree = "<group>";
 		};
 		662232622BE07D6500C8813F /* Toolbar */ = {
@@ -351,6 +353,14 @@
 				66A05B732BDC6D2D00434245 /* DrawingEditorBrushOptionsView.swift */,
 			);
 			path = Brush;
+			sourceTree = "<group>";
+		};
+		662232722BE1B85D00C8813F /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				662232702BE1B79300C8813F /* ToolOverlaySlider.swift */,
+			);
+			path = Shared;
 			sourceTree = "<group>";
 		};
 		66311CD42BD7252D00D53489 /* Graphics */ = {
@@ -544,8 +554,6 @@
 				66D084552BA3CDE400EB8556 /* App */,
 				66D0847B2BA3D78900EB8556 /* Library */,
 				66D0848D2BA56E7800EB8556 /* Editor */,
-				662232532BE049B000C8813F /* Movable Canvas */,
-				664B59432BC5A9D1003FA90E /* Brush Gesture */,
 				66311CE52BD7898000D53489 /* Shared */,
 			);
 			path = Views;
@@ -657,7 +665,10 @@
 				662232542BE0629F00C8813F /* Canvas */,
 				662232582BE074B200C8813F /* Timeline */,
 				66A05B782BDC7B6700434245 /* Title Bar */,
-				6622325C2BE07CE100C8813F /* Tools */,
+				6622325C2BE07CE100C8813F /* Tool Overlay */,
+				662232532BE049B000C8813F /* Movable Canvas */,
+				664B59432BC5A9D1003FA90E /* Brush Gesture */,
+				662232722BE1B85D00C8813F /* Shared */,
 				66E523512BD341A500794751 /* EditorVC.swift */,
 				66311CD52BD7270000D53489 /* EditorContentVC.swift */,
 			);
@@ -774,6 +785,7 @@
 				66099BA92BDB1C2500243D9F /* DrawingEditorFrameRenderer.swift in Sources */,
 				66099BBC2BDB32F500243D9F /* BrushStrokeEngine.swift in Sources */,
 				66E523562BD37D8B00794751 /* MetalLayerTextureRenderer.swift in Sources */,
+				662232712BE1B79300C8813F /* ToolOverlaySlider.swift in Sources */,
 				66099BA42BDB193800243D9F /* EditorTitleBarView.swift in Sources */,
 				66D084712BA3CEC300EB8556 /* PassthroughView.swift in Sources */,
 				66099BC42BDB32F500243D9F /* Brush.swift in Sources */,
