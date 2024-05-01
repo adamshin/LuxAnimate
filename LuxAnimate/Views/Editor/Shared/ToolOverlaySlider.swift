@@ -15,10 +15,13 @@ private let thumbHeight: CGFloat = 16
 
 private let shadowWidth: CGFloat = 1
 
-private let scaleAnimDuration: TimeInterval = 0.3
+private let scaleAnimDuration: TimeInterval = 0.25
 private let scaleFactor: CGFloat = (barWidth + 4) / barWidth
 
-private let dragRate: CGFloat = 1 / 300
+private let thumbNormalColor = UIColor(white: 0.75, alpha: 1)
+private let thumbSelectedColor = UIColor(white: 0.95, alpha: 1)
+
+private let dragRate: CGFloat = 1 / 250
 
 protocol ToolOverlaySliderDelegate: AnyObject {
     
@@ -34,7 +37,7 @@ class ToolOverlaySlider: UIView {
     weak var delegate: ToolOverlaySliderDelegate?
     
     private let contentView = UIView()
-    private let cardView = ToolOverlayCardView()
+    private let cardView = ToolOverlaySliderCardView()
     private let thumbView = CircleView()
     
     private let panGesture = UILongPressGestureRecognizer()
@@ -56,7 +59,7 @@ class ToolOverlaySlider: UIView {
         cardView.cornerRadius = thumbInset + thumbHeight / 2
         
         contentView.addSubview(thumbView)
-        thumbView.backgroundColor = UIColor(white: 0.8, alpha: 1)
+        thumbView.backgroundColor = thumbNormalColor
         thumbView.layer.cornerCurve = .continuous
         
         panGesture.minimumPressDuration = 0
@@ -92,7 +95,7 @@ class ToolOverlaySlider: UIView {
         thumbView.frame = CGRect(
             center: CGPoint(
                 x: bounds.midX,
-                y: thumbPosition.rounded()),
+                y: thumbPosition),
             size: CGSize(
                 width: barWidth - thumbInset * 2,
                 height: thumbHeight))
@@ -128,6 +131,8 @@ class ToolOverlaySlider: UIView {
     
     private func showBeginDrag() {
         UIView.animate(springDuration: scaleAnimDuration) {
+            thumbView.backgroundColor = thumbSelectedColor
+            
             contentView.transform = CGAffineTransform(
                 scaleX: scaleFactor,
                 y: scaleFactor)
@@ -136,6 +141,8 @@ class ToolOverlaySlider: UIView {
     
     private func showEndDrag() {
         UIView.animate(springDuration: scaleAnimDuration) {
+            thumbView.backgroundColor = thumbNormalColor
+            
             contentView.transform = .identity
         }
     }
@@ -152,7 +159,7 @@ class ToolOverlaySlider: UIView {
     
 }
 
-private class ToolOverlayCardView: UIView {
+private class ToolOverlaySliderCardView: UIView {
     
     private let backgroundView = UIView()
     private let shadowView = UIView()
@@ -165,7 +172,7 @@ private class ToolOverlayCardView: UIView {
         super.init(frame: frame)
         
         addSubview(shadowView)
-        shadowView.backgroundColor = .white.withAlphaComponent(0.15)
+        shadowView.backgroundColor = .editorBarShadow
         shadowView.layer.cornerCurve = .continuous
         
         addSubview(backgroundView)
@@ -188,7 +195,7 @@ private class ToolOverlayCardView: UIView {
     
     private func updateCorners() {
         backgroundView.layer.cornerRadius = cornerRadius
-        shadowView.layer.cornerRadius = cornerRadius + shadowWidth - 0.5
+        shadowView.layer.cornerRadius = cornerRadius + shadowWidth
     }
     
 }

@@ -173,7 +173,7 @@ class TimelineToolbarView: UIView {
         rightStack.pinEdges(.vertical)
         rightStack.pinEdges(.trailing, padding: padding)
         
-        rightStack.addArrangedSubview(onionSkinButton)
+//        rightStack.addArrangedSubview(onionSkinButton)
 //        rightStack.addArrangedSubview(layersButton)
         rightStack.addArrangedSubview(expandButton)
         
