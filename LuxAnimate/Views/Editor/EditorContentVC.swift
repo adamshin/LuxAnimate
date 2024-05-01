@@ -8,7 +8,6 @@ protocol EditorContentVCDelegate: AnyObject {
     
     func onSelectBack(_ vc: EditorContentVC)
     func onSelectBrush(_ vc: EditorContentVC)
-    func onSelectClear(_ vc: EditorContentVC)
     
     func needsDrawCanvas(_ vc: EditorContentVC)
     
@@ -100,10 +99,6 @@ extension EditorContentVC: EditorTitleBarVCDelegate {
     
     func onSelectBrush(_ vc: EditorTitleBarVC) {
         delegate?.onSelectBrush(self)
-    }
-    
-    func onSelectClear(_ vc: EditorTitleBarVC) {
-        delegate?.onSelectClear(self)
     }
     
 }

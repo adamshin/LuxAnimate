@@ -49,7 +49,7 @@ class EditorCanvasVC: UIViewController {
 //        canvasView.canvasContentView.addSubview(metalView)
 //        metalView.pinEdges()
 //        metalView.delegate = self
-        let imageView = UIImageView(image: .sampleCanvas)
+        let imageView = UIImageView(image: .sampleCanvas3)
         canvasView.canvasContentView.addSubview(imageView)
         imageView.pinEdges()
         

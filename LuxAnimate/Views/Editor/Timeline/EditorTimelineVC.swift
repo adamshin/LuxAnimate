@@ -42,6 +42,8 @@ class EditorTimelineVC: UIViewController {
         addChild(toolbarVC, to: collapsibleBarVC.barView)
         addChild(trackVC, to: collapsibleBarVC.contentView)
         
+        collapsibleBarVC.setExpanded(true, animated: false)
+        
         trackVC.setFrameCount(frameCount)
     }
     

@@ -6,8 +6,8 @@ import UIKit
 
 class EditorBrushToolOverlayVC: UIViewController {
     
-    private let slider1 = ToolOverlaySlider()
-    private let slider2 = ToolOverlaySlider()
+    private let sizeSlider = ToolOverlaySlider()
+    private let opacitySlider = ToolOverlaySlider()
     
     override func loadView() {
         view = PassthroughView()
@@ -22,11 +22,14 @@ class EditorBrushToolOverlayVC: UIViewController {
         stack.pinEdges(.leading)
         stack.pin(.centerY)
         
-        stack.addArrangedSubview(slider1)
-        stack.addArrangedSubview(slider2)
+        stack.addArrangedSubview(sizeSlider)
+        stack.addArrangedSubview(opacitySlider)
         
-        slider1.value = 0.5
-        slider2.value = 1
+        sizeSlider.value = 0.5
+        opacitySlider.value = 1
     }
+    
+    var size: Double { sizeSlider.value }
+    var opacity: Double { opacitySlider.value }
     
 }
