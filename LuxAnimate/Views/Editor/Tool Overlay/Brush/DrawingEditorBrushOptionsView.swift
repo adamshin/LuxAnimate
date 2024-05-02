@@ -26,7 +26,7 @@ class DrawingEditorBrushOptionsView: PassthroughView {
         bgButton.backgroundColor = .clear
         bgButton.pinEdges()
         
-        let card = CardView()
+        let card = UIView()
         card.backgroundColor = .editorBar
         card.layer.cornerRadius = 24
         card.layer.cornerCurve = .continuous

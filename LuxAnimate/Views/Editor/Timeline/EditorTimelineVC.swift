@@ -40,7 +40,7 @@ class EditorTimelineVC: UIViewController {
         
         addChild(collapsibleBarVC, to: view)
         addChild(toolbarVC, to: collapsibleBarVC.barView)
-        addChild(trackVC, to: collapsibleBarVC.contentView)
+        addChild(trackVC, to: collapsibleBarVC.collapsibleContentView)
         
         collapsibleBarVC.setExpanded(true, animated: false)
         
@@ -49,8 +49,8 @@ class EditorTimelineVC: UIViewController {
     
     // MARK: - Interface
     
-    var remainderAreaView: UIView {
-        collapsibleBarVC.remainderAreaView
+    var backgroundAreaView: UIView {
+        collapsibleBarVC.backgroundAreaView
     }
     
     private func startPlayback() {

@@ -43,15 +43,16 @@ class EditorTitleBarView: UIView {
     
     init() {
         super.init(frame: .zero)
-        
-        backgroundColor = .editorBar
         clipsToBounds = false
         
-        let barView = UIView()
-        addSubview(barView)
-        barView.pinHeight(to: barHeight)
-        barView.pinEdges([.horizontal, .bottom])
-        barView.pin(.top, to: safeAreaLayoutGuide)
+        pinHeight(to: barHeight)
+        
+        let blurView = ChromeBlurView(
+            overlayColor: .editorBarOverlay)
+        
+        addSubview(blurView)
+        blurView.pinEdges()
+        blurView.backgroundColor = .editorBarShadow
         
         let shadow = UIView()
         shadow.backgroundColor = .editorBarShadow
@@ -63,13 +64,13 @@ class EditorTitleBarView: UIView {
         // Stacks
         let leftStack = UIStackView()
         leftStack.axis = .horizontal
-        barView.addSubview(leftStack)
+        addSubview(leftStack)
         leftStack.pinEdges(.vertical)
         leftStack.pinEdges(.leading, padding: padding)
         
         let rightStack = UIStackView()
         rightStack.axis = .horizontal
-        barView.addSubview(rightStack)
+        addSubview(rightStack)
         rightStack.pinEdges(.vertical)
         rightStack.pinEdges(.trailing, padding: padding)
         

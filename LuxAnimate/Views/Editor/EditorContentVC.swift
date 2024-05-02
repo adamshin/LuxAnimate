@@ -46,7 +46,7 @@ class EditorContentVC: UIViewController {
         
         let titleStack = PassthroughStackView()
         titleStack.axis = .vertical
-        timelineVC.remainderAreaView.addSubview(titleStack)
+        timelineVC.backgroundAreaView.addSubview(titleStack)
         titleStack.pinEdges()
         
         let titleContainer = UIView()

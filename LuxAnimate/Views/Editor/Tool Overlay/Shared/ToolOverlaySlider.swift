@@ -8,18 +8,18 @@ private let hPadding: CGFloat = 12
 private let vPadding: CGFloat = 10
 
 private let barWidth: CGFloat = 44
-private let barHeight: CGFloat = 160
+private let barHeight: CGFloat = 156
 
 private let thumbInset: CGFloat = 5
 private let thumbHeight: CGFloat = 16
 
-private let shadowWidth: CGFloat = 1
+private let outlineWidth: CGFloat = 1.0
 
 private let scaleAnimDuration: TimeInterval = 0.25
 private let scaleFactor: CGFloat = (barWidth + 4) / barWidth
 
-private let thumbNormalColor = UIColor(white: 0.75, alpha: 1)
-private let thumbSelectedColor = UIColor(white: 0.95, alpha: 1)
+private let thumbNormalColor = UIColor.white.withAlphaComponent(0.7)
+private let thumbSelectedColor = UIColor.white.withAlphaComponent(0.95)
 
 private let dragRate: CGFloat = 1 / 250
 
@@ -159,27 +159,28 @@ class ToolOverlaySlider: UIView {
     
 }
 
-private class ToolOverlaySliderCardView: UIView {
+class ToolOverlaySliderCardView: UIView {
     
-    private let backgroundView = UIView()
-    private let shadowView = UIView()
+    private let blurView = ChromeBlurView(
+        overlayColor: .editorBarOverlay)
+    
+    private let outlineView = UIView()
     
     var cornerRadius: CGFloat = 24 {
-        didSet { updateCorners() }
+        didSet { setNeedsLayout() }
     }
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init() {
+        super.init(frame: .zero)
         
-        addSubview(shadowView)
-        shadowView.backgroundColor = .editorBarShadow
-        shadowView.layer.cornerCurve = .continuous
+        addSubview(outlineView)
+        outlineView.pinEdges(padding: -outlineWidth)
+        outlineView.backgroundColor = .editorBarShadow
+        outlineView.layer.cornerCurve = .continuous
         
-        addSubview(backgroundView)
-        backgroundView.backgroundColor = .editorBar.withAlphaComponent(0.9)
-        backgroundView.layer.cornerCurve = .continuous
-        
-        updateCorners()
+        addSubview(blurView)
+        blurView.pinEdges()
+        blurView.layer.cornerCurve = .continuous
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -187,15 +188,9 @@ private class ToolOverlaySliderCardView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        backgroundView.frame = bounds
+        blurView.layer.cornerRadius = cornerRadius
         
-        shadowView.frame = bounds
-            .insetBy(dx: -shadowWidth, dy: -shadowWidth)
-    }
-    
-    private func updateCorners() {
-        backgroundView.layer.cornerRadius = cornerRadius
-        shadowView.layer.cornerRadius = cornerRadius + shadowWidth
+        outlineView.layer.cornerRadius = cornerRadius + outlineWidth
     }
     
 }

@@ -6,6 +6,8 @@ import UIKit
 
 private let barHeight: CGFloat = 48
 
+private let separatorColor = UIColor(white: 1, alpha: 0.04)
+
 protocol EditorTimelineCollapsibleBarVCDelegate: AnyObject {
     
     func onSetExpanded(
@@ -21,11 +23,15 @@ class EditorTimelineCollapsibleBarVC: UIViewController {
     
     weak var delegate: EditorTimelineCollapsibleBarVCDelegate?
     
-    let remainderAreaView = PassthroughView()
     let barView = EditorCollapsibleBarBarView()
-    let contentView = UIView()
+    let collapsibleContentView = UIView()
     
-    private let contentCoverView = UIView()
+    let backgroundAreaView = PassthroughView()
+    
+    private let collapsibleContentContainer = UIView()
+    
+    private let separatorContainer = UIView()
+    private let separator = UIView()
     
     private var expandedConstraint: NSLayoutConstraint?
     private var collapsedConstraint: NSLayoutConstraint?
@@ -46,29 +52,35 @@ class EditorTimelineCollapsibleBarVC: UIViewController {
         view.addSubview(mainStack)
         mainStack.pinEdges()
         
-        mainStack.addArrangedSubview(remainderAreaView)
+        mainStack.addArrangedSubview(backgroundAreaView)
         
-        let barContentContainer = UIView()
-        barContentContainer.backgroundColor = .editorBackground
-        mainStack.addArrangedSubview(barContentContainer)
+        let contentContainer = UIView()
+        mainStack.addArrangedSubview(contentContainer)
         
-        let barContentStack = UIStackView()
-        barContentStack.axis = .vertical
-        barContentContainer.addSubview(barContentStack)
-        barContentStack.pinEdges([.horizontal, .top])
+        let blurView = ChromeBlurView()
+        contentContainer.addSubview(blurView)
+        blurView.pinEdges()
+        blurView.backgroundColor = .editorBarShadow
         
-        barContentStack.addArrangedSubview(barView)
-        barContentStack.addArrangedSubview(contentView)
-        barView.layer.zPosition = 1
+        let contentStack = UIStackView()
+        contentStack.axis = .vertical
+        contentContainer.addSubview(contentStack)
+        contentStack.pinEdges()
         
-        contentCoverView.backgroundColor = .editorBar
+        contentStack.addArrangedSubview(barView)
         
-        view.addSubview(contentCoverView)
-        contentCoverView.pinEdges(.horizontal)
-        contentCoverView.pin(.top, to: barView, toAnchor: .bottom)
-        contentCoverView.pin(.bottom)
+        contentStack.addArrangedSubview(separatorContainer)
+        separatorContainer.pinHeight(to: 1)
+        separatorContainer.backgroundColor = .editorBarOverlay
         
-        expandedConstraint = contentView
+        separatorContainer.addSubview(separator)
+        separator.pinEdges()
+        
+        contentStack.addArrangedSubview(collapsibleContentContainer)
+        collapsibleContentContainer.addSubview(collapsibleContentView)
+        collapsibleContentView.pinEdges([.horizontal, .top])
+        
+        expandedConstraint = collapsibleContentView
             .pinEdges(.bottom, to: view.safeAreaLayoutGuide)
             .constraints.first!
         
@@ -94,8 +106,14 @@ class EditorTimelineCollapsibleBarVC: UIViewController {
                 self.collapsedConstraint?.isActive = true
             }
             
-            self.contentCoverView.alpha = expanded ? 0 : 1
-            self.contentCoverView.isUserInteractionEnabled = !expanded
+            self.collapsibleContentView.alpha = expanded ? 1 : 0
+            self.collapsibleContentView.isUserInteractionEnabled = expanded
+            
+            self.collapsibleContentContainer.backgroundColor =
+                expanded ? .editorBackgroundOverlay : .editorBarOverlay
+            
+            self.separator.backgroundColor = 
+                expanded ? separatorColor : .clear
             
             if animated {
                 self.view.layoutIfNeeded()
@@ -123,25 +141,19 @@ class EditorTimelineCollapsibleBarVC: UIViewController {
 
 class EditorCollapsibleBarBarView: UIView {
     
+    let topShadowView = UIView()
+    
     init() {
         super.init(frame: .zero)
+        backgroundColor = .editorBarOverlay
         
-        backgroundColor = .editorBar
         pinHeight(to: barHeight)
         
-        let shadow1 = UIView()
-        shadow1.backgroundColor = .editorBarShadow
-        addSubview(shadow1)
-        shadow1.pinEdges(.horizontal)
-        shadow1.pin(.bottom, toAnchor: .top)
-        shadow1.pinHeight(to: 1)
-        
-        let shadow2 = UIView()
-        shadow2.backgroundColor = .editorBarShadow
-        addSubview(shadow2)
-        shadow2.pinEdges(.horizontal)
-        shadow2.pin(.top, toAnchor: .bottom)
-        shadow2.pinHeight(to: 1)
+        topShadowView.backgroundColor = .editorBarShadow
+        addSubview(topShadowView)
+        topShadowView.pinEdges(.horizontal)
+        topShadowView.pin(.bottom, toAnchor: .top)
+        topShadowView.pinHeight(to: 1)
     }
     
     required init?(coder: NSCoder) { fatalError() }
