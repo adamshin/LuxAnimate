@@ -58,4 +58,8 @@ class EditorMenuCardView: UIView {
         shadowLayer1.shadowPath = shadowMask
     }
     
+    var contentView: UIView {
+        blurView.contentView
+    }
+    
 }

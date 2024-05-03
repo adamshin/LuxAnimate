@@ -63,7 +63,7 @@ class EditorMenuView: PassthroughView {
         animatorView.addSubview(cardView)
         cardView.pinEdges()
         
-        cardView.addSubview(contentView)
+        cardView.contentView.addSubview(contentView)
         contentView.pinEdges()
         contentView.menuView = self
     }
