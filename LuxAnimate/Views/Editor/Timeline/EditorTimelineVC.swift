@@ -153,10 +153,40 @@ extension EditorTimelineVC: TimelineToolbarVCDelegate {
 
 extension EditorTimelineVC: TimelineTrackVCDelegate {
     
+    func onTapFrame(_ vc: TimelineTrackVC, index: Int) {
+        guard let cell = trackVC.cell(at: index)
+        else { return }
+        
+        if abs(index - trackVC.selectedFrameIndex) < 2 {
+            trackVC.setDotVisible(false)
+        }
+        
+        let contentView = EditorTimelineFrameMenuView()
+        
+        let menu = EditorMenuView(
+            contentView: contentView,
+            presentation: .init(
+                sourceView: cell,
+                sourceViewEffect: .fade))
+        
+        menu.delegate = self
+        menu.present(in: self)
+    }
+    
     func onUpdateSelectedFrame(_ vc: TimelineTrackVC) {
         toolbarVC.updateFrameLabel(
             index: vc.selectedFrameIndex,
             total: frameCount)
+    }
+    
+}
+
+extension EditorTimelineVC: EditorMenuViewDelegate {
+    
+    func onPresent(_ v: EditorMenuView) { }
+    
+    func onDismiss(_ v: EditorMenuView) {
+        trackVC.setDotVisible(true)
     }
     
 }

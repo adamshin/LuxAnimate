@@ -6,7 +6,7 @@ import UIKit
 
 private let trackHeight: CGFloat = 64
 private let trackTopInset: CGFloat = 32
-private let trackBottomInset: CGFloat = 16
+private let trackBottomInset: CGFloat = 20
 
 private let dotSize: CGFloat = 8
 
@@ -18,7 +18,11 @@ private let cellSize: CGSize = CGSize(
 private let cellSpacing: CGFloat = 8
 
 protocol TimelineTrackVCDelegate: AnyObject {
+    
     func onUpdateSelectedFrame(_ vc: TimelineTrackVC)
+    
+    func onTapFrame(_ vc: TimelineTrackVC, index: Int)
+    
 }
 
 class TimelineTrackVC: UIViewController {
@@ -43,6 +47,8 @@ class TimelineTrackVC: UIViewController {
         frame: .zero,
         collectionViewLayout: flowLayout)
     
+    private let dot = CircleView()
+    
     private var frameCount = 0
     
     private(set) var selectedFrameIndex = 0 {
@@ -56,7 +62,6 @@ class TimelineTrackVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let dot = CircleView()
         dot.backgroundColor = .editorLabel
         view.addSubview(dot)
         dot.pinSize(to: dotSize)
@@ -150,6 +155,18 @@ class TimelineTrackVC: UIViewController {
             animated: animated)
     }
     
+    func setDotVisible(_ visible: Bool) {
+        UIView.animate(withDuration: 0.15) {
+            self.dot.alpha = visible ? 1 : 0
+        }
+    }
+    
+    func cell(at index: Int) -> TimelineTrackCell? {
+        collectionView.cellForItem(
+            at: IndexPath(item: index, section: 0))
+            as? TimelineTrackCell
+    }
+    
 }
 
 // MARK: - Collection View
@@ -178,6 +195,13 @@ extension TimelineTrackVC: UICollectionViewDataSource {
 }
 
 extension TimelineTrackVC: UICollectionViewDelegate {
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        didSelectItemAt indexPath: IndexPath
+    ) {
+        delegate?.onTapFrame(self, index: indexPath.item)
+    }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         updateSelectedFrameIndex()

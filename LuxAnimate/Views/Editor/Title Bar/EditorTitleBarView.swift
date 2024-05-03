@@ -79,6 +79,13 @@ class EditorTitleBarView: UIView {
         leftStack.setCustomSpacing(8, after: backButton)
         
         rightStack.addArrangedSubview(brushButton)
+        
+        brushButton.showsMenuAsPrimaryAction = true
+        brushButton.menu = UIMenu(
+            preferredElementSize: .large,
+            children: [
+                UIAction(title: "Test", handler: { _ in }),
+            ])
     }
     
     required init?(coder: NSCoder) { fatalError() }

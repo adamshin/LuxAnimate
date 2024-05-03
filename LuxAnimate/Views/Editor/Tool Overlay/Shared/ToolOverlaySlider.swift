@@ -13,20 +13,18 @@ private let barHeight: CGFloat = 156
 private let thumbInset: CGFloat = 5
 private let thumbHeight: CGFloat = 16
 
-private let outlineWidth: CGFloat = 1.0
-
-private let scaleAnimDuration: TimeInterval = 0.25
-private let scaleFactor: CGFloat = (barWidth + 4) / barWidth
+private let pressAnimDuration: TimeInterval = 0.25
+private let pressScaleFactor: CGFloat = (barWidth + 4) / barWidth
 
 private let thumbNormalColor = UIColor.white.withAlphaComponent(0.7)
 private let thumbSelectedColor = UIColor.white.withAlphaComponent(0.95)
 
-private let dragRate: CGFloat = 1 / 250
+private let dragRate: CGFloat = 0.6
 
 protocol ToolOverlaySliderDelegate: AnyObject {
     
-    func onBeginDrag(_ v: ToolOverlaySlider)
-    func onEndDrag(_ v: ToolOverlaySlider)
+    func onBeginPress(_ v: ToolOverlaySlider)
+    func onEndPress(_ v: ToolOverlaySlider)
     
     func onChangeValue(_ v: ToolOverlaySlider)
     
@@ -40,11 +38,13 @@ class ToolOverlaySlider: UIView {
     private let cardView = ToolOverlaySliderCardView()
     private let thumbView = CircleView()
     
-    private let panGesture = UILongPressGestureRecognizer()
-    private var panGestureStartPosition: CGPoint?
+    private let pressGesture = UILongPressGestureRecognizer()
+    private let panGesture = UIPanGestureRecognizer()
     private var panGestureStartValue: Double?
     
     private var internalValue: Double = 0
+    
+    // MARK: - Init
     
     init() {
         super.init(frame: .zero)
@@ -62,14 +62,18 @@ class ToolOverlaySlider: UIView {
         thumbView.backgroundColor = thumbNormalColor
         thumbView.layer.cornerCurve = .continuous
         
-        panGesture.minimumPressDuration = 0
+        addGestureRecognizer(pressGesture)
+        pressGesture.addTarget(self, action: #selector(onPress))
+        pressGesture.minimumPressDuration = 0
+        
         addGestureRecognizer(panGesture)
         panGesture.addTarget(self, action: #selector(onPan))
-        
-        value = 0
+        panGesture.delegate = self
     }
     
     required init?(coder: NSCoder) { fatalError() }
+    
+    // MARK: - Lifecycle
     
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -101,51 +105,66 @@ class ToolOverlaySlider: UIView {
                 height: thumbHeight))
     }
     
+    // MARK: - Handlers
+    
+    @objc private func onPress() {
+        switch pressGesture.state {
+        case .began: 
+            showBeginPress()
+            delegate?.onBeginPress(self)
+            
+        case .changed: 
+            break
+            
+        default: 
+            showEndPress()
+            delegate?.onEndPress(self)
+        }
+    }
+    
     @objc private func onPan() {
         switch panGesture.state {
         case .began:
-            panGestureStartPosition = panGesture.location(in: self)
             panGestureStartValue = internalValue
             
-            showBeginDrag()
-            delegate?.onBeginDrag(self)
-            
         case .changed:
-            guard let panGestureStartPosition,
-                let panGestureStartValue
+            guard let panGestureStartValue
             else { return }
             
-            let newPosition = panGesture.location(in: self)
-            let translationY = newPosition.y - panGestureStartPosition.y
+            let translation = panGesture.translation(in: self)
             
-            value = panGestureStartValue + (-translationY * dragRate)
+            let thumbRangeSize = barHeight -
+                thumbHeight -
+                thumbInset * 2
+            
+            let dv = -translation.y / thumbRangeSize * dragRate
+            value = panGestureStartValue + dv
             
         default:
-            panGestureStartPosition = nil
             panGestureStartValue = nil
-            
-            showEndDrag()
-            delegate?.onEndDrag(self)
         }
     }
     
-    private func showBeginDrag() {
-        UIView.animate(springDuration: scaleAnimDuration) {
+    // MARK: - UI
+    
+    private func showBeginPress() {
+        UIView.animate(springDuration: pressAnimDuration) {
             thumbView.backgroundColor = thumbSelectedColor
             
             contentView.transform = CGAffineTransform(
-                scaleX: scaleFactor,
-                y: scaleFactor)
+                scaleX: pressScaleFactor,
+                y: pressScaleFactor)
         }
     }
     
-    private func showEndDrag() {
-        UIView.animate(springDuration: scaleAnimDuration) {
+    private func showEndPress() {
+        UIView.animate(springDuration: pressAnimDuration) {
             thumbView.backgroundColor = thumbNormalColor
-            
             contentView.transform = .identity
         }
     }
+    
+    // MARK: - Interface
     
     var value: Double {
         get {
@@ -153,44 +172,22 @@ class ToolOverlaySlider: UIView {
         }
         set {
             internalValue = clamp(newValue, min: 0, max: 1)
+            delegate?.onChangeValue(self)
             setNeedsLayout()
         }
     }
     
 }
 
-class ToolOverlaySliderCardView: UIView {
+// MARK: - Delegates
+
+extension ToolOverlaySlider: UIGestureRecognizerDelegate {
     
-    private let blurView = ChromeBlurView(
-        overlayColor: .editorBarOverlay)
-    
-    private let outlineView = UIView()
-    
-    var cornerRadius: CGFloat = 24 {
-        didSet { setNeedsLayout() }
-    }
-    
-    init() {
-        super.init(frame: .zero)
-        
-        addSubview(outlineView)
-        outlineView.pinEdges(padding: -outlineWidth)
-        outlineView.backgroundColor = .editorBarShadow
-        outlineView.layer.cornerCurve = .continuous
-        
-        addSubview(blurView)
-        blurView.pinEdges()
-        blurView.layer.cornerCurve = .continuous
-    }
-    
-    required init?(coder: NSCoder) { fatalError() }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        blurView.layer.cornerRadius = cornerRadius
-        
-        outlineView.layer.cornerRadius = cornerRadius + outlineWidth
+    func gestureRecognizer(
+        _ gestureRecognizer: UIGestureRecognizer,
+        shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
+    ) -> Bool {
+        return otherGestureRecognizer == pressGesture
     }
     
 }

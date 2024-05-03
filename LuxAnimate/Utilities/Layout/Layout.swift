@@ -245,7 +245,8 @@ extension UIView {
         to t: LayoutTarget? = nil,
         toAnchor targetAnchor: HorizontalAnchor? = nil,
         constant: CGFloat = 0,
-        relation: LayoutRelation = .equal)
+        relation: LayoutRelation = .equal,
+        priority: UILayoutPriority = .required)
     -> LayoutConstraints {
         
         prepareForConstraints()
@@ -264,6 +265,7 @@ extension UIView {
             c = a1.constraint(greaterThanOrEqualTo: a2, constant: constant)
         }
         c.isActive = true
+        c.priority = priority
         
         return LayoutConstraints([c])
     }
@@ -274,7 +276,8 @@ extension UIView {
         to t: LayoutTarget? = nil,
         toAnchor targetAnchor: VerticalAnchor? = nil,
         constant: CGFloat = 0,
-        relation: LayoutRelation = .equal)
+        relation: LayoutRelation = .equal,
+        priority: UILayoutPriority = .required)
     -> LayoutConstraints {
         
         prepareForConstraints()
@@ -293,6 +296,7 @@ extension UIView {
             c = a1.constraint(greaterThanOrEqualTo: a2, constant: constant)
         }
         c.isActive = true
+        c.priority = priority
         
         return LayoutConstraints([c])
     }

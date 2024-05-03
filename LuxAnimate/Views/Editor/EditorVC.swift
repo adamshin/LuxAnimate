@@ -121,8 +121,7 @@ extension EditorVC: EditorContentVCDelegate {
     }
     
     func onSelectBrush(_ vc: EditorContentVC) {
-        let popupVC = EditorPopupMenuVC()
-        present(popupVC, animated: false)
+        //
     }
     
     func needsDrawCanvas(_ vc: EditorContentVC) {
