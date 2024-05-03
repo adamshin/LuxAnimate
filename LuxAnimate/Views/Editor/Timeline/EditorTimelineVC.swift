@@ -107,14 +107,38 @@ extension EditorTimelineVC: TimelineToolbarVCDelegate {
 
 extension EditorTimelineVC: TimelineTrackVCDelegate {
     
-    func onUpdateFocusedFrame(_ vc: TimelineTrackVC) {
+    func onChangeFocusedFrame(_ vc: TimelineTrackVC) {
         toolbarVC.updateFrameLabel(
             index: vc.focusedFrameIndex,
             total: frameCount)
     }
     
+    func onSelectFocusedFrame(_ vc: TimelineTrackVC) {
+        // TODO: Create new drawing on focused frame
+    }
+    
     func onSelectFrame(_ vc: TimelineTrackVC, index: Int) {
         vc.focusFrame(at: index, animated: true)
+    }
+    
+    func onLongPressFrame(_ vc: TimelineTrackVC, index: Int) {
+        guard let cell = trackVC.cell(at: index)
+        else { return }
+        
+        if abs(index - trackVC.focusedFrameIndex) < 2 {
+            trackVC.setDotVisible(false)
+        }
+        
+        let contentView = EditorTimelineFrameMenuView()
+        
+        let menu = EditorMenuView(
+            contentView: contentView,
+            presentation: .init(
+                sourceView: cell,
+                sourceViewEffect: .fade))
+        
+        menu.delegate = self
+        menu.present(in: self)
     }
     
 }

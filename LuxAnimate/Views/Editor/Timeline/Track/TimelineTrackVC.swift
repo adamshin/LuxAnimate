@@ -19,9 +19,12 @@ private let cellSpacing: CGFloat = 8
 
 protocol TimelineTrackVCDelegate: AnyObject {
     
-    func onUpdateFocusedFrame(_ vc: TimelineTrackVC)
+    func onChangeFocusedFrame(_ vc: TimelineTrackVC)
+    
+    func onSelectFocusedFrame(_ vc: TimelineTrackVC)
     
     func onSelectFrame(_ vc: TimelineTrackVC, index: Int)
+    func onLongPressFrame(_ vc: TimelineTrackVC, index: Int)
     
 }
 
@@ -122,7 +125,7 @@ class TimelineTrackVC: UIViewController {
         
         if focusedFrameIndex != index {
             focusedFrameIndex = index
-            delegate?.onUpdateFocusedFrame(self)
+            delegate?.onChangeFocusedFrame(self)
         }
     }
     
@@ -191,7 +194,7 @@ class TimelineTrackVC: UIViewController {
         else { return }
         
         focusedFrameIndex = clampedIndex
-        delegate?.onUpdateFocusedFrame(self)
+        delegate?.onChangeFocusedFrame(self)
         
         isScrolling = animated
         isScrollDrivingFocusedFrame = !animated
@@ -334,7 +337,20 @@ extension TimelineTrackVC: TimelineTrackCellDelegate {
         else { return }
         
         let index = indexPath.item
-        delegate?.onSelectFrame(self, index: index)
+        
+        if index == focusedFrameIndex {
+            delegate?.onSelectFocusedFrame(self)
+        } else {
+            delegate?.onSelectFrame(self, index: index)
+        }
+    }
+    
+    func onLongPress(_ cell: TimelineTrackCell) {
+        guard let indexPath = collectionView.indexPath(for: cell)
+        else { return }
+        
+        let index = indexPath.item
+        delegate?.onLongPressFrame(self, index: index)
     }
     
 }

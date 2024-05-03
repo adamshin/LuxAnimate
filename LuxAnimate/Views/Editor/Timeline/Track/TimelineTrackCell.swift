@@ -5,11 +5,16 @@
 import UIKit
 
 private let cornerRadius: CGFloat = 8
+private let noDrawingBackgroundColor = UIColor(white: 1, alpha: 0.15)
+
+private let longPressDuration: TimeInterval = 0.5
 
 private let buttonSelectAnimateInDuration: CGFloat = 0.1
 private let buttonSelectAnimateOutDuration: CGFloat = 0.25
-private let buttonSelectAnimateAlpha: CGFloat = 0.8
+private let buttonSelectAnimateAlpha: CGFloat = 0.75
 private let buttonSelectAnimateScale: CGFloat = (64 - 6) / 64
+
+private let plusIconColor = UIColor(white: 1, alpha: 0.4)
 
 private let plusIconAnimateScale: CGFloat = 0.3
 private let plusIconAnimateInDuration: CGFloat = 0.3
@@ -29,7 +34,10 @@ private let plusIcon = UIImage(
 // MARK: - TimelineTrackCell
 
 protocol TimelineTrackCellDelegate: AnyObject {
+    
     func onSelect(_ cell: TimelineTrackCell)
+    func onLongPress(_ cell: TimelineTrackCell)
+    
 }
 
 class TimelineTrackCell: UICollectionViewCell {
@@ -40,6 +48,8 @@ class TimelineTrackCell: UICollectionViewCell {
     private let cardView = TimelineTrackCellCardView()
     private let plusIconView = TimelineTrackCellPlusIconView()
     
+    private let longPress = UILongPressGestureRecognizer()
+    
     var hasDrawing: Bool = false {
         didSet {
             updateUI()
@@ -48,6 +58,10 @@ class TimelineTrackCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
+        addGestureRecognizer(longPress)
+        longPress.minimumPressDuration = longPressDuration
+        longPress.addTarget(self, action: #selector(onLongPress))
         
         contentView.addSubview(button)
         button.pinEdges()
@@ -75,10 +89,15 @@ class TimelineTrackCell: UICollectionViewCell {
         button.reset()
     }
     
+    @objc private func onLongPress() {
+        if longPress.state == .began {
+            delegate?.onLongPress(self)
+        }
+    }
+    
     private func updateUI() {
         cardView.backgroundColor = hasDrawing ?
-            UIColor(white: 1, alpha: 1) :
-            UIColor(white: 1, alpha: 0.15)
+            .white : noDrawingBackgroundColor
     }
     
     func setPlusIconVisible(
@@ -125,6 +144,8 @@ private class TimelineTrackCellButton: UIButton {
     }
     
     private func showUnHighlightAnimation() {
+        alpha = buttonSelectAnimateAlpha
+        
         UIView.animate(
             springDuration: buttonSelectAnimateOutDuration,
             options: [.allowUserInteraction]
@@ -168,7 +189,7 @@ class TimelineTrackCellPlusIconView: UIView {
         addSubview(imageView)
         imageView.pinEdges()
         imageView.contentMode = .center
-        imageView.tintColor = UIColor(white: 1, alpha: 0.5)
+        imageView.tintColor = plusIconColor
         imageView.layer.shouldRasterize = true
         imageView.layer.rasterizationScale = UIScreen.main.scale
         

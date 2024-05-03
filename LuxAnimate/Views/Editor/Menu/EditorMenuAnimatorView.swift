@@ -12,7 +12,8 @@ private let animateOutBounce: TimeInterval = 0.3
 
 private let collapsedScale: CGFloat = 0.4
 
-private let sourceViewHighlightedAlpha: CGFloat = 0.4
+private let sourceViewHighlightedAlpha: CGFloat = 0.5
+private let sourceViewHighlightedScale: CGFloat = (64 + 0) / 64
 
 class EditorMenuAnimatorView: UIView {
     
@@ -31,13 +32,17 @@ class EditorMenuAnimatorView: UIView {
         ) {
             alpha = 1
             transform = .identity
-        }
-        
-        switch presentation.sourceViewEffect {
-        case .none:
-            break
-        case .fade:
-            presentation.sourceView.alpha = sourceViewHighlightedAlpha
+            
+            switch presentation.sourceViewEffect {
+            case .none:
+                break
+            case .fade:
+                presentation.sourceView.alpha = sourceViewHighlightedAlpha
+                
+                presentation.sourceView.transform = CGAffineTransform(
+                    scaleX: sourceViewHighlightedScale,
+                    y: sourceViewHighlightedScale)
+            }
         }
     }
     
