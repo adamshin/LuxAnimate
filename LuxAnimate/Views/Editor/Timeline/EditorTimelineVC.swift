@@ -22,9 +22,6 @@ class EditorTimelineVC: UIViewController {
     private let toolbarVC = TimelineToolbarVC()
     private let trackVC = TimelineTrackVC()
     
-    private var isPlaying = false
-    private var playbackTimer: Timer?
-    
     // MARK: - Lifecycle
     
     override func loadView() {
@@ -53,43 +50,6 @@ class EditorTimelineVC: UIViewController {
         collapsibleBarVC.backgroundAreaView
     }
     
-    private func startPlayback() {
-        guard !isPlaying else { return }
-        
-        isPlaying = true
-        toolbarVC.setPlayButtonPlaying(true)
-        
-        if trackVC.selectedFrameIndex == frameCount - 1 {
-            trackVC.selectFrame(at: 0, animated: false)
-        }
-        
-        playbackTimer = Timer.scheduledTimer(
-            withTimeInterval: 1 / Double(framesPerSecond),
-            repeats: true)
-        { [weak self] _ in
-            guard let self else { return }
-            
-            let nextFrame = self.trackVC.selectedFrameIndex + 1
-            guard nextFrame < frameCount else {
-                stopPlayback()
-                return
-            }
-            trackVC.selectFrame(
-                at: nextFrame,
-                animated: false)
-        }
-    }
-    
-    private func stopPlayback() {
-        guard isPlaying else { return }
-        
-        isPlaying = false
-        toolbarVC.setPlayButtonPlaying(false)
-        
-        playbackTimer?.invalidate()
-        playbackTimer = nil
-    }
-    
 }
 
 // MARK: - Delegates
@@ -113,39 +73,33 @@ extension EditorTimelineVC: EditorTimelineCollapsibleBarVCDelegate {
 
 extension EditorTimelineVC: TimelineToolbarVCDelegate {
     
-    func onSelectPlay() {
-        if !isPlaying {
-            startPlayback()
-        } else {
-            stopPlayback()
-        }
-    }
+    func onSelectPlay(_ vc: TimelineToolbarVC) { }
     
-    func onSelectFirstFrame() {
-        trackVC.selectFrame(
+    func onSelectFirstFrame(_ vc: TimelineToolbarVC) {
+        trackVC.focusFrame(
             at: 0,
             animated: false)
     }
     
-    func onSelectLastFrame() {
-        trackVC.selectFrame(
+    func onSelectLastFrame(_ vc: TimelineToolbarVC) {
+        trackVC.focusFrame(
             at: frameCount - 1,
             animated: false)
     }
     
-    func onSelectPreviousFrame() {
-        trackVC.selectFrame(
-            at: trackVC.selectedFrameIndex - 1,
+    func onSelectPreviousFrame(_ vc: TimelineToolbarVC) {
+        trackVC.focusFrame(
+            at: trackVC.focusedFrameIndex - 1,
             animated: false)
     }
     
-    func onSelectNextFrame() {
-        trackVC.selectFrame(
-            at: trackVC.selectedFrameIndex + 1,
+    func onSelectNextFrame(_ vc: TimelineToolbarVC) {
+        trackVC.focusFrame(
+            at: trackVC.focusedFrameIndex + 1,
             animated: false)
     }
     
-    func onSelectToggleExpanded() {
+    func onSelectToggleExpanded(_ vc: TimelineToolbarVC) {
         collapsibleBarVC.toggleExpanded()
     }
     
@@ -153,30 +107,14 @@ extension EditorTimelineVC: TimelineToolbarVCDelegate {
 
 extension EditorTimelineVC: TimelineTrackVCDelegate {
     
-    func onTapFrame(_ vc: TimelineTrackVC, index: Int) {
-        guard let cell = trackVC.cell(at: index)
-        else { return }
-        
-        if abs(index - trackVC.selectedFrameIndex) < 2 {
-            trackVC.setDotVisible(false)
-        }
-        
-        let contentView = EditorTimelineFrameMenuView()
-        
-        let menu = EditorMenuView(
-            contentView: contentView,
-            presentation: .init(
-                sourceView: cell,
-                sourceViewEffect: .fade))
-        
-        menu.delegate = self
-        menu.present(in: self)
+    func onUpdateFocusedFrame(_ vc: TimelineTrackVC) {
+        toolbarVC.updateFrameLabel(
+            index: vc.focusedFrameIndex,
+            total: frameCount)
     }
     
-    func onUpdateSelectedFrame(_ vc: TimelineTrackVC) {
-        toolbarVC.updateFrameLabel(
-            index: vc.selectedFrameIndex,
-            total: frameCount)
+    func onSelectFrame(_ vc: TimelineTrackVC, index: Int) {
+        vc.focusFrame(at: index, animated: true)
     }
     
 }

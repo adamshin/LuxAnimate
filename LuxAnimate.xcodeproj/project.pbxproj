@@ -61,6 +61,7 @@
 		6643CB042BE4822E0094B998 /* EditorMenuAnimatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6643CB032BE4822E0094B998 /* EditorMenuAnimatorView.swift */; };
 		6643CB062BE483030094B998 /* EditorMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6643CB052BE483030094B998 /* EditorMenuView.swift */; };
 		6643CB082BE488800094B998 /* EditorMenuPositioningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6643CB072BE488800094B998 /* EditorMenuPositioningView.swift */; };
+		6643CB0E2BE593730094B998 /* TouchCancellingCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6643CB0D2BE593730094B998 /* TouchCancellingCollectionView.swift */; };
 		664B593F2BC5A9AA003FA90E /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664B593D2BC5A9AA003FA90E /* AppConfig.swift */; };
 		664B59442BC5A9D1003FA90E /* BrushGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664B59402BC5A9D1003FA90E /* BrushGestureRecognizer.swift */; };
 		664B59452BC5A9D1003FA90E /* BrushGestureRecognizerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664B59412BC5A9D1003FA90E /* BrushGestureRecognizerState.swift */; };
@@ -159,6 +160,7 @@
 		6643CB032BE4822E0094B998 /* EditorMenuAnimatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorMenuAnimatorView.swift; sourceTree = "<group>"; };
 		6643CB052BE483030094B998 /* EditorMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorMenuView.swift; sourceTree = "<group>"; };
 		6643CB072BE488800094B998 /* EditorMenuPositioningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorMenuPositioningView.swift; sourceTree = "<group>"; };
+		6643CB0D2BE593730094B998 /* TouchCancellingCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchCancellingCollectionView.swift; sourceTree = "<group>"; };
 		664B593D2BC5A9AA003FA90E /* AppConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
 		664B59402BC5A9D1003FA90E /* BrushGestureRecognizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrushGestureRecognizer.swift; sourceTree = "<group>"; };
 		664B59412BC5A9D1003FA90E /* BrushGestureRecognizerState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrushGestureRecognizerState.swift; sourceTree = "<group>"; };
@@ -639,6 +641,7 @@
 				66D084672BA3CEC300EB8556 /* UIViewController+Extensions.swift */,
 				66D084642BA3CEC300EB8556 /* UIView+Extensions.swift */,
 				66D084662BA3CEC300EB8556 /* ContainerViewController.swift */,
+				6643CB0D2BE593730094B998 /* TouchCancellingCollectionView.swift */,
 				66D0845F2BA3CEC300EB8556 /* PassthroughView.swift */,
 				66099BA62BDB195500243D9F /* CircleView.swift */,
 			);
@@ -835,6 +838,7 @@
 				66D084842BA3FE2E00EB8556 /* LibraryContentVC.swift in Sources */,
 				6643CAF52BE31CC00094B998 /* ChromeBlurView.swift in Sources */,
 				66D0846F2BA3CEC300EB8556 /* Indirect.swift in Sources */,
+				6643CB0E2BE593730094B998 /* TouchCancellingCollectionView.swift in Sources */,
 				660CD1302BA92FF500C8C7B5 /* ProjectEditSession.swift in Sources */,
 				66D084782BA3CEC300EB8556 /* UIViewController+Extensions.swift in Sources */,
 				6643CB062BE483030094B998 /* EditorMenuView.swift in Sources */,

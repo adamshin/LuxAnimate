@@ -5,12 +5,12 @@
 import UIKit
 
 protocol TimelineToolbarVCDelegate: AnyObject {
-    func onSelectPlay()
-    func onSelectFirstFrame()
-    func onSelectLastFrame()
-    func onSelectPreviousFrame()
-    func onSelectNextFrame()
-    func onSelectToggleExpanded()
+    func onSelectPlay(_ vc: TimelineToolbarVC)
+    func onSelectFirstFrame(_ vc: TimelineToolbarVC)
+    func onSelectLastFrame(_ vc: TimelineToolbarVC)
+    func onSelectPreviousFrame(_ vc: TimelineToolbarVC)
+    func onSelectNextFrame(_ vc: TimelineToolbarVC)
+    func onSelectToggleExpanded(_ vc: TimelineToolbarVC)
 }
 
 class TimelineToolbarVC: UIViewController {
@@ -27,22 +27,28 @@ class TimelineToolbarVC: UIViewController {
         super.viewDidLoad()
         
         bodyView.playButton.addHandler { [weak self] in
-            self?.delegate?.onSelectPlay()
+            guard let self else { return }
+            self.delegate?.onSelectPlay(self)
         }
         bodyView.firstFrameButton.addHandler { [weak self] in
-            self?.delegate?.onSelectFirstFrame()
+            guard let self else { return }
+            self.delegate?.onSelectFirstFrame(self)
         }
         bodyView.lastFrameButton.addHandler { [weak self] in
-            self?.delegate?.onSelectLastFrame()
+            guard let self else { return }
+            self.delegate?.onSelectLastFrame(self)
         }
         bodyView.previousFrameButton.addHandler { [weak self] in
-            self?.delegate?.onSelectPreviousFrame()
+            guard let self else { return }
+            self.delegate?.onSelectPreviousFrame(self)
         }
         bodyView.nextFrameButton.addHandler { [weak self] in
-            self?.delegate?.onSelectNextFrame()
+            guard let self else { return }
+            self.delegate?.onSelectNextFrame(self)
         }
         bodyView.expandButton.addHandler { [weak self] in
-            self?.delegate?.onSelectToggleExpanded()
+            guard let self else { return }
+            self.delegate?.onSelectToggleExpanded(self)
         }
     }
     

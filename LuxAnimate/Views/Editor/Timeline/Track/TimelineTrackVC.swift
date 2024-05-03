@@ -19,9 +19,9 @@ private let cellSpacing: CGFloat = 8
 
 protocol TimelineTrackVCDelegate: AnyObject {
     
-    func onUpdateSelectedFrame(_ vc: TimelineTrackVC)
+    func onUpdateFocusedFrame(_ vc: TimelineTrackVC)
     
-    func onTapFrame(_ vc: TimelineTrackVC, index: Int)
+    func onSelectFrame(_ vc: TimelineTrackVC, index: Int)
     
 }
 
@@ -43,19 +43,17 @@ class TimelineTrackVC: UIViewController {
         cell.hasDrawing = item % 6 == 0
     }
     
-    private lazy var collectionView = UICollectionView(
+    private lazy var collectionView = TouchCancellingCollectionView(
         frame: .zero,
         collectionViewLayout: flowLayout)
     
     private let dot = CircleView()
     
     private var frameCount = 0
+    private(set) var focusedFrameIndex = 0
     
-    private(set) var selectedFrameIndex = 0 {
-        didSet {
-            delegate?.onUpdateSelectedFrame(self)
-        }
-    }
+    private var isScrolling = false
+    private var isScrollDrivingFocusedFrame = true
     
     // MARK: - Lifecycle
     
@@ -77,15 +75,20 @@ class TimelineTrackVC: UIViewController {
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.showsVerticalScrollIndicator = false
         
+        collectionView.delaysContentTouches = false
+        collectionView.allowsSelection = false
+        
         collectionView.dataSource = self
         collectionView.delegate = self
+        
+        focusFrame(at: 0, animated: false)
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        updateCollectionViewInsets()
-        updateSelectedFrameIndex()
+        recalculateCollectionViewInsets()
+        recalculateFocusedFrame()
     }
     
     override func viewWillTransition(
@@ -94,16 +97,15 @@ class TimelineTrackVC: UIViewController {
     ) {
         super.viewWillTransition(to: size, with: coordinator)
         
-        let index = selectedFrameIndex
+        let index = focusedFrameIndex
         coordinator.animate { _ in
-            self.selectFrame(at: index, animated: false)
+            self.focusFrame(at: index, animated: false)
         }
-
     }
     
     // MARK: - UI
     
-    private func updateCollectionViewInsets() {
+    private func recalculateCollectionViewInsets() {
         let width = view.bounds.width
         let hInset = (width - cellSize.width) / 2
         
@@ -114,12 +116,17 @@ class TimelineTrackVC: UIViewController {
             right: hInset)
     }
     
-    private func updateSelectedFrameIndex() {
-        guard let index = getSelectedFrameIndex() else { return }
-        selectedFrameIndex = index
+    private func recalculateFocusedFrame() {
+        guard let index = currentFocusedFrameIndex()
+        else { return }
+        
+        if focusedFrameIndex != index {
+            focusedFrameIndex = index
+            delegate?.onUpdateFocusedFrame(self)
+        }
     }
     
-    private func getSelectedFrameIndex() -> Int? {
+    private func currentFocusedFrameIndex() -> Int? {
         collectionView.layoutIfNeeded()
         
         let scrollRectMidX =
@@ -139,20 +146,63 @@ class TimelineTrackVC: UIViewController {
         return indexPath?.item
     }
     
+    private func updateVisibleCellPlusButtons(animated: Bool) {
+        for cell in collectionView.visibleCells {
+            guard let cell = cell as? TimelineTrackCell
+            else { continue }
+            
+            guard let indexPath = collectionView.indexPath(for: cell)
+            else { continue }
+            
+            updateCellPlusButton(
+                cell: cell,
+                index: indexPath.item,
+                animated: animated)
+        }
+    }
+    
+    private func updateCellPlusButton(
+        cell: TimelineTrackCell,
+        index: Int,
+        animated: Bool
+    ) {
+        if isScrolling {
+            cell.setPlusIconVisible(false, withAnimation: animated)
+        } else {
+            let isFocused = index == focusedFrameIndex
+            cell.setPlusIconVisible(isFocused, withAnimation: animated)
+        }
+    }
+    
     // MARK: - Interface
     
     func setFrameCount(_ frameCount: Int) {
         self.frameCount = frameCount
         collectionView.reloadData()
+        
+        focusFrame(at: focusedFrameIndex, animated: false)
     }
     
-    func selectFrame(at index: Int, animated: Bool) {
-        let clampedIndex = clamp(index, min: 0, max: frameCount - 1)
+    func focusFrame(at index: Int, animated: Bool) {
+        let clampedIndex = clamp(index,
+            min: 0, max: frameCount - 1)
+        
+        guard focusedFrameIndex != clampedIndex
+        else { return }
+        
+        focusedFrameIndex = clampedIndex
+        delegate?.onUpdateFocusedFrame(self)
+        
+        isScrolling = animated
+        isScrollDrivingFocusedFrame = !animated
+        collectionView.isUserInteractionEnabled = !animated
         
         collectionView.scrollToItem(
             at: IndexPath(item: clampedIndex, section: 0),
             at: .centeredHorizontally,
             animated: animated)
+        
+        updateVisibleCellPlusButtons(animated: animated)
     }
     
     func setDotVisible(_ visible: Bool) {
@@ -186,10 +236,13 @@ extension TimelineTrackVC: UICollectionViewDataSource {
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
         
-        collectionView.dequeueConfiguredReusableCell(
+        let cell = collectionView.dequeueConfiguredReusableCell(
             using: cellRegistration,
             for: indexPath, 
             item: indexPath.item)
+        
+        cell.delegate = self
+        return cell
     }
     
 }
@@ -198,13 +251,45 @@ extension TimelineTrackVC: UICollectionViewDelegate {
     
     func collectionView(
         _ collectionView: UICollectionView,
-        didSelectItemAt indexPath: IndexPath
+        willDisplay cell: UICollectionViewCell,
+        forItemAt indexPath: IndexPath
     ) {
-        delegate?.onTapFrame(self, index: indexPath.item)
+        guard let cell = cell as? TimelineTrackCell
+        else { return }
+        
+        updateCellPlusButton(
+            cell: cell,
+            index: indexPath.item,
+            animated: false)
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        updateSelectedFrameIndex()
+        if isScrollDrivingFocusedFrame {
+            recalculateFocusedFrame()
+        }
+    }
+    
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        isScrolling = true
+        isScrollDrivingFocusedFrame = true
+        
+        updateVisibleCellPlusButtons(animated: true)
+    }
+    
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        isScrolling = false
+        isScrollDrivingFocusedFrame = true
+        
+        collectionView.isUserInteractionEnabled = true
+        updateVisibleCellPlusButtons(animated: true)
+    }
+    
+    func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        isScrolling = false
+        isScrollDrivingFocusedFrame = true
+        
+        collectionView.isUserInteractionEnabled = true
+        updateVisibleCellPlusButtons(animated: true)
     }
     
     func scrollViewWillEndDragging(
@@ -236,6 +321,20 @@ extension TimelineTrackVC: UICollectionViewDelegate {
         targetContentOffset.pointee = CGPoint(
             x: target.x + offsetAdjustment,
             y: target.y)
+    }
+    
+}
+
+// MARK: - Cell Delegate
+
+extension TimelineTrackVC: TimelineTrackCellDelegate {
+    
+    func onSelect(_ cell: TimelineTrackCell) {
+        guard let indexPath = collectionView.indexPath(for: cell)
+        else { return }
+        
+        let index = indexPath.item
+        delegate?.onSelectFrame(self, index: index)
     }
     
 }

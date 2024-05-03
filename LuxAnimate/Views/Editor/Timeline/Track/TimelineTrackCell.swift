@@ -4,53 +4,226 @@
 
 import UIKit
 
-private let cornerRadiusFactor: CGFloat = 0.1
+private let cornerRadius: CGFloat = 8
 
-private let outlinePadding: CGFloat = 4
-private let outlineWidth: CGFloat = 4
+private let buttonSelectAnimateInDuration: CGFloat = 0.1
+private let buttonSelectAnimateOutDuration: CGFloat = 0.25
+private let buttonSelectAnimateAlpha: CGFloat = 0.8
+private let buttonSelectAnimateScale: CGFloat = (64 - 6) / 64
 
-private let outlineColor: UIColor = .systemBlue
+private let plusIconAnimateScale: CGFloat = 0.3
+private let plusIconAnimateInDuration: CGFloat = 0.3
+private let plusIconAnimateInBounce: CGFloat = 0.4
+private let plusIconAnimateOutDuration: CGFloat = 0.3
+private let plusIconAnimateOutBounce: CGFloat = 0.4
+
+private let plusIconConfig = UIImage.SymbolConfiguration(
+    pointSize: 30,
+    weight: .bold,
+    scale: .medium)
+
+private let plusIcon = UIImage(
+    systemName: "plus.circle.fill",
+    withConfiguration: plusIconConfig)
+
+// MARK: - TimelineTrackCell
+
+protocol TimelineTrackCellDelegate: AnyObject {
+    func onSelect(_ cell: TimelineTrackCell)
+}
 
 class TimelineTrackCell: UICollectionViewCell {
     
-    let cardView = TimelineTrackCardView()
+    weak var delegate: TimelineTrackCellDelegate?
+    
+    private let button = TimelineTrackCellButton()
+    private let cardView = TimelineTrackCellCardView()
+    private let plusIconView = TimelineTrackCellPlusIconView()
     
     var hasDrawing: Bool = false {
-        didSet { updateUI() }
+        didSet {
+            updateUI()
+        }
     }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        cardView.layer.cornerCurve = .continuous
-        cardView.layer.borderColor = UIColor(white: 1, alpha: 0.08).cgColor
-        cardView.layer.borderWidth = 1.0
+        contentView.addSubview(button)
+        button.pinEdges()
+        button.addHandler { [weak self] in
+            guard let self else { return }
+            self.delegate?.onSelect(self)
+        }
         
-        contentView.addSubview(cardView)
+        button.addSubview(cardView)
         cardView.pinEdges()
+        cardView.isUserInteractionEnabled = false
+        
+        cardView.addSubview(plusIconView)
+        plusIconView.pinEdges()
         
         updateUI()
     }
     
     required init?(coder: NSCoder) { fatalError() }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        setPlusIconVisible(false, withAnimation: false)
+        button.reset()
+    }
+    
     private func updateUI() {
-        if hasDrawing {
-            cardView.backgroundColor = .white
-        } else {
-            cardView.backgroundColor = .white.withAlphaComponent(0.15)
+        cardView.backgroundColor = hasDrawing ?
+            UIColor(white: 1, alpha: 1) :
+            UIColor(white: 1, alpha: 0.15)
+    }
+    
+    func setPlusIconVisible(
+        _ visible: Bool,
+        withAnimation: Bool
+    ) {
+        plusIconView.setIconVisible(
+            visible,
+            withAnimation: withAnimation)
+    }
+    
+}
+
+// MARK: - Button
+
+private class TimelineTrackCellButton: UIButton {
+    
+    override var isHighlighted: Bool {
+        didSet {
+            if isHighlighted {
+                showHighlightAnimation()
+            } else {
+                showUnHighlightAnimation()
+            }
+        }
+    }
+    
+    func reset() {
+        layer.removeAllAnimations()
+        alpha = 1
+        transform = .identity
+    }
+    
+    private func showHighlightAnimation() {
+        UIView.animate(
+            springDuration: buttonSelectAnimateInDuration,
+            options: [.allowUserInteraction]
+        ) {
+            alpha = buttonSelectAnimateAlpha
+            transform = CGAffineTransform(
+                scaleX: buttonSelectAnimateScale,
+                y: buttonSelectAnimateScale)
+        }
+    }
+    
+    private func showUnHighlightAnimation() {
+        UIView.animate(
+            springDuration: buttonSelectAnimateOutDuration,
+            options: [.allowUserInteraction]
+        ) {
+            alpha = 1
+            transform = .identity
         }
     }
     
 }
 
-class TimelineTrackCardView: UIView {
+// MARK: - Card
+
+private class TimelineTrackCellCardView: UIView {
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
+    init() {
+        super.init(frame: .zero)
         
-        layer.cornerRadius = 
-            min(bounds.width, bounds.height) * cornerRadiusFactor
+        layer.masksToBounds = true
+        layer.cornerCurve = .continuous
+        layer.cornerRadius = cornerRadius
+        layer.borderWidth = 1.0
+        layer.borderColor = UIColor(white: 1, alpha: 0.08).cgColor
+    }
+    
+    required init?(coder: NSCoder) { fatalError() }
+    
+}
+
+// MARK: - Plus Icon
+
+class TimelineTrackCellPlusIconView: UIView {
+    
+    private let imageView = UIImageView(image: plusIcon)
+    private var isIconVisible = true
+    
+    init() {
+        super.init(frame: .zero)
+        isUserInteractionEnabled = false
+        
+        addSubview(imageView)
+        imageView.pinEdges()
+        imageView.contentMode = .center
+        imageView.tintColor = UIColor(white: 1, alpha: 0.5)
+        imageView.layer.shouldRasterize = true
+        imageView.layer.rasterizationScale = UIScreen.main.scale
+        
+        setIconVisible(false, withAnimation: false)
+    }
+    
+    required init?(coder: NSCoder) { fatalError() }
+    
+    func setIconVisible(
+        _ visible: Bool,
+        withAnimation: Bool
+    ) {
+        guard isIconVisible != visible else { return }
+        isIconVisible = visible
+        
+        if withAnimation {
+            if visible {
+                showPlusIconAppearAnimation()
+            } else {
+                showPlusIconDisappearAnimation()
+            }
+        } else {
+            imageView.alpha = visible ? 1 : 0
+            imageView.transform = .identity
+        }
+    }
+
+    private func showPlusIconAppearAnimation() {
+        imageView.alpha = 0
+        imageView.transform = CGAffineTransform(
+            scaleX: plusIconAnimateScale,
+            y: plusIconAnimateScale)
+        
+        UIView.animate(
+            springDuration: plusIconAnimateInDuration,
+            bounce: plusIconAnimateInBounce) 
+        {
+            imageView.alpha = 1
+            imageView.transform = .identity
+        }
+    }
+    
+    private func showPlusIconDisappearAnimation() {
+        imageView.alpha = 1
+        imageView.transform = .identity
+        
+        UIView.animate(
+            springDuration: plusIconAnimateOutDuration,
+            bounce: plusIconAnimateOutBounce)
+        {
+            imageView.alpha = 0
+            imageView.transform = CGAffineTransform(
+                scaleX: plusIconAnimateScale,
+                y: plusIconAnimateScale)
+        }
     }
     
 }
