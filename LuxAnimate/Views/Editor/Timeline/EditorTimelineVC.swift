@@ -125,10 +125,6 @@ extension EditorTimelineVC: TimelineTrackVCDelegate {
         guard let cell = trackVC.cell(at: index)
         else { return }
         
-        if abs(index - trackVC.focusedFrameIndex) < 2 {
-            trackVC.setDotVisible(false)
-        }
-        
         let contentView = EditorTimelineFrameMenuView()
         
         let menu = EditorMenuView(
@@ -139,6 +135,8 @@ extension EditorTimelineVC: TimelineTrackVCDelegate {
         
         menu.delegate = self
         menu.present(in: self)
+        
+        trackVC.setOpenMenuIndex(index)
     }
     
 }
@@ -148,7 +146,7 @@ extension EditorTimelineVC: EditorMenuViewDelegate {
     func onPresent(_ v: EditorMenuView) { }
     
     func onDismiss(_ v: EditorMenuView) {
-        trackVC.setDotVisible(true)
+        trackVC.setOpenMenuIndex(nil)
     }
     
 }

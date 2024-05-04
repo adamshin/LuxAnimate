@@ -58,6 +58,8 @@ class TimelineTrackVC: UIViewController {
     private var isScrolling = false
     private var isScrollDrivingFocusedFrame = true
     
+    private var openMenuIndex: Int?
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -149,7 +151,7 @@ class TimelineTrackVC: UIViewController {
         return indexPath?.item
     }
     
-    private func updateVisibleCellPlusButtons(animated: Bool) {
+    private func updateVisibleCellUI(animated: Bool) {
         for cell in collectionView.visibleCells {
             guard let cell = cell as? TimelineTrackCell
             else { continue }
@@ -157,14 +159,14 @@ class TimelineTrackVC: UIViewController {
             guard let indexPath = collectionView.indexPath(for: cell)
             else { continue }
             
-            updateCellPlusButton(
+            updateCellUI(
                 cell: cell,
                 index: indexPath.item,
                 animated: animated)
         }
     }
     
-    private func updateCellPlusButton(
+    private func updateCellUI(
         cell: TimelineTrackCell,
         index: Int,
         animated: Bool
@@ -173,7 +175,28 @@ class TimelineTrackVC: UIViewController {
             cell.setPlusIconVisible(false, withAnimation: animated)
         } else {
             let isFocused = index == focusedFrameIndex
-            cell.setPlusIconVisible(isFocused, withAnimation: animated)
+            let isMenuOpen = index == openMenuIndex
+            let plusIconVisible = isFocused && !isMenuOpen
+            
+            cell.setPlusIconVisible(
+                plusIconVisible,
+                withAnimation: animated)
+        }
+    }
+    
+    private func updateDot() {
+        if let openMenuIndex {
+            if abs(openMenuIndex - focusedFrameIndex) < 2 {
+                setDotVisible(false)
+            }
+        } else {
+            setDotVisible(true)
+        }
+    }
+    
+    private func setDotVisible(_ visible: Bool) {
+        UIView.animate(withDuration: 0.15) {
+            self.dot.alpha = visible ? 1 : 0
         }
     }
     
@@ -196,22 +219,28 @@ class TimelineTrackVC: UIViewController {
         focusedFrameIndex = clampedIndex
         delegate?.onChangeFocusedFrame(self)
         
-        isScrolling = animated
-        isScrollDrivingFocusedFrame = !animated
-        collectionView.isUserInteractionEnabled = !animated
+        if animated {
+            isScrolling = true
+            isScrollDrivingFocusedFrame = false
+            collectionView.isUserInteractionEnabled = false
+        } else {
+            isScrolling = false
+            isScrollDrivingFocusedFrame = true
+        }
         
         collectionView.scrollToItem(
             at: IndexPath(item: clampedIndex, section: 0),
             at: .centeredHorizontally,
             animated: animated)
         
-        updateVisibleCellPlusButtons(animated: animated)
+        updateVisibleCellUI(animated: animated)
     }
     
-    func setDotVisible(_ visible: Bool) {
-        UIView.animate(withDuration: 0.15) {
-            self.dot.alpha = visible ? 1 : 0
-        }
+    func setOpenMenuIndex(_ index: Int?) {
+        openMenuIndex = index
+        
+        updateDot()
+        updateVisibleCellUI(animated: true)
     }
     
     func cell(at index: Int) -> TimelineTrackCell? {
@@ -260,7 +289,7 @@ extension TimelineTrackVC: UICollectionViewDelegate {
         guard let cell = cell as? TimelineTrackCell
         else { return }
         
-        updateCellPlusButton(
+        updateCellUI(
             cell: cell,
             index: indexPath.item,
             animated: false)
@@ -276,7 +305,7 @@ extension TimelineTrackVC: UICollectionViewDelegate {
         isScrolling = true
         isScrollDrivingFocusedFrame = true
         
-        updateVisibleCellPlusButtons(animated: true)
+        updateVisibleCellUI(animated: true)
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
@@ -284,7 +313,7 @@ extension TimelineTrackVC: UICollectionViewDelegate {
         isScrollDrivingFocusedFrame = true
         
         collectionView.isUserInteractionEnabled = true
-        updateVisibleCellPlusButtons(animated: true)
+        updateVisibleCellUI(animated: true)
     }
     
     func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
@@ -292,7 +321,7 @@ extension TimelineTrackVC: UICollectionViewDelegate {
         isScrollDrivingFocusedFrame = true
         
         collectionView.isUserInteractionEnabled = true
-        updateVisibleCellPlusButtons(animated: true)
+        updateVisibleCellUI(animated: true)
     }
     
     func scrollViewWillEndDragging(

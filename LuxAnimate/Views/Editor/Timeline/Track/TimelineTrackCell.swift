@@ -180,7 +180,9 @@ private class TimelineTrackCellCardView: UIView {
 class TimelineTrackCellPlusIconView: UIView {
     
     private let imageView = UIImageView(image: plusIcon)
+    
     private var isIconVisible = true
+    private var isIconVisibleDelayed = true
     
     init() {
         super.init(frame: .zero)
@@ -202,16 +204,25 @@ class TimelineTrackCellPlusIconView: UIView {
         _ visible: Bool,
         withAnimation: Bool
     ) {
-        guard isIconVisible != visible else { return }
-        isIconVisible = visible
-        
         if withAnimation {
-            if visible {
-                showPlusIconAppearAnimation()
-            } else {
-                showPlusIconDisappearAnimation()
+            isIconVisible = visible
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.02) {
+                if self.isIconVisibleDelayed != self.isIconVisible {
+                    self.isIconVisibleDelayed = self.isIconVisible
+                    
+                    if self.isIconVisible {
+                        self.showPlusIconAppearAnimation()
+                    } else {
+                        self.showPlusIconDisappearAnimation()
+                    }
+                }
             }
+            
         } else {
+            isIconVisible = visible
+            isIconVisibleDelayed = visible
+            
             imageView.alpha = visible ? 1 : 0
             imageView.transform = .identity
         }
