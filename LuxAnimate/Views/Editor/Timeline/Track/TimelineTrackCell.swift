@@ -23,7 +23,7 @@ private let plusIconAnimateOutDuration: CGFloat = 0.3
 private let plusIconAnimateOutBounce: CGFloat = 0.4
 
 private let plusIconConfig = UIImage.SymbolConfiguration(
-    pointSize: 30,
+    pointSize: 24,
     weight: .bold,
     scale: .medium)
 
@@ -50,12 +50,6 @@ class TimelineTrackCell: UICollectionViewCell {
     
     private let longPress = UILongPressGestureRecognizer()
     
-    var hasDrawing: Bool = false {
-        didSet {
-            updateUI()
-        }
-    }
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -76,8 +70,6 @@ class TimelineTrackCell: UICollectionViewCell {
         
         cardView.addSubview(plusIconView)
         plusIconView.pinEdges()
-        
-        updateUI()
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -95,8 +87,10 @@ class TimelineTrackCell: UICollectionViewCell {
         }
     }
     
-    private func updateUI() {
-        cardView.backgroundColor = hasDrawing ?
+    func updateContent(
+        frame: EditorTimelineModel.Frame
+    ) {
+        cardView.backgroundColor = frame.hasDrawing ?
             .white : noDrawingBackgroundColor
     }
     

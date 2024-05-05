@@ -4,9 +4,29 @@
 
 import UIKit
 
+protocol EditorTimelineFrameMenuViewDelegate: AnyObject {
+    
+    func onSelectCreateDrawing(
+        _ v: EditorTimelineFrameMenuView,
+        frameIndex: Int)
+    
+    func onSelectDeleteDrawing(
+        _ v: EditorTimelineFrameMenuView,
+        frameIndex: Int)
+    
+}
+
 class EditorTimelineFrameMenuView: EditorMenuContentView {
     
-    init() {
+    weak var delegate: EditorTimelineFrameMenuViewDelegate?
+    
+    private let frameIndex: Int
+    
+    init(
+        frameIndex: Int,
+        hasDrawing: Bool
+    ) {
+        self.frameIndex = frameIndex
         super.init(frame: .zero)
         
         pinWidth(to: 240)
@@ -16,24 +36,30 @@ class EditorTimelineFrameMenuView: EditorMenuContentView {
         addSubview(stack)
         stack.pinEdges()
         
-        let row1 = RowView(title: "Copy")
-        let row2 = RowView(title: "Delete Drawing")
-        let row3 = RowView(title: "Select")
-        
-        stack.addArrangedSubview(row1)
-        stack.addArrangedSubview(RowSeparator())
-        stack.addArrangedSubview(row2)
-        stack.addArrangedSubview(RowThickSeparator())
-        stack.addArrangedSubview(row3)
-        
-        row1.button.addHandler { [weak self] in
-            self?.menuView?.dismiss()
-        }
-        row2.button.addHandler { [weak self] in
-            self?.menuView?.dismiss()
-        }
-        row3.button.addHandler { [weak self] in
-            self?.menuView?.dismiss()
+        if hasDrawing {
+            let row1 = RowView(
+                title: "Delete Drawing",
+                destructive: true)
+            stack.addArrangedSubview(row1)
+            
+            row1.button.addHandler { [weak self] in
+                guard let self else { return }
+                self.menuView?.dismiss()
+                self.delegate?.onSelectDeleteDrawing(
+                    self,
+                    frameIndex: frameIndex)
+            }
+        } else {
+            let row1 = RowView(title: "New Drawing")
+            stack.addArrangedSubview(row1)
+            
+            row1.button.addHandler { [weak self] in
+                guard let self else { return }
+                self.menuView?.dismiss()
+                self.delegate?.onSelectCreateDrawing(
+                    self,
+                    frameIndex: frameIndex)
+            }
         }
     }
     
@@ -45,7 +71,7 @@ private class RowView: UIView {
     
     let button = RowButton()
     
-    init(title: String) {
+    init(title: String, destructive: Bool = false) {
         super.init(frame: .zero)
         pinHeight(to: 48)
         
@@ -54,7 +80,7 @@ private class RowView: UIView {
         
         let label = UILabel()
         label.text = title
-        label.textColor = .editorLabel
+        label.textColor = destructive ? .systemRed : .editorLabel
         label.font = .systemFont(ofSize: 17, weight: .regular)
         
         addSubview(label)

@@ -9,7 +9,15 @@ private let framesPerSecond = 24
 
 protocol EditorTimelineVCDelegate: AnyObject {
     
-    func onModifyConstraints(_ vc: EditorTimelineVC)
+    func onRequestCreateDrawing(
+        _ vc: EditorTimelineVC,
+        frameIndex: Int)
+    
+    func onChangeFocusedFrame(
+        _ vc: EditorTimelineVC,
+        index: Int)
+    
+    func onChangeConstraints(_ vc: EditorTimelineVC)
     
 }
 
@@ -22,6 +30,8 @@ class EditorTimelineVC: UIViewController {
     private let toolbarVC = TimelineToolbarVC()
     private let trackVC = TimelineTrackVC()
     
+    private var model = EditorTimelineModel(frames: [])
+    
     // MARK: - Lifecycle
     
     override func loadView() {
@@ -31,6 +41,13 @@ class EditorTimelineVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        setupUI()
+        initializeData()
+    }
+    
+    // MARK: - Setup
+    
+    private func setupUI() {
         collapsibleBarVC.delegate = self
         toolbarVC.delegate = self
         trackVC.delegate = self
@@ -40,8 +57,77 @@ class EditorTimelineVC: UIViewController {
         addChild(trackVC, to: collapsibleBarVC.collapsibleContentView)
         
         collapsibleBarVC.setExpanded(true, animated: false)
+    }
+    
+    // MARK: - Data
+    
+    private func initializeData() {
+        let frames: [EditorTimelineModel.Frame] = Array(
+            repeating: .init(hasDrawing: false),
+            count: 100)
         
-        trackVC.setFrameCount(frameCount)
+        let model = EditorTimelineModel(frames: frames)
+        setModel(model)
+    }
+    
+    private func setModel(_ model: EditorTimelineModel) {
+        self.model = model
+        trackVC.setModel(model)
+    }
+    
+    // MARK: - Logic
+    
+    private func createDrawing(frameIndex: Int) {
+        guard model.frames.indices.contains(frameIndex),
+            !model.frames[frameIndex].hasDrawing
+        else { return }
+        
+        let frame = EditorTimelineModel.Frame(
+            hasDrawing: true)
+        
+        var model = model
+        model.frames[frameIndex] = frame
+        
+        setModel(model)
+    }
+    
+    private func deleteDrawing(frameIndex: Int) {
+        guard model.frames.indices.contains(frameIndex),
+            model.frames[frameIndex].hasDrawing
+        else { return }
+        
+        let frame = EditorTimelineModel.Frame(
+            hasDrawing: false)
+        
+        var model = model
+        model.frames[frameIndex] = frame
+        
+        setModel(model)
+    }
+    
+    // MARK: - Menu
+    
+    private func showFrameMenu(frameIndex: Int) {
+        guard let cell = trackVC.cell(at: frameIndex)
+        else { return }
+        
+        let frame = model.frames[frameIndex]
+        
+        let contentView = EditorTimelineFrameMenuView(
+            frameIndex: frameIndex,
+            hasDrawing: frame.hasDrawing)
+        
+        let menu = EditorMenuView(
+            contentView: contentView,
+            presentation: .init(
+                sourceView: cell,
+                sourceViewEffect: .fade))
+        
+        contentView.delegate = self
+        menu.delegate = self
+        menu.present(in: self)
+        
+        trackVC.setOpenMenuFrameIndex(frameIndex)
     }
     
     // MARK: - Interface
@@ -63,10 +149,10 @@ extension EditorTimelineVC: EditorTimelineCollapsibleBarVCDelegate {
         toolbarVC.setExpanded(expanded)
     }
     
-    func onModifyConstraints(
+    func onChangeConstraints(
         _ vc: EditorTimelineCollapsibleBarVC
     ) {
-        delegate?.onModifyConstraints(self)
+        delegate?.onChangeConstraints(self)
     }
     
 }
@@ -107,14 +193,11 @@ extension EditorTimelineVC: TimelineToolbarVCDelegate {
 
 extension EditorTimelineVC: TimelineTrackVCDelegate {
     
-    func onChangeFocusedFrame(_ vc: TimelineTrackVC) {
-        toolbarVC.updateFrameLabel(
-            index: vc.focusedFrameIndex,
-            total: frameCount)
-    }
-    
-    func onSelectFocusedFrame(_ vc: TimelineTrackVC) {
-        // TODO: Create new drawing on focused frame
+    func onSelectFocusedFrame(_ vc: TimelineTrackVC, index: Int) {
+//        delegate?.onRequestCreateDrawing(self,
+//            frameIndex: trackVC.focusedFrameIndex)
+        
+        createDrawing(frameIndex: index)
     }
     
     func onSelectFrame(_ vc: TimelineTrackVC, index: Int) {
@@ -122,21 +205,16 @@ extension EditorTimelineVC: TimelineTrackVCDelegate {
     }
     
     func onLongPressFrame(_ vc: TimelineTrackVC, index: Int) {
-        guard let cell = trackVC.cell(at: index)
-        else { return }
+        showFrameMenu(frameIndex: index)
+    }
+    
+    func onChangeFocusedFrame(_ vc: TimelineTrackVC) {
+        toolbarVC.updateFrameLabel(
+            index: vc.focusedFrameIndex,
+            total: frameCount)
         
-        let contentView = EditorTimelineFrameMenuView()
-        
-        let menu = EditorMenuView(
-            contentView: contentView,
-            presentation: .init(
-                sourceView: cell,
-                sourceViewEffect: .fade))
-        
-        menu.delegate = self
-        menu.present(in: self)
-        
-        trackVC.setOpenMenuIndex(index)
+        delegate?.onChangeFocusedFrame(self,
+            index: vc.focusedFrameIndex)
     }
     
 }
@@ -146,7 +224,25 @@ extension EditorTimelineVC: EditorMenuViewDelegate {
     func onPresent(_ v: EditorMenuView) { }
     
     func onDismiss(_ v: EditorMenuView) {
-        trackVC.setOpenMenuIndex(nil)
+        trackVC.setOpenMenuFrameIndex(nil)
+    }
+    
+}
+
+extension EditorTimelineVC: EditorTimelineFrameMenuViewDelegate {
+    
+    func onSelectCreateDrawing(
+        _ v: EditorTimelineFrameMenuView,
+        frameIndex: Int
+    ) {
+        createDrawing(frameIndex: frameIndex)
+    }
+    
+    func onSelectDeleteDrawing(
+        _ v: EditorTimelineFrameMenuView,
+        frameIndex: Int
+    ) {
+        deleteDrawing(frameIndex: frameIndex)
     }
     
 }

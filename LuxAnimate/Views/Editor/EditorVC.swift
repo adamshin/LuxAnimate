@@ -124,6 +124,10 @@ extension EditorVC: EditorContentVCDelegate {
         //
     }
     
+    func onChangeFocusedFrame(_ vc: EditorContentVC, index: Int) {
+        // Switch to displaying new frame
+    }
+    
     func needsDrawCanvas(_ vc: EditorContentVC) {
         //
     }

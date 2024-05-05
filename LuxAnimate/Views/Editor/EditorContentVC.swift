@@ -9,6 +9,8 @@ protocol EditorContentVCDelegate: AnyObject {
     func onSelectBack(_ vc: EditorContentVC)
     func onSelectBrush(_ vc: EditorContentVC)
     
+    func onChangeFocusedFrame(_ vc: EditorContentVC, index: Int)
+    
     func needsDrawCanvas(_ vc: EditorContentVC)
     
 }
@@ -85,7 +87,16 @@ extension EditorContentVC: EditorCanvasVCDelegate {
 
 extension EditorContentVC: EditorTimelineVCDelegate {
     
-    func onModifyConstraints(_ vc: EditorTimelineVC) {
+    func onRequestCreateDrawing(_ vc: EditorTimelineVC, frameIndex: Int) {
+        // TODO
+    }
+    
+    
+    func onChangeFocusedFrame(_ vc: EditorTimelineVC, index: Int) {
+        delegate?.onChangeFocusedFrame(self, index: index)
+    }
+    
+    func onChangeConstraints(_ vc: EditorTimelineVC) {
         canvasVC.handleUpdateBoundsReferenceView()
     }
     

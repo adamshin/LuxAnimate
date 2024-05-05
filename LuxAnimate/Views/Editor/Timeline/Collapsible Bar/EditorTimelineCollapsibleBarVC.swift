@@ -14,7 +14,7 @@ protocol EditorTimelineCollapsibleBarVCDelegate: AnyObject {
         _ vc: EditorTimelineCollapsibleBarVC,
         _ expanded: Bool)
     
-    func onModifyConstraints(
+    func onChangeConstraints(
         _ vc: EditorTimelineCollapsibleBarVC)
     
 }
@@ -119,7 +119,7 @@ class EditorTimelineCollapsibleBarVC: UIViewController {
                 self.view.layoutIfNeeded()
             }
             
-            self.delegate?.onModifyConstraints(self)
+            self.delegate?.onChangeConstraints(self)
         }
         
         if animated {
