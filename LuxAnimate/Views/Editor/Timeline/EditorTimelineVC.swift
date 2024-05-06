@@ -13,12 +13,16 @@ protocol EditorTimelineVCDelegate: AnyObject {
         _ vc: EditorTimelineVC,
         index: Int)
     
+    func onChangeContentAreaSize(
+        _ vc: EditorTimelineVC)
+    
     func onRequestCreateDrawing(
         _ vc: EditorTimelineVC,
         frameIndex: Int)
     
-    func onChangeContentAreaSize(
-        _ vc: EditorTimelineVC)
+    func onRequestDeleteDrawing(
+        _ vc: EditorTimelineVC,
+        frameIndex: Int)
     
 }
 
@@ -43,7 +47,6 @@ class EditorTimelineVC: UIViewController {
         super.viewDidLoad()
         
         setupUI()
-        initializeData()
     }
     
     // MARK: - Setup
@@ -58,22 +61,6 @@ class EditorTimelineVC: UIViewController {
         addChild(trackVC, to: collapsibleContentVC.collapsibleContentView)
         
         collapsibleContentVC.setExpanded(true, animated: false)
-    }
-    
-    // MARK: - Data
-    
-    private func initializeData() {
-        let frames: [EditorTimelineModel.Frame] = Array(
-            repeating: .init(hasDrawing: false),
-            count: 100)
-        
-        let model = EditorTimelineModel(frames: frames)
-        setModel(model)
-    }
-    
-    private func setModel(_ model: EditorTimelineModel) {
-        self.model = model
-        trackVC.setModel(model)
     }
     
     // MARK: - Logic
@@ -132,6 +119,11 @@ class EditorTimelineVC: UIViewController {
     }
     
     // MARK: - Interface
+    
+    func setModel(_ model: EditorTimelineModel) {
+        self.model = model
+        trackVC.setModel(model)
+    }
     
     var contentAreaView: UIView {
         collapsibleContentVC.contentAreaView
@@ -195,10 +187,8 @@ extension EditorTimelineVC: TimelineToolbarVCDelegate {
 extension EditorTimelineVC: TimelineTrackVCDelegate {
     
     func onSelectFocusedFrame(_ vc: TimelineTrackVC, index: Int) {
-//        delegate?.onRequestCreateDrawing(self,
-//            frameIndex: trackVC.focusedFrameIndex)
-        
-        createDrawing(frameIndex: index)
+        delegate?.onRequestCreateDrawing(self,
+            frameIndex: trackVC.focusedFrameIndex)
     }
     
     func onSelectFrame(_ vc: TimelineTrackVC, index: Int) {
@@ -236,14 +226,16 @@ extension EditorTimelineVC: EditorTimelineFrameMenuViewDelegate {
         _ v: EditorTimelineFrameMenuView,
         frameIndex: Int
     ) {
-        createDrawing(frameIndex: frameIndex)
+        delegate?.onRequestCreateDrawing(self,
+            frameIndex: frameIndex)
     }
     
     func onSelectDeleteDrawing(
         _ v: EditorTimelineFrameMenuView,
         frameIndex: Int
     ) {
-        deleteDrawing(frameIndex: frameIndex)
+        delegate?.onRequestDeleteDrawing(self,
+            frameIndex: frameIndex)
     }
     
 }

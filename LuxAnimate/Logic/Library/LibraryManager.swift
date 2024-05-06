@@ -4,6 +4,11 @@
 
 import Foundation
 
+private let defaultCanvasSize = PixelSize(
+    width: 1920, height: 1080)
+
+private let defaultFramesPerSecond = 24
+
 struct LibraryManager {
     
     struct LibraryProject {
@@ -106,19 +111,9 @@ struct LibraryManager {
             at: projectURL,
             withIntermediateDirectories: false)
         
-        let now = Date()
-        
-        let metadata = Project.Metadata(
-            canvasSize: PixelSize(width: 1920, height: 1080),
-            framesPerSecond: 24)
-        
-        let projectManifest = Project.Manifest(
+        let projectManifest = createNewProjectManifest(
             id: projectID,
-            name: "New Project",
-            createdAt: now,
-            metadata: metadata,
-            timeline: Project.Timeline(drawings: []),
-            assetIDs: [])
+            name: "New Project")
         
         let projectManifestData = try encoder.encode(projectManifest)
         try projectManifestData.write(to: projectManifestURL)
@@ -144,6 +139,36 @@ struct LibraryManager {
             libraryManifest.projects.remove(at: projectIndex)
             try setLibraryManifest(libraryManifest)
         }
+    }
+    
+    // MARK: - Project Manifest
+    
+    private func createNewProjectManifest(
+        id: String,
+        name: String
+    ) -> Project.Manifest {
+        
+        let now = Date()
+        
+        let metadata = Project.Metadata(
+            viewportSize: defaultCanvasSize,
+            viewportMaxSize: defaultCanvasSize,
+            framesPerSecond: defaultFramesPerSecond)
+        
+        let content = Project.Content(
+            animationLayer: Project.AnimationLayer(
+                id: UUID().uuidString,
+                name: "Layer",
+                size: defaultCanvasSize,
+                drawings: []))
+        
+        return Project.Manifest(
+            id: id,
+            name: name,
+            createdAt: now,
+            metadata: metadata,
+            content: content,
+            assetIDs: [])
     }
     
 }

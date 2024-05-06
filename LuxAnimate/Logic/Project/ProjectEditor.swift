@@ -4,39 +4,43 @@
 
 import Foundation
 
+protocol ProjectEditorDelegate: AnyObject {
+    
+    func onEditProject(_ editor: ProjectEditor)
+    
+}
+
 class ProjectEditor {
     
-    private let projectID: String
+    weak var delegate: ProjectEditorDelegate?
     
-    private var editSession: ProjectEditSession? = nil
+    private let projectID: String
+    private let editSession: ProjectEditSession
     
     private let imageResizer = ImageResizer()
     
-    init(projectID: String) {
+    init(projectID: String) throws {
         self.projectID = projectID
+        
+        editSession = try ProjectEditSession(
+            projectID: projectID)
     }
     
-    func startEditSession() throws {
-        editSession = try ProjectEditSession(projectID: projectID)
-    }
-    
-    func endEditSession() {
-        editSession = nil
-    }
-    
-    var projectManifest: Project.Manifest? {
-        editSession?.currentProjectManifest
+    var currentProjectManifest: Project.Manifest {
+        editSession.currentProjectManifest
     }
     
 }
 
 extension ProjectEditor {
     
+    // MARK: - Create Drawing
+    
     func createDrawing(
+        frameIndex: Int,
         imageData: Data,
         imageSize: PixelSize
     ) throws {
-        guard let editSession else { return }
         
         let createdAssets = try createDrawingAssets(
             imageData: imageData,
@@ -44,12 +48,17 @@ extension ProjectEditor {
         
         let drawing = Project.Drawing(
             id: UUID().uuidString,
-            frameIndex: 0,
+            frameIndex: frameIndex,
             assetIDs: createdAssets.assetIDs)
         
         var projectManifest = editSession.currentProjectManifest
         
-        projectManifest.timeline.drawings.append(drawing)
+        guard !projectManifest.content.animationLayer.drawings
+            .contains(where: { $0.frameIndex == frameIndex })
+        else { return }
+        
+        projectManifest.content.animationLayer.drawings
+            .append(drawing)
         
         for assetID in createdAssets.assetIDs.all {
             projectManifest.assetIDs.insert(assetID)
@@ -58,14 +67,39 @@ extension ProjectEditor {
         try editSession.applyEdit(
             newProjectManifest: projectManifest,
             newAssets: createdAssets.newAssets)
+        
+        delegate?.onEditProject(self)
     }
+    
+    func createEmptyDrawing(
+        frameIndex: Int
+    ) throws {
+        
+        let projectManifest = editSession.currentProjectManifest
+        
+        let imageSize = projectManifest.content.animationLayer.size
+        let imageData = Self.emptyImageData(size: imageSize)
+        
+        try createDrawing(
+            frameIndex: frameIndex,
+            imageData: imageData,
+            imageSize: imageSize)
+    }
+    
+    private static func emptyImageData(
+        size: PixelSize
+    ) -> Data {
+        let byteCount = size.width * size.height * 4
+        return Data(repeating: 0, count: byteCount)
+    }
+    
+    // MARK: - Edit Drawing
     
     func editDrawing(
         drawingID: String,
         imageData: Data,
         imageSize: PixelSize
     ) throws {
-        guard let editSession else { return }
         
         let createdAssets = try createDrawingAssets(
             imageData: imageData,
@@ -73,16 +107,19 @@ extension ProjectEditor {
         
         var projectManifest = editSession.currentProjectManifest
         
-        guard let drawingIndex = projectManifest.timeline.drawings
+        let drawings = projectManifest.content.animationLayer.drawings
+        
+        guard let drawingIndex = drawings
             .firstIndex(where: { $0.id == drawingID })
         else { return }
         
-        let drawing = projectManifest.timeline.drawings[drawingIndex]
+        let drawing = drawings[drawingIndex]
+        
         for assetID in drawing.assetIDs.all {
             projectManifest.assetIDs.remove(assetID)
         }
         
-        projectManifest.timeline.drawings[drawingIndex]
+        projectManifest.content.animationLayer.drawings[drawingIndex]
             .assetIDs = createdAssets.assetIDs
         
         for assetID in createdAssets.assetIDs.all {
@@ -92,7 +129,38 @@ extension ProjectEditor {
         try editSession.applyEdit(
             newProjectManifest: projectManifest,
             newAssets: createdAssets.newAssets)
+        
+        delegate?.onEditProject(self)
     }
+    
+    // MARK: - Delete Drawing
+    
+    func deleteDrawing(at frameIndex: Int) throws {
+        var projectManifest = editSession.currentProjectManifest
+        
+        var filteredDrawings: [Project.Drawing] = []
+        
+        for drawing in projectManifest.content.animationLayer.drawings {
+            if drawing.frameIndex == frameIndex {
+                for assetID in drawing.assetIDs.all {
+                    projectManifest.assetIDs.remove(assetID)
+                }
+                
+            } else {
+                filteredDrawings.append(drawing)
+            }
+        }
+        
+        projectManifest.content.animationLayer.drawings = filteredDrawings
+        
+        try editSession.applyEdit(
+            newProjectManifest: projectManifest,
+            newAssets: [])
+        
+        delegate?.onEditProject(self)
+    }
+    
+    // MARK: - Assets
     
     private struct CreatedDrawingAssets {
         var assetIDs: Project.DrawingAssetIDGroup

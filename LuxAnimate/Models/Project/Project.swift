@@ -14,7 +14,7 @@ enum Project {
         var createdAt: Date
         
         var metadata: Metadata
-        var timeline: Timeline
+        var content: Content
         
         var assetIDs: Set<String>
     }
@@ -22,13 +22,24 @@ enum Project {
     // MARK: - Metadata
     
     struct Metadata: Codable {
-        var canvasSize: PixelSize
+        var viewportSize: PixelSize
+        var viewportMaxSize: PixelSize
+        
         var framesPerSecond: Int
     }
     
-    // MARK: - Timeline
+    // MARK: - Content
     
-    struct Timeline: Codable {
+    struct Content: Codable {
+        // TODO: Multiple animation layers, scenes, etc
+        var animationLayer: AnimationLayer
+    }
+    
+    struct AnimationLayer: Codable {
+        var id: String
+        var name: String
+        
+        var size: PixelSize
         var drawings: [Drawing]
     }
     
@@ -44,11 +55,7 @@ enum Project {
         var medium: String
         var small: String
         
-        var all: [String] {[
-            full, 
-            medium,
-            small
-        ]}
+        var all: [String] { [full, medium, small] }
     }
     
 }

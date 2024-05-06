@@ -5,8 +5,6 @@
 import UIKit
 import Metal
 
-// TODO: Move the UI-level stuff into an EditorCanvasContentVC
-
 // This view controller should contain logic for loading
 // and displaying the contents of a single frame. It should
 // coordinate with the frame cache system -- maybe that lives
@@ -36,12 +34,9 @@ import Metal
 // Probably easier than propagating all that interaction
 // up to the EditorVC.
 
-// TODO: Move the top bar view controller inside here.
-// Most actions will be directly related to drawing editing
-// (tool selection etc).
-// May reevaluate if plans for the UI change.
-
 protocol EditorDrawingVCDelegate: AnyObject {
+    
+    func onSelectBack(_ vc: EditorDrawingVC)
     
 }
 
@@ -57,6 +52,8 @@ class EditorDrawingVC: UIViewController {
         super.viewDidLoad()
         
         contentVC.canvasVC.delegate = self
+        contentVC.topBarVC.delegate = self
+        
         addChild(contentVC, to: view)
         
         contentVC.canvasVC.setCanvasSize(
@@ -78,5 +75,15 @@ class EditorDrawingVC: UIViewController {
 // MARK: - Delegates
 
 extension EditorDrawingVC: EditorDrawingCanvasVCDelegate {
+    
+}
+
+extension EditorDrawingVC: EditorDrawingTopBarVCDelegate {
+    
+    func onSelectBack(_ vc: EditorDrawingTopBarVC) {
+        delegate?.onSelectBack(self)
+    }
+    
+    func onSelectBrush(_ vc: EditorDrawingTopBarVC) { }
     
 }

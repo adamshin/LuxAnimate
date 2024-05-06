@@ -14,26 +14,25 @@ class EditorVC: UIViewController {
     private let timelineVC = EditorTimelineVC()
     
     private let projectID: String
-//    private let editor: ProjectEditor
+    
+    private var editor: ProjectEditor?
     
     // MARK: - Init
     
     init(projectID: String) {
         self.projectID = projectID
-//        editor = ProjectEditor(projectID: projectID)
         
         super.init(nibName: nil, bundle: nil)
+        modalPresentationStyle = .fullScreen
         
-//        do {
-//            try editor.startEditSession()
-//        } catch { }
+        do {
+            editor = try ProjectEditor(projectID: projectID)
+            editor?.delegate = self
+            
+        } catch { }
     }
     
     required init?(coder: NSCoder) { fatalError() }
-    
-    deinit {
-//        editor.endEditSession()
-    }
     
     // MARK: - Lifecycle
     
@@ -62,67 +61,23 @@ class EditorVC: UIViewController {
     // MARK: - Data
     
     private func setInitialData() {
-//        guard let projectManifest = editor.projectManifest
-//        else { return }
-//        
-//        let projectName = projectManifest.name
-//        
-//        let drawings = projectManifest
-//            .timeline.drawings
-//        .map {
-//            EditorContentVC.Drawing(id: $0.id)
-//        }
-//        
-//        contentVC.update(projectName: projectName)
-//        contentVC.update(drawings: drawings)
+        guard let editor else { return }
+        
+        let model = EditorTimelineModelGenerator
+            .generate(from: editor.currentProjectManifest)
+        
+        timelineVC.setModel(model)
     }
-    
-    // MARK: - Logic
-    
-    // Move this to ProjectEditor?
-    private func createEmptyDrawing() {
-//        let imageSize = defaultImageSize
-//        let imageData = Self.emptyImageData(
-//            imageSize: imageSize)
-//        
-//        do {
-//            try editor.createDrawing(
-//                imageData: imageData,
-//                imageSize: imageSize)
-//            
-//            updateUI()
-//            
-//        } catch { }
-    }
-    
-    private func editDrawing(
-        drawingID: String,
-        imageData: Data,
-        imageSize: PixelSize
-    ) {
-//        do {
-//            try editor.editDrawing(
-//                drawingID: drawingID,
-//                imageData: imageData,
-//                imageSize: imageSize)
-//            
-//            updateUI()
-//            
-//        } catch { }
-    }
-    
-//    private static func emptyImageData(
-//        imageSize: PixelSize
-//    ) -> Data {
-//        let byteCount = imageSize.width * imageSize.height * 4
-//        return Data(repeating: 0, count: byteCount)
-//    }
     
 }
 
-// MARK: - Delegates
+// MARK: - View Controller Delegates
 
 extension EditorVC: EditorDrawingVCDelegate {
+    
+    func onSelectBack(_ vc: EditorDrawingVC) {
+        dismiss(animated: true)
+    }
     
 }
 
@@ -132,20 +87,42 @@ extension EditorVC: EditorTimelineVCDelegate {
         _ vc: EditorTimelineVC,
         index: Int
     ) {
-        // TODO
-    }
-    
-    func onRequestCreateDrawing(
-        _ vc: EditorTimelineVC,
-        frameIndex: Int
-    ) {
-        // TODO
+        // TODO: Tell drawing view controller to display frame
     }
     
     func onChangeContentAreaSize(
         _ vc: EditorTimelineVC
     ) {
         drawingVC.handleChangeBottomInsetViewFrame()
+    }
+    
+    func onRequestCreateDrawing(
+        _ vc: EditorTimelineVC,
+        frameIndex: Int
+    ) {
+        try? editor?.createEmptyDrawing(
+            frameIndex: frameIndex)
+    }
+    
+    func onRequestDeleteDrawing(
+        _ vc: EditorTimelineVC,
+        frameIndex: Int
+    ) {
+        try? editor?.deleteDrawing(
+            at: frameIndex)
+    }
+    
+}
+
+// MARK: - Editor Delegate
+
+extension EditorVC: ProjectEditorDelegate {
+    
+    func onEditProject(_ editor: ProjectEditor) {
+        let model = EditorTimelineModelGenerator
+            .generate(from: editor.currentProjectManifest)
+        
+        timelineVC.setModel(model)
     }
     
 }
