@@ -22,6 +22,8 @@ class BrushEngine {
     
     weak var delegate: BrushEngineDelegate?
     
+    let canvasSize: PixelSize
+    
     private let renderer: BrushEngineRenderer
     private let displayLink = BrushEngineDisplayLink()
     
@@ -31,6 +33,8 @@ class BrushEngine {
     // MARK: - Initializer
     
     init(canvasSize: PixelSize) {
+        self.canvasSize = canvasSize
+        
         renderer = BrushEngineRenderer(
             canvasSize: canvasSize)
         

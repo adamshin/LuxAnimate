@@ -34,9 +34,29 @@ import Metal
 // Probably easier than propagating all that interaction
 // up to the EditorVC.
 
+// TODO: Factor out the tool system. Maybe it should live
+// in nested view controllers?
+
+private let brushConfig = Brush.Configuration(
+    stampTextureName: "brush1.png",
+    stampSize: 50,
+    stampSpacing: 0.0,
+    stampAlpha: 1,
+    pressureScaling: 0.5,
+    taperLength: 0.05,
+    taperRoundness: 1.0)
+
+private let brushColor: Color = .brushBlack
+
 protocol EditorDrawingVCDelegate: AnyObject {
     
     func onSelectBack(_ vc: EditorDrawingVC)
+    
+    func onEditDrawing(
+        _ vc: EditorDrawingVC,
+        drawingID: String,
+        imageData: Data,
+        imageSize: PixelSize)
     
 }
 
@@ -46,21 +66,100 @@ class EditorDrawingVC: UIViewController {
     
     private let contentVC = EditorDrawingContentVC()
     
+    private let projectID: String
+    private let drawingSize: PixelSize
+    
+    private var drawingID: String?
+    
+    private let brushEngine: BrushEngine
+    private let drawingRenderer: DrawingEditorFrameRenderer
+    
+    private let brush = try! Brush(
+        configuration: brushConfig)
+    
+    // MARK: - Init
+    
+    init(
+        projectID: String,
+        animationLayer: Project.AnimationLayer
+    ) {
+        self.projectID = projectID
+        drawingSize = animationLayer.size
+        
+        brushEngine = BrushEngine(canvasSize: drawingSize)
+        
+        drawingRenderer = DrawingEditorFrameRenderer(
+            drawingSize: drawingSize,
+            backgroundColor: .white)
+        
+        super.init(nibName: nil, bundle: nil)
+        
+        brushEngine.delegate = self
+    }
+    
+    required init?(coder: NSCoder) { fatalError() }
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         contentVC.canvasVC.delegate = self
+        contentVC.canvasVC.brushGestureDelegate = self
         contentVC.topBarVC.delegate = self
         
         addChild(contentVC, to: view)
         
-        contentVC.canvasVC.setCanvasSize(
-            PixelSize(width: 1920, height: 1080))
+        contentVC.canvasVC.setCanvasSize(drawingSize)
+    }
+    
+    // MARK: - Editing
+    
+    private func applyBrushStrokeEdit() {
+        guard let drawingID else { return }
+        
+        do {
+            let imageData = try TextureDataReader
+                .read(brushEngine.canvasTexture)
+            
+            let imageSize = brushEngine.canvasSize
+            
+            delegate?.onEditDrawing(
+                self,
+                drawingID: drawingID,
+                imageData: imageData,
+                imageSize: imageSize)
+            
+        } catch { }
+    }
+    
+    // MARK: - Rendering
+    
+    private func render() {
+        drawingRenderer.draw(
+            drawingTexture: brushEngine.canvasTexture)
+        
+        contentVC.canvasVC.setCanvasTexture(
+            drawingRenderer.texture)
     }
     
     // MARK: - Interface
+    
+    func showDrawing(_ drawing: Project.Drawing) {
+        drawingID = drawing.id
+        
+        let assetURL = FileUrlHelper().projectAssetURL(
+            projectID: projectID,
+            assetID: drawing.assetIDs.full)
+        
+        let assetTexture = try! JXLTextureLoader.load(
+            url: assetURL)
+        
+        brushEngine.endStroke()
+        brushEngine.setCanvasContents(assetTexture)
+        
+        render()
+    }
     
     func setBottomInsetView(_ bottomInsetView: UIView) {
         contentVC.setBottomInsetView(bottomInsetView)
@@ -78,6 +177,32 @@ extension EditorDrawingVC: EditorDrawingCanvasVCDelegate {
     
 }
 
+extension EditorDrawingVC: BrushGestureRecognizerGestureDelegate {
+    
+    func onBeginBrushStroke() {
+        brushEngine.beginStroke(
+            brush: brush,
+            brushMode: .brush,
+            color: brushColor,
+            scale: 0.5,
+            smoothingLevel: 0)
+    }
+    
+    func onUpdateBrushStroke(
+        _ stroke: BrushGestureRecognizer.Stroke
+    ) {
+        let inputStroke = BrushEngineGestureAdapter
+            .convert(stroke)
+        
+        brushEngine.updateStroke(inputStroke: inputStroke)
+    }
+    
+    func onEndBrushStroke() {
+        brushEngine.endStroke()
+    }
+    
+}
+
 extension EditorDrawingVC: EditorDrawingTopBarVCDelegate {
     
     func onSelectBack(_ vc: EditorDrawingTopBarVC) {
@@ -85,5 +210,17 @@ extension EditorDrawingVC: EditorDrawingTopBarVCDelegate {
     }
     
     func onSelectBrush(_ vc: EditorDrawingTopBarVC) { }
+    
+}
+
+extension EditorDrawingVC: BrushEngineDelegate {
+    
+    func onUpdateCanvas(_ engine: BrushEngine) {
+        render()
+    }
+    
+    func onFinalizeStroke(_ engine: BrushEngine) {
+        applyBrushStrokeEdit()
+    }
     
 }

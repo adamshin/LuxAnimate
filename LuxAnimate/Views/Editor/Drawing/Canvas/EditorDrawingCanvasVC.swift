@@ -27,7 +27,7 @@ class EditorDrawingCanvasVC: UIViewController {
     private let canvasView = MovableCanvasView()
     private let brushGesture = BrushGestureRecognizer()
     
-//    private let layerRenderer = MetalLayerTextureRenderer()
+    private let layerRenderer = MetalLayerTextureRenderer()
     
     private var canvasSize = PixelSize(width: 0, height: 0)
     private var canvasTexture: MTLTexture?
@@ -41,23 +41,19 @@ class EditorDrawingCanvasVC: UIViewController {
         view.addSubview(canvasView)
         canvasView.pinEdges()
         canvasView.delegate = self
-//        canvasView.singleFingerPanEnabled = false
+        canvasView.singleFingerPanEnabled = false
         
-//        canvasView.canvasContentView.addSubview(metalView)
-//        metalView.pinEdges()
-//        metalView.delegate = self
-        
-        let imageView = UIImageView(image: .sampleCanvas2)
-        canvasView.canvasContentView.addSubview(imageView)
-        imageView.pinEdges()
+        canvasView.canvasContentView.addSubview(metalView)
+        metalView.pinEdges()
+        metalView.delegate = self
         
         metalView.metalLayer.shouldRasterize = true
         metalView.metalLayer.rasterizationScale = 1
         
-//        canvasView.canvasContentView
-//            .addGestureRecognizer(brushGesture)
+        canvasView.canvasContentView
+            .addGestureRecognizer(brushGesture)
         
-        setCanvasSize(PixelSize(width: 1920, height: 1080))
+        setCanvasSize(PixelSize(width: 100, height: 100))
     }
     
     override func viewIsAppearing(_ animated: Bool) {
@@ -69,11 +65,11 @@ class EditorDrawingCanvasVC: UIViewController {
     // MARK: - Canvas
     
     private func drawCanvas() {
-//        guard let canvasTexture else { return }
-//        
-//        layerRenderer.draw(
-//            texture: canvasTexture,
-//            to: metalView.metalLayer)
+        guard let canvasTexture else { return }
+        
+        layerRenderer.draw(
+            texture: canvasTexture,
+            to: metalView.metalLayer)
     }
     
     // MARK: - Interface

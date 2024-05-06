@@ -10,7 +10,7 @@ import PhotosUI
 
 class EditorVC: UIViewController {
     
-    private let drawingVC = EditorDrawingVC()
+    private var drawingVC: EditorDrawingVC?
     private let timelineVC = EditorTimelineVC()
     
     private let projectID: String
@@ -26,8 +26,16 @@ class EditorVC: UIViewController {
         modalPresentationStyle = .fullScreen
         
         do {
-            editor = try ProjectEditor(projectID: projectID)
-            editor?.delegate = self
+            let editor = try ProjectEditor(projectID: projectID)
+            self.editor = editor
+            editor.delegate = self
+            
+            let animationLayer = editor.currentProjectManifest
+                .content.animationLayer
+            
+            drawingVC = EditorDrawingVC(
+                projectID: projectID,
+                animationLayer: animationLayer)
             
         } catch { }
     }
@@ -48,6 +56,8 @@ class EditorVC: UIViewController {
     // MARK: - Setup
     
     private func setupUI() {
+        guard let drawingVC else { return }
+        
         drawingVC.delegate = self
         timelineVC.delegate = self
         
@@ -63,8 +73,10 @@ class EditorVC: UIViewController {
     private func setInitialData() {
         guard let editor else { return }
         
+        let projectManifest = editor.currentProjectManifest
+        
         let model = EditorTimelineModelGenerator
-            .generate(from: editor.currentProjectManifest)
+            .generate(from: projectManifest)
         
         timelineVC.setModel(model)
     }
@@ -79,6 +91,18 @@ extension EditorVC: EditorDrawingVCDelegate {
         dismiss(animated: true)
     }
     
+    func onEditDrawing(
+        _ vc: EditorDrawingVC,
+        drawingID: String,
+        imageData: Data,
+        imageSize: PixelSize
+    ) {
+        try? editor?.editDrawing(
+            drawingID: drawingID,
+            imageData: imageData,
+            imageSize: imageSize)
+    }
+    
 }
 
 extension EditorVC: EditorTimelineVCDelegate {
@@ -87,13 +111,22 @@ extension EditorVC: EditorTimelineVCDelegate {
         _ vc: EditorTimelineVC,
         index: Int
     ) {
-        // TODO: Tell drawing view controller to display frame
+        guard let editor else { return }
+        
+        let projectManifest = editor.currentProjectManifest
+        let animationLayer = projectManifest.content.animationLayer
+        
+        guard let drawing = animationLayer.drawings
+            .first(where: { $0.frameIndex == index })
+        else { return }
+        
+        drawingVC?.showDrawing(drawing)
     }
     
     func onChangeContentAreaSize(
         _ vc: EditorTimelineVC
     ) {
-        drawingVC.handleChangeBottomInsetViewFrame()
+        drawingVC?.handleChangeBottomInsetViewFrame()
     }
     
     func onRequestCreateDrawing(
