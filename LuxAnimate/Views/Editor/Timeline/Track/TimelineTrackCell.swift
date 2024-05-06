@@ -46,9 +46,12 @@ class TimelineTrackCell: UICollectionViewCell {
     
     private let button = TimelineTrackCellButton()
     private let cardView = TimelineTrackCellCardView()
+    private let imageView = UIImageView()
     private let plusIconView = TimelineTrackCellPlusIconView()
     
     private let longPress = UILongPressGestureRecognizer()
+    
+    // MARK: - Init
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -68,18 +71,28 @@ class TimelineTrackCell: UICollectionViewCell {
         cardView.pinEdges()
         cardView.isUserInteractionEnabled = false
         
+        cardView.addSubview(imageView)
+        imageView.pinEdges()
+        imageView.contentMode = .scaleAspectFill
+        
         cardView.addSubview(plusIconView)
         plusIconView.pinEdges()
     }
     
     required init?(coder: NSCoder) { fatalError() }
     
+    // MARK: - Lifecycle
+    
     override func prepareForReuse() {
         super.prepareForReuse()
+        
+        imageView.image = nil
         
         setPlusIconVisible(false, withAnimation: false)
         button.reset()
     }
+    
+    // MARK: - Handlers
     
     @objc private func onLongPress() {
         if longPress.state == .began {
@@ -87,11 +100,21 @@ class TimelineTrackCell: UICollectionViewCell {
         }
     }
     
+    // MARK: - Interface
+    
     func updateContent(
         frame: EditorTimelineModel.Frame
     ) {
-        cardView.backgroundColor = frame.hasDrawing ?
-            .white : noDrawingBackgroundColor
+        if let drawing = frame.drawing {
+            cardView.backgroundColor = .white
+            
+            let imageData = try? Data(contentsOf: drawing.thumbnailURL)
+            imageView.image = UIImage(data: imageData ?? Data())
+            
+        } else {
+            cardView.backgroundColor = noDrawingBackgroundColor
+            imageView.image = nil
+        }
     }
     
     func setPlusIconVisible(

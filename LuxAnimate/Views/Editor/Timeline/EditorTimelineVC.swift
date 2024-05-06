@@ -63,36 +63,6 @@ class EditorTimelineVC: UIViewController {
         collapsibleContentVC.setExpanded(true, animated: false)
     }
     
-    // MARK: - Logic
-    
-    private func createDrawing(frameIndex: Int) {
-        guard model.frames.indices.contains(frameIndex),
-            !model.frames[frameIndex].hasDrawing
-        else { return }
-        
-        let frame = EditorTimelineModel.Frame(
-            hasDrawing: true)
-        
-        var model = model
-        model.frames[frameIndex] = frame
-        
-        setModel(model)
-    }
-    
-    private func deleteDrawing(frameIndex: Int) {
-        guard model.frames.indices.contains(frameIndex),
-            model.frames[frameIndex].hasDrawing
-        else { return }
-        
-        let frame = EditorTimelineModel.Frame(
-            hasDrawing: false)
-        
-        var model = model
-        model.frames[frameIndex] = frame
-        
-        setModel(model)
-    }
-    
     // MARK: - Menu
     
     private func showFrameMenu(frameIndex: Int) {
@@ -103,7 +73,7 @@ class EditorTimelineVC: UIViewController {
         
         let contentView = EditorTimelineFrameMenuView(
             frameIndex: frameIndex,
-            hasDrawing: frame.hasDrawing)
+            hasDrawing: frame.drawing != nil)
         
         let menu = EditorMenuView(
             contentView: contentView,

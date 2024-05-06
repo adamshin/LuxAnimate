@@ -216,7 +216,7 @@ class TimelineTrackVC: UIViewController {
         
         let isFocused = index == focusedFrameIndex
         let isMenuOpen = index == openMenuFrameIndex
-        let hasDrawing = frame.hasDrawing
+        let hasDrawing = frame.drawing != nil
         
         let plusIconVisible = 
             isFocused &&

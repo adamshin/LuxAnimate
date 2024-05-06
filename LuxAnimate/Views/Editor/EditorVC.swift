@@ -17,6 +17,8 @@ class EditorVC: UIViewController {
     
     private var editor: ProjectEditor?
     
+    private let modelGenerator = EditorTimelineModelGenerator()
+    
     // MARK: - Init
     
     init(projectID: String) {
@@ -75,7 +77,7 @@ class EditorVC: UIViewController {
         
         let projectManifest = editor.currentProjectManifest
         
-        let model = EditorTimelineModelGenerator
+        let model = modelGenerator
             .generate(from: projectManifest)
         
         timelineVC.setModel(model)
@@ -152,7 +154,7 @@ extension EditorVC: EditorTimelineVCDelegate {
 extension EditorVC: ProjectEditorDelegate {
     
     func onEditProject(_ editor: ProjectEditor) {
-        let model = EditorTimelineModelGenerator
+        let model = modelGenerator
             .generate(from: editor.currentProjectManifest)
         
         timelineVC.setModel(model)

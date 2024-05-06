@@ -172,20 +172,36 @@ extension ProjectEditor {
         imageSize: PixelSize
     ) throws -> CreatedDrawingAssets {
         
+        let imageAspectRatio =
+            Double(imageSize.width) /
+            Double(imageSize.height)
+        
+        let mediumImageSize = PixelSize(
+            fitting: PixelSize(
+                width: AppConfig.assetPreviewMediumSize,
+                height: AppConfig.assetPreviewMediumSize),
+            aspectRatio: imageAspectRatio)
+        
+        let smallImageSize = PixelSize(
+            fitting: PixelSize(
+                width: AppConfig.assetPreviewSmallSize,
+                height: AppConfig.assetPreviewSmallSize),
+            aspectRatio: imageAspectRatio)
+        
         // Resize images
         let mediumImageData = try imageResizer.resize(
             imageData: imageData,
             width: imageSize.width,
             height: imageSize.height,
-            targetWidth: AppConfig.assetPreviewMediumSize,
-            targetHeight: AppConfig.assetPreviewMediumSize)
+            targetWidth: mediumImageSize.width,
+            targetHeight: mediumImageSize.height)
         
         let smallImageData = try imageResizer.resize(
             imageData: imageData,
             width: imageSize.width,
             height: imageSize.height,
-            targetWidth: AppConfig.assetPreviewSmallSize,
-            targetHeight: AppConfig.assetPreviewSmallSize)
+            targetWidth: smallImageSize.width,
+            targetHeight: smallImageSize.height)
         
         // Encode images
         let fullEncodedData = try! JXLEncoder.encode(
@@ -200,8 +216,8 @@ extension ProjectEditor {
         let mediumEncodedData = try! JXLEncoder.encode(
             input: .init(
                 data: mediumImageData,
-                width: AppConfig.assetPreviewMediumSize,
-                height: AppConfig.assetPreviewMediumSize),
+                width: mediumImageSize.width,
+                height: mediumImageSize.height),
             lossless: false,
             quality: 90,
             effort: 1)
@@ -209,8 +225,8 @@ extension ProjectEditor {
         let smallEncodedData = try! JXLEncoder.encode(
             input: .init(
                 data: smallImageData,
-                width: AppConfig.assetPreviewSmallSize,
-                height: AppConfig.assetPreviewSmallSize),
+                width: smallImageSize.width,
+                height: smallImageSize.height),
             lossless: false,
             quality: 90,
             effort: 1)
@@ -238,6 +254,42 @@ extension ProjectEditor {
                 mediumAsset,
                 smallAsset,
             ])
+    }
+    
+}
+
+private extension PixelSize {
+    
+    init(filling containerSize: PixelSize, aspectRatio: Double) {
+        let containerAspectRatio =
+            Double(containerSize.width) /
+            Double(containerSize.height)
+        
+        if aspectRatio > containerAspectRatio {
+            self = PixelSize(
+                width: Int(Double(containerSize.height) * aspectRatio),
+                height: containerSize.height)
+        } else {
+            self = PixelSize(
+                width: containerSize.width,
+                height: Int(Double(containerSize.width) / aspectRatio))
+        }
+    }
+
+    init(fitting containerSize: PixelSize, aspectRatio: Double) {
+        let containerAspectRatio =
+            Double(containerSize.width) /
+            Double(containerSize.height)
+        
+        if aspectRatio > containerAspectRatio {
+            self = PixelSize(
+                width: containerSize.width,
+                height: Int(Double(containerSize.width) / aspectRatio))
+        } else {
+            self = PixelSize(
+                width: Int(Double(containerSize.height) * aspectRatio),
+                height: containerSize.height)
+        }
     }
     
 }

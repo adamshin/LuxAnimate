@@ -8,12 +8,14 @@ private let displayedFrameCount = 100
 
 struct EditorTimelineModelGenerator {
     
-    static func generate(
+    private let fileUrlHelper = FileUrlHelper()
+    
+    func generate(
         from projectManifest: Project.Manifest
     ) -> EditorTimelineModel {
         
         let emptyFrame = EditorTimelineModel.Frame(
-            hasDrawing: false)
+            drawing: nil)
         
         var frames = Array(
             repeating: emptyFrame,
@@ -25,8 +27,16 @@ struct EditorTimelineModelGenerator {
             guard frames.indices.contains(drawing.frameIndex)
             else { continue }
             
+            let thumbnailURL = fileUrlHelper.projectAssetURL(
+                projectID: projectManifest.id,
+                assetID: drawing.assetIDs.small)
+            
+            let modelDrawing = EditorTimelineModel.Drawing(
+                id: drawing.id,
+                thumbnailURL: thumbnailURL)
+            
             let frame = EditorTimelineModel.Frame(
-                hasDrawing: true)
+                drawing: modelDrawing)
             
             frames[drawing.frameIndex] = frame
         }
