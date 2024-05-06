@@ -1,5 +1,5 @@
 //
-//  EditorTimelineCollapsibleBarVC.swift
+//  EditorCollapsibleContentVC.swift
 //
 
 import UIKit
@@ -8,29 +8,28 @@ private let barHeight: CGFloat = 48
 
 private let separatorColor = UIColor(white: 1, alpha: 0.04)
 
-protocol EditorTimelineCollapsibleBarVCDelegate: AnyObject {
+protocol EditorCollapsibleContentVCDelegate: AnyObject {
     
     func onSetExpanded(
-        _ vc: EditorTimelineCollapsibleBarVC,
+        _ vc: EditorCollapsibleContentVC,
         _ expanded: Bool)
     
-    func onChangeConstraints(
-        _ vc: EditorTimelineCollapsibleBarVC)
+    func onChangeContentAreaSize(
+        _ vc: EditorCollapsibleContentVC)
     
 }
 
-class EditorTimelineCollapsibleBarVC: UIViewController {
+class EditorCollapsibleContentVC: UIViewController {
     
-    weak var delegate: EditorTimelineCollapsibleBarVCDelegate?
+    weak var delegate: EditorCollapsibleContentVCDelegate?
+    
+    let contentAreaView = UIView()
     
     let barView = EditorCollapsibleBarBarView()
     let collapsibleContentView = UIView()
     
-    let backgroundAreaView = PassthroughView()
+    private let bottomAreaContainer = UIView()
     
-    private let collapsibleContentContainer = UIView()
-    
-    private let separatorContainer = UIView()
     private let separator = UIView()
     
     private var expandedConstraint: NSLayoutConstraint?
@@ -47,37 +46,31 @@ class EditorTimelineCollapsibleBarVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let mainStack = PassthroughStackView()
-        mainStack.axis = .vertical
-        view.addSubview(mainStack)
-        mainStack.pinEdges()
-        
-        mainStack.addArrangedSubview(backgroundAreaView)
-        
-        let contentContainer = UIView()
-        mainStack.addArrangedSubview(contentContainer)
+        view.addSubview(contentAreaView)
+        contentAreaView.pinEdges([.horizontal, .bottom])
         
         let blurView = ChromeBlurView()
-        contentContainer.addSubview(blurView)
+        contentAreaView.addSubview(blurView)
         blurView.pinEdges()
         blurView.backgroundColor = .editorBarShadow
         
-        let contentStack = UIStackView()
-        contentStack.axis = .vertical
-        contentContainer.addSubview(contentStack)
-        contentStack.pinEdges()
+        let stack = UIStackView()
+        stack.axis = .vertical
+        contentAreaView.addSubview(stack)
+        stack.pinEdges()
         
-        contentStack.addArrangedSubview(barView)
+        stack.addArrangedSubview(barView)
         
-        contentStack.addArrangedSubview(separatorContainer)
-        separatorContainer.pinHeight(to: 1)
+        let separatorContainer = UIView()
         separatorContainer.backgroundColor = .editorBarOverlay
+        stack.addArrangedSubview(separatorContainer)
+        separatorContainer.pinHeight(to: 1)
         
         separatorContainer.addSubview(separator)
         separator.pinEdges()
         
-        contentStack.addArrangedSubview(collapsibleContentContainer)
-        collapsibleContentContainer.addSubview(collapsibleContentView)
+        stack.addArrangedSubview(bottomAreaContainer)
+        bottomAreaContainer.addSubview(collapsibleContentView)
         collapsibleContentView.pinEdges([.horizontal, .top])
         
         expandedConstraint = collapsibleContentView
@@ -109,17 +102,14 @@ class EditorTimelineCollapsibleBarVC: UIViewController {
             self.collapsibleContentView.alpha = expanded ? 1 : 0
             self.collapsibleContentView.isUserInteractionEnabled = expanded
             
-            self.collapsibleContentContainer.backgroundColor =
+            self.bottomAreaContainer.backgroundColor =
                 expanded ? .editorBackgroundOverlay : .editorBarOverlay
             
             self.separator.backgroundColor = 
                 expanded ? separatorColor : .clear
             
-            if animated {
-                self.view.layoutIfNeeded()
-            }
-            
-            self.delegate?.onChangeConstraints(self)
+            self.view.layoutIfNeeded()
+            self.delegate?.onChangeContentAreaSize(self)
         }
         
         if animated {

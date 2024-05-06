@@ -9,15 +9,16 @@ private let framesPerSecond = 24
 
 protocol EditorTimelineVCDelegate: AnyObject {
     
-    func onRequestCreateDrawing(
-        _ vc: EditorTimelineVC,
-        frameIndex: Int)
-    
     func onChangeFocusedFrame(
         _ vc: EditorTimelineVC,
         index: Int)
     
-    func onChangeConstraints(_ vc: EditorTimelineVC)
+    func onRequestCreateDrawing(
+        _ vc: EditorTimelineVC,
+        frameIndex: Int)
+    
+    func onChangeContentAreaSize(
+        _ vc: EditorTimelineVC)
     
 }
 
@@ -25,7 +26,7 @@ class EditorTimelineVC: UIViewController {
     
     weak var delegate: EditorTimelineVCDelegate?
     
-    private let collapsibleBarVC = EditorTimelineCollapsibleBarVC()
+    private let collapsibleContentVC = EditorCollapsibleContentVC()
     
     private let toolbarVC = TimelineToolbarVC()
     private let trackVC = TimelineTrackVC()
@@ -48,15 +49,15 @@ class EditorTimelineVC: UIViewController {
     // MARK: - Setup
     
     private func setupUI() {
-        collapsibleBarVC.delegate = self
+        collapsibleContentVC.delegate = self
         toolbarVC.delegate = self
         trackVC.delegate = self
         
-        addChild(collapsibleBarVC, to: view)
-        addChild(toolbarVC, to: collapsibleBarVC.barView)
-        addChild(trackVC, to: collapsibleBarVC.collapsibleContentView)
+        addChild(collapsibleContentVC, to: view)
+        addChild(toolbarVC, to: collapsibleContentVC.barView)
+        addChild(trackVC, to: collapsibleContentVC.collapsibleContentView)
         
-        collapsibleBarVC.setExpanded(true, animated: false)
+        collapsibleContentVC.setExpanded(true, animated: false)
     }
     
     // MARK: - Data
@@ -132,27 +133,27 @@ class EditorTimelineVC: UIViewController {
     
     // MARK: - Interface
     
-    var backgroundAreaView: UIView {
-        collapsibleBarVC.backgroundAreaView
+    var contentAreaView: UIView {
+        collapsibleContentVC.contentAreaView
     }
     
 }
 
 // MARK: - Delegates
 
-extension EditorTimelineVC: EditorTimelineCollapsibleBarVCDelegate {
+extension EditorTimelineVC: EditorCollapsibleContentVCDelegate {
     
     func onSetExpanded(
-        _ vc: EditorTimelineCollapsibleBarVC,
+        _ vc: EditorCollapsibleContentVC,
         _ expanded: Bool
     ) {
         toolbarVC.setExpanded(expanded)
     }
     
-    func onChangeConstraints(
-        _ vc: EditorTimelineCollapsibleBarVC
+    func onChangeContentAreaSize(
+        _ vc: EditorCollapsibleContentVC
     ) {
-        delegate?.onChangeConstraints(self)
+        delegate?.onChangeContentAreaSize(self)
     }
     
 }
@@ -186,7 +187,7 @@ extension EditorTimelineVC: TimelineToolbarVCDelegate {
     }
     
     func onSelectToggleExpanded(_ vc: TimelineToolbarVC) {
-        collapsibleBarVC.toggleExpanded()
+        collapsibleContentVC.toggleExpanded()
     }
     
 }

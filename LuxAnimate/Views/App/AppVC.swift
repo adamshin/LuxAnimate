@@ -19,6 +19,7 @@ class AppVC: UIViewController {
         
         // TESTING
         let editorVC = EditorVC(projectID: "")
+        editorVC.modalPresentationStyle = .fullScreen
         present(editorVC, animated: false)
     }
     

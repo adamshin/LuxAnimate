@@ -5,9 +5,13 @@
 import UIKit
 import PhotosUI
 
+// TODO: Frame prerendering and caching
+// Coordinate switching frames between timeline/canvas VCs
+
 class EditorVC: UIViewController {
     
-    private let contentVC = EditorContentVC()
+    private let drawingVC = EditorDrawingVC()
+    private let timelineVC = EditorTimelineVC()
     
     private let projectID: String
 //    private let editor: ProjectEditor
@@ -16,11 +20,9 @@ class EditorVC: UIViewController {
     
     init(projectID: String) {
         self.projectID = projectID
-        
 //        editor = ProjectEditor(projectID: projectID)
         
         super.init(nibName: nil, bundle: nil)
-        modalPresentationStyle = .fullScreen
         
 //        do {
 //            try editor.startEditSession()
@@ -29,9 +31,9 @@ class EditorVC: UIViewController {
     
     required init?(coder: NSCoder) { fatalError() }
     
-//    deinit {
+    deinit {
 //        editor.endEditSession()
-//    }
+    }
     
     // MARK: - Lifecycle
     
@@ -39,7 +41,7 @@ class EditorVC: UIViewController {
         super.viewDidLoad()
         
         setupUI()
-        updateUI()
+        setInitialData()
     }
     
     override var prefersStatusBarHidden: Bool { true }
@@ -47,14 +49,19 @@ class EditorVC: UIViewController {
     // MARK: - Setup
     
     private func setupUI() {
-        contentVC.delegate = self
+        drawingVC.delegate = self
+        timelineVC.delegate = self
         
-        addChild(contentVC, to: view)
+        addChild(drawingVC, to: view)
+        addChild(timelineVC, to: view)
+        
+        drawingVC.setBottomInsetView(
+            timelineVC.contentAreaView)
     }
     
-    // MARK: - UI
+    // MARK: - Data
     
-    private func updateUI() {
+    private func setInitialData() {
 //        guard let projectManifest = editor.projectManifest
 //        else { return }
 //        
@@ -72,6 +79,7 @@ class EditorVC: UIViewController {
     
     // MARK: - Logic
     
+    // Move this to ProjectEditor?
     private func createEmptyDrawing() {
 //        let imageSize = defaultImageSize
 //        let imageData = Self.emptyImageData(
@@ -114,22 +122,30 @@ class EditorVC: UIViewController {
 
 // MARK: - Delegates
 
-extension EditorVC: EditorContentVCDelegate {
+extension EditorVC: EditorDrawingVCDelegate {
     
-    func onSelectBack(_ vc: EditorContentVC) {
-        dismiss(animated: true)
+}
+
+extension EditorVC: EditorTimelineVCDelegate {
+    
+    func onChangeFocusedFrame(
+        _ vc: EditorTimelineVC,
+        index: Int
+    ) {
+        // TODO
     }
     
-    func onSelectBrush(_ vc: EditorContentVC) {
-        //
+    func onRequestCreateDrawing(
+        _ vc: EditorTimelineVC,
+        frameIndex: Int
+    ) {
+        // TODO
     }
     
-    func onChangeFocusedFrame(_ vc: EditorContentVC, index: Int) {
-        // Switch to displaying new frame
-    }
-    
-    func needsDrawCanvas(_ vc: EditorContentVC) {
-        //
+    func onChangeContentAreaSize(
+        _ vc: EditorTimelineVC
+    ) {
+        drawingVC.handleChangeBottomInsetViewFrame()
     }
     
 }

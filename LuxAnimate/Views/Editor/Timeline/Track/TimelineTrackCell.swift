@@ -23,7 +23,7 @@ private let plusIconAnimateOutDuration: CGFloat = 0.3
 private let plusIconAnimateOutBounce: CGFloat = 0.4
 
 private let plusIconConfig = UIImage.SymbolConfiguration(
-    pointSize: 24,
+    pointSize: 26,
     weight: .bold,
     scale: .medium)
 

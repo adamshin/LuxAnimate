@@ -14,10 +14,9 @@ private let rotationSnapThreshold: Scalar =
 protocol MovableCanvasViewDelegate: AnyObject {
     
     func canvasSize(_ v: MovableCanvasView) -> Size
+    
     func minScale(_ v: MovableCanvasView) -> Scalar
     func maxScale(_ v: MovableCanvasView) -> Scalar
-    
-    func canvasBoundsReferenceView(_ v: MovableCanvasView) -> UIView?
     
     func onUpdateCanvasTransform(
         _ v: MovableCanvasView,
@@ -29,6 +28,8 @@ class MovableCanvasView: UIView {
     weak var delegate: MovableCanvasViewDelegate?
     
     let canvasContentView = MovableCanvasExtendedHitAreaView()
+    
+    private weak var safeAreaReferenceView: UIView?
     
     private let multiGesture = CanvasMultiGestureRecognizer()
     private let panGesture = UIPanGestureRecognizer()
@@ -126,9 +127,7 @@ class MovableCanvasView: UIView {
         guard let canvasSize = delegate?.canvasSize(self)
         else { return MovableCanvasTransform() }
         
-        let boundsReferenceView = delegate?
-            .canvasBoundsReferenceView(self)
-            ?? self
+        let boundsReferenceView = safeAreaReferenceView ?? self
         
         let referenceBoundsCenter = convert(
             boundsReferenceView.bounds.center,
@@ -259,14 +258,9 @@ class MovableCanvasView: UIView {
     
     // MARK: - Interface
     
-    func setNeedsCanvasSizeUpdate() {
+    func handleChangeCanvasSize() {
         isCanvasFitToBounds = false
         
-        setNeedsLayout()
-        layoutIfNeeded()
-    }
-    
-    func handleUpdateBoundsReferenceView() {
         setNeedsLayout()
         layoutIfNeeded()
     }
@@ -282,6 +276,16 @@ class MovableCanvasView: UIView {
         setCanvasTransform(
             baseCanvasTransform,
             animated: animated)
+    }
+    
+    func setSafeAreaReferenceView(_ safeAreaReferenceView: UIView) {
+        self.safeAreaReferenceView = safeAreaReferenceView
+        handleChangeSafeAreaReferenceViewFrame()
+    }
+    
+    func handleChangeSafeAreaReferenceViewFrame() {
+        setNeedsLayout()
+        layoutIfNeeded()
     }
     
 }

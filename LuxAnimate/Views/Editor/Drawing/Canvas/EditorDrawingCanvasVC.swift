@@ -1,5 +1,5 @@
 //
-//  EditorCanvasVC.swift
+//  EditorDrawingCanvasVC.swift
 //
 
 import UIKit
@@ -9,24 +9,20 @@ private let minScaleLevel: Scalar = 0.1
 private let maxScaleLevel: Scalar = 30
 private let scalePixelateThreshold: Scalar = 1.0
 
-protocol EditorCanvasVCDelegate: AnyObject {
-    
-    func canvasBoundsReferenceView(_ vc: EditorCanvasVC) -> UIView?
-    
-    func needsDrawCanvas(_ vc: EditorCanvasVC)
+protocol EditorDrawingCanvasVCDelegate: AnyObject {
     
 }
 
-class EditorCanvasVC: UIViewController {
+class EditorDrawingCanvasVC: UIViewController {
     
-    weak var delegate: EditorCanvasVCDelegate?
+    weak var delegate: EditorDrawingCanvasVCDelegate?
     
     weak var brushGestureDelegate: BrushGestureRecognizerGestureDelegate? {
         didSet {
             brushGesture.gestureDelegate = brushGestureDelegate
         }
     }
-        
+    
     private let metalView = MetalView()
     private let canvasView = MovableCanvasView()
     private let brushGesture = BrushGestureRecognizer()
@@ -34,6 +30,7 @@ class EditorCanvasVC: UIViewController {
 //    private let layerRenderer = MetalLayerTextureRenderer()
     
     private var canvasSize = PixelSize(width: 0, height: 0)
+    private var canvasTexture: MTLTexture?
     
     // MARK: - Lifecycle
     
@@ -69,6 +66,16 @@ class EditorCanvasVC: UIViewController {
         canvasView.fitCanvasToBounds(animated: false)
     }
     
+    // MARK: - Canvas
+    
+    private func drawCanvas() {
+//        guard let canvasTexture else { return }
+//        
+//        layerRenderer.draw(
+//            texture: canvasTexture,
+//            to: metalView.metalLayer)
+    }
+    
     // MARK: - Interface
     
     func setCanvasSize(_ canvasSize: PixelSize) {
@@ -78,25 +85,28 @@ class EditorCanvasVC: UIViewController {
             width: canvasSize.width,
             height: canvasSize.height))
         
-        canvasView.setNeedsCanvasSizeUpdate()
+        canvasView.handleChangeCanvasSize()
         canvasView.fitCanvasToBounds(animated: false)
     }
     
-    func handleUpdateBoundsReferenceView() {
-        canvasView.handleUpdateBoundsReferenceView()
+    func setCanvasTexture(_ texture: MTLTexture) {
+        canvasTexture = texture
+        drawCanvas()
     }
     
-    func drawTextureToCanvas(_ texture: MTLTexture) {
-//        layerRenderer.draw(
-//            texture: texture,
-//            to: metalView.metalLayer)
+    func setSafeAreaReferenceView(_ safeAreaReferenceView: UIView) {
+        canvasView.setSafeAreaReferenceView(safeAreaReferenceView)
+    }
+    
+    func handleChangeSafeAreaReferenceViewFrame() {
+        canvasView.handleChangeSafeAreaReferenceViewFrame()
     }
     
 }
 
 // MARK: - Delegates
 
-extension EditorCanvasVC: MovableCanvasViewDelegate {
+extension EditorDrawingCanvasVC: MovableCanvasViewDelegate {
     
     func canvasSize(_ v: MovableCanvasView) -> Size {
         Size(
@@ -110,10 +120,6 @@ extension EditorCanvasVC: MovableCanvasViewDelegate {
     
     func maxScale(_ v: MovableCanvasView) -> Scalar {
         maxScaleLevel
-    }
-    
-    func canvasBoundsReferenceView(_ v: MovableCanvasView) -> UIView? {
-        delegate?.canvasBoundsReferenceView(self)
     }
     
     func onUpdateCanvasTransform(
@@ -131,10 +137,10 @@ extension EditorCanvasVC: MovableCanvasViewDelegate {
     
 }
 
-extension EditorCanvasVC: MetalViewDelegate {
+extension EditorDrawingCanvasVC: MetalViewDelegate {
     
     func draw(in layer: CAMetalLayer) {
-        delegate?.needsDrawCanvas(self)
+        drawCanvas()
     }
     
 }
