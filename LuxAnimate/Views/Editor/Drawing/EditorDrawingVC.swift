@@ -111,6 +111,9 @@ class EditorDrawingVC: UIViewController {
         addChild(contentVC, to: view)
         
         contentVC.canvasVC.setCanvasSize(drawingSize)
+        
+        contentVC.toolOverlayVC.size = 0.25
+        contentVC.toolOverlayVC.smoothing = 0
     }
     
     // MARK: - Editing
@@ -180,12 +183,15 @@ extension EditorDrawingVC: EditorDrawingCanvasVCDelegate {
 extension EditorDrawingVC: BrushGestureRecognizerGestureDelegate {
     
     func onBeginBrushStroke() {
+        let scale = contentVC.toolOverlayVC.size
+        let smoothingLevel = contentVC.toolOverlayVC.smoothing
+        
         brushEngine.beginStroke(
             brush: brush,
             brushMode: .brush,
             color: brushColor,
-            scale: 0.5,
-            smoothingLevel: 0)
+            scale: scale,
+            smoothingLevel: smoothingLevel)
     }
     
     func onUpdateBrushStroke(

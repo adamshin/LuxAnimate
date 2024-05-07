@@ -4,10 +4,15 @@
 
 import UIKit
 
+private let sizeGamma: Double = 2.0
+private let sizeMin: Double = 0.01
+
+private let smoothingGamma: Double = 1.5
+
 class EditorBrushToolOverlayVC: UIViewController {
     
     private let sizeSlider = ToolOverlaySlider()
-    private let opacitySlider = ToolOverlaySlider()
+    private let smoothingSlider = ToolOverlaySlider()
     
     override func loadView() {
         view = PassthroughView()
@@ -23,13 +28,25 @@ class EditorBrushToolOverlayVC: UIViewController {
         stack.pin(.centerY)
         
         stack.addArrangedSubview(sizeSlider)
-        stack.addArrangedSubview(opacitySlider)
-        
-        sizeSlider.value = 0.5
-        opacitySlider.value = 1
+        stack.addArrangedSubview(smoothingSlider)
     }
     
-    var size: Double { sizeSlider.value }
-    var opacity: Double { opacitySlider.value }
+    var size: Double {
+        get {
+            max(pow(sizeSlider.value, sizeGamma), sizeMin)
+        }
+        set {
+            sizeSlider.value = pow(newValue, 1/sizeGamma)
+        }
+    }
+    
+    var smoothing: Double {
+        get {
+            pow(smoothingSlider.value, smoothingGamma)
+        }
+        set {
+            smoothingSlider.value = pow(newValue, 1/smoothingGamma)
+        }
+    }
     
 }
