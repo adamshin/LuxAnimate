@@ -349,22 +349,6 @@ extension TimelineTrackVC: UICollectionViewDelegate {
         updateVisibleCellsPlusButton(animated: true)
     }
     
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        isScrolling = false
-        isScrollDrivingFocusedFrame = true
-        
-        collectionView.isUserInteractionEnabled = true
-        updateVisibleCellsPlusButton(animated: true)
-    }
-    
-    func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
-        isScrolling = false
-        isScrollDrivingFocusedFrame = true
-        
-        collectionView.isUserInteractionEnabled = true
-        updateVisibleCellsPlusButton(animated: true)
-    }
-    
     func scrollViewWillEndDragging(
         _ scrollView: UIScrollView,
         withVelocity velocity: CGPoint,
@@ -394,6 +378,32 @@ extension TimelineTrackVC: UICollectionViewDelegate {
         targetContentOffset.pointee = CGPoint(
             x: target.x + offsetAdjustment,
             y: target.y)
+    }
+    
+    func scrollViewDidEndDragging(
+        _ scrollView: UIScrollView,
+        willDecelerate decelerate: Bool
+    ) {
+        isScrolling = decelerate
+        isScrollDrivingFocusedFrame = true
+        
+        updateVisibleCellsPlusButton(animated: true)
+    }
+    
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        isScrolling = false
+        isScrollDrivingFocusedFrame = true
+        
+        collectionView.isUserInteractionEnabled = true
+        updateVisibleCellsPlusButton(animated: true)
+    }
+    
+    func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        isScrolling = false
+        isScrollDrivingFocusedFrame = true
+        
+        collectionView.isUserInteractionEnabled = true
+        updateVisibleCellsPlusButton(animated: true)
     }
     
 }
