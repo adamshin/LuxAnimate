@@ -10,7 +10,7 @@ struct BrushStrokeGestureConfig {
     static let usePredictedTouches = true
     
     static let fingerActivationDelay: TimeInterval = 0.25
-    static let fingerActivationDistance: CGFloat = 10
+    static let fingerActivationDistance: CGFloat = 20
     static let fingerSecondTouchCancellationThreshold: TimeInterval = 0.25
     
     static let estimateFinalizationDelay: TimeInterval = 0.1

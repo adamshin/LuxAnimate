@@ -105,7 +105,6 @@ class EditorDrawingVC: UIViewController {
         super.viewDidLoad()
         
         contentVC.canvasVC.delegate = self
-        contentVC.canvasVC.brushGestureDelegate = self
         contentVC.topBarVC.delegate = self
         
         addChild(contentVC, to: view)
@@ -178,10 +177,6 @@ class EditorDrawingVC: UIViewController {
 // MARK: - Delegates
 
 extension EditorDrawingVC: EditorDrawingCanvasVCDelegate {
-    
-}
-
-extension EditorDrawingVC: BrushGestureRecognizerGestureDelegate {
     
     func onBeginBrushStroke() {
         let scale = contentVC.toolOverlayVC.size

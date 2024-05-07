@@ -9,17 +9,15 @@ private let minScaleLevel: Scalar = 0.1
 private let maxScaleLevel: Scalar = 30
 private let scalePixelateThreshold: Scalar = 1.0
 
-protocol EditorDrawingCanvasVCDelegate: AnyObject {
+protocol EditorDrawingCanvasVCDelegate: BrushGestureRecognizerGestureDelegate {
     
 }
 
 class EditorDrawingCanvasVC: UIViewController {
     
-    weak var delegate: EditorDrawingCanvasVCDelegate?
-    
-    weak var brushGestureDelegate: BrushGestureRecognizerGestureDelegate? {
+    weak var delegate: EditorDrawingCanvasVCDelegate? {
         didSet {
-            brushGesture.gestureDelegate = brushGestureDelegate
+            brushGesture.gestureDelegate = delegate
         }
     }
     

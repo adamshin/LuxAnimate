@@ -329,8 +329,8 @@
 		662232542BE0629F00C8813F /* Drawing */ = {
 			isa = PBXGroup;
 			children = (
-				66A05B782BDC7B6700434245 /* Title Bar */,
 				6643CB162BE8AA440094B998 /* Canvas */,
+				66A05B782BDC7B6700434245 /* Title Bar */,
 				6622325C2BE07CE100C8813F /* Tool Overlay */,
 				662232552BE062A900C8813F /* EditorDrawingVC.swift */,
 				6643CB172BE959740094B998 /* EditorDrawingContentVC.swift */,
