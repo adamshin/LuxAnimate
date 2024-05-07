@@ -103,7 +103,6 @@ class BrushGestureRecognizer: UIGestureRecognizer {
 extension BrushGestureRecognizer: BrushGestureRecognizerInternalStateDelegate {
     
     func setState(_ newState: BrushGestureRecognizerInternalState) {
-        print(type(of: newState))
         setInternalState(newState)
     }
     

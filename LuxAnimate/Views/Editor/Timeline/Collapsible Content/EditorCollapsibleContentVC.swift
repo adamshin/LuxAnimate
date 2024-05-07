@@ -77,7 +77,7 @@ class EditorCollapsibleContentVC: UIViewController {
             .pinEdges(.bottom, to: view.safeAreaLayoutGuide)
             .constraints.first!
         
-        collapsedConstraint = barView
+        collapsedConstraint = separatorContainer
             .pinEdges(.bottom, to: view.safeAreaLayoutGuide)
             .constraints.first!
         
