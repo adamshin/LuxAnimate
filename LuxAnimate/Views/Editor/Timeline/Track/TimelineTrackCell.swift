@@ -4,7 +4,9 @@
 
 import UIKit
 
-private let cornerRadius: CGFloat = 8
+private let cellCornerRadius: CGFloat = 8
+private let cellBorderColor = UIColor(white: 1, alpha: 0.1)
+
 private let canvasBackgroundColor: UIColor = .white
 private let noDrawingImageAlpha: CGFloat = 0.15
 
@@ -15,7 +17,7 @@ private let buttonSelectAnimateOutDuration: CGFloat = 0.25
 private let buttonSelectAnimateAlpha: CGFloat = 0.75
 private let buttonSelectAnimateScale: CGFloat = (64 - 6) / 64
 
-private let plusIconColor = UIColor(white: 0.7, alpha: 1)
+private let plusIconColor = UIColor(white: 0.8, alpha: 1)
 
 private let plusIconAnimateScale: CGFloat = 0.3
 private let plusIconAnimateInDuration: CGFloat = 0.3
@@ -186,9 +188,9 @@ private class TimelineTrackCellCardView: UIView {
         
         layer.masksToBounds = true
         layer.cornerCurve = .continuous
-        layer.cornerRadius = cornerRadius
+        layer.cornerRadius = cellCornerRadius
         layer.borderWidth = 1.0
-        layer.borderColor = UIColor(white: 1, alpha: 0.08).cgColor
+        layer.borderColor = cellBorderColor.cgColor
     }
     
     required init?(coder: NSCoder) { fatalError() }

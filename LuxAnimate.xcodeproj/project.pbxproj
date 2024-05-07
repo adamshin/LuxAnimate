@@ -341,9 +341,9 @@
 		662232582BE074B200C8813F /* Timeline */ = {
 			isa = PBXGroup;
 			children = (
-				662232592BE074D700C8813F /* Collapsible Content */,
-				662232622BE07D6500C8813F /* Toolbar */,
 				662232652BE07D6500C8813F /* Track */,
+				662232622BE07D6500C8813F /* Toolbar */,
+				662232592BE074D700C8813F /* Collapsible Content */,
 				6643CB022BE4672A0094B998 /* Menu */,
 				662232662BE07D6500C8813F /* EditorTimelineVC.swift */,
 				6643CB0F2BE6CE120094B998 /* EditorTimelineModel.swift */,
