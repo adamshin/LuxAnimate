@@ -63,7 +63,6 @@ class BrushEngine {
         smoothingLevel: Double
     ) {
         self.brushMode = brushMode
-        renderer.resetStroke()
         
         strokeEngine = BrushStrokeEngine(
             brush: brush,
@@ -87,10 +86,19 @@ class BrushEngine {
             stroke: strokeEngine.outputStroke,
             brushMode: brushMode)
         
+        renderer.finalizeStroke()
+        
         self.strokeEngine = nil
         
         delegate?.onUpdateCanvas(self)
         delegate?.onFinalizeStroke(self)
+    }
+    
+    func cancelStroke() {
+        renderer.cancelStroke()
+        self.strokeEngine = nil
+        
+        delegate?.onUpdateCanvas(self)
     }
     
     // MARK: - Frame

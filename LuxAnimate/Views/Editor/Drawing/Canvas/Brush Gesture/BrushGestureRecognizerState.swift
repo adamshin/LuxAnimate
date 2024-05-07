@@ -16,6 +16,7 @@ protocol BrushGestureRecognizerInternalStateDelegate: AnyObject {
     func onBeginBrushStroke()
     func onUpdateBrushStroke(_ stroke: BrushGestureRecognizer.Stroke)
     func onEndBrushStroke()
+    func onCancelBrushStroke()
     
 }
 
@@ -209,6 +210,23 @@ class BrushGestureRecognizerActiveState: BrushGestureRecognizerInternalState {
             BrushGestureRecognizerWaitingState())
     }
     
+    func touchesBegan(
+        touches: Set<UITouch>, event: UIEvent
+    ) {
+        if stroke.touch.type == .direct {
+            let cancellationThreshold = stroke.startTimestamp +
+                BrushStrokeGestureConfig.fingerSecondTouchCancellationThreshold
+            
+            if touches.contains(
+                where: { $0.timestamp < cancellationThreshold })
+            {
+                delegate?.onCancelBrushStroke()
+                delegate?.setState(BrushGestureRecognizerWaitingState())
+                delegate?.setGestureRecognizerState(.failed)
+            }
+        }
+    }
+    
     func touchesMoved(
         touches: Set<UITouch>, event: UIEvent
     ) {
@@ -236,7 +254,11 @@ class BrushGestureRecognizerActiveState: BrushGestureRecognizerInternalState {
     func touchesCancelled(
         touches: Set<UITouch>, event: UIEvent
     ) {
-        touchesEnded(touches: touches, event: event)
+        guard touches.contains(stroke.touch) else { return }
+        
+        delegate?.onCancelBrushStroke()
+        delegate?.setState(BrushGestureRecognizerWaitingState())
+        delegate?.setGestureRecognizerState(.failed)
     }
     
     func touchesEstimatedPropertiesUpdated(

@@ -11,6 +11,7 @@ class BrushEngineRenderer {
     private let stampRenderer = BrushEngineStampRenderer()
     private let textureBlitter = TextureBlitter()
     
+    private let originalCanvasTexture: MTLTexture
     private let partialStrokeCanvasTexture: MTLTexture
     private let fullStrokeCanvasTexture: MTLTexture
     
@@ -26,6 +27,9 @@ class BrushEngineRenderer {
         texDesc.storageMode = .shared
         texDesc.usage = [.renderTarget, .shaderRead]
         
+        originalCanvasTexture = MetalInterface.shared
+            .device.makeTexture(descriptor: texDesc)!
+        
         partialStrokeCanvasTexture = MetalInterface.shared
             .device.makeTexture(descriptor: texDesc)!
         
@@ -40,19 +44,15 @@ class BrushEngineRenderer {
     func setCanvasContents(_ texture: MTLTexture) {
         try? textureBlitter.blit(
             from: texture,
+            to: originalCanvasTexture)
+        
+        try? textureBlitter.blit(
+            from: texture,
             to: partialStrokeCanvasTexture)
         
         try? textureBlitter.blit(
             from: texture,
             to: fullStrokeCanvasTexture)
-    }
-    
-    func resetStroke() {
-        drawnFinalizedStampCount = 0
-        
-        try? textureBlitter.blit(
-            from: fullStrokeCanvasTexture,
-            to: partialStrokeCanvasTexture)
     }
     
     func update(
@@ -98,6 +98,30 @@ class BrushEngineRenderer {
             erase: erase)
         
         drawnFinalizedStampCount = finalizedStampCount
+    }
+    
+    func finalizeStroke() {
+        drawnFinalizedStampCount = 0
+        
+        try? textureBlitter.blit(
+            from: fullStrokeCanvasTexture,
+            to: originalCanvasTexture)
+        
+        try? textureBlitter.blit(
+            from: fullStrokeCanvasTexture,
+            to: partialStrokeCanvasTexture)
+    }
+    
+    func cancelStroke() {
+        drawnFinalizedStampCount = 0
+        
+        try? textureBlitter.blit(
+            from: originalCanvasTexture,
+            to: fullStrokeCanvasTexture)
+        
+        try? textureBlitter.blit(
+            from: originalCanvasTexture,
+            to: partialStrokeCanvasTexture)
     }
     
     private static func finalizedStampCount(

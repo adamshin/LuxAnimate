@@ -11,6 +11,7 @@ struct BrushStrokeGestureConfig {
     
     static let fingerActivationDelay: TimeInterval = 0.25
     static let fingerActivationDistance: CGFloat = 10
+    static let fingerSecondTouchCancellationThreshold: TimeInterval = 0.25
     
     static let estimateFinalizationDelay: TimeInterval = 0.1
     
@@ -24,6 +25,8 @@ protocol BrushGestureRecognizerGestureDelegate: AnyObject {
         _ stroke: BrushGestureRecognizer.Stroke)
     
     func onEndBrushStroke()
+    
+    func onCancelBrushStroke()
     
 }
 
@@ -100,6 +103,7 @@ class BrushGestureRecognizer: UIGestureRecognizer {
 extension BrushGestureRecognizer: BrushGestureRecognizerInternalStateDelegate {
     
     func setState(_ newState: BrushGestureRecognizerInternalState) {
+        print(type(of: newState))
         setInternalState(newState)
     }
     
@@ -117,6 +121,10 @@ extension BrushGestureRecognizer: BrushGestureRecognizerInternalStateDelegate {
     
     func onEndBrushStroke() {
         gestureDelegate?.onEndBrushStroke()
+    }
+    
+    func onCancelBrushStroke() {
+        gestureDelegate?.onCancelBrushStroke()
     }
     
 }

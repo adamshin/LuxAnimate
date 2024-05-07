@@ -43,7 +43,7 @@ private let brushConfig = Brush.Configuration(
     stampSpacing: 0.0,
     stampAlpha: 1,
     pressureScaling: 0.5,
-    taperLength: 0.05,
+    taperLength: 0,
     taperRoundness: 1.0)
 
 private let brushColor: Color = .brushBlack
@@ -205,6 +205,10 @@ extension EditorDrawingVC: BrushGestureRecognizerGestureDelegate {
     
     func onEndBrushStroke() {
         brushEngine.endStroke()
+    }
+    
+    func onCancelBrushStroke() {
+        brushEngine.cancelStroke()
     }
     
 }
