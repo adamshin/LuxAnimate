@@ -15,14 +15,15 @@ struct EditorTimelineModelGenerator {
     ) -> EditorTimelineModel {
         
         let emptyFrame = EditorTimelineModel.Frame(
-            drawing: nil)
+            hasDrawing: false,
+            thumbnailURL: nil)
         
         var frames = Array(
             repeating: emptyFrame,
             count: displayedFrameCount)
         
+        // Put drawings on frames
         let drawings = projectManifest.content.animationLayer.drawings
-        
         for drawing in drawings {
             guard frames.indices.contains(drawing.frameIndex)
             else { continue }
@@ -31,14 +32,19 @@ struct EditorTimelineModelGenerator {
                 projectID: projectManifest.id,
                 assetID: drawing.assetIDs.small)
             
-            let modelDrawing = EditorTimelineModel.Drawing(
-                id: drawing.id,
+            let frame = EditorTimelineModel.Frame(
+                hasDrawing: true,
                 thumbnailURL: thumbnailURL)
             
-            let frame = EditorTimelineModel.Frame(
-                drawing: modelDrawing)
-            
             frames[drawing.frameIndex] = frame
+        }
+        
+        // Propagate thumbnails forward
+        for index in frames.indices.dropFirst() {
+            if !frames[index].hasDrawing {
+                let thumbnailURL = frames[index - 1].thumbnailURL
+                frames[index].thumbnailURL = thumbnailURL
+            }
         }
         
         return EditorTimelineModel(frames: frames)

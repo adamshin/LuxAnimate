@@ -73,7 +73,7 @@ class EditorTimelineVC: UIViewController {
         
         let contentView = EditorTimelineFrameMenuView(
             frameIndex: frameIndex,
-            hasDrawing: frame.drawing != nil)
+            hasDrawing: frame.hasDrawing)
         
         let menu = EditorMenuView(
             contentView: contentView,

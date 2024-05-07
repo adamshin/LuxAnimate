@@ -50,10 +50,7 @@ class TimelineTrackVC: UIViewController {
     private let cellRegistration = UICollectionView.CellRegistration<
         TimelineTrackCell, 
         EditorTimelineModel.Frame
-    > { cell, indexPath, item in
-        
-        cell.updateContent(frame: item)
-    }
+    > { cell, indexPath, item in }
     
     private lazy var collectionView = TouchCancellingCollectionView(
         frame: .zero,
@@ -216,7 +213,7 @@ class TimelineTrackVC: UIViewController {
         
         let isFocused = index == focusedFrameIndex
         let isMenuOpen = index == openMenuFrameIndex
-        let hasDrawing = frame.drawing != nil
+        let hasDrawing = frame.hasDrawing
         
         let plusIconVisible = 
             isFocused &&
@@ -327,6 +324,11 @@ extension TimelineTrackVC: UICollectionViewDelegate {
     ) {
         guard let cell = cell as? TimelineTrackCell
         else { return }
+        
+        let index = indexPath.item
+        let frame = model.frames[index]
+        
+        cell.updateContent(frame: frame)
         
         updateCellPlusButton(
             cell: cell,

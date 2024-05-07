@@ -5,7 +5,7 @@
 import UIKit
 
 private let cornerRadius: CGFloat = 8
-private let noDrawingBackgroundColor = UIColor(white: 1, alpha: 0.15)
+private let noDrawingImageAlpha: CGFloat = 0.15
 
 private let longPressDuration: TimeInterval = 0.5
 
@@ -14,7 +14,7 @@ private let buttonSelectAnimateOutDuration: CGFloat = 0.25
 private let buttonSelectAnimateAlpha: CGFloat = 0.75
 private let buttonSelectAnimateScale: CGFloat = (64 - 6) / 64
 
-private let plusIconColor = UIColor(white: 1, alpha: 0.4)
+private let plusIconColor = UIColor(white: 1, alpha: 0.6)
 
 private let plusIconAnimateScale: CGFloat = 0.3
 private let plusIconAnimateInDuration: CGFloat = 0.3
@@ -86,8 +86,6 @@ class TimelineTrackCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         
-        imageView.image = nil
-        
         setPlusIconVisible(false, withAnimation: false)
         button.reset()
     }
@@ -105,14 +103,18 @@ class TimelineTrackCell: UICollectionViewCell {
     func updateContent(
         frame: EditorTimelineModel.Frame
     ) {
-        if let drawing = frame.drawing {
-            cardView.backgroundColor = .white
-            
-            let imageData = try? Data(contentsOf: drawing.thumbnailURL)
-            imageView.image = UIImage(data: imageData ?? Data())
-            
+        if frame.hasDrawing {
+            imageView.backgroundColor = .white
+            imageView.alpha = 1
         } else {
-            cardView.backgroundColor = noDrawingBackgroundColor
+            imageView.backgroundColor = .white
+            imageView.alpha = noDrawingImageAlpha
+        }
+        
+        if let thumbnailURL = frame.thumbnailURL {
+            let imageData = try? Data(contentsOf: thumbnailURL)
+            imageView.image = UIImage(data: imageData ?? Data())
+        } else {
             imageView.image = nil
         }
     }
