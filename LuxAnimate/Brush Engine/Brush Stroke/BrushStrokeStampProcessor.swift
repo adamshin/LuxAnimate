@@ -5,6 +5,8 @@
 import Foundation
 
 private let minStampDistance: Double = 1.0
+private let minStampSize: Double = 1.0
+
 private let maxTaperTime: TimeInterval = 0.2
 
 private  let pressureSensitivity: Double = 1.5
@@ -149,6 +151,7 @@ class BrushStrokeStampProcessor {
             * scale
             * pressureScale
             * taperScale
+        let clampedSize = max(size, minStampSize)
         
         let rotation = Self.rotation(from: sample.azimuth)
         
@@ -157,7 +160,7 @@ class BrushStrokeStampProcessor {
         let isFinalized = sample.isFinalized && !isInTaperEnd
         
         return BrushStrokeEngine.Stamp(
-            size: size,
+            size: clampedSize,
             position: sample.position,
             rotation: rotation,
             alpha: alpha,
