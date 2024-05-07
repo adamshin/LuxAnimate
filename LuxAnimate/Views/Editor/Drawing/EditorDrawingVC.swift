@@ -149,6 +149,8 @@ class EditorDrawingVC: UIViewController {
     // MARK: - Interface
     
     func showDrawing(_ drawing: Project.Drawing) {
+        brushEngine.endStroke()
+        
         drawingID = drawing.id
         
         let assetURL = FileUrlHelper().projectAssetURL(
@@ -158,7 +160,6 @@ class EditorDrawingVC: UIViewController {
         let assetTexture = try! JXLTextureLoader.load(
             url: assetURL)
         
-        brushEngine.endStroke()
         brushEngine.setCanvasContents(assetTexture)
         
         render()
