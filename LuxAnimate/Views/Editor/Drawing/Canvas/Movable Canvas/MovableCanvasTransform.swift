@@ -34,15 +34,16 @@ extension MovableCanvasTransform {
     
     mutating func applyScale(
         _ dScale: Scalar,
-        min: Scalar,
-        max: Scalar,
+        minScale: Scalar,
+        maxScale: Scalar,
         anchor: Vector2
     ) {
         let newScale = clamp(
             scale * dScale,
-            min: min,
-            max: max)
-        let scaleFactor = newScale / scale
+            min: minScale,
+            max: maxScale)
+        
+        let scaleFactor = max(0, newScale / scale)
         
         applyTranslation(-anchor)
         
@@ -81,6 +82,16 @@ extension MovableCanvasTransform {
                 break
             }
         }
+    }
+    
+    mutating func snapScale(
+        minScale: Scalar,
+        maxScale: Scalar
+    ) {
+        applyScale(1,
+            minScale: minScale,
+            maxScale: maxScale,
+            anchor: .zero)
     }
     
     func matrix() -> Matrix3 {

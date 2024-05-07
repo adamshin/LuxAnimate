@@ -157,10 +157,18 @@ class MovableCanvasView: UIView {
         _ transform: MovableCanvasTransform
     ) -> MovableCanvasTransform {
         
-        guard let canvasSize = delegate?.canvasSize(self)
+        guard let delegate
         else { return MovableCanvasTransform() }
         
+        let canvasSize = delegate.canvasSize(self)
+        let minScale = delegate.minScale(self)
+        let maxScale = delegate.maxScale(self)
+        
         var snappedTransform = transform
+        
+        snappedTransform.snapScale(
+            minScale: minScale,
+            maxScale: maxScale)
         
         snappedTransform.snapRotation(
             threshold: rotationSnapThreshold)
@@ -209,7 +217,6 @@ class MovableCanvasView: UIView {
         rotation: Scalar,
         scale: Scalar
     ) {
-        let minScale = delegate?.minScale(self) ?? 1
         let maxScale = delegate?.maxScale(self) ?? 1
         
         let anchor = Vector(
@@ -219,8 +226,8 @@ class MovableCanvasView: UIView {
         var newTransform = baseCanvasTransform
         
         newTransform.applyScale(scale,
-            min: minScale,
-            max: maxScale,
+            minScale: 0,
+            maxScale: maxScale,
             anchor: anchor)
         
         newTransform.applyRotation(rotation, anchor: anchor)
