@@ -60,6 +60,7 @@ class BrushEngine {
         brushMode: BrushMode,
         color: Color,
         scale: Double,
+        quickTap: Bool,
         smoothingLevel: Double
     ) {
         self.brushMode = brushMode
@@ -68,6 +69,7 @@ class BrushEngine {
             brush: brush,
             color: color,
             scale: scale,
+            quickTap: quickTap,
             smoothingLevel: smoothingLevel)
     }
     

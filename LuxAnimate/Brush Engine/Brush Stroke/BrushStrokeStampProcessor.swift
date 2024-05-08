@@ -22,12 +22,18 @@ class BrushStrokeStampProcessor {
     
     private let brush: Brush
     private let scale: Double
+    private let ignoreTaper: Bool
     
     private var lastFinalizedState: State
     
-    init(brush: Brush, scale: Double) {
+    init(
+        brush: Brush,
+        scale: Double,
+        ignoreTaper: Bool
+    ) {
         self.brush = brush
         self.scale = scale
+        self.ignoreTaper = ignoreTaper
         
         lastFinalizedState = State(
             stamps: [],
@@ -182,9 +188,15 @@ class BrushStrokeStampProcessor {
         endTimeOffset: TimeInterval
     ) -> (Double, Bool) {
         
-        let taperTime =
-            clamp(brush.taperLength, min: 0, max: 1)
-            * maxTaperTime
+        let taperTime: TimeInterval
+        
+        if ignoreTaper {
+            taperTime = 0
+        } else {
+            taperTime =
+                clamp(brush.taperLength, min: 0, max: 1)
+                * maxTaperTime
+        }
         
         let normalizedDistanceToStart = sampleTimeOffset / taperTime
         let normalizedDistanceToEnd = (endTimeOffset - sampleTimeOffset) / taperTime

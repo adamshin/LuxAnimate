@@ -13,7 +13,7 @@ protocol BrushGestureRecognizerInternalStateDelegate: AnyObject {
     
     func setGestureRecognizerState(_ newState: UIGestureRecognizer.State)
     
-    func onBeginBrushStroke()
+    func onBeginBrushStroke(quickTap: Bool)
     func onUpdateBrushStroke(_ stroke: BrushGestureRecognizer.Stroke)
     func onEndBrushStroke()
     func onCancelBrushStroke()
@@ -145,7 +145,7 @@ class BrushGestureRecognizerPreActiveState: BrushGestureRecognizerInternalState 
         stroke.hasTouchEnded = true
         stroke.predictedSamples = []
         
-        delegate?.onBeginBrushStroke()
+        delegate?.onBeginBrushStroke(quickTap: true)
         delegate?.onUpdateBrushStroke(stroke)
         
         delegate?.setState(
@@ -180,7 +180,7 @@ class BrushGestureRecognizerPreActiveState: BrushGestureRecognizerInternalState 
     }
     
     private func activateStroke() {
-        delegate?.onBeginBrushStroke()
+        delegate?.onBeginBrushStroke(quickTap: false)
         delegate?.onUpdateBrushStroke(stroke)
         
         delegate?.setGestureRecognizerState(.began)

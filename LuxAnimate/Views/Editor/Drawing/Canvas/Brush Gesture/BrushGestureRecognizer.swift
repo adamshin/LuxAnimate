@@ -19,7 +19,7 @@ struct BrushStrokeGestureConfig {
 
 protocol BrushGestureRecognizerGestureDelegate: AnyObject {
     
-    func onBeginBrushStroke()
+    func onBeginBrushStroke(quickTap: Bool)
     
     func onUpdateBrushStroke(
         _ stroke: BrushGestureRecognizer.Stroke)
@@ -110,8 +110,8 @@ extension BrushGestureRecognizer: BrushGestureRecognizerInternalStateDelegate {
         state = newState
     }
     
-    func onBeginBrushStroke() {
-        gestureDelegate?.onBeginBrushStroke()
+    func onBeginBrushStroke(quickTap: Bool) {
+        gestureDelegate?.onBeginBrushStroke(quickTap: quickTap)
     }
     
     func onUpdateBrushStroke(_ stroke: BrushGestureRecognizer.Stroke) {

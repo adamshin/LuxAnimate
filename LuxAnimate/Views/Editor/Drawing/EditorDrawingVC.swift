@@ -43,7 +43,7 @@ private let brushConfig = Brush.Configuration(
     stampSpacing: 0.0,
     stampAlpha: 1,
     pressureScaling: 0.5,
-    taperLength: 0,
+    taperLength: 1.0,
     taperRoundness: 1.0)
 
 private let brushColor: Color = .brushBlack
@@ -178,7 +178,7 @@ class EditorDrawingVC: UIViewController {
 
 extension EditorDrawingVC: EditorDrawingCanvasVCDelegate {
     
-    func onBeginBrushStroke() {
+    func onBeginBrushStroke(quickTap: Bool) {
         let scale = contentVC.toolOverlayVC.size
         let smoothingLevel = contentVC.toolOverlayVC.smoothing
         
@@ -187,6 +187,7 @@ extension EditorDrawingVC: EditorDrawingCanvasVCDelegate {
             brushMode: .brush,
             color: brushColor,
             scale: scale,
+            quickTap: quickTap,
             smoothingLevel: smoothingLevel)
     }
     

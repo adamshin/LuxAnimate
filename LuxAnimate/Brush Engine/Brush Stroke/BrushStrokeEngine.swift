@@ -41,6 +41,7 @@ class BrushStrokeEngine {
     
     private let brush: Brush
     private let color: Color
+    private let quickTap: Bool
     
     private let inputInterpolationProcessor: BrushStrokeInputInterpolationProcessor
     private let smoothingProcessor: BrushStrokeSmoothingProcessor
@@ -54,10 +55,12 @@ class BrushStrokeEngine {
         brush: Brush,
         color: Color,
         scale: Double,
+        quickTap: Bool,
         smoothingLevel: Double
     ) {
         self.brush = brush
         self.color = color
+        self.quickTap = quickTap
         
         inputInterpolationProcessor = .init()
         
@@ -68,7 +71,8 @@ class BrushStrokeEngine {
         
         stampProcessor = .init(
             brush: brush,
-            scale: scale)
+            scale: scale,
+            ignoreTaper: quickTap)
         
         outputStroke = OutputStroke(
             brush: brush,
