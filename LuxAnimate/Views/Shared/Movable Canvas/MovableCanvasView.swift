@@ -49,6 +49,7 @@ class MovableCanvasView: UIView {
     
     init() {
         super.init(frame: .zero)
+        clipsToBounds = true
         backgroundColor = .clear
         
         addSubview(canvasContentView)
