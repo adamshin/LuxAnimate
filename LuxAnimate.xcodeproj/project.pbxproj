@@ -471,7 +471,6 @@
 			isa = PBXGroup;
 			children = (
 				662232532BE049B000C8813F /* Movable Canvas */,
-				664B59432BC5A9D1003FA90E /* Brush Gesture */,
 				6643CB112BE892930094B998 /* EditorDrawingCanvasVC.swift */,
 			);
 			path = Canvas;
@@ -587,6 +586,7 @@
 				66D0847F2BA3ED7E00EB8556 /* Logic */,
 				66D0847E2BA3ED7600EB8556 /* Models */,
 				66099BBB2BDB32F500243D9F /* Brush Engine */,
+				664B59432BC5A9D1003FA90E /* Brush Gesture */,
 				66311CDE2BD740BC00D53489 /* Rendering */,
 				66311CD42BD7252D00D53489 /* Graphics */,
 				66D0846B2BA3CEC300EB8556 /* Utilities */,
