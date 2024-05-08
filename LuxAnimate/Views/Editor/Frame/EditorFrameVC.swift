@@ -139,14 +139,12 @@ class EditorFrameVC: UIViewController {
         drawingID = drawing.id
         isDrawingFullyLoaded = false
         
-        Task.detached(priority: .background) { [weak self] in
-            guard let self else { return }
+        DispatchQueue.global(qos: .background).async {
+            self.loadAndDisplayPreview(drawing: drawing)
             
-            await self.loadAndDisplayPreview(drawing: drawing)
+            guard self.drawingID == drawing.id else { return }
             
-            guard await self.drawingID == drawingID else { return }
-            
-            await self.loadAndDisplayFullData(drawing: drawing)
+            self.loadAndDisplayFullData(drawing: drawing)
         }
     }
     
@@ -161,40 +159,40 @@ class EditorFrameVC: UIViewController {
     
     private func loadAndDisplayPreview(
         drawing: Project.Drawing
-    ) async {
+    ) {
         let assetURL = fileUrlHelper.projectAssetURL(
             projectID: projectID,
             assetID: drawing.assetIDs.medium)
         
         let texture = try! JXLTextureLoader.load(url: assetURL)
         
-        await MainActor.run {
-            guard drawingID == drawing.id else { return }
+        DispatchQueue.main.async {
+            guard self.drawingID == drawing.id else { return }
             
-            drawingRenderer.draw(
+            self.drawingRenderer.draw(
                 drawingTexture: texture)
             
-            contentVC.canvasVC.setCanvasTexture(
-                drawingRenderer.texture)
+            self.contentVC.canvasVC.setCanvasTexture(
+                self.drawingRenderer.texture)
         }
     }
     
     private func loadAndDisplayFullData(
         drawing: Project.Drawing
-    ) async {
+    ) {
         let assetURL = fileUrlHelper.projectAssetURL(
             projectID: projectID,
             assetID: drawing.assetIDs.full)
         
         let texture = try! JXLTextureLoader.load(url: assetURL)
         
-        await MainActor.run {
-            guard drawingID == drawing.id else { return }
+        DispatchQueue.main.async {
+            guard self.drawingID == drawing.id else { return }
             
-            brushEngine.setCanvasContents(texture)
+            self.brushEngine.setCanvasContents(texture)
             
-            isDrawingFullyLoaded = true
-            render()
+            self.isDrawingFullyLoaded = true
+            self.render()
         }
     }
     
