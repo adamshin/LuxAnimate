@@ -1,5 +1,5 @@
 //
-//  EditorDrawingCanvasVC.swift
+//  EditorFrameCanvasVC.swift
 //
 
 import UIKit
@@ -9,13 +9,13 @@ private let minScaleLevel: Scalar = 0.1
 private let maxScaleLevel: Scalar = 30
 private let scalePixelateThreshold: Scalar = 1.0
 
-protocol EditorDrawingCanvasVCDelegate: BrushGestureRecognizerGestureDelegate {
+protocol EditorFrameCanvasVCDelegate: BrushGestureRecognizerGestureDelegate {
     
 }
 
-class EditorDrawingCanvasVC: UIViewController {
+class EditorFrameCanvasVC: UIViewController {
     
-    weak var delegate: EditorDrawingCanvasVCDelegate? {
+    weak var delegate: EditorFrameCanvasVCDelegate? {
         didSet {
             brushGesture.gestureDelegate = delegate
         }
@@ -100,7 +100,7 @@ class EditorDrawingCanvasVC: UIViewController {
 
 // MARK: - Delegates
 
-extension EditorDrawingCanvasVC: MovableCanvasViewDelegate {
+extension EditorFrameCanvasVC: MovableCanvasViewDelegate {
     
     func canvasSize(_ v: MovableCanvasView) -> Size {
         Size(
@@ -131,7 +131,7 @@ extension EditorDrawingCanvasVC: MovableCanvasViewDelegate {
     
 }
 
-extension EditorDrawingCanvasVC: MetalViewDelegate {
+extension EditorFrameCanvasVC: MetalViewDelegate {
     
     func draw(in layer: CAMetalLayer) {
         drawCanvas()

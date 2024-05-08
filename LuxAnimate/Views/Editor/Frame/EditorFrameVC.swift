@@ -1,5 +1,5 @@
 //
-//  EditorDrawingVC.swift
+//  EditorFrameVC.swift
 //
 
 import UIKit
@@ -48,23 +48,23 @@ private let brushConfig = Brush.Configuration(
 
 private let brushColor: Color = .brushBlack
 
-protocol EditorDrawingVCDelegate: AnyObject {
+protocol EditorFrameVCDelegate: AnyObject {
     
-    func onSelectBack(_ vc: EditorDrawingVC)
+    func onSelectBack(_ vc: EditorFrameVC)
     
     func onEditDrawing(
-        _ vc: EditorDrawingVC,
+        _ vc: EditorFrameVC,
         drawingID: String,
         imageData: Data,
         imageSize: PixelSize)
     
 }
 
-class EditorDrawingVC: UIViewController {
+class EditorFrameVC: UIViewController {
     
-    weak var delegate: EditorDrawingVCDelegate?
+    weak var delegate: EditorFrameVCDelegate?
     
-    private let contentVC = EditorDrawingContentVC()
+    private let contentVC = EditorFrameContentVC()
     
     private let projectID: String
     private let drawingSize: PixelSize
@@ -176,7 +176,7 @@ class EditorDrawingVC: UIViewController {
 
 // MARK: - Delegates
 
-extension EditorDrawingVC: EditorDrawingCanvasVCDelegate {
+extension EditorFrameVC: EditorFrameCanvasVCDelegate {
     
     func onBeginBrushStroke(quickTap: Bool) {
         let scale = contentVC.toolOverlayVC.size
@@ -210,17 +210,17 @@ extension EditorDrawingVC: EditorDrawingCanvasVCDelegate {
     
 }
 
-extension EditorDrawingVC: EditorDrawingTopBarVCDelegate {
+extension EditorFrameVC: EditorFrameTopBarVCDelegate {
     
-    func onSelectBack(_ vc: EditorDrawingTopBarVC) {
+    func onSelectBack(_ vc: EditorFrameTopBarVC) {
         delegate?.onSelectBack(self)
     }
     
-    func onSelectBrush(_ vc: EditorDrawingTopBarVC) { }
+    func onSelectBrush(_ vc: EditorFrameTopBarVC) { }
     
 }
 
-extension EditorDrawingVC: BrushEngineDelegate {
+extension EditorFrameVC: BrushEngineDelegate {
     
     func onUpdateCanvas(_ engine: BrushEngine) {
         render()

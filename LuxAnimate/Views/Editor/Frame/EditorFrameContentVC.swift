@@ -1,13 +1,13 @@
 //
-//  EditorDrawingContentVC.swift
+//  EditorFrameContentVC.swift
 //
 
 import UIKit
 
-class EditorDrawingContentVC: UIViewController {
+class EditorFrameContentVC: UIViewController {
     
-    let canvasVC = EditorDrawingCanvasVC()
-    let topBarVC = EditorDrawingTopBarVC()
+    let canvasVC = EditorFrameCanvasVC()
+    let topBarVC = EditorFrameTopBarVC()
     let toolOverlayVC = EditorBrushToolOverlayVC()
     
     let canvasSafeAreaView = PassthroughView()

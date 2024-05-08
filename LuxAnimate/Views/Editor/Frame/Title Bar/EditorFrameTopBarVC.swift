@@ -1,19 +1,19 @@
 //
-//  EditorDrawingTopBarVC.swift
+//  EditorFrameTopBarVC.swift
 //
 
 import UIKit
 
-protocol EditorDrawingTopBarVCDelegate: AnyObject {
-    func onSelectBack(_ vc: EditorDrawingTopBarVC)
-    func onSelectBrush(_ vc: EditorDrawingTopBarVC)
+protocol EditorFrameTopBarVCDelegate: AnyObject {
+    func onSelectBack(_ vc: EditorFrameTopBarVC)
+    func onSelectBrush(_ vc: EditorFrameTopBarVC)
 }
 
-class EditorDrawingTopBarVC: UIViewController {
+class EditorFrameTopBarVC: UIViewController {
     
-    weak var delegate: EditorDrawingTopBarVCDelegate?
+    weak var delegate: EditorFrameTopBarVCDelegate?
     
-    let bodyView = EditorDrawingTopBarView()
+    let bodyView = EditorFrameTopBarView()
     
     override func loadView() {
         view = bodyView

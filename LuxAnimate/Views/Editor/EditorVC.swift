@@ -6,11 +6,10 @@ import UIKit
 import PhotosUI
 
 // TODO: Frame prerendering and caching
-// Coordinate switching frames between timeline/canvas VCs
 
 class EditorVC: UIViewController {
     
-    private var drawingVC: EditorDrawingVC?
+    private var frameVC: EditorFrameVC?
     private let timelineVC = EditorTimelineVC()
     
     private let projectID: String
@@ -35,7 +34,7 @@ class EditorVC: UIViewController {
             let animationLayer = editor.currentProjectManifest
                 .content.animationLayer
             
-            drawingVC = EditorDrawingVC(
+            frameVC = EditorFrameVC(
                 projectID: projectID,
                 animationLayer: animationLayer)
             
@@ -58,15 +57,15 @@ class EditorVC: UIViewController {
     // MARK: - Setup
     
     private func setupUI() {
-        guard let drawingVC else { return }
+        guard let frameVC else { return }
         
-        drawingVC.delegate = self
+        frameVC.delegate = self
         timelineVC.delegate = self
         
-        addChild(drawingVC, to: view)
+        addChild(frameVC, to: view)
         addChild(timelineVC, to: view)
         
-        drawingVC.setBottomInsetView(
+        frameVC.setBottomInsetView(
             timelineVC.contentAreaView)
     }
     
@@ -87,14 +86,14 @@ class EditorVC: UIViewController {
 
 // MARK: - View Controller Delegates
 
-extension EditorVC: EditorDrawingVCDelegate {
+extension EditorVC: EditorFrameVCDelegate {
     
-    func onSelectBack(_ vc: EditorDrawingVC) {
+    func onSelectBack(_ vc: EditorFrameVC) {
         dismiss(animated: true)
     }
     
     func onEditDrawing(
-        _ vc: EditorDrawingVC,
+        _ vc: EditorFrameVC,
         drawingID: String,
         imageData: Data,
         imageSize: PixelSize
@@ -122,13 +121,13 @@ extension EditorVC: EditorTimelineVCDelegate {
             .first(where: { $0.frameIndex == index })
         else { return }
         
-        drawingVC?.showDrawing(drawing)
+        frameVC?.showDrawing(drawing)
     }
     
     func onChangeContentAreaSize(
         _ vc: EditorTimelineVC
     ) {
-        drawingVC?.handleChangeBottomInsetViewFrame()
+        frameVC?.handleChangeBottomInsetViewFrame()
     }
     
     func onRequestCreateDrawing(
