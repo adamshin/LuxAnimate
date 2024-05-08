@@ -20,7 +20,7 @@ typedef enum
 {
     ShaderSampleModeNearest = 0,
     ShaderSampleModeLinear = 1,
-    ShaderSampleModeLinearClampEdgeToZero = 2,
+    ShaderSampleModeLinearClampEdgeToBlack = 2,
 } ShaderSampleMode;
 
 typedef enum

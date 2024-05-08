@@ -48,7 +48,8 @@ struct SpriteRenderer {
         blendMode: BlendMode = .normal,
         sampleMode: SampleMode = .linear,
         colorMode: ColorMode = .none,
-        color: Color = .white
+        color: Color = .white,
+        addPadding: Bool = false
     ) {
         guard !sprites.isEmpty else { return }
         
@@ -75,10 +76,20 @@ struct SpriteRenderer {
             t = Matrix3(rotation: s.rotation) * t
             t = Matrix3(translation: s.position) * t
             
-            let quadPositions: [Vector] = [
+            var quadPositions: [Vector] = [
                 .init(0, 0), .init(1, 0), .init(1, 1),
                 .init(0, 0), .init(1, 1), .init(0, 1),
             ]
+            quadPositions = quadPositions.map { pos in
+                var pos = pos
+                pos -= Vector(0.5, 0.5)
+                if addPadding {
+                    pos *= 3 // TODO: adjust this based on scale
+                }
+                pos += Vector(0.5, 0.5)
+                return pos
+            }
+            
             let spriteVertices = quadPositions.map { p in
                 let tp = t * p
                 return SpriteVertex(

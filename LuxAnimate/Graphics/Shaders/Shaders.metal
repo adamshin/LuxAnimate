@@ -73,9 +73,10 @@ sampler samplerForMode(
                 min_filter::linear,
                 mip_filter::linear
             );
-        case ShaderSampleModeLinearClampEdgeToZero:
+        case ShaderSampleModeLinearClampEdgeToBlack:
             return sampler(
-                address::clamp_to_zero,
+                address::clamp_to_border,
+                border_color::opaque_black,
                 mag_filter::linear,
                 min_filter::linear,
                 mip_filter::linear

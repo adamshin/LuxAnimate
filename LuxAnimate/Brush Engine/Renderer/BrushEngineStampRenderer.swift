@@ -41,6 +41,7 @@ struct BrushEngineStampRenderer {
             texture: brush.stampTexture,
             sprites: sprites,
             blendMode: blendMode,
+            sampleMode: .linearClampEdgeToBlack,
             colorMode: .brush,
             color: color)
         
