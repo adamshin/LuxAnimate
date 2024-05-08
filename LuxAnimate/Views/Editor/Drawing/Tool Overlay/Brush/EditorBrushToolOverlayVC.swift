@@ -5,8 +5,6 @@
 import UIKit
 
 private let sizeGamma: Double = 2.0
-private let sizeMin: Double = 0.01
-
 private let smoothingGamma: Double = 1.5
 
 class EditorBrushToolOverlayVC: UIViewController {
@@ -33,7 +31,7 @@ class EditorBrushToolOverlayVC: UIViewController {
     
     var size: Double {
         get {
-            max(pow(sizeSlider.value, sizeGamma), sizeMin)
+            pow(sizeSlider.value, sizeGamma)
         }
         set {
             sizeSlider.value = pow(newValue, 1/sizeGamma)

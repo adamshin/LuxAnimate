@@ -153,8 +153,13 @@ class BrushStrokeStampProcessor {
             sampleTimeOffset: sample.timeOffset,
             endTimeOffset: endTimeOffset)
         
-        let size = brush.stampSize
-            * scale
+        // TODO: Allow brushes to control minimum size more explicitly?
+        let scaledBrushSize = map(
+            scale,
+            in: (0, 1),
+            to: (minStampSize, brush.stampSize))
+        
+        let size = scaledBrushSize
             * pressureScale
             * taperScale
         let clampedSize = max(size, minStampSize)

@@ -4,6 +4,8 @@
 
 import Metal
 
+private let paddingSizeThreshold: Double = 20
+
 struct BrushEngineStampRenderer {
     
     private let spriteRenderer = SpriteRenderer()
@@ -24,11 +26,16 @@ struct BrushEngineStampRenderer {
         let stampsToDraw = stamps[startIndex ..< endIndex]
         
         let sprites = stampsToDraw.map { stamp in
-            SpriteRenderer.Sprite(
+            let paddingScale: Double =
+                stamp.size < paddingSizeThreshold ?
+                3 : 1
+            
+            return SpriteRenderer.Sprite(
                 size: Size(stamp.size, stamp.size),
                 position: stamp.position,
                 rotation: stamp.rotation,
-                alpha: stamp.alpha)
+                alpha: stamp.alpha,
+                paddingScale: paddingScale)
         }
         
         let commandBuffer = MetalInterface.shared

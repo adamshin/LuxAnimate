@@ -13,6 +13,7 @@ struct SpriteRenderer {
         var rotation: Scalar = 0
         var scale: Scalar = 1
         var alpha: Double = 1
+        var paddingScale: Double = 1
     }
     
     private let pipelineState: MTLRenderPipelineState
@@ -48,8 +49,7 @@ struct SpriteRenderer {
         blendMode: BlendMode = .normal,
         sampleMode: SampleMode = .linear,
         colorMode: ColorMode = .none,
-        color: Color = .white,
-        addPadding: Bool = false
+        color: Color = .white
     ) {
         guard !sprites.isEmpty else { return }
         
@@ -83,9 +83,7 @@ struct SpriteRenderer {
             quadPositions = quadPositions.map { pos in
                 var pos = pos
                 pos -= Vector(0.5, 0.5)
-                if addPadding {
-                    pos *= 3 // TODO: adjust this based on scale
-                }
+                pos *= s.paddingScale
                 pos += Vector(0.5, 0.5)
                 return pos
             }

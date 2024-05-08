@@ -65,6 +65,7 @@
 		6643CB122BE892930094B998 /* EditorDrawingCanvasVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6643CB112BE892930094B998 /* EditorDrawingCanvasVC.swift */; };
 		6643CB182BE959740094B998 /* EditorDrawingContentVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6643CB172BE959740094B998 /* EditorDrawingContentVC.swift */; };
 		6643CB1A2BE975450094B998 /* EditorTimelineModelGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6643CB192BE975450094B998 /* EditorTimelineModelGenerator.swift */; };
+		6643CB222BEB354E0094B998 /* brush-square.png in Resources */ = {isa = PBXBuildFile; fileRef = 6643CB212BEB354E0094B998 /* brush-square.png */; };
 		664B593F2BC5A9AA003FA90E /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664B593D2BC5A9AA003FA90E /* AppConfig.swift */; };
 		664B59442BC5A9D1003FA90E /* BrushGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664B59402BC5A9D1003FA90E /* BrushGestureRecognizer.swift */; };
 		664B59452BC5A9D1003FA90E /* BrushGestureRecognizerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664B59412BC5A9D1003FA90E /* BrushGestureRecognizerState.swift */; };
@@ -167,6 +168,7 @@
 		6643CB112BE892930094B998 /* EditorDrawingCanvasVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorDrawingCanvasVC.swift; sourceTree = "<group>"; };
 		6643CB172BE959740094B998 /* EditorDrawingContentVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorDrawingContentVC.swift; sourceTree = "<group>"; };
 		6643CB192BE975450094B998 /* EditorTimelineModelGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorTimelineModelGenerator.swift; sourceTree = "<group>"; };
+		6643CB212BEB354E0094B998 /* brush-square.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "brush-square.png"; sourceTree = "<group>"; };
 		664B593D2BC5A9AA003FA90E /* AppConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
 		664B59402BC5A9D1003FA90E /* BrushGestureRecognizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrushGestureRecognizer.swift; sourceTree = "<group>"; };
 		664B59412BC5A9D1003FA90E /* BrushGestureRecognizerState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrushGestureRecognizerState.swift; sourceTree = "<group>"; };
@@ -291,6 +293,7 @@
 				66099BCB2BDB3D6400243D9F /* brush2.png */,
 				66099BCC2BDB3D6400243D9F /* brush3.png */,
 				66099BCA2BDB3D6400243D9F /* brush4.png */,
+				6643CB212BEB354E0094B998 /* brush-square.png */,
 			);
 			path = Brushes;
 			sourceTree = "<group>";
@@ -805,6 +808,7 @@
 				66099BCF2BDB3D6400243D9F /* brush2.png in Resources */,
 				6615BDF12BD4B51A00D26714 /* testCanvas.jxl in Resources */,
 				66099BCE2BDB3D6400243D9F /* brush4.png in Resources */,
+				6643CB222BEB354E0094B998 /* brush-square.png in Resources */,
 				66D084462BA3840D00EB8556 /* Assets.xcassets in Resources */,
 				66D084492BA3840D00EB8556 /* Base in Resources */,
 			);
