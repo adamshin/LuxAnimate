@@ -12,7 +12,8 @@ struct MetalLayerTextureRenderer {
     
     func draw(
         texture: MTLTexture,
-        to layer: CAMetalLayer
+        to layer: CAMetalLayer,
+        sampleMode: SampleMode = .nearest
     ) {
         guard let drawable = layer.nextDrawable() else { return }
         
@@ -30,7 +31,7 @@ struct MetalLayerTextureRenderer {
                     position: Vector(0.5, 0.5))
             ],
             blendMode: .replace,
-            sampleMode: .nearest)
+            sampleMode: sampleMode)
         
         commandBuffer.present(drawable)
         commandBuffer.commit()

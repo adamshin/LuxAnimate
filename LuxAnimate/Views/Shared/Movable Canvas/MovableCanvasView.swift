@@ -54,6 +54,7 @@ class MovableCanvasView: UIView {
         addSubview(canvasContentView)
         canvasContentView.frame = .zero
         canvasContentView.clipsToBounds = true
+        canvasContentView.isUserInteractionEnabled = false
         canvasContentView.backgroundColor = .clear
         
         addGestureRecognizer(multiGesture)

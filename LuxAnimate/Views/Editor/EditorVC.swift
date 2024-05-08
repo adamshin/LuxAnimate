@@ -104,6 +104,13 @@ extension EditorVC: EditorFrameVCDelegate {
             imageSize: imageSize)
     }
     
+    func currentProjectManifest(
+        _ vc: EditorFrameVC
+    ) -> Project.Manifest? {
+        
+        editor?.currentProjectManifest
+    }
+    
 }
 
 extension EditorVC: EditorTimelineVCDelegate {
@@ -112,16 +119,7 @@ extension EditorVC: EditorTimelineVCDelegate {
         _ vc: EditorTimelineVC,
         index: Int
     ) {
-        guard let editor else { return }
-        
-        let projectManifest = editor.currentProjectManifest
-        let animationLayer = projectManifest.content.animationLayer
-        
-        guard let drawing = animationLayer.drawings
-            .first(where: { $0.frameIndex == index })
-        else { return }
-        
-        frameVC?.showDrawing(drawing)
+        frameVC?.showFrame(at: index)
     }
     
     func onChangeContentAreaSize(
@@ -136,6 +134,8 @@ extension EditorVC: EditorTimelineVCDelegate {
     ) {
         try? editor?.createEmptyDrawing(
             frameIndex: frameIndex)
+        
+        frameVC?.handleUpdateFrame(at: frameIndex)
     }
     
     func onRequestDeleteDrawing(
@@ -144,6 +144,8 @@ extension EditorVC: EditorTimelineVCDelegate {
     ) {
         try? editor?.deleteDrawing(
             at: frameIndex)
+        
+        frameVC?.handleUpdateFrame(at: frameIndex)
     }
     
 }

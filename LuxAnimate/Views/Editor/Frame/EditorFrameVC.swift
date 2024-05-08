@@ -58,6 +58,10 @@ protocol EditorFrameVCDelegate: AnyObject {
         imageData: Data,
         imageSize: PixelSize)
     
+    func currentProjectManifest(
+        _ vc: EditorFrameVC
+    ) -> Project.Manifest?
+    
 }
 
 class EditorFrameVC: UIViewController {
@@ -69,13 +73,18 @@ class EditorFrameVC: UIViewController {
     private let projectID: String
     private let drawingSize: PixelSize
     
+    private var currentFrameIndex: Int?
+    
     private var drawingID: String?
+    private var isDrawingFullyLoaded = false
     
     private let brushEngine: BrushEngine
     private let drawingRenderer: DrawingEditorFrameRenderer
     
     private let brush = try! Brush(
         configuration: brushConfig)
+    
+    private let fileUrlHelper = FileUrlHelper()
     
     // MARK: - Init
     
@@ -111,8 +120,82 @@ class EditorFrameVC: UIViewController {
         
         contentVC.canvasVC.setCanvasSize(drawingSize)
         
-        contentVC.toolOverlayVC.size = 0.25
+        contentVC.toolOverlayVC.size = 0.2
         contentVC.toolOverlayVC.smoothing = 0
+    }
+    
+    // MARK: - Drawings
+    
+    private func showDrawing(
+        _ drawing: Project.Drawing,
+        forceReload: Bool
+    ) {
+        if drawingID == drawing.id, !forceReload {
+            return
+        }
+        
+        brushEngine.endStroke()
+        
+        drawingID = drawing.id
+        isDrawingFullyLoaded = false
+        
+        Task.detached(priority: .background) { [weak self] in
+            guard let self else { return }
+            
+            await self.loadAndDisplayPreview(drawing: drawing)
+            
+            guard await self.drawingID == drawingID else { return }
+            
+            await self.loadAndDisplayFullData(drawing: drawing)
+        }
+    }
+    
+    private func showNoDrawing() {
+        brushEngine.endStroke()
+        
+        drawingID = nil
+        isDrawingFullyLoaded = true
+        
+        // TODO: Clear brush engine canvas
+    }
+    
+    private func loadAndDisplayPreview(
+        drawing: Project.Drawing
+    ) async {
+        let assetURL = fileUrlHelper.projectAssetURL(
+            projectID: projectID,
+            assetID: drawing.assetIDs.medium)
+        
+        let texture = try! JXLTextureLoader.load(url: assetURL)
+        
+        await MainActor.run {
+            guard drawingID == drawing.id else { return }
+            
+            drawingRenderer.draw(
+                drawingTexture: texture)
+            
+            contentVC.canvasVC.setCanvasTexture(
+                drawingRenderer.texture)
+        }
+    }
+    
+    private func loadAndDisplayFullData(
+        drawing: Project.Drawing
+    ) async {
+        let assetURL = fileUrlHelper.projectAssetURL(
+            projectID: projectID,
+            assetID: drawing.assetIDs.full)
+        
+        let texture = try! JXLTextureLoader.load(url: assetURL)
+        
+        await MainActor.run {
+            guard drawingID == drawing.id else { return }
+            
+            brushEngine.setCanvasContents(texture)
+            
+            isDrawingFullyLoaded = true
+            render()
+        }
     }
     
     // MARK: - Editing
@@ -147,21 +230,32 @@ class EditorFrameVC: UIViewController {
     
     // MARK: - Interface
     
-    func showDrawing(_ drawing: Project.Drawing) {
-        brushEngine.endStroke()
+    func showFrame(
+        at frameIndex: Int,
+        forceReload: Bool = false
+    ) {
+        currentFrameIndex = frameIndex
         
-        drawingID = drawing.id
+        guard let projectManifest =
+            delegate?.currentProjectManifest(self)
+        else { return }
         
-        let assetURL = FileUrlHelper().projectAssetURL(
-            projectID: projectID,
-            assetID: drawing.assetIDs.full)
+        let animationLayer = projectManifest.content.animationLayer
         
-        let assetTexture = try! JXLTextureLoader.load(
-            url: assetURL)
-        
-        brushEngine.setCanvasContents(assetTexture)
-        
-        render()
+        if let drawing = drawingForFrame(
+            drawings: animationLayer.drawings,
+            frameIndex: frameIndex)
+        {
+            showDrawing(drawing, forceReload: forceReload)
+        } else {
+            showNoDrawing()
+        }
+    }
+    
+    func handleUpdateFrame(at frameIndex: Int) {
+        if currentFrameIndex == frameIndex {
+            showFrame(at: frameIndex, forceReload: true)
+        }
     }
     
     func setBottomInsetView(_ bottomInsetView: UIView) {
@@ -179,6 +273,8 @@ class EditorFrameVC: UIViewController {
 extension EditorFrameVC: EditorFrameCanvasVCDelegate {
     
     func onBeginBrushStroke(quickTap: Bool) {
+        guard isDrawingFullyLoaded else { return }
+        
         let scale = contentVC.toolOverlayVC.size
         let smoothingLevel = contentVC.toolOverlayVC.smoothing
         
@@ -194,6 +290,8 @@ extension EditorFrameVC: EditorFrameCanvasVCDelegate {
     func onUpdateBrushStroke(
         _ stroke: BrushGestureRecognizer.Stroke
     ) {
+        guard isDrawingFullyLoaded else { return }
+        
         let inputStroke = BrushEngineGestureAdapter
             .convert(stroke)
         
@@ -201,10 +299,12 @@ extension EditorFrameVC: EditorFrameCanvasVCDelegate {
     }
     
     func onEndBrushStroke() {
+        guard isDrawingFullyLoaded else { return }
         brushEngine.endStroke()
     }
     
     func onCancelBrushStroke() {
+        guard isDrawingFullyLoaded else { return }
         brushEngine.cancelStroke()
     }
     
@@ -230,4 +330,35 @@ extension EditorFrameVC: BrushEngineDelegate {
         applyBrushStrokeEdit()
     }
     
+}
+
+// MARK: - Frame Search
+
+private func drawingForFrame(
+    drawings: [Project.Drawing],
+    frameIndex: Int
+) -> Project.Drawing? {
+    
+    guard !drawings.isEmpty else { return nil }
+    
+    var left = 0
+    var right = drawings.count - 1
+    
+    while left <= right {
+        let mid = (left + right) / 2
+        
+        if drawings[mid].frameIndex == frameIndex {
+            return drawings[mid]
+        } else if drawings[mid].frameIndex < frameIndex {
+            left = mid + 1
+        } else {
+            right = mid - 1
+        }
+    }
+    
+    if right < 0 {
+        return nil
+    }
+    
+    return drawings[right]
 }
