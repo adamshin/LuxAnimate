@@ -9,11 +9,18 @@ private let framesPerSecond = 24
 
 protocol EditorTimelineVCDelegate: AnyObject {
     
+    func onChangeContentAreaSize(
+        _ vc: EditorTimelineVC)
+    
+    func onRequestFocusFrame(
+        _ vc: EditorTimelineVC,
+        index: Int)
+    
     func onChangeFocusedFrame(
         _ vc: EditorTimelineVC,
         index: Int)
     
-    func onChangeContentAreaSize(
+    func onSelectPlayPause(
         _ vc: EditorTimelineVC)
     
     func onRequestCreateDrawing(
@@ -95,6 +102,19 @@ class EditorTimelineVC: UIViewController {
         trackVC.setModel(model)
     }
     
+    func focusFrame(at index: Int) {
+        trackVC.focusFrame(at: index, animated: false)
+    }
+    
+    func setPlaying(_ playing: Bool) {
+        toolbarVC.setPlaying(playing)
+        trackVC.view.isUserInteractionEnabled = !playing
+    }
+    
+    var focusedFrameIndex: Int {
+        trackVC.focusedFrameIndex
+    }
+    
     var contentAreaView: UIView {
         collapsibleContentVC.contentAreaView
     }
@@ -122,30 +142,32 @@ extension EditorTimelineVC: EditorCollapsibleContentVCDelegate {
 
 extension EditorTimelineVC: TimelineToolbarVCDelegate {
     
-    func onSelectPlay(_ vc: TimelineToolbarVC) { }
+    func onSelectPlayPause(_ vc: TimelineToolbarVC) {
+        delegate?.onSelectPlayPause(self)
+    }
     
     func onSelectFirstFrame(_ vc: TimelineToolbarVC) {
-        trackVC.focusFrame(
-            at: 0,
-            animated: false)
+        delegate?.onRequestFocusFrame(
+            self, 
+            index: 0)
     }
     
     func onSelectLastFrame(_ vc: TimelineToolbarVC) {
-        trackVC.focusFrame(
-            at: frameCount - 1,
-            animated: false)
+        delegate?.onRequestFocusFrame(
+            self, 
+            index: frameCount - 1)
     }
     
     func onSelectPreviousFrame(_ vc: TimelineToolbarVC) {
-        trackVC.focusFrame(
-            at: trackVC.focusedFrameIndex - 1,
-            animated: false)
+        delegate?.onRequestFocusFrame(
+            self,
+            index: trackVC.focusedFrameIndex - 1)
     }
     
     func onSelectNextFrame(_ vc: TimelineToolbarVC) {
-        trackVC.focusFrame(
-            at: trackVC.focusedFrameIndex + 1,
-            animated: false)
+        delegate?.onRequestFocusFrame(
+            self,
+            index: trackVC.focusedFrameIndex + 1)
     }
     
     func onSelectToggleExpanded(_ vc: TimelineToolbarVC) {

@@ -5,7 +5,7 @@
 import UIKit
 
 protocol TimelineToolbarVCDelegate: AnyObject {
-    func onSelectPlay(_ vc: TimelineToolbarVC)
+    func onSelectPlayPause(_ vc: TimelineToolbarVC)
     func onSelectFirstFrame(_ vc: TimelineToolbarVC)
     func onSelectLastFrame(_ vc: TimelineToolbarVC)
     func onSelectPreviousFrame(_ vc: TimelineToolbarVC)
@@ -28,7 +28,7 @@ class TimelineToolbarVC: UIViewController {
         
         bodyView.playButton.addHandler { [weak self] in
             guard let self else { return }
-            self.delegate?.onSelectPlay(self)
+            self.delegate?.onSelectPlayPause(self)
         }
         bodyView.firstFrameButton.addHandler { [weak self] in
             guard let self else { return }
@@ -52,7 +52,7 @@ class TimelineToolbarVC: UIViewController {
         }
     }
     
-    func setPlayButtonPlaying(_ playing: Bool) {
+    func setPlaying(_ playing: Bool) {
         bodyView.setPlayButtonPlaying(playing)
     }
     

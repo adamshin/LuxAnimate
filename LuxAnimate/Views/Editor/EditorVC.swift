@@ -16,7 +16,8 @@ class EditorVC: UIViewController {
     
     private var editor: ProjectEditor?
     
-    private let modelGenerator = EditorTimelineModelGenerator()
+    private let timelineModelGenerator = EditorTimelineModelGenerator()
+    private let playbackController = EditorPlaybackController()
     
     // MARK: - Init
     
@@ -25,6 +26,8 @@ class EditorVC: UIViewController {
         
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
+        
+        playbackController.delegate = self
         
         do {
             let editor = try ProjectEditor(projectID: projectID)
@@ -74,12 +77,19 @@ class EditorVC: UIViewController {
     private func setInitialData() {
         guard let editor else { return }
         
-        let projectManifest = editor.currentProjectManifest
-        
-        let model = modelGenerator
+        updateData(projectManifest: editor.currentProjectManifest)
+    }
+    
+    private func updateData(projectManifest: Project.Manifest) {
+        let model = timelineModelGenerator
             .generate(from: projectManifest)
         
         timelineVC.setModel(model)
+        
+        playbackController.frameCount = 
+            model.frames.count
+        playbackController.framesPerSecond = 12
+            //projectManifest.metadata.framesPerSecond
     }
     
 }
@@ -115,6 +125,29 @@ extension EditorVC: EditorFrameVCDelegate {
 
 extension EditorVC: EditorTimelineVCDelegate {
     
+    func onChangeContentAreaSize(
+        _ vc: EditorTimelineVC
+    ) {
+        frameVC?.handleChangeBottomInsetViewFrame()
+    }
+    
+    func onRequestFocusFrame(
+        _ vc: EditorTimelineVC,
+        index: Int
+    ) {
+        if playbackController.isPlaying {
+            playbackController.stopPlayback()
+            
+            if index < playbackController.frameCount {
+                playbackController.startPlayback(frameIndex: index)
+            } else {
+                timelineVC.focusFrame(at: index)
+            }
+        } else {
+            timelineVC.focusFrame(at: index)
+        }
+    }
+    
     func onChangeFocusedFrame(
         _ vc: EditorTimelineVC,
         index: Int
@@ -122,10 +155,15 @@ extension EditorVC: EditorTimelineVCDelegate {
         frameVC?.showFrame(at: index)
     }
     
-    func onChangeContentAreaSize(
+    func onSelectPlayPause(
         _ vc: EditorTimelineVC
     ) {
-        frameVC?.handleChangeBottomInsetViewFrame()
+        if playbackController.isPlaying {
+            playbackController.stopPlayback()
+        } else {
+            playbackController.startPlayback(
+                frameIndex: timelineVC.focusedFrameIndex)
+        }
     }
     
     func onRequestCreateDrawing(
@@ -155,10 +193,34 @@ extension EditorVC: EditorTimelineVCDelegate {
 extension EditorVC: ProjectEditorDelegate {
     
     func onEditProject(_ editor: ProjectEditor) {
-        let model = modelGenerator
-            .generate(from: editor.currentProjectManifest)
-        
-        timelineVC.setModel(model)
+        updateData(projectManifest: editor.currentProjectManifest)
+    }
+    
+}
+
+// MARK: - Playback Controller Delegate
+
+extension EditorVC: EditorPlaybackControllerDelegate {
+    
+    func onBeginPlayback(
+        _ c: EditorPlaybackController
+    ) {
+        frameVC?.setPlaying(true)
+        timelineVC.setPlaying(true)
+    }
+    
+    func onUpdatePlayback(
+        _ c: EditorPlaybackController,
+        frameIndex: Int
+    ) {
+        timelineVC.focusFrame(at: frameIndex)
+    }
+    
+    func onEndPlayback(
+        _ c: EditorPlaybackController
+    ) {
+        frameVC?.setPlaying(false)
+        timelineVC.setPlaying(false)
     }
     
 }

@@ -1,11 +1,11 @@
 //
-//  BrushEngineDisplayLink.swift
+//  WrappedDisplayLink.swift
 //
 
 import Foundation
 import QuartzCore
 
-class BrushEngineDisplayLink {
+class WrappedDisplayLink {
     
     private var displayLink: CADisplayLink?
     
@@ -31,9 +31,9 @@ class BrushEngineDisplayLink {
 
 private class WeakWrapper {
     
-    weak var wrapped: BrushEngineDisplayLink?
+    weak var wrapped: WrappedDisplayLink?
     
-    init(_ wrapped: BrushEngineDisplayLink) {
+    init(_ wrapped: WrappedDisplayLink) {
         self.wrapped = wrapped
     }
     

@@ -25,7 +25,7 @@ class BrushEngine {
     let canvasSize: PixelSize
     
     private let renderer: BrushEngineRenderer
-    private let displayLink = BrushEngineDisplayLink()
+    private let displayLink = WrappedDisplayLink()
     
     private var brushMode: BrushMode = .brush
     private var strokeEngine: BrushStrokeEngine?
