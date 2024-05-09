@@ -179,8 +179,15 @@ extension EditorTimelineVC: TimelineToolbarVCDelegate {
 extension EditorTimelineVC: TimelineTrackVCDelegate {
     
     func onSelectFocusedFrame(_ vc: TimelineTrackVC, index: Int) {
-        delegate?.onRequestCreateDrawing(self,
-            frameIndex: trackVC.focusedFrameIndex)
+        let frame = model.frames[index]
+        
+        if frame.hasDrawing {
+            showFrameMenu(frameIndex: index)
+            
+        } else {
+            delegate?.onRequestCreateDrawing(self,
+                frameIndex: trackVC.focusedFrameIndex)
+        }
     }
     
     func onSelectFrame(_ vc: TimelineTrackVC, index: Int) {
