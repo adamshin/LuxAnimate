@@ -7,7 +7,7 @@ import UIKit
 private let barHeight: CGFloat = 48
 private let separatorColor = UIColor(white: 1, alpha: 0.04)
 
-private let animationDuration: TimeInterval = 0.3
+private let animationDuration: TimeInterval = 0.25
 private let animationBounce: TimeInterval = 0
 
 protocol EditorCollapsibleContentVCDelegate: AnyObject {
