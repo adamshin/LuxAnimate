@@ -98,7 +98,7 @@ private class PopupView: UIView {
         stack.pinCenter()
         
         stack.addArrangedSubview(titleLabel)
-        titleLabel.textColor = .editorLabelSecondary
+        titleLabel.textColor = .editorLabel
         titleLabel.font = .systemFont(ofSize: 15, weight: .medium)
         titleLabel.text = title
         

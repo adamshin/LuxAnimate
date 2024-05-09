@@ -16,8 +16,8 @@ private let thumbHeight: CGFloat = 16
 private let pressAnimDuration: TimeInterval = 0.25
 private let pressScaleFactor: CGFloat = (barWidth + 4) / barWidth
 
-private let thumbNormalColor = UIColor.white.withAlphaComponent(0.7)
-private let thumbSelectedColor = UIColor.white.withAlphaComponent(0.95)
+private let thumbNormalColor = UIColor(white: 1, alpha: 0.7)
+private let thumbSelectedColor = UIColor(white: 1, alpha: 0.95)
 
 private let dragRate: CGFloat = 0.5
 
