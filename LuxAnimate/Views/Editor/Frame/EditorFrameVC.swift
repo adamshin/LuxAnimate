@@ -78,7 +78,7 @@ class EditorFrameVC: UIViewController {
     private var currentFrameIndex: Int?
     
     private var drawingID: String?
-    private var isDrawingFullyLoaded = false
+    private var isEditingEnabled = false
     
     private let brushEngine: BrushEngine
     private let drawingRenderer: DrawingEditorFrameRenderer
@@ -139,7 +139,7 @@ class EditorFrameVC: UIViewController {
         brushEngine.endStroke()
         
         drawingID = drawing.id
-        isDrawingFullyLoaded = false
+        isEditingEnabled = false
         
         DispatchQueue.global(qos: .background).async {
             self.loadAndDisplayPreview(drawing: drawing)
@@ -154,7 +154,7 @@ class EditorFrameVC: UIViewController {
         brushEngine.endStroke()
         
         drawingID = nil
-        isDrawingFullyLoaded = true
+        isEditingEnabled = false
         
         displayEmptyFrame()
     }
@@ -192,17 +192,15 @@ class EditorFrameVC: UIViewController {
             guard self.drawingID == drawing.id else { return }
             
             self.brushEngine.setCanvasContents(texture)
-            
-            self.isDrawingFullyLoaded = true
             self.render()
+            
+            self.isEditingEnabled = true
         }
     }
     
     private func displayEmptyFrame() {
         let texture = emptyTexture(size: drawingSize)
         brushEngine.setCanvasContents(texture)
-        
-        isDrawingFullyLoaded = true
         render()
     }
     
@@ -300,8 +298,17 @@ class EditorFrameVC: UIViewController {
 
 extension EditorFrameVC: EditorFrameCanvasVCDelegate {
     
+    func onSelectUndo(_ vc: EditorFrameCanvasVC) {
+        delegate?.onSelectUndo(self)
+    }
+    
+    func onSelectRedo(_ vc: EditorFrameCanvasVC) {
+        delegate?.onSelectRedo(self)
+    }
+    
+    
     func onBeginBrushStroke(quickTap: Bool) {
-        guard isDrawingFullyLoaded else { return }
+        guard isEditingEnabled else { return }
         
         let scale = contentVC.toolOverlayVC.size
         let smoothingLevel = contentVC.toolOverlayVC.smoothing
@@ -318,7 +325,7 @@ extension EditorFrameVC: EditorFrameCanvasVCDelegate {
     func onUpdateBrushStroke(
         _ stroke: BrushGestureRecognizer.Stroke
     ) {
-        guard isDrawingFullyLoaded else { return }
+        guard isEditingEnabled else { return }
         
         let inputStroke = BrushEngineGestureAdapter
             .convert(stroke)
@@ -327,12 +334,12 @@ extension EditorFrameVC: EditorFrameCanvasVCDelegate {
     }
     
     func onEndBrushStroke() {
-        guard isDrawingFullyLoaded else { return }
+        guard isEditingEnabled else { return }
         brushEngine.endStroke()
     }
     
     func onCancelBrushStroke() {
-        guard isDrawingFullyLoaded else { return }
+        guard isEditingEnabled else { return }
         brushEngine.cancelStroke()
     }
     

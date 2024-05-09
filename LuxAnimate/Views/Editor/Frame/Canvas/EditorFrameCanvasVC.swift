@@ -11,6 +11,9 @@ private let scalePixelateThreshold: Scalar = 1.0
 
 protocol EditorFrameCanvasVCDelegate: BrushGestureRecognizerGestureDelegate {
     
+    func onSelectUndo(_ vc: EditorFrameCanvasVC)
+    func onSelectRedo(_ vc: EditorFrameCanvasVC)
+    
 }
 
 class EditorFrameCanvasVC: UIViewController {
@@ -23,6 +26,7 @@ class EditorFrameCanvasVC: UIViewController {
     
     private let metalView = MetalView()
     private let canvasView = MovableCanvasView()
+    
     private let brushGesture = BrushGestureRecognizer()
     
     private let layerRenderer = MetalLayerTextureRenderer()
