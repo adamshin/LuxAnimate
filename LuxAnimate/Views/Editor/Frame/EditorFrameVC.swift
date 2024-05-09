@@ -154,7 +154,7 @@ class EditorFrameVC: UIViewController {
         drawingID = nil
         isDrawingFullyLoaded = true
         
-        // TODO: Clear brush engine canvas
+        displayEmptyFrame()
     }
     
     private func loadAndDisplayPreview(
@@ -194,6 +194,25 @@ class EditorFrameVC: UIViewController {
             self.isDrawingFullyLoaded = true
             self.render()
         }
+    }
+    
+    private func displayEmptyFrame() {
+        let texture = emptyTexture(size: drawingSize)
+        brushEngine.setCanvasContents(texture)
+        
+        isDrawingFullyLoaded = true
+        render()
+    }
+    
+    private func emptyTexture(size: PixelSize) -> MTLTexture {
+        let byteCount = size.width * size.height * 4
+        let data = Data(repeating: 0, count: byteCount)
+        
+        return try! TextureCreator.createTexture(
+            imageData: data,
+            width: size.width,
+            height: size.height,
+            mipMapped: false)
     }
     
     // MARK: - Editing

@@ -9,6 +9,7 @@ struct JXLTextureLoader {
     
     static func load(
         url: URL,
+        mipMapped: Bool = false,
         usage: MTLTextureUsage = .shaderRead
     ) throws -> MTLTexture {
         
@@ -22,7 +23,8 @@ struct JXLTextureLoader {
             imageData: output.data,
             width: output.width,
             height: output.height,
-            mipMapped: false)
+            mipMapped: mipMapped,
+            usage: usage)
     }
     
 }

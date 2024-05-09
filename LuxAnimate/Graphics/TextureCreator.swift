@@ -14,14 +14,15 @@ struct TextureCreator {
         imageData: Data,
         width: Int,
         height: Int,
-        mipMapped: Bool
+        mipMapped: Bool,
+        usage: MTLTextureUsage = .shaderRead
     ) throws -> MTLTexture {
         
         let texDescriptor = MTLTextureDescriptor()
         texDescriptor.width = width
         texDescriptor.height = height
         texDescriptor.pixelFormat = AppConfig.pixelFormat
-        texDescriptor.usage = [.shaderRead]
+        texDescriptor.usage = usage
         
         if mipMapped {
             let widthLevels = ceil(log2(Double(width)))
