@@ -42,17 +42,20 @@ class BrushEngineRenderer {
     }
     
     func setCanvasContents(_ texture: MTLTexture) {
-        try? textureBlitter.blit(
-            from: texture,
-            to: originalCanvasTexture)
-        
-        try? textureBlitter.blit(
-            from: texture,
-            to: partialStrokeCanvasTexture)
-        
-        try? textureBlitter.blit(
-            from: texture,
-            to: fullStrokeCanvasTexture)
+        do {
+            try textureBlitter.blit(
+                from: texture,
+                to: originalCanvasTexture)
+            
+            try textureBlitter.blit(
+                from: texture,
+                to: partialStrokeCanvasTexture)
+            
+            try textureBlitter.blit(
+                from: texture,
+                to: fullStrokeCanvasTexture)
+            
+        } catch { }
     }
     
     func update(

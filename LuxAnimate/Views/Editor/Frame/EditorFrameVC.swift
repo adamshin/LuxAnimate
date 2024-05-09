@@ -88,6 +88,10 @@ class EditorFrameVC: UIViewController {
     
     private let fileUrlHelper = FileUrlHelper()
     
+    private let frameLoadingQueue = DispatchQueue(
+        label: "EditorFrameVC.frameLoadingQueue",
+        qos: .background)
+    
     // MARK: - Init
     
     init(
@@ -121,9 +125,6 @@ class EditorFrameVC: UIViewController {
         addChild(contentVC, to: view)
         
         contentVC.canvasVC.setCanvasSize(drawingSize)
-        
-        contentVC.toolOverlayVC.size = 0.2
-        contentVC.toolOverlayVC.smoothing = 0
     }
     
     // MARK: - Drawings
@@ -141,13 +142,7 @@ class EditorFrameVC: UIViewController {
         drawingID = drawing.id
         isEditingEnabled = false
         
-        DispatchQueue.global(qos: .background).async {
-            self.loadAndDisplayPreview(drawing: drawing)
-            
-            guard self.drawingID == drawing.id else { return }
-            
-            self.loadAndDisplayFullData(drawing: drawing)
-        }
+        loadAndDisplayFrame(drawing: drawing)
     }
     
     private func showNoDrawing() {
@@ -159,43 +154,52 @@ class EditorFrameVC: UIViewController {
         displayEmptyFrame()
     }
     
-    private func loadAndDisplayPreview(
+    private func loadAndDisplayFrame(
         drawing: Project.Drawing
     ) {
+        frameLoadingQueue.async {
+            self.loadAndDisplayPreviewImage(drawing: drawing)
+            self.loadAndDisplayFullImage(drawing: drawing)
+        }
+    }
+    
+    private func loadAndDisplayPreviewImage(
+        drawing: Project.Drawing
+    ) {
+        guard drawingID == drawing.id else { return }
+        
         let assetURL = fileUrlHelper.projectAssetURL(
             projectID: projectID,
             assetID: drawing.assetIDs.medium)
         
         let texture = try! JXLTextureLoader.load(url: assetURL)
         
-        DispatchQueue.main.async {
-            guard self.drawingID == drawing.id else { return }
-            
-            self.drawingRenderer.draw(
-                drawingTexture: texture)
-            
-            self.contentVC.canvasVC.setCanvasTexture(
-                self.drawingRenderer.texture)
-        }
+        guard drawingID == drawing.id else { return }
+        
+        drawingRenderer.draw(
+            drawingTexture: texture)
+        
+        contentVC.canvasVC.setCanvasTexture(
+            drawingRenderer.texture)
     }
     
-    private func loadAndDisplayFullData(
+    private func loadAndDisplayFullImage(
         drawing: Project.Drawing
     ) {
+        guard drawingID == drawing.id else { return }
+        
         let assetURL = fileUrlHelper.projectAssetURL(
             projectID: projectID,
             assetID: drawing.assetIDs.full)
         
         let texture = try! JXLTextureLoader.load(url: assetURL)
         
-        DispatchQueue.main.async {
-            guard self.drawingID == drawing.id else { return }
-            
-            self.brushEngine.setCanvasContents(texture)
-            self.render()
-            
-            self.isEditingEnabled = true
-        }
+        guard drawingID == drawing.id else { return }
+        
+        brushEngine.setCanvasContents(texture)
+        render()
+        
+        isEditingEnabled = true
     }
     
     private func displayEmptyFrame() {

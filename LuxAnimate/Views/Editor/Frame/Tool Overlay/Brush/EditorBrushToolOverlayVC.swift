@@ -4,6 +4,9 @@
 
 import UIKit
 
+private let defaultSize: Double = 0.2
+private let defaultSmoothing: Double = 0
+
 private let sizeGamma: Double = 2.0
 private let smoothingGamma: Double = 1.5
 
@@ -34,6 +37,9 @@ class EditorBrushToolOverlayVC: UIViewController {
         
         stack.addArrangedSubview(sizeSlider)
         stack.addArrangedSubview(smoothingSlider)
+        
+        size = defaultSize
+        smoothing = defaultSmoothing
     }
     
     var size: Double {
