@@ -109,6 +109,12 @@ class EditorFrameCanvasVC: UIViewController {
         drawCanvas()
     }
     
+    func setEditingEnabled(_ enabled: Bool) {
+        brushGesture.isEnabled = enabled
+        undoGesture.isEnabled = enabled
+        redoGesture.isEnabled = enabled
+    }
+    
     func setSafeAreaReferenceView(_ safeAreaReferenceView: UIView) {
         canvasView.setSafeAreaReferenceView(safeAreaReferenceView)
     }

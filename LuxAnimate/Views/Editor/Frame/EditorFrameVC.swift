@@ -295,7 +295,7 @@ class EditorFrameVC: UIViewController {
     }
     
     func setPlaying(_ playing: Bool) {
-        view.isUserInteractionEnabled = !playing
+        contentVC.canvasVC.setEditingEnabled(!playing)
     }
     
     func setBottomInsetView(_ bottomInsetView: UIView) {
