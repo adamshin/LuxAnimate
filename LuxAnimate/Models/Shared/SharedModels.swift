@@ -5,12 +5,12 @@
 import Foundation
 import Metal
 
-struct PixelSize: Codable {
-    var width, height: Int
-}
-
 struct Color: Codable {
     var r, g, b, a: UInt8
+}
+
+struct PixelSize: Codable {
+    var width, height: Int
 }
 
 // MARK: - Extensions
@@ -63,6 +63,48 @@ extension Color {
             Double(g) / 255,
             Double(b) / 255,
             Double(a) / 255)
+    }
+    
+}
+
+extension PixelSize {
+    
+    init(
+        filling containerSize: PixelSize,
+        aspectRatio: Double
+    ) {
+        let containerAspectRatio =
+            Double(containerSize.width) /
+            Double(containerSize.height)
+        
+        if aspectRatio > containerAspectRatio {
+            self = PixelSize(
+                width: Int(Double(containerSize.height) * aspectRatio),
+                height: containerSize.height)
+        } else {
+            self = PixelSize(
+                width: containerSize.width,
+                height: Int(Double(containerSize.width) / aspectRatio))
+        }
+    }
+
+    init(
+        fitting containerSize: PixelSize,
+        aspectRatio: Double
+    ) {
+        let containerAspectRatio =
+            Double(containerSize.width) /
+            Double(containerSize.height)
+        
+        if aspectRatio > containerAspectRatio {
+            self = PixelSize(
+                width: containerSize.width,
+                height: Int(Double(containerSize.width) / aspectRatio))
+        } else {
+            self = PixelSize(
+                width: Int(Double(containerSize.height) * aspectRatio),
+                height: containerSize.height)
+        }
     }
     
 }

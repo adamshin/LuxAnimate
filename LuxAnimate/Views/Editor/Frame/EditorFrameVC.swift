@@ -51,6 +51,8 @@ private let brushColor: Color = .brushBlack
 protocol EditorFrameVCDelegate: AnyObject {
     
     func onSelectBack(_ vc: EditorFrameVC)
+    func onSelectUndo(_ vc: EditorFrameVC)
+    func onSelectRedo(_ vc: EditorFrameVC)
     
     func onEditDrawing(
         _ vc: EditorFrameVC,
@@ -275,6 +277,11 @@ class EditorFrameVC: UIViewController {
         }
     }
     
+    func reloadFrame() {
+        guard let currentFrameIndex else { return }
+        showFrame(at: currentFrameIndex, forceReload: true)
+    }
+    
     func setPlaying(_ playing: Bool) {
         view.isUserInteractionEnabled = !playing
     }
@@ -337,7 +344,13 @@ extension EditorFrameVC: EditorFrameTopBarVCDelegate {
         delegate?.onSelectBack(self)
     }
     
-    func onSelectBrush(_ vc: EditorFrameTopBarVC) { }
+    func onSelectUndo(_ vc: EditorFrameTopBarVC) {
+        delegate?.onSelectUndo(self)
+    }
+    
+    func onSelectRedo(_ vc: EditorFrameTopBarVC) {
+        delegate?.onSelectRedo(self)
+    }
     
 }
 

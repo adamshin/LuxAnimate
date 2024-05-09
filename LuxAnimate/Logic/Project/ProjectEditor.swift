@@ -160,6 +160,18 @@ extension ProjectEditor {
         delegate?.onEditProject(self)
     }
     
+    // MARK: - Undo / Redo
+    
+    func applyUndo() throws {
+        try editSession.applyUndo()
+        delegate?.onEditProject(self)
+    }
+    
+    func applyRedo() throws {
+        try editSession.applyRedo()
+        delegate?.onEditProject(self)
+    }
+    
     // MARK: - Assets
     
     private struct CreatedDrawingAssets {
@@ -254,42 +266,6 @@ extension ProjectEditor {
                 mediumAsset,
                 smallAsset,
             ])
-    }
-    
-}
-
-private extension PixelSize {
-    
-    init(filling containerSize: PixelSize, aspectRatio: Double) {
-        let containerAspectRatio =
-            Double(containerSize.width) /
-            Double(containerSize.height)
-        
-        if aspectRatio > containerAspectRatio {
-            self = PixelSize(
-                width: Int(Double(containerSize.height) * aspectRatio),
-                height: containerSize.height)
-        } else {
-            self = PixelSize(
-                width: containerSize.width,
-                height: Int(Double(containerSize.width) / aspectRatio))
-        }
-    }
-
-    init(fitting containerSize: PixelSize, aspectRatio: Double) {
-        let containerAspectRatio =
-            Double(containerSize.width) /
-            Double(containerSize.height)
-        
-        if aspectRatio > containerAspectRatio {
-            self = PixelSize(
-                width: containerSize.width,
-                height: Int(Double(containerSize.width) / aspectRatio))
-        } else {
-            self = PixelSize(
-                width: Int(Double(containerSize.height) * aspectRatio),
-                height: containerSize.height)
-        }
     }
     
 }

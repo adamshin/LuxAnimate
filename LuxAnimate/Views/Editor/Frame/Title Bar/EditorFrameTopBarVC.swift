@@ -6,7 +6,8 @@ import UIKit
 
 protocol EditorFrameTopBarVCDelegate: AnyObject {
     func onSelectBack(_ vc: EditorFrameTopBarVC)
-    func onSelectBrush(_ vc: EditorFrameTopBarVC)
+    func onSelectUndo(_ vc: EditorFrameTopBarVC)
+    func onSelectRedo(_ vc: EditorFrameTopBarVC)
 }
 
 class EditorFrameTopBarVC: UIViewController {
@@ -26,9 +27,13 @@ class EditorFrameTopBarVC: UIViewController {
             guard let self else { return }
             self.delegate?.onSelectBack(self)
         }
-        bodyView.brushButton.addHandler { [weak self] in
+        bodyView.undoButton.addHandler { [weak self] in
             guard let self else { return }
-            self.delegate?.onSelectBrush(self)
+            self.delegate?.onSelectUndo(self)
+        }
+        bodyView.redoButton.addHandler { [weak self] in
+            guard let self else { return }
+            self.delegate?.onSelectRedo(self)
         }
     }
     

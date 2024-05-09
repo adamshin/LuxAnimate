@@ -7,7 +7,7 @@ import Foundation
 private let defaultCanvasSize = PixelSize(
     width: 1920, height: 1080)
 
-private let defaultFramesPerSecond = 24
+private let defaultFramesPerSecond = 12
 
 struct LibraryManager {
     

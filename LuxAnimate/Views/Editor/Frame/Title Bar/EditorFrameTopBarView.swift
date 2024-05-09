@@ -30,10 +30,20 @@ class EditorFrameTopBarView: UIView {
         return button
     }()
     
-    let brushButton = {
+    let undoButton = {
         let button = UIButton(type: .system)
         let image = UIImage(
-            systemName: "paintbrush.pointed.fill",
+            systemName: "arrow.uturn.backward",
+            withConfiguration: iconConfig)
+        button.setImage(image, for: .normal)
+        button.tintColor = .editorLabel
+        button.pinWidth(to: buttonWidth)
+        return button
+    }()
+    let redoButton = {
+        let button = UIButton(type: .system)
+        let image = UIImage(
+            systemName: "arrow.uturn.forward",
             withConfiguration: iconConfig)
         button.setImage(image, for: .normal)
         button.tintColor = .editorLabel
@@ -78,14 +88,8 @@ class EditorFrameTopBarView: UIView {
         leftStack.addArrangedSubview(backButton)
         leftStack.setCustomSpacing(8, after: backButton)
         
-        rightStack.addArrangedSubview(brushButton)
-        
-        brushButton.showsMenuAsPrimaryAction = true
-        brushButton.menu = UIMenu(
-            preferredElementSize: .large,
-            children: [
-                UIAction(title: "Test", handler: { _ in }),
-            ])
+        rightStack.addArrangedSubview(undoButton)
+        rightStack.addArrangedSubview(redoButton)
     }
     
     required init?(coder: NSCoder) { fatalError() }

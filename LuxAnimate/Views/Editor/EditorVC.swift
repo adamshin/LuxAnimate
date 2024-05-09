@@ -88,8 +88,8 @@ class EditorVC: UIViewController {
         
         playbackController.frameCount = 
             model.frames.count
-        playbackController.framesPerSecond = 12
-            //projectManifest.metadata.framesPerSecond
+        playbackController.framesPerSecond =
+            projectManifest.metadata.framesPerSecond
     }
     
 }
@@ -100,6 +100,16 @@ extension EditorVC: EditorFrameVCDelegate {
     
     func onSelectBack(_ vc: EditorFrameVC) {
         dismiss(animated: true)
+    }
+    
+    func onSelectUndo(_ vc: EditorFrameVC) {
+        try? editor?.applyUndo()
+        frameVC?.reloadFrame()
+    }
+    
+    func onSelectRedo(_ vc: EditorFrameVC) {
+        try? editor?.applyRedo()
+        frameVC?.reloadFrame()
     }
     
     func onEditDrawing(
