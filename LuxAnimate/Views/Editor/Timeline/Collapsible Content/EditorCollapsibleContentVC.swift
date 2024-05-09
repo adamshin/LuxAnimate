@@ -29,8 +29,10 @@ class EditorCollapsibleContentVC: UIViewController {
     let collapsibleContentView = UIView()
     
     private let bottomAreaContainer = UIView()
-    
     private let separator = UIView()
+    
+    private let swipeUpGesture = UISwipeGestureRecognizer()
+    private let swipeDownGesture = UISwipeGestureRecognizer()
     
     private var expandedConstraint: NSLayoutConstraint?
     private var collapsedConstraint: NSLayoutConstraint?
@@ -81,12 +83,32 @@ class EditorCollapsibleContentVC: UIViewController {
             .pinEdges(.bottom, to: view.safeAreaLayoutGuide)
             .constraints.first!
         
+        contentAreaView.addGestureRecognizer(swipeUpGesture)
+        swipeUpGesture.addTarget(self, action: #selector(onSwipeUp))
+        swipeUpGesture.direction = .up
+        
+        contentAreaView.addGestureRecognizer(swipeDownGesture)
+        swipeDownGesture.addTarget(self, action: #selector(onSwipeDown))
+        swipeDownGesture.direction = .down
+        
         setExpanded(false, animated: false)
+    }
+    
+    // MARK: - Handlers
+    
+    @objc private func onSwipeUp() {
+        setExpanded(true, animated: true)
+    }
+    
+    @objc private func onSwipeDown() {
+        setExpanded(false, animated: true)
     }
     
     // MARK: - Interface
     
     func setExpanded(_ expanded: Bool, animated: Bool) {
+        guard isExpanded != expanded else { return }
+        
         isExpanded = expanded
         delegate?.onSetExpanded(self, expanded)
         

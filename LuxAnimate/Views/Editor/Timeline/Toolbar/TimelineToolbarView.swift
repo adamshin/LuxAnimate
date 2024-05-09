@@ -160,6 +160,14 @@ class TimelineToolbarView: UIView {
         centerStack.addArrangedSubview(frameLabelContainer)
         frameLabelContainer.pinWidth(to: centerTextWidth)
         
+        let frameLabelLozenge = CircleView()
+        frameLabelLozenge.layer.cornerCurve = .continuous
+        frameLabelContainer.addSubview(frameLabelLozenge)
+        frameLabelLozenge.pinEdges(.horizontal)
+        frameLabelLozenge.pin(.centerY)
+        frameLabelLozenge.pinHeight(to: 32)
+        frameLabelLozenge.backgroundColor = UIColor(white: 1, alpha: 0.15)
+        
         frameLabelContainer.addSubview(frameLabel)
         frameLabel.pinCenter()
         
