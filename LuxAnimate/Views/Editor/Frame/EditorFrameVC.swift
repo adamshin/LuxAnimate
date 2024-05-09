@@ -343,6 +343,10 @@ private func drawingForFrame(
     
     guard !drawings.isEmpty else { return nil }
     
+    let drawings = drawings.sorted {
+        $0.frameIndex < $1.frameIndex
+    }
+    
     var left = 0
     var right = drawings.count - 1
     
