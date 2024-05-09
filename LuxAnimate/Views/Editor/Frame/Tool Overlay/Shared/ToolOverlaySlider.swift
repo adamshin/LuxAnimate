@@ -19,7 +19,7 @@ private let pressScaleFactor: CGFloat = (barWidth + 4) / barWidth
 private let thumbNormalColor = UIColor.white.withAlphaComponent(0.7)
 private let thumbSelectedColor = UIColor.white.withAlphaComponent(0.95)
 
-private let dragRate: CGFloat = 0.6
+private let dragRate: CGFloat = 0.5
 
 protocol ToolOverlaySliderDelegate: AnyObject {
     

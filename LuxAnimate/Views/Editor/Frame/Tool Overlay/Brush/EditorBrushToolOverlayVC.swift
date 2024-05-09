@@ -9,8 +9,15 @@ private let smoothingGamma: Double = 1.5
 
 class EditorBrushToolOverlayVC: UIViewController {
     
-    private let sizeSlider = ToolOverlaySlider()
-    private let smoothingSlider = ToolOverlaySlider()
+    private let sizeSlider = EditorBrushToolOverlaySlider(
+        title: "Size",
+        gamma: sizeGamma,
+        valueDisplayMode: .percent(minValue: 1))
+    
+    private let smoothingSlider = EditorBrushToolOverlaySlider(
+        title: "Smoothing",
+        gamma: smoothingGamma,
+        valueDisplayMode: .percent(minValue: 0))
     
     override func loadView() {
         view = PassthroughView()
@@ -30,21 +37,13 @@ class EditorBrushToolOverlayVC: UIViewController {
     }
     
     var size: Double {
-        get {
-            pow(sizeSlider.value, sizeGamma)
-        }
-        set {
-            sizeSlider.value = pow(newValue, 1/sizeGamma)
-        }
+        get { sizeSlider.value }
+        set { sizeSlider.value = newValue }
     }
     
     var smoothing: Double {
-        get {
-            pow(smoothingSlider.value, smoothingGamma)
-        }
-        set {
-            smoothingSlider.value = pow(newValue, 1/smoothingGamma)
-        }
+        get { smoothingSlider.value }
+        set { smoothingSlider.value = newValue }
     }
     
 }
