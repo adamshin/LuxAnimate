@@ -7,7 +7,7 @@ import UIKit
 class EditorFrameContentVC: UIViewController {
     
     let canvasVC = EditorFrameCanvasVC()
-    let topBarVC = EditorFrameTopBarVC()
+    let toolbarVC = EditorFrameToolbarVC()
     let toolOverlayVC = EditorBrushToolOverlayVC()
     
     let canvasSafeAreaView = PassthroughView()
@@ -17,15 +17,15 @@ class EditorFrameContentVC: UIViewController {
         
         addChild(canvasVC, to: view)
         
-        let topBarContainer = UIView()
-        view.addSubview(topBarContainer)
-        topBarContainer.pinEdges([.horizontal, .top])
+        let toolbarContainer = UIView()
+        view.addSubview(toolbarContainer)
+        toolbarContainer.pinEdges([.horizontal, .top])
         
-        addChild(topBarVC, to: topBarContainer)
+        addChild(toolbarVC, to: toolbarContainer)
         
         view.addSubview(canvasSafeAreaView)
         canvasSafeAreaView.pinEdges(.horizontal)
-        canvasSafeAreaView.pin(.top, to: topBarContainer, toAnchor: .bottom)
+        canvasSafeAreaView.pin(.top, to: toolbarContainer, toAnchor: .bottom)
         canvasSafeAreaView.pin(.bottom, priority: .defaultLow)
         
         addChild(toolOverlayVC, to: canvasSafeAreaView)

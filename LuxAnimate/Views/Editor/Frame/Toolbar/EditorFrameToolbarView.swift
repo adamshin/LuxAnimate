@@ -1,5 +1,5 @@
 //
-//  EditorFrameTopBarView.swift
+//  EditorFrameToolbarView.swift
 //
 
 import UIKit
@@ -14,7 +14,7 @@ private let iconConfig = UIImage.SymbolConfiguration(
     weight: .medium,
     scale: .medium)
 
-class EditorFrameTopBarView: UIView {
+class EditorFrameToolbarView: UIView {
     
     let backButton = {
         let button = UIButton(type: .system)
@@ -24,6 +24,27 @@ class EditorFrameTopBarView: UIView {
                 pointSize: 22,
                 weight: .medium,
                 scale: .medium))
+        button.setImage(image, for: .normal)
+        button.tintColor = .editorLabel
+        button.pinWidth(to: buttonWidth)
+        return button
+    }()
+    
+    let brushButton = {
+        let button = UIButton(type: .system)
+        let image = UIImage(
+            systemName: "paintbrush.pointed.fill",
+            withConfiguration: iconConfig)
+        button.setImage(image, for: .normal)
+        button.tintColor = .editorLabel
+        button.pinWidth(to: buttonWidth)
+        return button
+    }()
+    let eraseButton = {
+        let button = UIButton(type: .system)
+        let image = UIImage(
+            systemName: "eraser.fill",
+            withConfiguration: iconConfig)
         button.setImage(image, for: .normal)
         button.tintColor = .editorLabel
         button.pinWidth(to: buttonWidth)
@@ -88,10 +109,33 @@ class EditorFrameTopBarView: UIView {
         leftStack.addArrangedSubview(backButton)
         leftStack.setCustomSpacing(8, after: backButton)
         
+        let separator = UIView()
+        leftStack.addArrangedSubview(separator)
+        separator.pinWidth(to: 16)
+        let line = CircleView()
+        line.backgroundColor = UIColor(white: 1, alpha: 0.15)
+        separator.addSubview(line)
+        line.pinWidth(to: 2)
+        line.pinHeight(to: 24)
+        line.pinCenter(.vertical)
+        line.pinEdges(.leading)
+        
+        leftStack.addArrangedSubview(brushButton)
+        leftStack.addArrangedSubview(eraseButton)
+        
         rightStack.addArrangedSubview(undoButton)
         rightStack.addArrangedSubview(redoButton)
     }
     
     required init?(coder: NSCoder) { fatalError() }
+    
+    func selectBrush() {
+        brushButton.tintColor = .tint
+        eraseButton.tintColor = .editorLabel
+    }
+    func selectErase() {
+        brushButton.tintColor = .editorLabel
+        eraseButton.tintColor = .tint
+    }
     
 }

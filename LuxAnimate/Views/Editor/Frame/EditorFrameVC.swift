@@ -81,10 +81,12 @@ class EditorFrameVC: UIViewController {
     private var isEditingEnabled = false
     
     private let brushEngine: BrushEngine
-    private let drawingRenderer: DrawingEditorFrameRenderer
+    private var brushMode: BrushEngine.BrushMode = .brush
     
     private let brush = try! Brush(
         configuration: brushConfig)
+    
+    private let drawingRenderer: DrawingEditorFrameRenderer
     
     private let fileUrlHelper = FileUrlHelper()
     
@@ -120,7 +122,7 @@ class EditorFrameVC: UIViewController {
         super.viewDidLoad()
         
         contentVC.canvasVC.delegate = self
-        contentVC.topBarVC.delegate = self
+        contentVC.toolbarVC.delegate = self
         
         addChild(contentVC, to: view)
         
@@ -329,7 +331,7 @@ extension EditorFrameVC: EditorFrameCanvasVCDelegate {
         
         brushEngine.beginStroke(
             brush: brush,
-            brushMode: .brush,
+            brushMode: brushMode,
             color: brushColor,
             scale: scale,
             quickTap: quickTap,
@@ -359,17 +361,21 @@ extension EditorFrameVC: EditorFrameCanvasVCDelegate {
     
 }
 
-extension EditorFrameVC: EditorFrameTopBarVCDelegate {
+extension EditorFrameVC: EditorFrameToolbarVCDelegate {
     
-    func onSelectBack(_ vc: EditorFrameTopBarVC) {
+    func onSelectBack(_ vc: EditorFrameToolbarVC) {
         delegate?.onSelectBack(self)
     }
-    
-    func onSelectUndo(_ vc: EditorFrameTopBarVC) {
+    func onSelectBrush(_ vc: EditorFrameToolbarVC) {
+        brushMode = .brush
+    }
+    func onSelectErase(_ vc: EditorFrameToolbarVC) {
+        brushMode = .erase
+    }
+    func onSelectUndo(_ vc: EditorFrameToolbarVC) {
         delegate?.onSelectUndo(self)
     }
-    
-    func onSelectRedo(_ vc: EditorFrameTopBarVC) {
+    func onSelectRedo(_ vc: EditorFrameToolbarVC) {
         delegate?.onSelectRedo(self)
     }
     
