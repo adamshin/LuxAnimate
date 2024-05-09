@@ -29,6 +29,9 @@ class EditorFrameCanvasVC: UIViewController {
     
     private let brushGesture = BrushGestureRecognizer()
     
+    private let undoGesture = MultiFingerTapGestureRecognizer(touchCount: 2)
+    private let redoGesture = MultiFingerTapGestureRecognizer(touchCount: 3)
+    
     private let layerRenderer = MetalLayerTextureRenderer()
     
     private var canvasSize = PixelSize(width: 0, height: 0)
@@ -52,8 +55,12 @@ class EditorFrameCanvasVC: UIViewController {
         metalView.metalLayer.shouldRasterize = true
         metalView.metalLayer.rasterizationScale = 1
         
-        canvasView.canvasContentView
-            .addGestureRecognizer(brushGesture)
+        canvasView.canvasContentView.addGestureRecognizer(brushGesture)
+        
+        canvasView.canvasContentView.addGestureRecognizer(undoGesture)
+        canvasView.canvasContentView.addGestureRecognizer(redoGesture)
+        undoGesture.addTarget(self, action: #selector(onUndoGesture))
+        redoGesture.addTarget(self, action: #selector(onRedoGesture))
         
         setCanvasSize(PixelSize(width: 100, height: 100))
     }
@@ -62,6 +69,16 @@ class EditorFrameCanvasVC: UIViewController {
         super.viewIsAppearing(animated)
         
         canvasView.fitCanvasToBounds(animated: false)
+    }
+    
+    // MARK: - Handlers
+    
+    @objc private func onUndoGesture() {
+        delegate?.onSelectUndo(self)
+    }
+    
+    @objc private func onRedoGesture() {
+        delegate?.onSelectRedo(self)
     }
     
     // MARK: - Canvas

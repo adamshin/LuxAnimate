@@ -81,6 +81,7 @@
 		667BF74B2BA655CB003E3430 /* FileUrlHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667BF74A2BA655CB003E3430 /* FileUrlHelper.swift */; };
 		66AD3A882BEC34CD002B294A /* EditorPlaybackController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66AD3A872BEC34CD002B294A /* EditorPlaybackController.swift */; };
 		66AD3A8A2BEC46BD002B294A /* EditorBrushToolOverlaySlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66AD3A892BEC46BD002B294A /* EditorBrushToolOverlaySlider.swift */; };
+		66AD3A8C2BEC900C002B294A /* MultiFingerTapGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66AD3A8B2BEC900C002B294A /* MultiFingerTapGestureRecognizer.swift */; };
 		66B2BE422BCB55FF0072AC1B /* SharedModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B2BE412BCB55FF0072AC1B /* SharedModels.swift */; };
 		66B491B32BD9993F008A2A2E /* TextureCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B491B22BD9993F008A2A2E /* TextureCreator.swift */; };
 		66D0843D2BA3840C00EB8556 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0843C2BA3840C00EB8556 /* AppDelegate.swift */; };
@@ -184,6 +185,7 @@
 		667BF74A2BA655CB003E3430 /* FileUrlHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileUrlHelper.swift; sourceTree = "<group>"; };
 		66AD3A872BEC34CD002B294A /* EditorPlaybackController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorPlaybackController.swift; sourceTree = "<group>"; };
 		66AD3A892BEC46BD002B294A /* EditorBrushToolOverlaySlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorBrushToolOverlaySlider.swift; sourceTree = "<group>"; };
+		66AD3A8B2BEC900C002B294A /* MultiFingerTapGestureRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiFingerTapGestureRecognizer.swift; sourceTree = "<group>"; };
 		66B2BE412BCB55FF0072AC1B /* SharedModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedModels.swift; sourceTree = "<group>"; };
 		66B491B22BD9993F008A2A2E /* TextureCreator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextureCreator.swift; sourceTree = "<group>"; };
 		66D084392BA3840C00EB8556 /* LuxAnimate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LuxAnimate.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -469,6 +471,7 @@
 			isa = PBXGroup;
 			children = (
 				6643CB112BE892930094B998 /* EditorFrameCanvasVC.swift */,
+				66AD3A8B2BEC900C002B294A /* MultiFingerTapGestureRecognizer.swift */,
 			);
 			path = Canvas;
 			sourceTree = "<group>";
@@ -836,6 +839,7 @@
 				66099BA92BDB1C2500243D9F /* DrawingEditorFrameRenderer.swift in Sources */,
 				66099BBC2BDB32F500243D9F /* BrushStrokeEngine.swift in Sources */,
 				66E523562BD37D8B00794751 /* MetalLayerTextureRenderer.swift in Sources */,
+				66AD3A8C2BEC900C002B294A /* MultiFingerTapGestureRecognizer.swift in Sources */,
 				662232712BE1B79300C8813F /* ToolOverlaySlider.swift in Sources */,
 				66099BA42BDB193800243D9F /* EditorFrameTopBarView.swift in Sources */,
 				6643CB182BE959740094B998 /* EditorFrameContentVC.swift in Sources */,
