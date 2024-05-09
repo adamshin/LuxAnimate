@@ -5,8 +5,10 @@
 import UIKit
 
 private let barHeight: CGFloat = 48
-
 private let separatorColor = UIColor(white: 1, alpha: 0.04)
+
+private let animationDuration: TimeInterval = 0.3
+private let animationBounce: TimeInterval = 0
 
 protocol EditorCollapsibleContentVCDelegate: AnyObject {
     
@@ -31,8 +33,7 @@ class EditorCollapsibleContentVC: UIViewController {
     private let bottomAreaContainer = UIView()
     private let separator = UIView()
     
-    private let swipeUpGesture = UISwipeGestureRecognizer()
-    private let swipeDownGesture = UISwipeGestureRecognizer()
+    private let swipeGesture = EditorCollapsibleContentSwipeGestureRecognizer()
     
     private var expandedConstraint: NSLayoutConstraint?
     private var collapsedConstraint: NSLayoutConstraint?
@@ -83,25 +84,11 @@ class EditorCollapsibleContentVC: UIViewController {
             .pinEdges(.bottom, to: view.safeAreaLayoutGuide)
             .constraints.first!
         
-        contentAreaView.addGestureRecognizer(swipeUpGesture)
-        swipeUpGesture.addTarget(self, action: #selector(onSwipeUp))
-        swipeUpGesture.direction = .up
-        
-        contentAreaView.addGestureRecognizer(swipeDownGesture)
-        swipeDownGesture.addTarget(self, action: #selector(onSwipeDown))
-        swipeDownGesture.direction = .down
+        contentAreaView.addGestureRecognizer(swipeGesture)
+        swipeGesture.delegate = self
+        swipeGesture.gestureDelegate = self
         
         setExpanded(false, animated: false)
-    }
-    
-    // MARK: - Handlers
-    
-    @objc private func onSwipeUp() {
-        setExpanded(true, animated: true)
-    }
-    
-    @objc private func onSwipeDown() {
-        setExpanded(false, animated: true)
     }
     
     // MARK: - Interface
@@ -135,7 +122,10 @@ class EditorCollapsibleContentVC: UIViewController {
         }
         
         if animated {
-            UIView.animate(springDuration: 0.25) {
+            UIView.animate(
+                springDuration: animationDuration,
+                bounce: animationBounce
+            ) {
                 updateLayout()
             }
         } else {
@@ -145,6 +135,30 @@ class EditorCollapsibleContentVC: UIViewController {
     
     func toggleExpanded() {
         setExpanded(!isExpanded, animated: true)
+    }
+    
+}
+
+extension EditorCollapsibleContentVC: UIGestureRecognizerDelegate {
+    
+    func gestureRecognizer(
+        _ gestureRecognizer: UIGestureRecognizer,
+        shouldReceive touch: UITouch
+    ) -> Bool {
+        let safeAreaBounds = view.bounds
+            .inset(by: UIEdgeInsets(
+                top: 0, left: 0, bottom: 30, right: 0))
+        
+        let pos = touch.location(in: view)
+        return safeAreaBounds.contains(pos)
+    }
+    
+}
+
+extension EditorCollapsibleContentVC: EditorCollapsibleContentSwipeGestureRecognizerDelegate {
+    
+    func onSwipe(up: Bool) {
+        setExpanded(up, animated: true)
     }
     
 }

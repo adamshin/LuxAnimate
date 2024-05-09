@@ -72,6 +72,7 @@
 		664B59692BC5AA1E003FA90E /* Metal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664B59652BC5AA1E003FA90E /* Metal.swift */; };
 		664B596F2BC5AA25003FA90E /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 664B596C2BC5AA25003FA90E /* Shaders.metal */; };
 		664B597F2BC71B2F003FA90E /* MetalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664B597E2BC71B2F003FA90E /* MetalView.swift */; };
+		6661026D2BED697E0084099A /* EditorCollapsibleContentSwipeGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6661026C2BED697E0084099A /* EditorCollapsibleContentSwipeGestureRecognizer.swift */; };
 		6662D8852BBB5D4500B4C1D4 /* JXLDecoderShim.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6662D8842BBB5D4500B4C1D4 /* JXLDecoderShim.mm */; };
 		6662D88D2BBD0F3900B4C1D4 /* CanvasMultiGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6662D88C2BBD0F3900B4C1D4 /* CanvasMultiGestureRecognizer.swift */; };
 		6662D88F2BBD1F2200B4C1D4 /* CanvasMultiGestureRecognizerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6662D88E2BBD1F2200B4C1D4 /* CanvasMultiGestureRecognizerState.swift */; };
@@ -175,6 +176,7 @@
 		664B596C2BC5AA25003FA90E /* Shaders.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
 		664B596D2BC5AA25003FA90E /* ShaderTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
 		664B597E2BC71B2F003FA90E /* MetalView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetalView.swift; sourceTree = "<group>"; };
+		6661026C2BED697E0084099A /* EditorCollapsibleContentSwipeGestureRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorCollapsibleContentSwipeGestureRecognizer.swift; sourceTree = "<group>"; };
 		6662D8842BBB5D4500B4C1D4 /* JXLDecoderShim.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = JXLDecoderShim.mm; sourceTree = "<group>"; };
 		6662D8862BBB5D4F00B4C1D4 /* JXLDecoderShim.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JXLDecoderShim.h; sourceTree = "<group>"; };
 		6662D88C2BBD0F3900B4C1D4 /* CanvasMultiGestureRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasMultiGestureRecognizer.swift; sourceTree = "<group>"; };
@@ -355,6 +357,7 @@
 			isa = PBXGroup;
 			children = (
 				6622325A2BE0750300C8813F /* EditorCollapsibleContentVC.swift */,
+				6661026C2BED697E0084099A /* EditorCollapsibleContentSwipeGestureRecognizer.swift */,
 			);
 			path = "Collapsible Content";
 			sourceTree = "<group>";
@@ -895,6 +898,7 @@
 				66D084702BA3CEC300EB8556 /* Math.swift in Sources */,
 				6632594C2BB66C1A00460F70 /* JXLEncoderShim.mm in Sources */,
 				6614C1D12BB8AD93000FCC78 /* JXLDecoder.swift in Sources */,
+				6661026D2BED697E0084099A /* EditorCollapsibleContentSwipeGestureRecognizer.swift in Sources */,
 				6622326F2BE0AF5D00C8813F /* EditorBrushToolOverlayVC.swift in Sources */,
 				66311CD82BD73B3700D53489 /* ProjectEditor.swift in Sources */,
 				66311CD22BD713BE00D53489 /* MovableCanvasTransform.swift in Sources */,
