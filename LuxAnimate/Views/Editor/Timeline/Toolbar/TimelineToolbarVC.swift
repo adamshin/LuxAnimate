@@ -38,30 +38,40 @@ class TimelineToolbarVC: UIViewController {
             guard let self else { return }
             self.delegate?.onSelectLastFrame(self)
         }
-        bodyView.previousFrameButton.addHandler { [weak self] in
-            guard let self else { return }
-            self.delegate?.onSelectPreviousFrame(self)
-        }
-        bodyView.nextFrameButton.addHandler { [weak self] in
-            guard let self else { return }
-            self.delegate?.onSelectNextFrame(self)
-        }
         bodyView.expandButton.addHandler { [weak self] in
             guard let self else { return }
             self.delegate?.onSelectToggleExpanded(self)
         }
+        
+        bodyView.frameWidget.delegate = self
+    }
+    
+    func setFocusedFrameIndex(_ index: Int) {
+        bodyView.frameWidget.setFocusedFrameIndex(index)
     }
     
     func setPlaying(_ playing: Bool) {
         bodyView.setPlayButtonPlaying(playing)
     }
     
-    func updateFrameLabel(index: Int, total: Int) {
-        bodyView.updateFrameLabel(index: index, total: total)
-    }
-    
     func setExpanded(_ expanded: Bool) {
         bodyView.setExpanded(expanded)
+    }
+    
+}
+
+extension TimelineToolbarVC: TimelineToolbarFrameWidgetDelegate {
+    
+    func onSelectPreviousFrame(
+        _ v: TimelineToolbarFrameWidget
+    ) {
+        delegate?.onSelectPreviousFrame(self)
+    }
+    
+    func onSelectNextFrame(
+        _ v: TimelineToolbarFrameWidget
+    ) {
+        delegate?.onSelectNextFrame(self)
     }
     
 }

@@ -207,9 +207,7 @@ extension EditorTimelineVC: TimelineTrackVCDelegate {
     }
     
     func onChangeFocusedFrame(_ vc: TimelineTrackVC) {
-        toolbarVC.updateFrameLabel(
-            index: vc.focusedFrameIndex,
-            total: frameCount)
+        toolbarVC.setFocusedFrameIndex(vc.focusedFrameIndex)
         
         delegate?.onChangeFocusedFrame(self,
             index: vc.focusedFrameIndex)

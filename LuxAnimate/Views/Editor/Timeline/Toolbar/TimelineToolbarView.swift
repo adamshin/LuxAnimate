@@ -7,12 +7,6 @@ import UIKit
 private let padding: CGFloat = 8
 private let buttonWidth: CGFloat = 64
 
-private let centerTextWidth: CGFloat = 80
-
-private let frameFont = UIFont.monospacedDigitSystemFont(
-    ofSize: 17,
-    weight: .medium)
-
 private let iconConfig = UIImage.SymbolConfiguration(
     pointSize: 19,
     weight: .medium,
@@ -25,7 +19,7 @@ private let playIconConfig = UIImage.SymbolConfiguration(
 
 class TimelineToolbarView: UIView {
     
-    let frameLabel = UILabel()
+    let frameWidget = TimelineToolbarFrameWidget()
     
     let playButton = {
         let button = UIButton(type: .system)
@@ -71,28 +65,6 @@ class TimelineToolbarView: UIView {
         return button
     }()
     
-    let previousFrameButton = {
-        let button = UIButton(type: .system)
-        let image = UIImage(
-            systemName: "chevron.left",
-            withConfiguration: iconConfig)
-        button.setImage(image, for: .normal)
-        button.tintColor = .editorLabel
-        button.pinWidth(to: buttonWidth)
-        return button
-    }()
-    
-    let nextFrameButton = {
-        let button = UIButton(type: .system)
-        let image = UIImage(
-            systemName: "chevron.right",
-            withConfiguration: iconConfig)
-        button.setImage(image, for: .normal)
-        button.tintColor = .editorLabel
-        button.pinWidth(to: buttonWidth)
-        return button
-    }()
-    
     let expandButton = {
         let button = UIButton(type: .system)
         button.tintColor = .editorLabel
@@ -125,31 +97,9 @@ class TimelineToolbarView: UIView {
         leftStack.addArrangedSubview(loopButton)
         
         // Center content
-        let centerStack = UIStackView()
-        centerStack.axis = .horizontal
-        
-        addSubview(centerStack)
-        centerStack.pinEdges(.vertical)
-        centerStack.pinCenter(.horizontal)
-        
-        centerStack.addArrangedSubview(previousFrameButton)
-        
-        let frameLabelContainer = UIView()
-        centerStack.addArrangedSubview(frameLabelContainer)
-        frameLabelContainer.pinWidth(to: centerTextWidth)
-        
-        let frameLabelLozenge = CircleView()
-        frameLabelLozenge.layer.cornerCurve = .continuous
-        frameLabelContainer.addSubview(frameLabelLozenge)
-        frameLabelLozenge.pinEdges(.horizontal)
-        frameLabelLozenge.pin(.centerY)
-        frameLabelLozenge.pinHeight(to: 32)
-        frameLabelLozenge.backgroundColor = UIColor(white: 1, alpha: 0.15)
-        
-        frameLabelContainer.addSubview(frameLabel)
-        frameLabel.pinCenter()
-        
-        centerStack.addArrangedSubview(nextFrameButton)
+        addSubview(frameWidget)
+        frameWidget.pin(.centerX)
+        frameWidget.pinEdges(.vertical)
         
         // Right content
         let rightStack = UIStackView()
@@ -187,44 +137,4 @@ class TimelineToolbarView: UIView {
         }
     }
     
-    func updateFrameLabel(index: Int, total: Int) {
-        let string = NSMutableAttributedString()
-        
-//        string.append(attributedString(
-//            text: "Frame ",
-//            font: frameFont,
-//            color: .editorLabel))
-        
-        string.append(attributedString(
-            text: "\(index + 1)",
-            font: frameFont,
-            color: .editorLabel))
-//        string.append(attributedString(
-//            text: "\u{2000}/\u{2000}",
-//            font: frameFont,
-//            color: .editorLabelSecondary))
-//        string.append(attributedString(
-//            text: "\(total)",
-//            font: frameFont,
-//            color: .editorLabelSecondary))
-        
-        frameLabel.attributedText = string
-    }
-    
 }
-
-private func attributedString(
-    text: String,
-    font: UIFont,
-    color: UIColor)
--> NSAttributedString {
-    
-    let attributes: [NSAttributedString.Key: Any] = [
-        .font: font,
-        .foregroundColor: color,
-    ]
-    return NSAttributedString(
-        string: text,
-        attributes: attributes)
-}
-

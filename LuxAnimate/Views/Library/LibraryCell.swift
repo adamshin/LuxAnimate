@@ -7,6 +7,7 @@ import UIKit
 class LibraryCell: UICollectionViewCell {
     
     let cardView = UIView()
+    let thumbnailImageView = UIImageView()
     let nameLabel = UILabel()
     
     override init(frame: CGRect) {
@@ -28,8 +29,13 @@ class LibraryCell: UICollectionViewCell {
         cardView.pinAspectRatio(to: 1)
         
         cardView.backgroundColor = .white
+        cardView.layer.masksToBounds = true
         cardView.layer.cornerRadius = 12
         cardView.layer.cornerCurve = .continuous
+        
+        cardView.addSubview(thumbnailImageView)
+        thumbnailImageView.pinEdges()
+        thumbnailImageView.contentMode = .scaleAspectFill
         
         let labelContainer = UIView()
         stack.addArrangedSubview(labelContainer)
@@ -49,6 +55,7 @@ class LibraryCell: UICollectionViewCell {
     
     func configure(item: LibraryContentVC.Item) {
         setName(item.project.name)
+        loadThumbnail(url: item.project.thumbnailURL)
     }
     
     private func setName(_ name: String) {
@@ -66,6 +73,16 @@ class LibraryCell: UICollectionViewCell {
         nameLabel.attributedText = NSAttributedString(
             string: name,
             attributes: attributes)
+    }
+    
+    private func loadThumbnail(url: URL?) {
+        thumbnailImageView.image = nil
+        
+        if let url {
+            let imageData = try? Data(contentsOf: url)
+            thumbnailImageView.image = UIImage(
+                data: imageData ?? Data())
+        }
     }
     
 }

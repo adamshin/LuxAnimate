@@ -15,6 +15,7 @@ struct LibraryManager {
         var id: String
         var url: URL
         var name: String
+        var thumbnailURL: URL?
     }
     
     enum RenameError: Error {
@@ -93,10 +94,26 @@ struct LibraryManager {
                 from: projectManifestData)
             else { continue }
             
+            let firstDrawing = projectManifest.content
+                .animationLayer
+                .drawings
+                .sorted { $0.frameIndex < $1.frameIndex }
+                .first
+            
+            let thumbnailURL: URL?
+            if let firstDrawing {
+                thumbnailURL = fileUrlHelper.projectAssetURL(
+                    projectID: projectID,
+                    assetID: firstDrawing.assetIDs.medium)
+            } else {
+                thumbnailURL = nil
+            }
+            
             let project = LibraryProject(
                 id: projectID,
                 url: projectURL,
-                name: projectManifest.name)
+                name: projectManifest.name,
+                thumbnailURL: thumbnailURL)
             
             projects.append(project)
         }

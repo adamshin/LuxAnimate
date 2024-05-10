@@ -35,6 +35,7 @@
 		6614C1D12BB8AD93000FCC78 /* JXLDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6614C1D02BB8AD93000FCC78 /* JXLDecoder.swift */; };
 		66211E8B2BEDDEB0005490C4 /* LayoutInvalidatingFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66211E8A2BEDDEB0005490C4 /* LayoutInvalidatingFlowLayout.swift */; };
 		66211E8D2BEDE491005490C4 /* LibraryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66211E8C2BEDE491005490C4 /* LibraryCell.swift */; };
+		66211E8F2BEEC8B8005490C4 /* TimelineToolbarFrameWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66211E8E2BEEC8B8005490C4 /* TimelineToolbarFrameWidget.swift */; };
 		662232562BE062A900C8813F /* EditorFrameVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662232552BE062A900C8813F /* EditorFrameVC.swift */; };
 		6622325B2BE0750300C8813F /* EditorCollapsibleContentVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6622325A2BE0750300C8813F /* EditorCollapsibleContentVC.swift */; };
 		662232682BE07FA500C8813F /* EditorTimelineVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662232662BE07D6500C8813F /* EditorTimelineVC.swift */; };
@@ -138,6 +139,7 @@
 		6614C1D02BB8AD93000FCC78 /* JXLDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JXLDecoder.swift; sourceTree = "<group>"; };
 		66211E8A2BEDDEB0005490C4 /* LayoutInvalidatingFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutInvalidatingFlowLayout.swift; sourceTree = "<group>"; };
 		66211E8C2BEDE491005490C4 /* LibraryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryCell.swift; sourceTree = "<group>"; };
+		66211E8E2BEEC8B8005490C4 /* TimelineToolbarFrameWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineToolbarFrameWidget.swift; sourceTree = "<group>"; };
 		662232552BE062A900C8813F /* EditorFrameVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorFrameVC.swift; sourceTree = "<group>"; };
 		6622325A2BE0750300C8813F /* EditorCollapsibleContentVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorCollapsibleContentVC.swift; sourceTree = "<group>"; };
 		662232602BE07D6500C8813F /* TimelineToolbarVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineToolbarVC.swift; sourceTree = "<group>"; };
@@ -380,6 +382,7 @@
 			children = (
 				662232602BE07D6500C8813F /* TimelineToolbarVC.swift */,
 				662232612BE07D6500C8813F /* TimelineToolbarView.swift */,
+				66211E8E2BEEC8B8005490C4 /* TimelineToolbarFrameWidget.swift */,
 			);
 			path = Toolbar;
 			sourceTree = "<group>";
@@ -830,6 +833,7 @@
 				6643CB1A2BE975450094B998 /* EditorTimelineModelGenerator.swift in Sources */,
 				6643CB102BE6CE120094B998 /* EditorTimelineModel.swift in Sources */,
 				66099BD72BDB642300243D9F /* BrushEngineGestureAdapter.swift in Sources */,
+				66211E8F2BEEC8B8005490C4 /* TimelineToolbarFrameWidget.swift in Sources */,
 				66D0846C2BA3CEC300EB8556 /* Layout.swift in Sources */,
 				6662D8A32BBE1A3700B4C1D4 /* Geometry.swift in Sources */,
 				66099BBE2BDB32F500243D9F /* BrushStrokePressureFilteringProcessor.swift in Sources */,
