@@ -143,7 +143,7 @@ class LibraryContentVC: UIViewController {
             handler: { _ in }))
         
         alert.addAction(UIAlertAction(
-            title: "Rename", style: .default,
+            title: "Done", style: .default,
             handler: { _ in
                 let name = alert.textFields?.first?.text ?? ""
                 completion(name)
