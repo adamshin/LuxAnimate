@@ -237,12 +237,12 @@
 			path = Shared;
 			sourceTree = "<group>";
 		};
-		66099BAC2BDB1E6500243D9F /* Drawing Editor */ = {
+		66099BAC2BDB1E6500243D9F /* Editor */ = {
 			isa = PBXGroup;
 			children = (
 				66099BA82BDB1C2500243D9F /* DrawingEditorFrameRenderer.swift */,
 			);
-			path = "Drawing Editor";
+			path = Editor;
 			sourceTree = "<group>";
 		};
 		66099BB52BDB32F500243D9F /* Brush Stroke */ = {
@@ -424,7 +424,7 @@
 		66311CDE2BD740BC00D53489 /* Rendering */ = {
 			isa = PBXGroup;
 			children = (
-				66099BAC2BDB1E6500243D9F /* Drawing Editor */,
+				66099BAC2BDB1E6500243D9F /* Editor */,
 				66099B9B2BDB169400243D9F /* Shared */,
 			);
 			path = Rendering;

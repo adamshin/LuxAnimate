@@ -57,6 +57,12 @@ extension Color {
         self.init(UInt8(r), UInt8(g), UInt8(b), 255)
     }
     
+    func withAlpha(_ alpha: Double) -> Color {
+        var c = self
+        c.a = UInt8(Double(c.a) * alpha)
+        return c
+    }
+    
     var mtlClearColor: MTLClearColor {
         MTLClearColorMake(
             Double(r) / 255,

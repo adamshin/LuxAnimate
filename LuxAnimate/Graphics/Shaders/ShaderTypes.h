@@ -27,7 +27,8 @@ typedef enum
 {
     ShaderColorModeNone = 0,
     ShaderColorModeMultiply = 1,
-    ShaderColorModeBrush = 2,
+    ShaderColorModeStencil = 2,
+    ShaderColorModeBrush = 3,
 } ShaderColorMode;
 
 // MARK: - Sprite

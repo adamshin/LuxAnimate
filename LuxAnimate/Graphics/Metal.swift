@@ -37,6 +37,7 @@ enum SampleMode {
 enum ColorMode {
     case none
     case multiply
+    case stencil
     case brush
 }
 
@@ -66,6 +67,7 @@ extension ColorMode {
         switch self {
         case .none: ShaderColorModeNone
         case .multiply: ShaderColorModeMultiply
+        case .stencil: ShaderColorModeStencil
         case .brush: ShaderColorModeBrush
         }
     }

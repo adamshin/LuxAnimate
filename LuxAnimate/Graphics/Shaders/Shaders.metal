@@ -103,6 +103,11 @@ float4 colorForColorMode(
         case ShaderColorModeMultiply:
             return textureColor * vertexColor;
             
+        case ShaderColorModeStencil: {
+            float4 color = vertexColor;
+            color.a = color.a * textureColor.a;
+            return color;
+        }
         case ShaderColorModeBrush: {
             float4 color = vertexColor;
             color.a = color.a * textureColor.r;

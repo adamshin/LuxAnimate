@@ -83,10 +83,9 @@ class EditorFrameVC: UIViewController {
     private let brushEngine: BrushEngine
     private var brushMode: BrushEngine.BrushMode = .brush
     
-    private let brush = try! Brush(
-        configuration: brushConfig)
+    private let brush = try! Brush(configuration: brushConfig)
     
-    private let drawingRenderer: DrawingEditorFrameRenderer
+    private let frameRenderer: EditorFrameRenderer
     
     private let fileUrlHelper = FileUrlHelper()
     
@@ -105,7 +104,7 @@ class EditorFrameVC: UIViewController {
         
         brushEngine = BrushEngine(canvasSize: drawingSize)
         
-        drawingRenderer = DrawingEditorFrameRenderer(
+        frameRenderer = EditorFrameRenderer(
             drawingSize: drawingSize,
             backgroundColor: .white)
         
@@ -132,59 +131,88 @@ class EditorFrameVC: UIViewController {
     // MARK: - Drawings
     
     private func showDrawing(
-        _ drawing: Project.Drawing,
+        drawing: Project.Drawing?,
+        prevDrawing: Project.Drawing?,
+        nextDrawing: Project.Drawing?,
         forceReload: Bool
     ) {
-        if drawingID == drawing.id, !forceReload {
+        if drawingID == drawing?.id, !forceReload {
             return
         }
         
         brushEngine.endStroke()
         
-        drawingID = drawing.id
+        drawingID = drawing?.id
         isEditingEnabled = false
         
-        loadAndDisplayFrame(drawing: drawing)
-    }
-    
-    private func showNoDrawing() {
-        brushEngine.endStroke()
-        
-        drawingID = nil
-        isEditingEnabled = false
-        
-        displayEmptyFrame()
+        loadAndDisplayFrame(
+            drawing: drawing,
+            prevDrawing: prevDrawing,
+            nextDrawing: nextDrawing)
     }
     
     private func loadAndDisplayFrame(
-        drawing: Project.Drawing
+        drawing: Project.Drawing?,
+        prevDrawing: Project.Drawing?,
+        nextDrawing: Project.Drawing?
     ) {
-        loadAndDisplayPreviewImage(drawing: drawing) {
+        frameRenderer.drawingTexture = nil
+        frameRenderer.prevDrawingTexture = nil
+        frameRenderer.nextDrawingTexture = nil
+        
+        loadAndDisplayPreviewImage(
+            drawing: drawing,
+            prevDrawing: prevDrawing,
+            nextDrawing: nextDrawing
+        ) {
             self.loadAndDisplayFullImage(drawing: drawing)
         }
     }
     
     private func loadAndDisplayPreviewImage(
-        drawing: Project.Drawing,
+        drawing: Project.Drawing?,
+        prevDrawing: Project.Drawing?,
+        nextDrawing: Project.Drawing?,
         completion: @escaping () -> Void
     ) {
         frameLoadingQueue.async {
-            guard self.drawingID == drawing.id else { return }
+            guard self.drawingID == drawing?.id else { return }
             
-            let assetURL = self.fileUrlHelper.projectAssetURL(
-                projectID: self.projectID,
-                assetID: drawing.assetIDs.medium)
+            var drawingTexture: MTLTexture?
+            if let drawing {
+                let assetURL = self.fileUrlHelper.projectAssetURL(
+                    projectID: self.projectID,
+                    assetID: drawing.assetIDs.medium)
+                
+                drawingTexture = try? JXLTextureLoader.load(url: assetURL)
+            }
             
-            let texture = try! JXLTextureLoader.load(url: assetURL)
+            var prevDrawingTexture: MTLTexture?
+            if let prevDrawing {
+                let assetURL = self.fileUrlHelper.projectAssetURL(
+                    projectID: self.projectID,
+                    assetID: prevDrawing.assetIDs.medium)
+                
+                prevDrawingTexture = try? JXLTextureLoader.load(url: assetURL)
+            }
+            
+            var nextDrawingTexture: MTLTexture?
+            if let nextDrawing {
+                let assetURL = self.fileUrlHelper.projectAssetURL(
+                    projectID: self.projectID,
+                    assetID: nextDrawing.assetIDs.medium)
+                
+                nextDrawingTexture = try? JXLTextureLoader.load(url: assetURL)
+            }
             
             DispatchQueue.main.async {
-                guard self.drawingID == drawing.id else { return }
+                guard self.drawingID == drawing?.id else { return }
                 
-                self.drawingRenderer.draw(
-                    drawingTexture: texture)
+                self.frameRenderer.drawingTexture = drawingTexture
+                self.frameRenderer.prevDrawingTexture = prevDrawingTexture
+                self.frameRenderer.nextDrawingTexture = nextDrawingTexture
                 
-                self.contentVC.canvasVC.setCanvasTexture(
-                    self.drawingRenderer.texture)
+                self.draw()
                 
                 self.loadAndDisplayFullImage(drawing: drawing)
             }
@@ -192,43 +220,33 @@ class EditorFrameVC: UIViewController {
     }
     
     private func loadAndDisplayFullImage(
-        drawing: Project.Drawing
+        drawing: Project.Drawing?
     ) {
         frameLoadingQueue.async {
-            guard self.drawingID == drawing.id else { return }
+            guard self.drawingID == drawing?.id else { return }
             
-            let assetURL = self.fileUrlHelper.projectAssetURL(
-                projectID: self.projectID,
-                assetID: drawing.assetIDs.full)
-            
-            let texture = try! JXLTextureLoader.load(url: assetURL)
+            var drawingTexture: MTLTexture?
+            if let drawing {
+                let assetURL = self.fileUrlHelper.projectAssetURL(
+                    projectID: self.projectID,
+                    assetID: drawing.assetIDs.full)
+                
+                drawingTexture = try? JXLTextureLoader.load(url: assetURL)
+            }
             
             DispatchQueue.main.async {
-                guard self.drawingID == drawing.id else { return }
+                guard self.drawingID == drawing?.id else { return }
                 
-                self.brushEngine.setCanvasContents(texture)
-                self.render()
+                self.frameRenderer.drawingTexture = drawingTexture
+                self.draw()
                 
-                self.isEditingEnabled = true
+                if let drawingTexture {
+                    self.brushEngine.setCanvasContents(drawingTexture)
+                }
+                
+                self.isEditingEnabled = drawing != nil
             }
         }
-    }
-    
-    private func displayEmptyFrame() {
-        let texture = emptyTexture(size: drawingSize)
-        brushEngine.setCanvasContents(texture)
-        render()
-    }
-    
-    private func emptyTexture(size: PixelSize) -> MTLTexture {
-        let byteCount = size.width * size.height * 4
-        let data = Data(repeating: 0, count: byteCount)
-        
-        return try! TextureCreator.createTexture(
-            imageData: data,
-            width: size.width,
-            height: size.height,
-            mipMapped: false)
     }
     
     // MARK: - Editing
@@ -253,12 +271,10 @@ class EditorFrameVC: UIViewController {
     
     // MARK: - Rendering
     
-    private func render() {
-        drawingRenderer.draw(
-            drawingTexture: brushEngine.canvasTexture)
-        
+    private func draw() {
+        frameRenderer.draw()
         contentVC.canvasVC.setCanvasTexture(
-            drawingRenderer.texture)
+            frameRenderer.renderTarget)
     }
     
     // MARK: - Interface
@@ -275,14 +291,21 @@ class EditorFrameVC: UIViewController {
         
         let animationLayer = projectManifest.content.animationLayer
         
-        if let drawing = drawingForFrame(
+        let drawing = drawingForFrame(
             drawings: animationLayer.drawings,
             frameIndex: frameIndex)
-        {
-            showDrawing(drawing, forceReload: forceReload)
-        } else {
-            showNoDrawing()
-        }
+        let prevDrawing = drawingBefore(
+            drawings: animationLayer.drawings,
+            frameIndex: frameIndex)
+        let nextDrawing = drawingAfter(
+            drawings: animationLayer.drawings,
+            frameIndex: frameIndex)
+        
+        showDrawing(
+            drawing: drawing,
+            prevDrawing: prevDrawing,
+            nextDrawing: nextDrawing,
+            forceReload: forceReload)
     }
     
     func handleUpdateFrame(at frameIndex: Int) {
@@ -298,6 +321,11 @@ class EditorFrameVC: UIViewController {
     
     func setPlaying(_ playing: Bool) {
         contentVC.canvasVC.setEditingEnabled(!playing)
+    }
+    
+    func setOnionSkinOn(_ isOnionSkinOn: Bool) {
+        frameRenderer.isOnionSkinOn = isOnionSkinOn
+        draw()
     }
     
     func setBottomInsetView(_ bottomInsetView: UIView) {
@@ -384,7 +412,8 @@ extension EditorFrameVC: EditorFrameToolbarVCDelegate {
 extension EditorFrameVC: BrushEngineDelegate {
     
     func onUpdateCanvas(_ engine: BrushEngine) {
-        render()
+        frameRenderer.drawingTexture = brushEngine.canvasTexture
+        draw()
     }
     
     func onFinalizeStroke(_ engine: BrushEngine) {
@@ -400,30 +429,36 @@ private func drawingForFrame(
     frameIndex: Int
 ) -> Project.Drawing? {
     
-    guard !drawings.isEmpty else { return nil }
-    
-    let drawings = drawings.sorted {
+    let sortedDrawings = drawings.sorted {
         $0.frameIndex < $1.frameIndex
     }
-    
-    var left = 0
-    var right = drawings.count - 1
-    
-    while left <= right {
-        let mid = (left + right) / 2
-        
-        if drawings[mid].frameIndex == frameIndex {
-            return drawings[mid]
-        } else if drawings[mid].frameIndex < frameIndex {
-            left = mid + 1
-        } else {
-            right = mid - 1
-        }
+    return sortedDrawings.last {
+        $0.frameIndex <= frameIndex
     }
+}
+
+private func drawingBefore(
+    drawings: [Project.Drawing],
+    frameIndex: Int
+) -> Project.Drawing? {
     
-    if right < 0 {
-        return nil
+    let sortedDrawings = drawings.sorted {
+        $0.frameIndex < $1.frameIndex
     }
+    return sortedDrawings.last {
+        $0.frameIndex < frameIndex
+    }
+}
+
+private func drawingAfter(
+    drawings: [Project.Drawing],
+    frameIndex: Int
+) -> Project.Drawing? {
     
-    return drawings[right]
+    let sortedDrawings = drawings.sorted {
+        $0.frameIndex < $1.frameIndex
+    }
+    return sortedDrawings.first {
+        $0.frameIndex > frameIndex
+    }
 }
