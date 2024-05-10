@@ -160,6 +160,48 @@ extension ProjectEditor {
         delegate?.onEditProject(self)
     }
     
+    // MARK: - Spacing
+    
+    func insertSpacing(at frameIndex: Int) throws {
+        var projectManifest = editSession.currentProjectManifest
+        var drawings = projectManifest.content.animationLayer.drawings
+        
+        for index in drawings.indices {
+            if drawings[index].frameIndex > frameIndex {
+                drawings[index].frameIndex += 1
+            }
+        }
+        projectManifest.content.animationLayer.drawings = drawings
+        
+        try editSession.applyEdit(
+            newProjectManifest: projectManifest,
+            newAssets: [])
+        
+        delegate?.onEditProject(self)
+    }
+    
+    func removeSpacing(at frameIndex: Int) throws {
+        var projectManifest = editSession.currentProjectManifest
+        var drawings = projectManifest.content.animationLayer.drawings
+        
+        guard !drawings.contains(
+            where: { $0.frameIndex == frameIndex + 1 })
+        else { return }
+        
+        for index in drawings.indices {
+            if drawings[index].frameIndex > frameIndex {
+                drawings[index].frameIndex -= 1
+            }
+        }
+        projectManifest.content.animationLayer.drawings = drawings
+        
+        try editSession.applyEdit(
+            newProjectManifest: projectManifest,
+            newAssets: [])
+        
+        delegate?.onEditProject(self)
+    }
+    
     // MARK: - Undo / Redo
     
     func applyUndo() throws {

@@ -31,6 +31,14 @@ protocol EditorTimelineVCDelegate: AnyObject {
         _ vc: EditorTimelineVC,
         frameIndex: Int)
     
+    func onRequestInsertSpacing(
+        _ vc: EditorTimelineVC,
+        frameIndex: Int)
+    
+    func onRequestRemoveSpacing(
+        _ vc: EditorTimelineVC,
+        frameIndex: Int)
+    
 }
 
 class EditorTimelineVC: UIViewController {
@@ -234,6 +242,22 @@ extension EditorTimelineVC: EditorTimelineFrameMenuViewDelegate {
         frameIndex: Int
     ) {
         delegate?.onRequestDeleteDrawing(self,
+            frameIndex: frameIndex)
+    }
+    
+    func onSelectInsertSpacing(
+        _ v: EditorTimelineFrameMenuView,
+        frameIndex: Int
+    ) {
+        delegate?.onRequestInsertSpacing(self,
+            frameIndex: frameIndex)
+    }
+    
+    func onSelectRemoveSpacing(
+        _ v: EditorTimelineFrameMenuView,
+        frameIndex: Int
+    ) {
+        delegate?.onRequestRemoveSpacing(self,
             frameIndex: frameIndex)
     }
     

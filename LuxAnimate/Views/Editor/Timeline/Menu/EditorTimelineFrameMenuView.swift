@@ -14,6 +14,14 @@ protocol EditorTimelineFrameMenuViewDelegate: AnyObject {
         _ v: EditorTimelineFrameMenuView,
         frameIndex: Int)
     
+    func onSelectInsertSpacing(
+        _ v: EditorTimelineFrameMenuView,
+        frameIndex: Int)
+    
+    func onSelectRemoveSpacing(
+        _ v: EditorTimelineFrameMenuView,
+        frameIndex: Int)
+    
 }
 
 class EditorTimelineFrameMenuView: EditorMenuContentView {
@@ -35,6 +43,36 @@ class EditorTimelineFrameMenuView: EditorMenuContentView {
         stack.axis = .vertical
         addSubview(stack)
         stack.pinEdges()
+        
+        let row1 = RowView(
+            title: "Insert Spacing",
+            destructive: false)
+        stack.addArrangedSubview(row1)
+        
+        row1.button.addHandler { [weak self] in
+            guard let self else { return }
+            self.menuView?.dismiss()
+            self.delegate?.onSelectInsertSpacing(
+                self,
+                frameIndex: frameIndex)
+        }
+        
+        stack.addArrangedSubview(RowSeparator())
+        
+        let row2 = RowView(
+            title: "Remove Spacing",
+            destructive: false)
+        stack.addArrangedSubview(row2)
+        
+        row2.button.addHandler { [weak self] in
+            guard let self else { return }
+            self.menuView?.dismiss()
+            self.delegate?.onSelectRemoveSpacing(
+                self,
+                frameIndex: frameIndex)
+        }
+        
+        stack.addArrangedSubview(RowSectionSeparator())
         
         if hasDrawing {
             let row1 = RowView(
@@ -120,7 +158,7 @@ private class RowSeparator: UIView {
     
 }
 
-private class RowThickSeparator: UIView {
+private class RowSectionSeparator: UIView {
     
     init() {
         super.init(frame: .zero)

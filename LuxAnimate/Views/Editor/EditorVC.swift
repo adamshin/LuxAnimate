@@ -196,6 +196,22 @@ extension EditorVC: EditorTimelineVCDelegate {
         frameVC?.handleUpdateFrame(at: frameIndex)
     }
     
+    func onRequestInsertSpacing(
+        _ vc: EditorTimelineVC, 
+        frameIndex: Int
+    ) {
+        try? editor?.insertSpacing(at: frameIndex)
+        frameVC?.reloadFrame()
+    }
+    
+    func onRequestRemoveSpacing(
+        _ vc: EditorTimelineVC,
+        frameIndex: Int
+    ) {
+        try? editor?.removeSpacing(at: frameIndex)
+        frameVC?.reloadFrame()
+    }
+    
 }
 
 // MARK: - Editor Delegate
