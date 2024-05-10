@@ -91,7 +91,7 @@ class LibraryContentVC: UIViewController {
     }
     
     private func onSelectDeleteItem(_ item: Item) {
-        showDeleteAlert {
+        showDeleteAlert(name: item.project.name) {
             self.delegate?.onSelectDeleteProject(
                 id: item.project.id)
         }
@@ -99,9 +99,12 @@ class LibraryContentVC: UIViewController {
     
     // MARK: - Navigation
     
-    private func showDeleteAlert(delete: @escaping () -> Void) {
+    private func showDeleteAlert(
+        name: String,
+        delete: @escaping () -> Void
+    ) {
         let alert = UIAlertController(
-            title: "Delete Project?",
+            title: "Delete “\(name)”?",
             message: nil,
             preferredStyle: .alert)
         
@@ -200,19 +203,27 @@ extension LibraryContentVC: UICollectionViewDelegate {
         
         return UIContextMenuConfiguration(actionProvider: { _ in
             UIMenu(children: [
-                UIAction(
-                    title: "Rename",
-                    image: .init(systemName: "pencil"))
-                { _ in
-                    self.onSelectRenameItem(item)
-                },
-                UIAction(
-                    title: "Delete",
-                    image: .init(systemName: "trash"),
-                    attributes: [.destructive])
-                { _ in
-                    self.onSelectDeleteItem(item)
-                },
+                UIMenu(
+                    options: [.displayInline],
+                    children: [
+                        UIAction(
+                            title: "Rename",
+                            image: .init(systemName: "pencil"))
+                        { _ in
+                            self.onSelectRenameItem(item)
+                        },
+                    ]),
+                UIMenu(
+                    options: [.displayInline],
+                    children: [
+                        UIAction(
+                            title: "Delete",
+                            image: .init(systemName: "trash"),
+                            attributes: [.destructive])
+                        { _ in
+                            self.onSelectDeleteItem(item)
+                        },
+                    ]),
             ])
         })
     }
