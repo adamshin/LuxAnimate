@@ -93,28 +93,6 @@ class TimelineToolbarView: UIView {
         return button
     }()
     
-    let onionSkinButton = {
-        let button = UIButton(type: .system)
-        let image = UIImage(
-            systemName: "square.on.square.dashed",
-            withConfiguration: iconConfig)
-        button.setImage(image, for: .normal)
-        button.tintColor = .editorLabel
-        button.pinWidth(to: buttonWidth)
-        return button
-    }()
-    
-    let layersButton = {
-        let button = UIButton(type: .system)
-        let image = UIImage(
-            systemName: "square.stack.3d.up",
-            withConfiguration: iconConfig)
-        button.setImage(image, for: .normal)
-        button.tintColor = .editorLabel
-        button.pinWidth(to: buttonWidth)
-        return button
-    }()
-    
     let expandButton = {
         let button = UIButton(type: .system)
         button.tintColor = .editorLabel
@@ -181,8 +159,6 @@ class TimelineToolbarView: UIView {
         rightStack.pinEdges(.vertical)
         rightStack.pinEdges(.trailing, padding: padding)
         
-//        rightStack.addArrangedSubview(onionSkinButton)
-//        rightStack.addArrangedSubview(layersButton)
         rightStack.addArrangedSubview(expandButton)
         
         setExpanded(false)

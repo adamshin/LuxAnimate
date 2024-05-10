@@ -10,6 +10,8 @@ protocol EditorFrameToolbarVCDelegate: AnyObject {
     func onSelectErase(_ vc: EditorFrameToolbarVC)
     func onSelectUndo(_ vc: EditorFrameToolbarVC)
     func onSelectRedo(_ vc: EditorFrameToolbarVC)
+    
+    func onSetTraceOn(_ vc: EditorFrameToolbarVC, on: Bool)
 }
 
 class EditorFrameToolbarVC: UIViewController {
@@ -17,6 +19,8 @@ class EditorFrameToolbarVC: UIViewController {
     weak var delegate: EditorFrameToolbarVCDelegate?
     
     let bodyView = EditorFrameToolbarView()
+    
+    private var isTraceOn = false
     
     override func loadView() {
         view = bodyView
@@ -39,6 +43,12 @@ class EditorFrameToolbarVC: UIViewController {
             self.bodyView.selectErase()
             self.delegate?.onSelectErase(self)
         }
+        bodyView.traceButton.addHandler { [weak self] in
+            guard let self else { return }
+            self.isTraceOn.toggle()
+            self.bodyView.setTraceOn(self.isTraceOn)
+            self.delegate?.onSetTraceOn(self, on: self.isTraceOn)
+        }
         bodyView.undoButton.addHandler { [weak self] in
             guard let self else { return }
             self.delegate?.onSelectUndo(self)
@@ -49,6 +59,7 @@ class EditorFrameToolbarVC: UIViewController {
         }
         
         bodyView.selectBrush()
+        bodyView.setTraceOn(isTraceOn)
     }
     
 }

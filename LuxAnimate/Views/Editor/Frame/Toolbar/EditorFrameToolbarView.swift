@@ -51,6 +51,17 @@ class EditorFrameToolbarView: UIView {
         return button
     }()
     
+    let traceButton = {
+        let button = UIButton(type: .system)
+        let image = UIImage(
+            systemName: "square.on.square.dashed",
+            withConfiguration: iconConfig)
+        button.setImage(image, for: .normal)
+        button.tintColor = .editorLabel
+        button.pinWidth(to: buttonWidth)
+        return button
+    }()
+    
     let undoButton = {
         let button = UIButton(type: .system)
         let image = UIImage(
@@ -123,6 +134,7 @@ class EditorFrameToolbarView: UIView {
         leftStack.addArrangedSubview(brushButton)
         leftStack.addArrangedSubview(eraseButton)
         
+        rightStack.addArrangedSubview(traceButton)
         rightStack.addArrangedSubview(undoButton)
         rightStack.addArrangedSubview(redoButton)
     }
@@ -136,6 +148,10 @@ class EditorFrameToolbarView: UIView {
     func selectErase() {
         brushButton.tintColor = .editorLabel
         eraseButton.tintColor = .tint
+    }
+    func setTraceOn(_ on: Bool) {
+        traceButton.tintColor = on ?
+            .tint : .editorLabel
     }
     
 }

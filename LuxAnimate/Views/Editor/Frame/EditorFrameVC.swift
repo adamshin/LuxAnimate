@@ -187,31 +187,40 @@ class EditorFrameVC: UIViewController {
                 drawingTexture = try? JXLTextureLoader.load(url: assetURL)
             }
             
-            var prevDrawingTexture: MTLTexture?
-            if let prevDrawing {
-                let assetURL = self.fileUrlHelper.projectAssetURL(
-                    projectID: self.projectID,
-                    assetID: prevDrawing.assetIDs.medium)
+            self.frameLoadingQueue.async {
+                guard self.drawingID == drawing?.id else { return }
                 
-                prevDrawingTexture = try? JXLTextureLoader.load(url: assetURL)
-            }
-            
-            var nextDrawingTexture: MTLTexture?
-            if let nextDrawing {
-                let assetURL = self.fileUrlHelper.projectAssetURL(
-                    projectID: self.projectID,
-                    assetID: nextDrawing.assetIDs.medium)
+                var prevDrawingTexture: MTLTexture?
+                if let prevDrawing {
+                    let assetURL = self.fileUrlHelper.projectAssetURL(
+                        projectID: self.projectID,
+                        assetID: prevDrawing.assetIDs.medium)
+                    
+                    prevDrawingTexture = try? JXLTextureLoader.load(url: assetURL)
+                }
                 
-                nextDrawingTexture = try? JXLTextureLoader.load(url: assetURL)
+                var nextDrawingTexture: MTLTexture?
+                if let nextDrawing {
+                    let assetURL = self.fileUrlHelper.projectAssetURL(
+                        projectID: self.projectID,
+                        assetID: nextDrawing.assetIDs.medium)
+                    
+                    nextDrawingTexture = try? JXLTextureLoader.load(url: assetURL)
+                }
+                
+                DispatchQueue.main.async {
+                    guard self.drawingID == drawing?.id else { return }
+                    
+                    self.frameRenderer.prevDrawingTexture = prevDrawingTexture
+                    self.frameRenderer.nextDrawingTexture = nextDrawingTexture
+                    self.draw()
+                }
             }
             
             DispatchQueue.main.async {
                 guard self.drawingID == drawing?.id else { return }
                 
                 self.frameRenderer.drawingTexture = drawingTexture
-                self.frameRenderer.prevDrawingTexture = prevDrawingTexture
-                self.frameRenderer.nextDrawingTexture = nextDrawingTexture
-                
                 self.draw()
                 
                 self.loadAndDisplayFullImage(drawing: drawing)
@@ -405,6 +414,10 @@ extension EditorFrameVC: EditorFrameToolbarVCDelegate {
     }
     func onSelectRedo(_ vc: EditorFrameToolbarVC) {
         delegate?.onSelectRedo(self)
+    }
+    func onSetTraceOn(_ vc: EditorFrameToolbarVC, on: Bool) {
+        frameRenderer.isOnionSkinOn = on
+        draw()
     }
     
 }

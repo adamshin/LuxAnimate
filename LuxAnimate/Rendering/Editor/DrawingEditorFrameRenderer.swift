@@ -7,7 +7,7 @@ import Metal
 
 private let onionSkinPrevColor = Color(hex: "FEB941")
 private let onionSkinNextColor = Color(hex: "5AB2FF")
-private let onionSkinAlpha: Double = 0.7
+private let onionSkinAlpha: Double = 0.6
 
 class EditorFrameRenderer {
     
