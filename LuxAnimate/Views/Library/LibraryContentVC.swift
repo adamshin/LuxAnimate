@@ -14,8 +14,13 @@ private let bottomPadding: CGFloat = 40
 private let itemHeight: CGFloat = 240
 
 protocol LibraryContentVCDelegate: AnyObject {
+    
     func onSelectCreateProject()
+    
     func onSelectProject(id: String)
+    func onSelectRenameProject(id: String, name: String)
+    func onSelectDeleteProject(id: String)
+    
 }
 
 extension LibraryContentVC {
@@ -69,8 +74,73 @@ class LibraryContentVC: UIViewController {
         navigationItem.rightBarButtonItem = createButton
     }
     
+    // MARK: - Handlers
+    
     @objc private func onSelectCreate() {
         delegate?.onSelectCreateProject()
+    }
+    
+    private func onSelectRenameItem(_ item: Item) {
+        showRenameAlert(
+            originalName: item.project.name
+        ) { name in
+            self.delegate?.onSelectRenameProject(
+                id: item.project.id,
+                name: name)
+        }
+    }
+    
+    private func onSelectDeleteItem(_ item: Item) {
+        showDeleteAlert {
+            self.delegate?.onSelectDeleteProject(
+                id: item.project.id)
+        }
+    }
+    
+    // MARK: - Navigation
+    
+    private func showDeleteAlert(delete: @escaping () -> Void) {
+        let alert = UIAlertController(
+            title: "Delete Project?",
+            message: nil,
+            preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(
+            title: "Cancel", style: .cancel,
+            handler: { _ in }))
+        
+        alert.addAction(UIAlertAction(
+            title: "Delete", style: .destructive,
+            handler: { _ in delete() }))
+        
+        present(alert, animated: true)
+    }
+    
+    private func showRenameAlert(
+        originalName: String,
+        completion: @escaping (String) -> Void
+    ) {
+        let alert = UIAlertController(
+            title: "Rename Project",
+            message: nil,
+            preferredStyle: .alert)
+        
+        alert.addTextField { textField in
+            textField.text = originalName
+        }
+        
+        alert.addAction(UIAlertAction(
+            title: "Cancel", style: .cancel,
+            handler: { _ in }))
+        
+        alert.addAction(UIAlertAction(
+            title: "Rename", style: .default,
+            handler: { _ in
+                let name = alert.textFields?.first?.text ?? ""
+                completion(name)
+            }))
+        
+        present(alert, animated: true)
     }
     
     // MARK: - Interface
@@ -116,14 +186,63 @@ extension LibraryContentVC: UICollectionViewDelegate {
         delegate?.onSelectProject(id: item.project.id)
     }
     
-    func tableView(
-        _ tableView: UITableView,
-        didSelectRowAt indexPath: IndexPath
-    ) {
-        tableView.deselectRow(at: indexPath, animated: true)
+    func collectionView(
+        _ collectionView: UICollectionView,
+        contextMenuConfigurationForItemsAt indexPaths: [IndexPath],
+        point: CGPoint
+    ) -> UIContextMenuConfiguration? {
         
-        let item = items[indexPath.row]
-        delegate?.onSelectProject(id: item.project.id)
+        guard let indexPath = indexPaths.first
+        else { return nil }
+        
+        let index = indexPath.item
+        let item = items[index]
+        
+        return UIContextMenuConfiguration(actionProvider: { _ in
+            UIMenu(children: [
+                UIAction(
+                    title: "Rename",
+                    image: .init(systemName: "pencil"))
+                { _ in
+                    self.onSelectRenameItem(item)
+                },
+                UIAction(
+                    title: "Delete",
+                    image: .init(systemName: "trash"),
+                    attributes: [.destructive])
+                { _ in
+                    self.onSelectDeleteItem(item)
+                },
+            ])
+        })
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        contextMenuConfiguration configuration: UIContextMenuConfiguration,
+        highlightPreviewForItemAt indexPath: IndexPath
+    ) -> UITargetedPreview? {
+        
+        let cell = collectionView.cellForItem(at: indexPath)
+        guard let cell = cell as? LibraryCell
+        else { return nil }
+        
+        let preview = UITargetedPreview(view: cell.cardView)
+        return preview
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        contextMenuConfiguration configuration: UIContextMenuConfiguration,
+        dismissalPreviewForItemAt indexPath: IndexPath
+    ) -> UITargetedPreview? {
+        
+        let cell = collectionView.cellForItem(at: indexPath)
+        guard let cell = cell as? LibraryCell
+        else { return nil }
+        
+        let preview = UITargetedPreview(view: cell.cardView)
+        return preview
     }
     
 }

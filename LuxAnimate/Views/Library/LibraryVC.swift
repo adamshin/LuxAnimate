@@ -50,7 +50,7 @@ extension LibraryVC: LibraryContentVCDelegate {
     
     func onSelectCreateProject() {
         do {
-            _ = try libraryManager.createProject()
+            _ = try libraryManager.createProject(name: "New Project")
             reloadData()
             
         } catch { }
@@ -59,6 +59,22 @@ extension LibraryVC: LibraryContentVCDelegate {
     func onSelectProject(id: String) {
         let vc = EditorVC(projectID: id)
         present(vc, animated: true)
+    }
+    
+    func onSelectRenameProject(id: String, name: String) {
+        do {
+            _ = try libraryManager.renameProject(projectID: id, name: name)
+            reloadData()
+            
+        } catch { }
+    }
+    
+    func onSelectDeleteProject(id: String) {
+        do {
+            _ = try libraryManager.deleteProject(projectID: id)
+            reloadData()
+            
+        } catch { }
     }
     
 }

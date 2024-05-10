@@ -17,6 +17,10 @@ struct LibraryManager {
         var name: String
     }
     
+    enum RenameError: Error {
+        case invalidName
+    }
+    
     private let fileManager = FileManager.default
     private let fileUrlHelper = FileUrlHelper()
     
@@ -99,7 +103,7 @@ struct LibraryManager {
         return projects
     }
     
-    func createProject() throws -> String {
+    func createProject(name: String) throws -> String {
         let projectID = UUID().uuidString
         
         let projectURL = fileUrlHelper
@@ -113,7 +117,7 @@ struct LibraryManager {
         
         let projectManifest = createNewProjectManifest(
             id: projectID,
-            name: "New Project")
+            name: name)
         
         let projectManifestData = try encoder.encode(projectManifest)
         try projectManifestData.write(to: projectManifestURL)
@@ -124,6 +128,32 @@ struct LibraryManager {
         try setLibraryManifest(libraryManifest)
         
         return projectID
+    }
+    
+    func renameProject(
+        projectID: String, name: String
+    ) throws {
+        guard !name.isEmpty else {
+            throw RenameError.invalidName
+        }
+        
+        let projectManifestURL = fileUrlHelper
+            .projectManifestURL(for: projectID)
+        
+        let projectManifestData = try Data(
+            contentsOf: projectManifestURL)
+        
+        var projectManifest = try decoder.decode(
+            Project.Manifest.self,
+            from: projectManifestData)
+        
+        projectManifest.name = name
+        
+        let newProjectManifestData = 
+            try encoder.encode(projectManifest)
+        
+        try newProjectManifestData
+            .write(to: projectManifestURL)
     }
     
     func deleteProject(projectID: String) throws {

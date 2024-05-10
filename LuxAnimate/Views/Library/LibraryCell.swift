@@ -6,8 +6,8 @@ import UIKit
 
 class LibraryCell: UICollectionViewCell {
     
-    private let cardView = UIView()
-    private let nameLabel = UILabel()
+    let cardView = UIView()
+    let nameLabel = UILabel()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -42,8 +42,6 @@ class LibraryCell: UICollectionViewCell {
         nameLabel.widthAnchor.constraint(
             lessThanOrEqualToConstant: 200).isActive = true
         
-//        nameLabel.pinEdges(.horizontal, padding: 20)
-        
         nameLabel.numberOfLines = 2
     }
     
@@ -57,6 +55,7 @@ class LibraryCell: UICollectionViewCell {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = .center
         paragraphStyle.lineSpacing = 4
+        paragraphStyle.lineBreakMode = .byTruncatingMiddle
         
         let attributes: [NSAttributedString.Key: Any] = [
             .paragraphStyle: paragraphStyle,
