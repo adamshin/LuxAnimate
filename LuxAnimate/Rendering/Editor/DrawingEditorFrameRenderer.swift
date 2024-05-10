@@ -5,9 +5,9 @@
 import Foundation
 import Metal
 
-private let onionSkinPrevColor = Color(hex: "FEB941")
-private let onionSkinNextColor = Color(hex: "5AB2FF")
-private let onionSkinAlpha: Double = 0.6
+private let onionSkinPrevColor = Color(hex: "FF9600")
+private let onionSkinNextColor = Color(hex: "2EBAFF")
+private let onionSkinAlpha: Double = 0.5
 
 class EditorFrameRenderer {
     
