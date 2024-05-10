@@ -184,12 +184,23 @@ extension ProjectEditor {
         var projectManifest = editSession.currentProjectManifest
         var drawings = projectManifest.content.animationLayer.drawings
         
-        guard !drawings.contains(
+        let frameIndexToRemove: Int?
+        if !drawings.contains(
+            where: { $0.frameIndex == frameIndex })
+        {
+            frameIndexToRemove = frameIndex
+        } else if !drawings.contains(
             where: { $0.frameIndex == frameIndex + 1 })
-        else { return }
+        {
+            frameIndexToRemove = frameIndex + 1
+        } else {
+            frameIndexToRemove = nil
+        }
+        
+        guard let frameIndexToRemove else { return }
         
         for index in drawings.indices {
-            if drawings[index].frameIndex > frameIndex {
+            if drawings[index].frameIndex > frameIndexToRemove {
                 drawings[index].frameIndex -= 1
             }
         }
