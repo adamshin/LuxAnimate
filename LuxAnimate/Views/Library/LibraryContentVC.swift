@@ -129,6 +129,12 @@ class LibraryContentVC: UIViewController {
             preferredStyle: .alert)
         
         alert.addTextField { textField in
+            textField.autocapitalizationType = .sentences
+            textField.autocorrectionType = .no
+            textField.spellCheckingType = .no
+            textField.returnKeyType = .done
+            textField.clearButtonMode = .always
+            
             textField.text = originalName
         }
         
