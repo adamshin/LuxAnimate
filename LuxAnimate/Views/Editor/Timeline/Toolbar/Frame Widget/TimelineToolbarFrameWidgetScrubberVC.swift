@@ -4,14 +4,13 @@
 
 import UIKit
 
-private let cellSize = CGSize(
-    width: 40,
-    height: 40)
+private let cellWidth: CGFloat = 24
 
 protocol TimelineToolbarFrameWidgetScrubberVCDelegate: AnyObject {
     
     func onChangeFocusedFrame(
-        _ vc: TimelineToolbarFrameWidgetScrubberVC)
+        _ vc: TimelineToolbarFrameWidgetScrubberVC,
+        index: Int)
     
 }
 
@@ -26,7 +25,6 @@ class TimelineToolbarFrameWidgetScrubberVC: UIViewController {
     private let flowLayout: UICollectionViewFlowLayout = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
-        layout.itemSize = cellSize
         layout.minimumLineSpacing = 0
         return layout
     }()
@@ -43,6 +41,7 @@ class TimelineToolbarFrameWidgetScrubberVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         view.clipsToBounds = true
         
         view.addSubview(collectionView)
@@ -82,7 +81,7 @@ class TimelineToolbarFrameWidgetScrubberVC: UIViewController {
     
     private func recalculateCollectionViewInsets() {
         let width = view.bounds.width
-        let hInset = (width - cellSize.width) / 2
+        let hInset = (width - cellWidth) / 2
         
         collectionView.contentInset = UIEdgeInsets(
             top: 0, left: hInset,
@@ -95,7 +94,7 @@ class TimelineToolbarFrameWidgetScrubberVC: UIViewController {
         
         if focusedFrameIndex != index {
             focusedFrameIndex = index
-            delegate?.onChangeFocusedFrame(self)
+            delegate?.onChangeFocusedFrame(self, index: index)
         }
     }
     
@@ -153,13 +152,13 @@ class TimelineToolbarFrameWidgetScrubberVC: UIViewController {
 
 // MARK: - Collection View
 
-extension TimelineToolbarFrameWidgetScrubberVC: UICollectionViewDataSource {
+extension TimelineToolbarFrameWidgetScrubberVC:
+    UICollectionViewDataSource {
     
     func collectionView(
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
     ) -> Int {
-        
         frameCount
     }
     
@@ -176,7 +175,8 @@ extension TimelineToolbarFrameWidgetScrubberVC: UICollectionViewDataSource {
     
 }
 
-extension TimelineToolbarFrameWidgetScrubberVC: UICollectionViewDelegate {
+extension TimelineToolbarFrameWidgetScrubberVC:
+    UICollectionViewDelegate {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if isScrollDrivingFocusedFrame {
@@ -228,6 +228,21 @@ extension TimelineToolbarFrameWidgetScrubberVC: UICollectionViewDelegate {
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         isScrollDrivingFocusedFrame = false
+    }
+    
+}
+
+extension TimelineToolbarFrameWidgetScrubberVC:
+    UICollectionViewDelegateFlowLayout {
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath
+    ) -> CGSize {
+        CGSize(
+            width: cellWidth,
+            height: collectionView.bounds.height)
     }
     
 }

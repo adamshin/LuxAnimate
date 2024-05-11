@@ -40,20 +40,22 @@ class TimelineToolbarVC: UIViewController {
         bodyView.expandButton.addTarget(
             self, action: #selector(onSelectExpand))
         
-//        frameWidgetVC.delegate = self
-//        addChild(frameWidgetVC, to: bodyView.frameWidgetContainer)
+        frameWidgetVC.delegate = self
+        addChild(frameWidgetVC, to: bodyView.frameWidgetContainer)
     }
     
     // MARK: - Handlers
     
     @objc private func onSelectFirstFrame() {
-        delegate?.onChangeFocusedFrame(self,
-            index: 0)
+        let index = 0
+        frameWidgetVC.setFocusedFrameIndex(index)
+        delegate?.onChangeFocusedFrame(self, index: index)
     }
     
     @objc private func onSelectLastFrame() {
-        delegate?.onChangeFocusedFrame(self,
-            index: frameCount - 1)
+        let index = frameCount - 1
+        frameWidgetVC.setFocusedFrameIndex(index)
+        delegate?.onChangeFocusedFrame(self, index: index)
     }
     
     @objc private func onSelectPlayPause() {
@@ -67,8 +69,8 @@ class TimelineToolbarVC: UIViewController {
     // MARK: - Interface
     
     func setPlaying(_ playing: Bool) {
+        frameWidgetVC.setPlaying(playing)
         bodyView.setPlayButtonPlaying(playing)
-//        frameWidgetVC.view.isUserInteractionEnabled = !playing
     }
     
     func setExpanded(_ expanded: Bool) {
@@ -77,11 +79,11 @@ class TimelineToolbarVC: UIViewController {
     
     func setFrameCount(_ frameCount: Int) {
         self.frameCount = frameCount
-//        frameWidgetVC.setFrameCount(frameCount)
+        frameWidgetVC.setFrameCount(frameCount)
     }
     
     func setFocusedFrameIndex(_ index: Int) {
-//        frameWidgetVC.setFocusedFrameIndex(index)
+        frameWidgetVC.setFocusedFrameIndex(index)
     }
     
 }
@@ -92,7 +94,7 @@ extension TimelineToolbarVC: TimelineToolbarFrameWidgetVCDelegate {
         _ vc: TimelineToolbarFrameWidgetVC,
         index: Int
     ) {
-//        delegate?.onChangeFocusedFrame(self, index: index)
+        delegate?.onChangeFocusedFrame(self, index: index)
     }
     
 }

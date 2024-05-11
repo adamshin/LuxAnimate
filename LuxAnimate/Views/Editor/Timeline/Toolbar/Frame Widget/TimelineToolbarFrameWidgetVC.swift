@@ -18,7 +18,9 @@ private let numberFont = UIFont.monospacedDigitSystemFont(
 
 protocol TimelineToolbarFrameWidgetVCDelegate: AnyObject {
     
-    func onChangeFocusedFrame(_ vc: TimelineToolbarFrameWidgetVC, index: Int)
+    func onChangeFocusedFrame(
+        _ vc: TimelineToolbarFrameWidgetVC,
+        index: Int)
     
 }
 
@@ -56,6 +58,10 @@ class TimelineToolbarFrameWidgetVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.pinWidth(to: 200)
+        
+        scrubberVC.delegate = self
+        addChild(scrubberVC, to: view)
         
         /*
         let stack = UIStackView()
@@ -106,6 +112,23 @@ class TimelineToolbarFrameWidgetVC: UIViewController {
     
     func setFocusedFrameIndex(_ index: Int) {
         scrubberVC.setFocusedFrameIndex(index)
+    }
+    
+    func setPlaying(_ playing: Bool) {
+        view.isUserInteractionEnabled = !playing
+    }
+    
+}
+
+extension TimelineToolbarFrameWidgetVC: 
+    TimelineToolbarFrameWidgetScrubberVCDelegate {
+    
+    func onChangeFocusedFrame(
+        _ vc: TimelineToolbarFrameWidgetScrubberVC,
+        index: Int
+    ) {
+        // TODO: update this view's ui
+        delegate?.onChangeFocusedFrame(self, index: index)
     }
     
 }

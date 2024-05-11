@@ -60,7 +60,7 @@ class TimelineTrackVC: UIViewController {
     private var focusedFrameIndex = 0
     
     private var isScrolling = false
-    private var isScrollDrivingFocusedFrame = true
+    private var isScrollDrivingFocusedFrame = false
     
     private var openMenuFrameIndex: Int?
     
@@ -393,14 +393,14 @@ extension TimelineTrackVC: UICollectionViewDelegate {
         willDecelerate decelerate: Bool
     ) {
         isScrolling = decelerate
-        isScrollDrivingFocusedFrame = true
+        isScrollDrivingFocusedFrame = decelerate
         
         updateVisibleCellsPlusButton(animated: true)
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         isScrolling = false
-        isScrollDrivingFocusedFrame = true
+        isScrollDrivingFocusedFrame = false
         
         collectionView.isUserInteractionEnabled = true
         updateVisibleCellsPlusButton(animated: true)
@@ -408,7 +408,7 @@ extension TimelineTrackVC: UICollectionViewDelegate {
     
     func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
         isScrolling = false
-        isScrollDrivingFocusedFrame = true
+        isScrollDrivingFocusedFrame = false
         
         collectionView.isUserInteractionEnabled = true
         updateVisibleCellsPlusButton(animated: true)
