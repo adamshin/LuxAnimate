@@ -430,6 +430,7 @@ extension TimelineTrackVC: TimelineTrackCellDelegate {
             delegate?.onSelectFocusedFrame(self, index: index)
         } else {
             focusFrame(at: index, animated: true)
+            delegate?.onChangeFocusedFrame(self, index: index)
         }
     }
     

@@ -67,10 +67,15 @@ class EditorVC: UIViewController {
     // MARK: - Data
     
     private func setInitialData() {
-        updateData(projectManifest: editor.currentProjectManifest)
+        updateTimeline(
+            projectManifest: editor.currentProjectManifest)
+        
+        frameVC.showFrame(
+            at: timelineVC.focusedFrameIndex,
+            forceReload: true)
     }
     
-    private func updateData(projectManifest: Project.Manifest) {
+    private func updateTimeline(projectManifest: Project.Manifest) {
         let model = timelineModelGenerator
             .generate(from: projectManifest)
         
@@ -83,8 +88,6 @@ class EditorVC: UIViewController {
         
         timelineVC.setModel(model)
         timelineVC.setFocusedFrameIndex(newFocusedFrameIndex)
-        
-        frameVC.showFrame(at: newFocusedFrameIndex, forceReload: true)
     }
     
 }
@@ -200,7 +203,7 @@ extension EditorVC: EditorFrameVCDelegate {
 extension EditorVC: ProjectEditorDelegate {
     
     func onEditProject(_ editor: ProjectEditor) {
-        updateData(projectManifest: editor.currentProjectManifest)
+        updateTimeline(projectManifest: editor.currentProjectManifest)
     }
     
 }
