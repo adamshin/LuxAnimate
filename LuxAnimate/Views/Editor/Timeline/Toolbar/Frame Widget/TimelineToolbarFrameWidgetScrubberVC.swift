@@ -24,7 +24,7 @@ class TimelineToolbarFrameWidgetScrubberVC: UIViewController {
     
     weak var delegate: TimelineToolbarFrameWidgetScrubberVCDelegate?
     
-    private lazy var collectionView = UICollectionView(
+    private lazy var collectionView = ScrubberCollectionView(
         frame: .zero,
         collectionViewLayout: flowLayout)
     
@@ -39,6 +39,10 @@ class TimelineToolbarFrameWidgetScrubberVC: UIViewController {
         TimelineToolbarFrameWidgetScrubberCell,
         Void
     > { cell, indexPath, _ in }
+    
+    private var cells: [TimelineToolbarFrameWidgetScrubberCell] = []
+    
+    let staticContentView = UIView()
     
     private var frameCount = 0
     
@@ -57,9 +61,13 @@ class TimelineToolbarFrameWidgetScrubberVC: UIViewController {
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.showsVerticalScrollIndicator = false
         collectionView.allowsSelection = false
+        collectionView.delaysContentTouches = false
         
         collectionView.dataSource = self
         collectionView.delegate = self
+        
+        collectionView.addSubview(staticContentView)
+        staticContentView.pinEdges(to: view)
         
         focusFrame(at: 0)
     }
@@ -154,6 +162,28 @@ class TimelineToolbarFrameWidgetScrubberVC: UIViewController {
         focusFrame(at: index)
     }
     
+    func setScrubberVisible(
+        _ visible: Bool,
+        animated: Bool
+    ) {
+        if animated {
+            if visible {
+                UIView.animate(withDuration: 0.1) {
+//                    self.cells.forEach { $0.tick.alpha = 1 }
+                    self.staticContentView.alpha = 0
+                }
+            } else {
+                UIView.animate(withDuration: 0.25) {
+//                    self.cells.forEach { $0.tick.alpha = 0 }
+                    self.staticContentView.alpha = 1
+                }
+            }
+        } else {
+//            cells.forEach { $0.tick.alpha = visible ? 1 : 0 }
+            staticContentView.alpha = visible ? 0 : 1
+        }
+    }
+    
 }
 
 // MARK: - Collection View
@@ -173,10 +203,14 @@ extension TimelineToolbarFrameWidgetScrubberVC:
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
         
-        collectionView.dequeueConfiguredReusableCell(
+        let cell = collectionView.dequeueConfiguredReusableCell(
             using: cellRegistration,
             for: indexPath, 
             item: ())
+        
+        cells.append(cell)
+//        cell.tick.alpha = 0
+        return cell
     }
     
 }
@@ -254,6 +288,29 @@ extension TimelineToolbarFrameWidgetScrubberVC:
         CGSize(
             width: cellWidth,
             height: collectionView.bounds.height)
+    }
+    
+}
+
+// MARK: - Helpers
+
+class ScrubberCollectionView: UICollectionView {
+    
+    override func hitTest(
+        _ point: CGPoint, with event: UIEvent?
+    ) -> UIView? {
+        for subview in subviews.reversed() {
+            let p = subview.convert(point, from: self)
+                
+            if let view = subview.hitTest(p, with: event) {
+                return view
+            }
+        }
+        return self
+    }
+    
+    override func touchesShouldCancel(in view: UIView) -> Bool {
+        true
     }
     
 }

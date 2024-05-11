@@ -6,10 +6,11 @@ import UIKit
 
 class TimelineToolbarFrameWidgetScrubberCell: UICollectionViewCell {
     
+    let tick = CircleView()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        let tick = CircleView()
         tick.backgroundColor = UIColor(white: 1, alpha: 0.35)
         tick.layer.cornerCurve = .continuous
         addSubview(tick)

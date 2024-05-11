@@ -4,18 +4,6 @@
 
 import UIKit
 
-private let buttonWidth: CGFloat = 64
-private let frameButtonWidth: CGFloat = 88
-
-private let iconConfig = UIImage.SymbolConfiguration(
-    pointSize: 19,
-    weight: .medium,
-    scale: .medium)
-
-private let numberFont = UIFont.monospacedDigitSystemFont(
-    ofSize: 17,
-    weight: .medium)
-
 protocol TimelineToolbarFrameWidgetVCDelegate: AnyObject {
     
     func onBeginFrameScroll(_ vc: TimelineToolbarFrameWidgetVC)
@@ -32,89 +20,28 @@ class TimelineToolbarFrameWidgetVC: UIViewController {
     weak var delegate: TimelineToolbarFrameWidgetVCDelegate?
     
     private let scrubberVC = TimelineToolbarFrameWidgetScrubberVC()
-    
-    /*
-    private let frameNumberLabel = UILabel()
-    
-    private let previousFrameButton = {
-        let button = UIButton(type: .system)
-        let image = UIImage(
-            systemName: "chevron.left",
-            withConfiguration: iconConfig)
-        button.setImage(image, for: .normal)
-        button.tintColor = .editorLabel
-        button.pinWidth(to: buttonWidth)
-        return button
-    }()
-    
-    private let nextFrameButton = {
-        let button = UIButton(type: .system)
-        let image = UIImage(
-            systemName: "chevron.right",
-            withConfiguration: iconConfig)
-        button.setImage(image, for: .normal)
-        button.tintColor = .editorLabel
-        button.pinWidth(to: buttonWidth)
-        return button
-    }()
-     */
+    private let controlVC = TimelineToolbarFrameWidgetControlVC()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.pinWidth(to: 200)
         
         scrubberVC.delegate = self
         addChild(scrubberVC, to: view)
         
-        /*
-        let stack = UIStackView()
-        stack.axis = .horizontal
+        controlVC.delegate = self
+        addChild(controlVC, to: scrubberVC.staticContentView)
         
-        view.addSubview(stack)
-        stack.pinEdges()
-        
-        stack.addArrangedSubview(previousFrameButton)
-        
-        let frameButtonContainer = UIView()
-        stack.addArrangedSubview(frameButtonContainer)
-        frameButtonContainer.pinWidth(to: frameButtonWidth)
-        
-        let frameLozenge = CircleView()
-        frameLozenge.layer.cornerCurve = .continuous
-        frameButtonContainer.addSubview(frameLozenge)
-        frameLozenge.pinEdges(.horizontal)
-        frameLozenge.pin(.centerY)
-        frameLozenge.pinHeight(to: 32)
-        frameLozenge.backgroundColor = UIColor(white: 1, alpha: 0.15)
-        
-        frameButtonContainer.addSubview(frameNumberLabel)
-        frameNumberLabel.pinCenter()
-        frameNumberLabel.font = numberFont
-        frameNumberLabel.textColor = .editorLabel
-        
-        stack.addArrangedSubview(nextFrameButton)
-        
-        previousFrameButton.addHandler { [weak self] in
-            guard let self else { return }
-            self.delegate?.onSelectPreviousFrame(self)
-        }
-        nextFrameButton.addHandler { [weak self] in
-            guard let self else { return }
-            self.delegate?.onSelectNextFrame(self)
-        }
-         */
+        scrubberVC.setScrubberVisible(false, animated: false)
     }
-    
-//    func setFocusedFrameIndex(_ index: Int) {
-//        frameNumberLabel.text = "\(index + 1)"
-//    }
     
     func setFrameCount(_ frameCount: Int) {
         scrubberVC.setFrameCount(frameCount)
+        controlVC.setFrameCount(frameCount)
     }
     
     func setFocusedFrameIndex(_ index: Int) {
         scrubberVC.setFocusedFrameIndex(index)
+        controlVC.setFocusedFrameIndex(index)
     }
     
     func setPlaying(_ playing: Bool) {
@@ -123,19 +50,22 @@ class TimelineToolbarFrameWidgetVC: UIViewController {
     
 }
 
+// MARK: - Delegates
+
 extension TimelineToolbarFrameWidgetVC: 
     TimelineToolbarFrameWidgetScrubberVCDelegate {
     
     func onBeginFrameScroll(
         _ vc: TimelineToolbarFrameWidgetScrubberVC
     ) {
-        // TODO: Hide buttons, show popup
+        scrubberVC.setScrubberVisible(true, animated: true)
         delegate?.onBeginFrameScroll(self)
     }
     
     func onEndFrameScroll(
         _ vc: TimelineToolbarFrameWidgetScrubberVC
     ) {
+        scrubberVC.setScrubberVisible(false, animated: true)
         delegate?.onEndFrameScroll(self)
     }
     
@@ -143,7 +73,20 @@ extension TimelineToolbarFrameWidgetVC:
         _ vc: TimelineToolbarFrameWidgetScrubberVC,
         index: Int
     ) {
-        // TODO: update this view's ui
+        controlVC.setFocusedFrameIndex(index)
+        delegate?.onChangeFocusedFrame(self, index: index)
+    }
+    
+}
+
+extension TimelineToolbarFrameWidgetVC:
+    TimelineToolbarFrameWidgetControlVCDelegate {
+    
+    func onChangeFocusedFrame(
+        _ vc: TimelineToolbarFrameWidgetControlVC,
+        index: Int
+    ) {
+        scrubberVC.setFocusedFrameIndex(index)
         delegate?.onChangeFocusedFrame(self, index: index)
     }
     
