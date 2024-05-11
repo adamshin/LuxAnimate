@@ -9,6 +9,9 @@ private let framesPerSecond = 24
 
 protocol EditorTimelineVCDelegate: AnyObject {
     
+    func onBeginFrameScroll(_ vc: EditorTimelineVC)
+    func onEndFrameScroll(_ vc: EditorTimelineVC)
+    
     func onChangeFocusedFrame(
         _ vc: EditorTimelineVC,
         index: Int)
@@ -147,6 +150,16 @@ extension EditorTimelineVC: EditorCollapsibleContentVCDelegate {
 
 extension EditorTimelineVC: TimelineToolbarVCDelegate {
     
+    func onBeginFrameScroll(_ vc: TimelineToolbarVC) {
+        trackVC.setFrameScrollEnabled(false)
+        delegate?.onBeginFrameScroll(self)
+    }
+    
+    func onEndFrameScroll(_ vc: TimelineToolbarVC) {
+        trackVC.setFrameScrollEnabled(true)
+        delegate?.onEndFrameScroll(self)
+    }
+    
     func onChangeFocusedFrame(_ vc: TimelineToolbarVC, index: Int) {
         focusedFrameIndex = index
         trackVC.setFocusedFrameIndex(index)
@@ -165,6 +178,15 @@ extension EditorTimelineVC: TimelineToolbarVCDelegate {
 }
 
 extension EditorTimelineVC: TimelineTrackVCDelegate {
+    
+    func onBeginFrameScroll(_ vc: TimelineTrackVC) {
+        toolbarVC.setFrameScrollEnabled(false)
+        delegate?.onBeginFrameScroll(self)
+    }
+    func onEndFrameScroll(_ vc: TimelineTrackVC) {
+        toolbarVC.setFrameScrollEnabled(true)
+        delegate?.onEndFrameScroll(self)
+    }
     
     func onChangeFocusedFrame(_ vc: TimelineTrackVC, index: Int) {
         focusedFrameIndex = index

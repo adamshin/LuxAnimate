@@ -8,6 +8,12 @@ private let cellWidth: CGFloat = 24
 
 protocol TimelineToolbarFrameWidgetScrubberVCDelegate: AnyObject {
     
+    func onBeginFrameScroll(
+        _ vc: TimelineToolbarFrameWidgetScrubberVC)
+    
+    func onEndFrameScroll(
+        _ vc: TimelineToolbarFrameWidgetScrubberVC)
+    
     func onChangeFocusedFrame(
         _ vc: TimelineToolbarFrameWidgetScrubberVC,
         index: Int)
@@ -186,6 +192,7 @@ extension TimelineToolbarFrameWidgetScrubberVC:
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         isScrollDrivingFocusedFrame = true
+        delegate?.onBeginFrameScroll(self)
     }
     
     func scrollViewWillEndDragging(
@@ -224,10 +231,14 @@ extension TimelineToolbarFrameWidgetScrubberVC:
         willDecelerate decelerate: Bool
     ) {
         isScrollDrivingFocusedFrame = decelerate
+        if !decelerate {
+            delegate?.onEndFrameScroll(self)
+        }
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         isScrollDrivingFocusedFrame = false
+        delegate?.onEndFrameScroll(self)
     }
     
 }

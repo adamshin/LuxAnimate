@@ -78,7 +78,8 @@ class EditorFrameVC: UIViewController {
     private var currentFrameIndex: Int?
     
     private var drawingID: String?
-    private var isEditingEnabled = false
+    private var isDrawingFullyLoaded = false
+    private var isEditingEnabled = true
     
     private let brushEngine: BrushEngine
     private var brushMode: BrushEngine.BrushMode = .brush
@@ -143,7 +144,7 @@ class EditorFrameVC: UIViewController {
         brushEngine.endStroke()
         
         drawingID = drawing?.id
-        isEditingEnabled = false
+        isDrawingFullyLoaded = false
         
         loadAndDisplayFrame(
             drawing: drawing,
@@ -253,7 +254,7 @@ class EditorFrameVC: UIViewController {
                     self.brushEngine.setCanvasContents(drawingTexture)
                 }
                 
-                self.isEditingEnabled = drawing != nil
+                self.isDrawingFullyLoaded = drawing != nil
             }
         }
     }
@@ -297,7 +298,7 @@ class EditorFrameVC: UIViewController {
         guard let delegate else { return }
         
         let projectManifest =
-            delegate.currentProjectManifest(self)
+        delegate.currentProjectManifest(self)
         
         let animationLayer = projectManifest.content.animationLayer
         
@@ -333,6 +334,10 @@ class EditorFrameVC: UIViewController {
         contentVC.canvasVC.setEditingEnabled(!playing)
     }
     
+    func setEditingEnabled(_ enabled: Bool) {
+        isEditingEnabled = enabled
+    }
+    
     func setOnionSkinOn(_ isOnionSkinOn: Bool) {
         frameRenderer.isOnionSkinOn = isOnionSkinOn
         draw()
@@ -362,7 +367,8 @@ extension EditorFrameVC: EditorFrameCanvasVCDelegate {
     
     
     func onBeginBrushStroke(quickTap: Bool) {
-        guard isEditingEnabled else { return }
+        guard isDrawingFullyLoaded, isEditingEnabled
+        else { return }
         
         let scale = contentVC.toolOverlayVC.size
         let smoothingLevel = contentVC.toolOverlayVC.smoothing
@@ -379,7 +385,8 @@ extension EditorFrameVC: EditorFrameCanvasVCDelegate {
     func onUpdateBrushStroke(
         _ stroke: BrushGestureRecognizer.Stroke
     ) {
-        guard isEditingEnabled else { return }
+        guard isDrawingFullyLoaded, isEditingEnabled
+        else { return }
         
         let inputStroke = BrushEngineGestureAdapter
             .convert(stroke)
@@ -388,12 +395,16 @@ extension EditorFrameVC: EditorFrameCanvasVCDelegate {
     }
     
     func onEndBrushStroke() {
-        guard isEditingEnabled else { return }
+        guard isDrawingFullyLoaded, isEditingEnabled
+        else { return }
+        
         brushEngine.endStroke()
     }
     
     func onCancelBrushStroke() {
-        guard isEditingEnabled else { return }
+        guard isDrawingFullyLoaded, isEditingEnabled
+        else { return }
+        
         brushEngine.cancelStroke()
     }
     

@@ -18,6 +18,9 @@ private let numberFont = UIFont.monospacedDigitSystemFont(
 
 protocol TimelineToolbarFrameWidgetVCDelegate: AnyObject {
     
+    func onBeginFrameScroll(_ vc: TimelineToolbarFrameWidgetVC)
+    func onEndFrameScroll(_ vc: TimelineToolbarFrameWidgetVC)
+    
     func onChangeFocusedFrame(
         _ vc: TimelineToolbarFrameWidgetVC,
         index: Int)
@@ -122,6 +125,19 @@ class TimelineToolbarFrameWidgetVC: UIViewController {
 
 extension TimelineToolbarFrameWidgetVC: 
     TimelineToolbarFrameWidgetScrubberVCDelegate {
+    
+    func onBeginFrameScroll(
+        _ vc: TimelineToolbarFrameWidgetScrubberVC
+    ) {
+        // TODO: Hide buttons, show popup
+        delegate?.onBeginFrameScroll(self)
+    }
+    
+    func onEndFrameScroll(
+        _ vc: TimelineToolbarFrameWidgetScrubberVC
+    ) {
+        delegate?.onEndFrameScroll(self)
+    }
     
     func onChangeFocusedFrame(
         _ vc: TimelineToolbarFrameWidgetScrubberVC,

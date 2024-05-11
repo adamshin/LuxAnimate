@@ -19,6 +19,9 @@ private let cellSpacing: CGFloat = 8
 
 protocol TimelineTrackVCDelegate: AnyObject {
     
+    func onBeginFrameScroll(_ vc: TimelineTrackVC)
+    func onEndFrameScroll(_ vc: TimelineTrackVC)
+    
     func onChangeFocusedFrame(
         _ vc: TimelineTrackVC,
         index: Int)
@@ -185,6 +188,9 @@ class TimelineTrackVC: UIViewController {
             isScrolling = true
             isScrollDrivingFocusedFrame = false
             collectionView.isUserInteractionEnabled = false
+            
+            delegate?.onBeginFrameScroll(self)
+            
         } else {
             isScrolling = false
             isScrollDrivingFocusedFrame = false
@@ -285,6 +291,10 @@ class TimelineTrackVC: UIViewController {
         }
     }
     
+    func setFrameScrollEnabled(_ enabled: Bool) {
+        view.isUserInteractionEnabled = enabled
+    }
+    
     func cell(at index: Int) -> TimelineTrackCell? {
         collectionView.cellForItem(
             at: IndexPath(item: index, section: 0))
@@ -353,6 +363,7 @@ extension TimelineTrackVC: UICollectionViewDelegate {
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         isScrolling = true
         isScrollDrivingFocusedFrame = true
+        delegate?.onBeginFrameScroll(self)
         
         updateVisibleCellsPlusButton(animated: true)
     }
@@ -394,6 +405,9 @@ extension TimelineTrackVC: UICollectionViewDelegate {
     ) {
         isScrolling = decelerate
         isScrollDrivingFocusedFrame = decelerate
+        if !decelerate {
+            delegate?.onEndFrameScroll(self)
+        }
         
         updateVisibleCellsPlusButton(animated: true)
     }
@@ -401,6 +415,7 @@ extension TimelineTrackVC: UICollectionViewDelegate {
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         isScrolling = false
         isScrollDrivingFocusedFrame = false
+        delegate?.onEndFrameScroll(self)
         
         collectionView.isUserInteractionEnabled = true
         updateVisibleCellsPlusButton(animated: true)
@@ -409,6 +424,7 @@ extension TimelineTrackVC: UICollectionViewDelegate {
     func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
         isScrolling = false
         isScrollDrivingFocusedFrame = false
+        delegate?.onEndFrameScroll(self)
         
         collectionView.isUserInteractionEnabled = true
         updateVisibleCellsPlusButton(animated: true)

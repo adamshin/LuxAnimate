@@ -96,6 +96,14 @@ class EditorVC: UIViewController {
 
 extension EditorVC: EditorTimelineVCDelegate {
     
+    func onBeginFrameScroll(_ vc: EditorTimelineVC) {
+        frameVC.setEditingEnabled(false)
+    }
+    
+    func onEndFrameScroll(_ vc: EditorTimelineVC) {
+        frameVC.setEditingEnabled(true)
+    }
+    
     func onChangeFocusedFrame(
         _ vc: EditorTimelineVC,
         index: Int
