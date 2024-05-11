@@ -1,0 +1,233 @@
+//
+//  TimelineToolbarFrameWidgetScrubberVC.swift
+//
+
+import UIKit
+
+private let cellSize = CGSize(
+    width: 40,
+    height: 40)
+
+protocol TimelineToolbarFrameWidgetScrubberVCDelegate: AnyObject {
+    
+    func onChangeFocusedFrame(
+        _ vc: TimelineToolbarFrameWidgetScrubberVC)
+    
+}
+
+class TimelineToolbarFrameWidgetScrubberVC: UIViewController {
+    
+    weak var delegate: TimelineToolbarFrameWidgetScrubberVCDelegate?
+    
+    private lazy var collectionView = UICollectionView(
+        frame: .zero,
+        collectionViewLayout: flowLayout)
+    
+    private let flowLayout: UICollectionViewFlowLayout = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.itemSize = cellSize
+        layout.minimumLineSpacing = 0
+        return layout
+    }()
+    
+    private let cellRegistration = UICollectionView.CellRegistration<
+        TimelineToolbarFrameWidgetScrubberCell,
+        Void
+    > { cell, indexPath, _ in }
+    
+    private var frameCount = 0
+    
+    private(set) var focusedFrameIndex = 0
+    private var isScrollDrivingFocusedFrame = false
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.clipsToBounds = true
+        
+        view.addSubview(collectionView)
+        collectionView.pinEdges()
+        
+        collectionView.backgroundColor = nil
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.showsVerticalScrollIndicator = false
+        collectionView.allowsSelection = false
+        
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        
+        focusFrame(at: 0)
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        recalculateCollectionViewInsets()
+        recalculateFocusedFrame()
+    }
+    
+    override func viewWillTransition(
+        to size: CGSize,
+        with coordinator: any UIViewControllerTransitionCoordinator
+    ) {
+        super.viewWillTransition(to: size, with: coordinator)
+        
+        let index = focusedFrameIndex
+        coordinator.animate { _ in
+            self.focusFrame(at: index)
+        }
+    }
+    
+    // MARK: - UI
+    
+    private func recalculateCollectionViewInsets() {
+        let width = view.bounds.width
+        let hInset = (width - cellSize.width) / 2
+        
+        collectionView.contentInset = UIEdgeInsets(
+            top: 0, left: hInset,
+            bottom: 0, right: hInset)
+    }
+    
+    private func recalculateFocusedFrame() {
+        guard let index = currentFocusedFrameIndex()
+        else { return }
+        
+        if focusedFrameIndex != index {
+            focusedFrameIndex = index
+            delegate?.onChangeFocusedFrame(self)
+        }
+    }
+    
+    private func currentFocusedFrameIndex() -> Int? {
+        collectionView.layoutIfNeeded()
+        
+        let scrollRectMidX =
+            collectionView.contentOffset.x +
+            collectionView.bounds.width / 2
+        
+        let cellsAndDistances = collectionView.visibleCells.map {
+            ($0, abs($0.frame.midX - scrollRectMidX))
+        }
+        let selectedCell = cellsAndDistances
+            .min { $0.1 < $1.1 }
+            .map { $0.0 }
+        
+        guard let selectedCell else { return nil }
+        
+        let indexPath = collectionView.indexPath(for: selectedCell)
+        return indexPath?.item
+    }
+    
+    private func focusFrame(at index: Int) {
+        let clampedIndex = clamp(index,
+            min: 0,
+            max: frameCount - 1)
+        
+        guard focusedFrameIndex != clampedIndex
+        else { return }
+        
+        focusedFrameIndex = clampedIndex
+        
+        isScrollDrivingFocusedFrame = false
+        collectionView.scrollToItem(
+            at: IndexPath(item: clampedIndex, section: 0),
+            at: .centeredHorizontally,
+            animated: false)
+    }
+    
+    // MARK: - Interface
+    
+    func setFrameCount(_ frameCount: Int) {
+        if self.frameCount != frameCount {
+            self.frameCount = frameCount
+            collectionView.reloadData()
+        }
+    }
+    
+    func setFocusedFrameIndex(_ index: Int) {
+        focusFrame(at: index)
+    }
+    
+}
+
+// MARK: - Collection View
+
+extension TimelineToolbarFrameWidgetScrubberVC: UICollectionViewDataSource {
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        numberOfItemsInSection section: Int
+    ) -> Int {
+        
+        frameCount
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        cellForItemAt indexPath: IndexPath
+    ) -> UICollectionViewCell {
+        
+        collectionView.dequeueConfiguredReusableCell(
+            using: cellRegistration,
+            for: indexPath, 
+            item: ())
+    }
+    
+}
+
+extension TimelineToolbarFrameWidgetScrubberVC: UICollectionViewDelegate {
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if isScrollDrivingFocusedFrame {
+            recalculateFocusedFrame()
+        }
+    }
+    
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        isScrollDrivingFocusedFrame = true
+    }
+    
+    func scrollViewWillEndDragging(
+        _ scrollView: UIScrollView,
+        withVelocity velocity: CGPoint,
+        targetContentOffset: UnsafeMutablePointer<CGPoint>
+    ) {
+        let target = targetContentOffset.pointee
+        
+        var offsetAdjustment = CGFloat.greatestFiniteMagnitude
+        let horizontalOffset = target.x + collectionView.contentInset.left
+
+        let targetRect = CGRect(
+            x: target.x,
+            y: 0,
+            width: collectionView.bounds.size.width,
+            height: collectionView.bounds.size.height)
+
+        let layoutAttributes = collectionView.collectionViewLayout
+            .layoutAttributesForElements(in: targetRect) ?? []
+
+        for attribute in layoutAttributes {
+            let itemOffset = attribute.frame.origin.x
+            if abs(itemOffset - horizontalOffset) < abs(offsetAdjustment) {
+                offsetAdjustment = itemOffset - horizontalOffset
+            }
+        }
+        
+        targetContentOffset.pointee = CGPoint(
+            x: target.x + offsetAdjustment,
+            y: target.y)
+    }
+    
+    func scrollViewDidEndDragging(
+        _ scrollView: UIScrollView,
+        willDecelerate decelerate: Bool
+    ) {
+        isScrollDrivingFocusedFrame = decelerate
+    }
+    
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        isScrollDrivingFocusedFrame = false
+    }
+    
+}

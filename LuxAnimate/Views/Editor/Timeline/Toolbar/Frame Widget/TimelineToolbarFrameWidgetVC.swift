@@ -16,19 +16,19 @@ private let numberFont = UIFont.monospacedDigitSystemFont(
     ofSize: 17,
     weight: .medium)
 
-protocol TimelineToolbarFrameWidgetDelegate: AnyObject {
+protocol TimelineToolbarFrameWidgetVCDelegate: AnyObject {
     
-    func onSelectPreviousFrame(
-        _ v: TimelineToolbarFrameWidget)
-    func onSelectNextFrame(
-        _ v: TimelineToolbarFrameWidget)
+    func onChangeFocusedFrame(_ vc: TimelineToolbarFrameWidgetVC, index: Int)
     
 }
 
-class TimelineToolbarFrameWidget: UIView {
+class TimelineToolbarFrameWidgetVC: UIViewController {
     
-    weak var delegate: TimelineToolbarFrameWidgetDelegate?
+    weak var delegate: TimelineToolbarFrameWidgetVCDelegate?
     
+    private let scrubberVC = TimelineToolbarFrameWidgetScrubberVC()
+    
+    /*
     private let frameNumberLabel = UILabel()
     
     private let previousFrameButton = {
@@ -52,14 +52,16 @@ class TimelineToolbarFrameWidget: UIView {
         button.pinWidth(to: buttonWidth)
         return button
     }()
+     */
     
-    init() {
-        super.init(frame: .zero)
+    override func viewDidLoad() {
+        super.viewDidLoad()
         
+        /*
         let stack = UIStackView()
         stack.axis = .horizontal
         
-        addSubview(stack)
+        view.addSubview(stack)
         stack.pinEdges()
         
         stack.addArrangedSubview(previousFrameButton)
@@ -91,12 +93,19 @@ class TimelineToolbarFrameWidget: UIView {
             guard let self else { return }
             self.delegate?.onSelectNextFrame(self)
         }
+         */
     }
     
-    required init?(coder: NSCoder) { fatalError() }
+//    func setFocusedFrameIndex(_ index: Int) {
+//        frameNumberLabel.text = "\(index + 1)"
+//    }
+    
+    func setFrameCount(_ frameCount: Int) {
+        scrubberVC.setFrameCount(frameCount)
+    }
     
     func setFocusedFrameIndex(_ index: Int) {
-        frameNumberLabel.text = "\(index + 1)"
+        scrubberVC.setFocusedFrameIndex(index)
     }
     
 }

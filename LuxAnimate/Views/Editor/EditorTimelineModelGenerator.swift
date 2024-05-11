@@ -14,6 +14,8 @@ struct EditorTimelineModelGenerator {
         from projectManifest: Project.Manifest
     ) -> EditorTimelineModel {
         
+        let framesPerSecond = projectManifest.metadata.framesPerSecond
+        
         let emptyFrame = EditorTimelineModel.Frame(
             hasDrawing: false,
             thumbnailURL: nil)
@@ -47,7 +49,9 @@ struct EditorTimelineModelGenerator {
             }
         }
         
-        return EditorTimelineModel(frames: frames)
+        return EditorTimelineModel(
+            framesPerSecond: framesPerSecond,
+            frames: frames)
     }
     
 }

@@ -9,13 +9,6 @@ private let framesPerSecond = 24
 
 protocol EditorTimelineVCDelegate: AnyObject {
     
-    func onChangeContentAreaSize(
-        _ vc: EditorTimelineVC)
-    
-    func onRequestFocusFrame(
-        _ vc: EditorTimelineVC,
-        index: Int)
-    
     func onChangeFocusedFrame(
         _ vc: EditorTimelineVC,
         index: Int)
@@ -39,6 +32,9 @@ protocol EditorTimelineVCDelegate: AnyObject {
         _ vc: EditorTimelineVC,
         frameIndex: Int)
     
+    func onChangeContentAreaSize(
+        _ vc: EditorTimelineVC)
+    
 }
 
 class EditorTimelineVC: UIViewController {
@@ -50,7 +46,8 @@ class EditorTimelineVC: UIViewController {
     private let toolbarVC = TimelineToolbarVC()
     private let trackVC = TimelineTrackVC()
     
-    private var model = EditorTimelineModel(frames: [])
+    private var model = EditorTimelineModel.empty
+    private(set) var focusedFrameIndex = 0
     
     // MARK: - Lifecycle
     
@@ -107,20 +104,20 @@ class EditorTimelineVC: UIViewController {
     
     func setModel(_ model: EditorTimelineModel) {
         self.model = model
+        
+        toolbarVC.setFrameCount(model.frames.count)
         trackVC.setModel(model)
     }
     
-    func focusFrame(at index: Int) {
-        trackVC.focusFrame(at: index, animated: false)
+    func setFocusedFrameIndex(_ index: Int) {
+        focusedFrameIndex = index
+        toolbarVC.setFocusedFrameIndex(index)
+        trackVC.setFocusedFrameIndex(index)
     }
     
     func setPlaying(_ playing: Bool) {
         toolbarVC.setPlaying(playing)
-        trackVC.view.isUserInteractionEnabled = !playing
-    }
-    
-    var focusedFrameIndex: Int {
-        trackVC.focusedFrameIndex
+        trackVC.setPlaying(playing)
     }
     
     var contentAreaView: UIView {
@@ -150,32 +147,15 @@ extension EditorTimelineVC: EditorCollapsibleContentVCDelegate {
 
 extension EditorTimelineVC: TimelineToolbarVCDelegate {
     
+    func onChangeFocusedFrame(_ vc: TimelineToolbarVC, index: Int) {
+        focusedFrameIndex = index
+        trackVC.setFocusedFrameIndex(index)
+        
+        delegate?.onChangeFocusedFrame(self, index: index)
+    }
+    
     func onSelectPlayPause(_ vc: TimelineToolbarVC) {
         delegate?.onSelectPlayPause(self)
-    }
-    
-    func onSelectFirstFrame(_ vc: TimelineToolbarVC) {
-        delegate?.onRequestFocusFrame(
-            self, 
-            index: 0)
-    }
-    
-    func onSelectLastFrame(_ vc: TimelineToolbarVC) {
-        delegate?.onRequestFocusFrame(
-            self, 
-            index: frameCount - 1)
-    }
-    
-    func onSelectPreviousFrame(_ vc: TimelineToolbarVC) {
-        delegate?.onRequestFocusFrame(
-            self,
-            index: trackVC.focusedFrameIndex - 1)
-    }
-    
-    func onSelectNextFrame(_ vc: TimelineToolbarVC) {
-        delegate?.onRequestFocusFrame(
-            self,
-            index: trackVC.focusedFrameIndex + 1)
     }
     
     func onSelectToggleExpanded(_ vc: TimelineToolbarVC) {
@@ -186,31 +166,25 @@ extension EditorTimelineVC: TimelineToolbarVCDelegate {
 
 extension EditorTimelineVC: TimelineTrackVCDelegate {
     
-    func onSelectFocusedFrame(_ vc: TimelineTrackVC, index: Int) {
-        let frame = model.frames[index]
+    func onChangeFocusedFrame(_ vc: TimelineTrackVC, index: Int) {
+        focusedFrameIndex = index
+        toolbarVC.setFocusedFrameIndex(index)
         
-        if frame.hasDrawing {
-            showFrameMenu(frameIndex: index)
-            
-        } else {
-            delegate?.onRequestCreateDrawing(self,
-                frameIndex: trackVC.focusedFrameIndex)
-        }
+        delegate?.onChangeFocusedFrame(self, index: index)
     }
     
-    func onSelectFrame(_ vc: TimelineTrackVC, index: Int) {
-        vc.focusFrame(at: index, animated: true)
+    func onSelectFocusedFrame(_ vc: TimelineTrackVC, index: Int) {
+        let frame = model.frames[index]
+        if frame.hasDrawing {
+            showFrameMenu(frameIndex: index)
+        } else {
+            delegate?.onRequestCreateDrawing(self,
+                frameIndex: index)
+        }
     }
     
     func onLongPressFrame(_ vc: TimelineTrackVC, index: Int) {
         showFrameMenu(frameIndex: index)
-    }
-    
-    func onChangeFocusedFrame(_ vc: TimelineTrackVC) {
-        toolbarVC.setFocusedFrameIndex(vc.focusedFrameIndex)
-        
-        delegate?.onChangeFocusedFrame(self,
-            index: vc.focusedFrameIndex)
     }
     
 }

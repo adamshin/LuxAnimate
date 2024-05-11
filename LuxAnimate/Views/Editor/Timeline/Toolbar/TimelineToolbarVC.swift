@@ -5,12 +5,12 @@
 import UIKit
 
 protocol TimelineToolbarVCDelegate: AnyObject {
+    
+    func onChangeFocusedFrame(_ vc: TimelineToolbarVC, index: Int)
+    
     func onSelectPlayPause(_ vc: TimelineToolbarVC)
-    func onSelectFirstFrame(_ vc: TimelineToolbarVC)
-    func onSelectLastFrame(_ vc: TimelineToolbarVC)
-    func onSelectPreviousFrame(_ vc: TimelineToolbarVC)
-    func onSelectNextFrame(_ vc: TimelineToolbarVC)
     func onSelectToggleExpanded(_ vc: TimelineToolbarVC)
+    
 }
 
 class TimelineToolbarVC: UIViewController {
@@ -18,6 +18,11 @@ class TimelineToolbarVC: UIViewController {
     weak var delegate: TimelineToolbarVCDelegate?
     
     private let bodyView = TimelineToolbarView()
+    private let frameWidgetVC = TimelineToolbarFrameWidgetVC()
+    
+    private var frameCount = 0
+    
+    // MARK: - Lifecycle
     
     override func loadView() {
         view = bodyView
@@ -26,52 +31,68 @@ class TimelineToolbarVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        bodyView.playButton.addHandler { [weak self] in
-            guard let self else { return }
-            self.delegate?.onSelectPlayPause(self)
-        }
-        bodyView.firstFrameButton.addHandler { [weak self] in
-            guard let self else { return }
-            self.delegate?.onSelectFirstFrame(self)
-        }
-        bodyView.lastFrameButton.addHandler { [weak self] in
-            guard let self else { return }
-            self.delegate?.onSelectLastFrame(self)
-        }
-        bodyView.expandButton.addHandler { [weak self] in
-            guard let self else { return }
-            self.delegate?.onSelectToggleExpanded(self)
-        }
+        bodyView.firstFrameButton.addTarget(
+            self, action: #selector(onSelectFirstFrame))
+        bodyView.lastFrameButton.addTarget(
+            self, action: #selector(onSelectLastFrame))
+        bodyView.playButton.addTarget(
+            self, action: #selector(onSelectPlayPause))
+        bodyView.expandButton.addTarget(
+            self, action: #selector(onSelectExpand))
         
-        bodyView.frameWidget.delegate = self
+//        frameWidgetVC.delegate = self
+//        addChild(frameWidgetVC, to: bodyView.frameWidgetContainer)
     }
     
-    func setFocusedFrameIndex(_ index: Int) {
-        bodyView.frameWidget.setFocusedFrameIndex(index)
+    // MARK: - Handlers
+    
+    @objc private func onSelectFirstFrame() {
+        delegate?.onChangeFocusedFrame(self,
+            index: 0)
     }
+    
+    @objc private func onSelectLastFrame() {
+        delegate?.onChangeFocusedFrame(self,
+            index: frameCount - 1)
+    }
+    
+    @objc private func onSelectPlayPause() {
+        delegate?.onSelectPlayPause(self)
+    }
+    
+    @objc private func onSelectExpand() {
+        delegate?.onSelectToggleExpanded(self)
+    }
+    
+    // MARK: - Interface
     
     func setPlaying(_ playing: Bool) {
         bodyView.setPlayButtonPlaying(playing)
+//        frameWidgetVC.view.isUserInteractionEnabled = !playing
     }
     
     func setExpanded(_ expanded: Bool) {
         bodyView.setExpanded(expanded)
     }
     
-}
-
-extension TimelineToolbarVC: TimelineToolbarFrameWidgetDelegate {
-    
-    func onSelectPreviousFrame(
-        _ v: TimelineToolbarFrameWidget
-    ) {
-        delegate?.onSelectPreviousFrame(self)
+    func setFrameCount(_ frameCount: Int) {
+        self.frameCount = frameCount
+//        frameWidgetVC.setFrameCount(frameCount)
     }
     
-    func onSelectNextFrame(
-        _ v: TimelineToolbarFrameWidget
+    func setFocusedFrameIndex(_ index: Int) {
+//        frameWidgetVC.setFocusedFrameIndex(index)
+    }
+    
+}
+
+extension TimelineToolbarVC: TimelineToolbarFrameWidgetVCDelegate {
+    
+    func onChangeFocusedFrame(
+        _ vc: TimelineToolbarFrameWidgetVC,
+        index: Int
     ) {
-        delegate?.onSelectNextFrame(self)
+//        delegate?.onChangeFocusedFrame(self, index: index)
     }
     
 }

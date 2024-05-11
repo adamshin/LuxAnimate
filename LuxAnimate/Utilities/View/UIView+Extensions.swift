@@ -111,4 +111,8 @@ extension UIButton {
             for: .touchUpInside)
     }
     
+    func addTarget(_ target: Any?, action: Selector) {
+        addTarget(target, action: action, for: .touchUpInside)
+    }
+    
 }

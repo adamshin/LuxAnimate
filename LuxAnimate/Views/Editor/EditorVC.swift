@@ -5,43 +5,37 @@
 import UIKit
 import PhotosUI
 
-// TODO: Frame prerendering and caching
-
 class EditorVC: UIViewController {
     
-    private var frameVC: EditorFrameVC?
     private let timelineVC = EditorTimelineVC()
+    private let frameVC: EditorFrameVC
     
     private let projectID: String
-    
-    private var editor: ProjectEditor?
+    private let editor: ProjectEditor
     
     private let timelineModelGenerator = EditorTimelineModelGenerator()
     private let playbackController = EditorPlaybackController()
     
     // MARK: - Init
     
-    init(projectID: String) {
+    init(projectID: String) throws {
         self.projectID = projectID
+        
+        editor = try ProjectEditor(projectID: projectID)
+        
+        let animationLayer = editor
+            .currentProjectManifest
+            .content.animationLayer
+        
+        frameVC = EditorFrameVC(
+            projectID: projectID,
+            animationLayer: animationLayer)
         
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
         
+        editor.delegate = self
         playbackController.delegate = self
-        
-        do {
-            let editor = try ProjectEditor(projectID: projectID)
-            self.editor = editor
-            editor.delegate = self
-            
-            let animationLayer = editor.currentProjectManifest
-                .content.animationLayer
-            
-            frameVC = EditorFrameVC(
-                projectID: projectID,
-                animationLayer: animationLayer)
-            
-        } catch { }
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -60,8 +54,6 @@ class EditorVC: UIViewController {
     // MARK: - Setup
     
     private func setupUI() {
-        guard let frameVC else { return }
-        
         frameVC.delegate = self
         timelineVC.delegate = self
         
@@ -75,8 +67,6 @@ class EditorVC: UIViewController {
     // MARK: - Data
     
     private func setInitialData() {
-        guard let editor else { return }
-        
         updateData(projectManifest: editor.currentProjectManifest)
     }
     
@@ -84,85 +74,34 @@ class EditorVC: UIViewController {
         let model = timelineModelGenerator
             .generate(from: projectManifest)
         
-        timelineVC.setModel(model)
+        let newFocusedFrameIndex = clamp(
+            timelineVC.focusedFrameIndex,
+            min: 0,
+            max: model.frames.count - 1)
         
-        playbackController.frameCount = 
-            model.frames.count
-        playbackController.framesPerSecond =
-            projectManifest.metadata.framesPerSecond
+        playbackController.setModel(model)
+        
+        timelineVC.setModel(model)
+        timelineVC.setFocusedFrameIndex(newFocusedFrameIndex)
+        
+        frameVC.showFrame(at: newFocusedFrameIndex, forceReload: true)
     }
     
 }
 
 // MARK: - View Controller Delegates
 
-extension EditorVC: EditorFrameVCDelegate {
-    
-    func onSelectBack(_ vc: EditorFrameVC) {
-        dismiss(animated: true)
-    }
-    
-    func onSelectUndo(_ vc: EditorFrameVC) {
-        try? editor?.applyUndo()
-        frameVC?.reloadFrame()
-    }
-    
-    func onSelectRedo(_ vc: EditorFrameVC) {
-        try? editor?.applyRedo()
-        frameVC?.reloadFrame()
-    }
-    
-    func onEditDrawing(
-        _ vc: EditorFrameVC,
-        drawingID: String,
-        imageData: Data,
-        imageSize: PixelSize
-    ) {
-        try? editor?.editDrawing(
-            drawingID: drawingID,
-            imageData: imageData,
-            imageSize: imageSize)
-    }
-    
-    func currentProjectManifest(
-        _ vc: EditorFrameVC
-    ) -> Project.Manifest? {
-        
-        editor?.currentProjectManifest
-    }
-    
-}
-
 extension EditorVC: EditorTimelineVCDelegate {
-    
-    func onChangeContentAreaSize(
-        _ vc: EditorTimelineVC
-    ) {
-        frameVC?.handleChangeBottomInsetViewFrame()
-    }
-    
-    func onRequestFocusFrame(
-        _ vc: EditorTimelineVC,
-        index: Int
-    ) {
-        if playbackController.isPlaying {
-            playbackController.stopPlayback()
-            
-            if index < playbackController.frameCount {
-                playbackController.startPlayback(frameIndex: index)
-            } else {
-                timelineVC.focusFrame(at: index)
-            }
-        } else {
-            timelineVC.focusFrame(at: index)
-        }
-    }
     
     func onChangeFocusedFrame(
         _ vc: EditorTimelineVC,
         index: Int
     ) {
-        frameVC?.showFrame(at: index)
+        frameVC.showFrame(at: index)
+        
+        if playbackController.isPlaying {
+            playbackController.stopPlayback()
+        }
     }
     
     func onSelectPlayPause(
@@ -180,36 +119,78 @@ extension EditorVC: EditorTimelineVCDelegate {
         _ vc: EditorTimelineVC,
         frameIndex: Int
     ) {
-        try? editor?.createEmptyDrawing(
+        try? editor.createEmptyDrawing(
             frameIndex: frameIndex)
         
-        frameVC?.handleUpdateFrame(at: frameIndex)
+        frameVC.handleUpdateFrame(at: frameIndex)
     }
     
     func onRequestDeleteDrawing(
         _ vc: EditorTimelineVC,
         frameIndex: Int
     ) {
-        try? editor?.deleteDrawing(
+        try? editor.deleteDrawing(
             at: frameIndex)
         
-        frameVC?.handleUpdateFrame(at: frameIndex)
+        frameVC.handleUpdateFrame(at: frameIndex)
     }
     
     func onRequestInsertSpacing(
         _ vc: EditorTimelineVC, 
         frameIndex: Int
     ) {
-        try? editor?.insertSpacing(at: frameIndex)
-        frameVC?.reloadFrame()
+        try? editor.insertSpacing(at: frameIndex)
+        frameVC.reloadFrame()
     }
     
     func onRequestRemoveSpacing(
         _ vc: EditorTimelineVC,
         frameIndex: Int
     ) {
-        try? editor?.removeSpacing(at: frameIndex)
-        frameVC?.reloadFrame()
+        try? editor.removeSpacing(at: frameIndex)
+        frameVC.reloadFrame()
+    }
+    
+    func onChangeContentAreaSize(
+        _ vc: EditorTimelineVC
+    ) {
+        frameVC.handleChangeBottomInsetViewFrame()
+    }
+    
+}
+
+extension EditorVC: EditorFrameVCDelegate {
+    
+    func onSelectBack(_ vc: EditorFrameVC) {
+        dismiss(animated: true)
+    }
+    
+    func onSelectUndo(_ vc: EditorFrameVC) {
+        try? editor.applyUndo()
+        frameVC.reloadFrame()
+    }
+    
+    func onSelectRedo(_ vc: EditorFrameVC) {
+        try? editor.applyRedo()
+        frameVC.reloadFrame()
+    }
+    
+    func onEditDrawing(
+        _ vc: EditorFrameVC,
+        drawingID: String,
+        imageData: Data,
+        imageSize: PixelSize
+    ) {
+        try? editor.editDrawing(
+            drawingID: drawingID,
+            imageData: imageData,
+            imageSize: imageSize)
+    }
+    
+    func currentProjectManifest(
+        _ vc: EditorFrameVC
+    ) -> Project.Manifest {
+        editor.currentProjectManifest
     }
     
 }
@@ -231,22 +212,23 @@ extension EditorVC: EditorPlaybackControllerDelegate {
     func onBeginPlayback(
         _ c: EditorPlaybackController
     ) {
-        frameVC?.setPlaying(true)
         timelineVC.setPlaying(true)
+        frameVC.setPlaying(true)
     }
     
     func onUpdatePlayback(
         _ c: EditorPlaybackController,
         frameIndex: Int
     ) {
-        timelineVC.focusFrame(at: frameIndex)
+        timelineVC.setFocusedFrameIndex(frameIndex)
+        frameVC.showFrame(at: frameIndex)
     }
     
     func onEndPlayback(
         _ c: EditorPlaybackController
     ) {
-        frameVC?.setPlaying(false)
         timelineVC.setPlaying(false)
+        frameVC.setPlaying(false)
     }
     
 }

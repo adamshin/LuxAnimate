@@ -21,8 +21,8 @@ class EditorPlaybackController {
     
     weak var delegate: EditorPlaybackControllerDelegate?
     
-    var frameCount: Int = 0
-    var framesPerSecond: Int = 1
+    private var frameCount: Int = 0
+    private var framesPerSecond: Int = 1
     
     private var playbackStartTime: CFTimeInterval?
     private var playbackStartFrameIndex: Int?
@@ -59,6 +59,11 @@ class EditorPlaybackController {
             delegate?.onUpdatePlayback(self,
                 frameIndex: currentFrameIndex)
         }
+    }
+    
+    func setModel(_ model: EditorTimelineModel) {
+        frameCount = model.frames.count
+        framesPerSecond = model.framesPerSecond
     }
     
     func startPlayback(frameIndex: Int) {

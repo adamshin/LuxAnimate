@@ -19,7 +19,7 @@ private let playIconConfig = UIImage.SymbolConfiguration(
 
 class TimelineToolbarView: UIView {
     
-    let frameWidget = TimelineToolbarFrameWidget()
+    let frameWidgetContainer = UIView()
     
     let playButton = {
         let button = UIButton(type: .system)
@@ -97,9 +97,9 @@ class TimelineToolbarView: UIView {
         leftStack.addArrangedSubview(loopButton)
         
         // Center content
-        addSubview(frameWidget)
-        frameWidget.pin(.centerX)
-        frameWidget.pinEdges(.vertical)
+        addSubview(frameWidgetContainer)
+        frameWidgetContainer.pin(.centerX)
+        frameWidgetContainer.pinEdges(.vertical)
         
         // Right content
         let rightStack = UIStackView()

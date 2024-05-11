@@ -62,7 +62,7 @@ protocol EditorFrameVCDelegate: AnyObject {
     
     func currentProjectManifest(
         _ vc: EditorFrameVC
-    ) -> Project.Manifest?
+    ) -> Project.Manifest
     
 }
 
@@ -294,9 +294,10 @@ class EditorFrameVC: UIViewController {
     ) {
         currentFrameIndex = frameIndex
         
-        guard let projectManifest =
-            delegate?.currentProjectManifest(self)
-        else { return }
+        guard let delegate else { return }
+        
+        let projectManifest =
+            delegate.currentProjectManifest(self)
         
         let animationLayer = projectManifest.content.animationLayer
         

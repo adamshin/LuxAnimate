@@ -14,8 +14,11 @@ class LibraryVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         setupUI()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         reloadData()
     }
     
@@ -57,8 +60,11 @@ extension LibraryVC: LibraryContentVCDelegate {
     }
     
     func onSelectProject(id: String) {
-        let vc = EditorVC(projectID: id)
-        present(vc, animated: true)
+        do {
+            let vc = try EditorVC(projectID: id)
+            present(vc, animated: true)
+            
+        } catch { }
     }
     
     func onSelectRenameProject(id: String, name: String) {
