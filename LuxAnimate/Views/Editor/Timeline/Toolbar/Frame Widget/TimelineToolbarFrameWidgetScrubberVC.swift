@@ -149,6 +149,13 @@ class TimelineToolbarFrameWidgetScrubberVC: UIViewController {
             animated: false)
     }
     
+//    private func snapToFocusedFrame() {
+//        collectionView.scrollToItem(
+//            at: IndexPath(item: focusedFrameIndex, section: 0),
+//            at: .centeredHorizontally,
+//            animated: false)
+//    }
+    
     // MARK: - Interface
     
     func setFrameCount(_ frameCount: Int) {
@@ -169,17 +176,17 @@ class TimelineToolbarFrameWidgetScrubberVC: UIViewController {
         if animated {
             if visible {
                 UIView.animate(withDuration: 0.1) {
-//                    self.cells.forEach { $0.tick.alpha = 1 }
+                    self.cells.forEach { $0.tick.alpha = 1 }
                     self.staticContentView.alpha = 0
                 }
             } else {
                 UIView.animate(withDuration: 0.25) {
-//                    self.cells.forEach { $0.tick.alpha = 0 }
+                    self.cells.forEach { $0.tick.alpha = 0 }
                     self.staticContentView.alpha = 1
                 }
             }
         } else {
-//            cells.forEach { $0.tick.alpha = visible ? 1 : 0 }
+            cells.forEach { $0.tick.alpha = visible ? 1 : 0 }
             staticContentView.alpha = visible ? 0 : 1
         }
     }
@@ -209,7 +216,7 @@ extension TimelineToolbarFrameWidgetScrubberVC:
             item: ())
         
         cells.append(cell)
-//        cell.tick.alpha = 0
+        cell.tick.alpha = cells.first?.tick.alpha ?? 0
         return cell
     }
     

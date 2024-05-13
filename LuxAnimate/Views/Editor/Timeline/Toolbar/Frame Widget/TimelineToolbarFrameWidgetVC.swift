@@ -19,28 +19,28 @@ class TimelineToolbarFrameWidgetVC: UIViewController {
     
     weak var delegate: TimelineToolbarFrameWidgetVCDelegate?
     
-    private let scrubberVC = TimelineToolbarFrameWidgetScrubberVC()
+//    private let scrubberVC = TimelineToolbarFrameWidgetScrubberVC()
     private let controlVC = TimelineToolbarFrameWidgetControlVC()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        scrubberVC.delegate = self
-        addChild(scrubberVC, to: view)
+//        scrubberVC.delegate = self
+//        addChild(scrubberVC, to: view)
         
         controlVC.delegate = self
-        addChild(controlVC, to: scrubberVC.staticContentView)
+        addChild(controlVC, to: view)
         
-        scrubberVC.setScrubberVisible(false, animated: false)
+//        scrubberVC.setScrubberVisible(false, animated: false)
     }
     
     func setFrameCount(_ frameCount: Int) {
-        scrubberVC.setFrameCount(frameCount)
+//        scrubberVC.setFrameCount(frameCount)
         controlVC.setFrameCount(frameCount)
     }
     
     func setFocusedFrameIndex(_ index: Int) {
-        scrubberVC.setFocusedFrameIndex(index)
+//        scrubberVC.setFocusedFrameIndex(index)
         controlVC.setFocusedFrameIndex(index)
     }
     
@@ -52,32 +52,32 @@ class TimelineToolbarFrameWidgetVC: UIViewController {
 
 // MARK: - Delegates
 
-extension TimelineToolbarFrameWidgetVC: 
-    TimelineToolbarFrameWidgetScrubberVCDelegate {
-    
-    func onBeginFrameScroll(
-        _ vc: TimelineToolbarFrameWidgetScrubberVC
-    ) {
-        scrubberVC.setScrubberVisible(true, animated: true)
-        delegate?.onBeginFrameScroll(self)
-    }
-    
-    func onEndFrameScroll(
-        _ vc: TimelineToolbarFrameWidgetScrubberVC
-    ) {
-        scrubberVC.setScrubberVisible(false, animated: true)
-        delegate?.onEndFrameScroll(self)
-    }
-    
-    func onChangeFocusedFrame(
-        _ vc: TimelineToolbarFrameWidgetScrubberVC,
-        index: Int
-    ) {
-        controlVC.setFocusedFrameIndex(index)
-        delegate?.onChangeFocusedFrame(self, index: index)
-    }
-    
-}
+//extension TimelineToolbarFrameWidgetVC: 
+//    TimelineToolbarFrameWidgetScrubberVCDelegate {
+//    
+//    func onBeginFrameScroll(
+//        _ vc: TimelineToolbarFrameWidgetScrubberVC
+//    ) {
+//        scrubberVC.setScrubberVisible(true, animated: true)
+//        delegate?.onBeginFrameScroll(self)
+//    }
+//    
+//    func onEndFrameScroll(
+//        _ vc: TimelineToolbarFrameWidgetScrubberVC
+//    ) {
+//        scrubberVC.setScrubberVisible(false, animated: true)
+//        delegate?.onEndFrameScroll(self)
+//    }
+//    
+//    func onChangeFocusedFrame(
+//        _ vc: TimelineToolbarFrameWidgetScrubberVC,
+//        index: Int
+//    ) {
+//        controlVC.setFocusedFrameIndex(index)
+//        delegate?.onChangeFocusedFrame(self, index: index)
+//    }
+//    
+//}
 
 extension TimelineToolbarFrameWidgetVC:
     TimelineToolbarFrameWidgetControlVCDelegate {
@@ -86,7 +86,7 @@ extension TimelineToolbarFrameWidgetVC:
         _ vc: TimelineToolbarFrameWidgetControlVC,
         index: Int
     ) {
-        scrubberVC.setFocusedFrameIndex(index)
+//        scrubberVC.setFocusedFrameIndex(index)
         delegate?.onChangeFocusedFrame(self, index: index)
     }
     
