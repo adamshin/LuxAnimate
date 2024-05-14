@@ -6,9 +6,6 @@ import UIKit
 
 protocol TimelineToolbarFrameWidgetVCDelegate: AnyObject {
     
-    func onBeginFrameScroll(_ vc: TimelineToolbarFrameWidgetVC)
-    func onEndFrameScroll(_ vc: TimelineToolbarFrameWidgetVC)
-    
     func onChangeFocusedFrame(
         _ vc: TimelineToolbarFrameWidgetVC,
         index: Int)

@@ -1,10 +1,10 @@
 //
-//  EditorBrushToolOverlaySlider.swift
+//  EditorSidebarSlider.swift
 //
 
 import UIKit
 
-class EditorBrushToolOverlaySlider: UIView {
+class EditorSidebarSlider: UIView {
     
     enum ValueDisplayMode {
         case percent(minValue: Int)
@@ -12,7 +12,7 @@ class EditorBrushToolOverlaySlider: UIView {
     
     private let gamma: Double
     
-    private let slider = ToolOverlaySlider()
+    private let slider = EditorVerticalSlider()
     private let popupView: PopupView
     
     init(
@@ -53,17 +53,17 @@ class EditorBrushToolOverlaySlider: UIView {
     
 }
 
-extension EditorBrushToolOverlaySlider: ToolOverlaySliderDelegate {
+extension EditorSidebarSlider: EditorVerticalSliderDelegate {
     
-    func onBeginPress(_ v: ToolOverlaySlider) {
+    func onBeginPress(_ v: EditorVerticalSlider) {
         popupView.setVisible(true, animated: true)
     }
     
-    func onEndPress(_ v: ToolOverlaySlider) {
+    func onEndPress(_ v: EditorVerticalSlider) {
         popupView.setVisible(false, animated: true)
     }
     
-    func onChangeValue(_ v: ToolOverlaySlider) {
+    func onChangeValue(_ v: EditorVerticalSlider) {
         popupView.updateValue(value)
     }
     
@@ -71,7 +71,7 @@ extension EditorBrushToolOverlaySlider: ToolOverlaySliderDelegate {
 
 private class PopupView: UIView {
     
-    private let valueDisplayMode: EditorBrushToolOverlaySlider.ValueDisplayMode
+    private let valueDisplayMode: EditorSidebarSlider.ValueDisplayMode
     
     private let cardView = EditorMenuCardView()
     private let titleLabel = UILabel()
@@ -79,7 +79,7 @@ private class PopupView: UIView {
     
     init(
         title: String,
-        valueDisplayMode: EditorBrushToolOverlaySlider.ValueDisplayMode
+        valueDisplayMode: EditorSidebarSlider.ValueDisplayMode
     ) {
         self.valueDisplayMode = valueDisplayMode
         super.init(frame: .zero)

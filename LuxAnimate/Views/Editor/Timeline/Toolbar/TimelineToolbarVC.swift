@@ -6,9 +6,6 @@ import UIKit
 
 protocol TimelineToolbarVCDelegate: AnyObject {
     
-    func onBeginFrameScroll(_ vc: TimelineToolbarVC)
-    func onEndFrameScroll(_ vc: TimelineToolbarVC)
-    
     func onChangeFocusedFrame(_ vc: TimelineToolbarVC, index: Int)
     
     func onSelectPlayPause(_ vc: TimelineToolbarVC)
@@ -89,22 +86,9 @@ class TimelineToolbarVC: UIViewController {
         frameWidgetVC.setFocusedFrameIndex(index)
     }
     
-    func setFrameScrollEnabled(_ enabled: Bool) {
-        frameWidgetVC.view.isUserInteractionEnabled = enabled
-    }
-    
 }
 
 extension TimelineToolbarVC: TimelineToolbarFrameWidgetVCDelegate {
-    
-    func onBeginFrameScroll(_ vc: TimelineToolbarFrameWidgetVC) {
-        // TODO: Disable interaction with other buttons
-        delegate?.onBeginFrameScroll(self)
-    }
-    
-    func onEndFrameScroll(_ vc: TimelineToolbarFrameWidgetVC) {
-        delegate?.onEndFrameScroll(self)
-    }
     
     func onChangeFocusedFrame(
         _ vc: TimelineToolbarFrameWidgetVC,

@@ -1,12 +1,12 @@
 //
-//  ToolOverlaySliderCardView.swift
+//  EditorSidebarCardView.swift
 //
 
 import UIKit
 
 private let outlineWidth: CGFloat = 1.0
 
-class ToolOverlaySliderCardView: UIView {
+class EditorSidebarCardView: UIView {
     
     private let blurView = ChromeBlurView(
         overlayColor: .editorBarOverlay)

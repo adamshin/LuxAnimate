@@ -1,11 +1,11 @@
 //
-//  ToolOverlaySlider.swift
+//  EditorVerticalSlider.swift
 //
 
 import UIKit
 
 private let hPadding: CGFloat = 12
-private let vPadding: CGFloat = 10
+private let vPadding: CGFloat = 6
 
 private let barWidth: CGFloat = 44
 private let barHeight: CGFloat = 156
@@ -21,21 +21,21 @@ private let thumbSelectedColor = UIColor(white: 1, alpha: 0.95)
 
 private let dragRate: CGFloat = 0.5
 
-protocol ToolOverlaySliderDelegate: AnyObject {
+protocol EditorVerticalSliderDelegate: AnyObject {
     
-    func onBeginPress(_ v: ToolOverlaySlider)
-    func onEndPress(_ v: ToolOverlaySlider)
+    func onBeginPress(_ v: EditorVerticalSlider)
+    func onEndPress(_ v: EditorVerticalSlider)
     
-    func onChangeValue(_ v: ToolOverlaySlider)
+    func onChangeValue(_ v: EditorVerticalSlider)
     
 }
 
-class ToolOverlaySlider: UIView {
+class EditorVerticalSlider: UIView {
     
-    weak var delegate: ToolOverlaySliderDelegate?
+    weak var delegate: EditorVerticalSliderDelegate?
     
     private let contentView = UIView()
-    private let cardView = ToolOverlaySliderCardView()
+    private let cardView = EditorSidebarCardView()
     private let thumbView = CircleView()
     
     private let pressGesture = UILongPressGestureRecognizer()
@@ -181,11 +181,12 @@ class ToolOverlaySlider: UIView {
 
 // MARK: - Delegates
 
-extension ToolOverlaySlider: UIGestureRecognizerDelegate {
+extension EditorVerticalSlider: UIGestureRecognizerDelegate {
     
     func gestureRecognizer(
         _ gestureRecognizer: UIGestureRecognizer,
-        shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
+        shouldRecognizeSimultaneouslyWith 
+        otherGestureRecognizer: UIGestureRecognizer
     ) -> Bool {
         return otherGestureRecognizer == pressGesture
     }
