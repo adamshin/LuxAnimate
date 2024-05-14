@@ -5,10 +5,6 @@
 import Foundation
 import Metal
 
-// TODO: Add flag to load item, saying whether to
-// notify delegate after load completes? Might be
-// the best way to have control over when to draw.
-
 // TODO: Replace recursion with loop when skipping
 // items. Don't want a stack overflow
 
@@ -62,8 +58,6 @@ class EditorFrameAssetLoader {
         drawings: [Project.Drawing],
         activeDrawingID: String?
     ) {
-        print("Loading assets")
-        
         // Create list of drawings to load
         var allDrawings: [Project.Drawing] = []
         var activeDrawing: Project.Drawing? = nil
@@ -81,7 +75,6 @@ class EditorFrameAssetLoader {
         drawingIDsToLoad = Set(allDrawings.map { $0.id })
         
         // Roll over any already-loaded assets that we can reuse
-        print("Previous loaded asset count: \(loadedAssets.count)")
         let oldLoadedAssets = loadedAssets
         loadedAssets = [:]
         
@@ -92,8 +85,6 @@ class EditorFrameAssetLoader {
                 loadedAssets[drawing.id] = existingAsset
             }
         }
-        
-        print("Reusing assets: \(loadedAssets.count)")
         
         // Create load items
         var loadItems: [LoadItem] = []
@@ -129,15 +120,12 @@ class EditorFrameAssetLoader {
         loadQueue.async {
             DispatchQueue.main.async {
                 self.pendingLoadItems = loadItems
-                print("Pending items: \(self.pendingLoadItems.count)")
                 self.processNextPendingLoadItem()
             }
         }
     }
     
     private func processNextPendingLoadItem() {
-        print("Processing next pending item. Pending count: \(pendingLoadItems.count), loaded asset count: \(loadedAssets.count)")
-        
         guard let item = pendingLoadItems.first
         else { return }
         
@@ -147,7 +135,6 @@ class EditorFrameAssetLoader {
             existingAsset.fullAssetID == item.assetIDs.full,
             existingAsset.quality.rawValue >= item.quality.rawValue
         {
-            print("Skipping load item, already cached")
             delegate?.onUpdateProgress(self)
             processNextPendingLoadItem() // recursion - stack overflow?
             return
@@ -171,13 +158,9 @@ class EditorFrameAssetLoader {
                     texture: texture)
                 
                 DispatchQueue.main.async {
-                    print("Loaded asset")
-                    
                     if self.drawingIDsToLoad.contains(item.drawingID) {
                         self.loadedAssets[item.drawingID] = asset
                         self.delegate?.onUpdateProgress(self)
-                    } else {
-                        print("Asset no longer needed - discarding")
                     }
                     
                     self.processNextPendingLoadItem()
@@ -202,18 +185,14 @@ class EditorFrameAssetLoader {
             activeDrawingID: activeDrawingID)
     }
     
-    func hasPendingPreviewLoadItems() -> Bool {
-        pendingLoadItems.contains {
-            $0.quality == .preview
-        }
-    }
-    
-    func hasLoadedAllPendingAssets() -> Bool {
-        pendingLoadItems.count == 0
-    }
-    
     func asset(for drawingID: String) -> LoadedAsset? {
         loadedAssets[drawingID]
+    }
+    
+    func hasLoadedAssetsForAllDrawings() -> Bool {
+        !drawingIDsToLoad.contains {
+            loadedAssets[$0] == nil
+        }
     }
     
     func cacheFullTexture(

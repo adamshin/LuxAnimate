@@ -258,8 +258,6 @@ class EditorFrameEditorVC: UIViewController {
     private func draw() {
         guard let frameScene else { return }
         
-        print("***** DRAW *****")
-        
         activeDrawingRenderer.draw()
         
         frameSceneRenderer.draw(
@@ -381,45 +379,16 @@ extension EditorFrameEditorVC: EditorFrameAssetLoaderDelegate {
     func onUpdateProgress(_ loader: EditorFrameAssetLoader) {
         guard let activeDrawingID else { return }
         
-        var needsDraw = false
-        
-        // TODO: The idea here is to wait until after the
-        // active drawing is loaded to draw. We only want
-        // to trigger drawing 3 times: when all layers have
-        // loaded at preview resolution, when the active
-        // layer has loaded at full resolution, and when
-        // all layers have loaded at full resolution.
-        
-        // This logic fails, however, when the active layer
-        // has been cached & reused from a previous load.
-        // In this case, the draw call fires too many
-        // times. I need to figure a way to have better
-        // control over when updates fire.
-        
-        // Temp fix: check hasPendingPreviewLoadItems.
-        // This should work for now. But I need a better
-        // solution.
-        
         if !isActiveDrawingLoaded,
-            !assetLoader.hasPendingPreviewLoadItems(),
-            let asset = assetLoader.asset(for: activeDrawingID)
+           let asset = assetLoader.asset(for: activeDrawingID),
+           asset.quality == .full
         {
-            switch asset.quality {
-            case .preview:
-                needsDraw = true
-                
-            case .full:
-                isActiveDrawingLoaded = true
-                brushEngine.setCanvasContents(asset.texture)
-                
-                needsDraw = true
-            }
-        }
-        if assetLoader.hasLoadedAllPendingAssets() {
-            needsDraw = true
+            isActiveDrawingLoaded = true
+            brushEngine.setCanvasContents(asset.texture)
         }
         
-        if needsDraw {
+        if loader.hasLoadedAssetsForAllDrawings() {
+            // TODO: set needsDraw flag, render on displaylink tick
             draw()
         }
     }
