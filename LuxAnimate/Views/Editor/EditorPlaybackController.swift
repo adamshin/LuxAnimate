@@ -61,12 +61,14 @@ class EditorPlaybackController {
         }
     }
     
-    func setModel(_ model: EditorTimelineModel) {
+    func setModel(_ model: EditorModel) {
         frameCount = model.frames.count
         framesPerSecond = model.framesPerSecond
     }
     
     func startPlayback(frameIndex: Int) {
+        guard !isPlaying else { return }
+        
         guard frameIndex >= 0, frameIndex < frameCount
         else { return }
         
@@ -86,6 +88,8 @@ class EditorPlaybackController {
     }
     
     func stopPlayback() {
+        guard isPlaying else { return }
+        
         playbackStartTime = nil
         playbackStartFrameIndex = nil
         

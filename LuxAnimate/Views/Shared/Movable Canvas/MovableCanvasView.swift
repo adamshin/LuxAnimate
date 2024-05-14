@@ -287,8 +287,8 @@ class MovableCanvasView: UIView {
             animated: animated)
     }
     
-    func setSafeAreaReferenceView(_ safeAreaReferenceView: UIView) {
-        self.safeAreaReferenceView = safeAreaReferenceView
+    func setSafeAreaReferenceView(_ view: UIView) {
+        self.safeAreaReferenceView = view
         handleChangeSafeAreaReferenceViewFrame()
     }
     

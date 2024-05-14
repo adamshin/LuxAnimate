@@ -49,8 +49,8 @@ class EditorTimelineVC: UIViewController {
     private let toolbarVC = TimelineToolbarVC()
     private let trackVC = TimelineTrackVC()
     
-    private var model = EditorTimelineModel.empty
-    private(set) var focusedFrameIndex = 0
+    private var model: EditorModel = .empty
+    private var focusedFrameIndex = 0
     
     // MARK: - Lifecycle
     
@@ -105,7 +105,7 @@ class EditorTimelineVC: UIViewController {
     
     // MARK: - Interface
     
-    func setModel(_ model: EditorTimelineModel) {
+    func setModel(_ model: EditorModel) {
         self.model = model
         
         toolbarVC.setFrameCount(model.frames.count)

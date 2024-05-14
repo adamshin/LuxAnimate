@@ -1,22 +1,22 @@
 //
-//  EditorTimelineModelGenerator.swift
+//  EditorModelGenerator.swift
 //
 
 import Foundation
 
 private let displayedFrameCount = 100
 
-struct EditorTimelineModelGenerator {
+struct EditorModelGenerator {
     
     private let fileUrlHelper = FileUrlHelper()
     
     func generate(
         from projectManifest: Project.Manifest
-    ) -> EditorTimelineModel {
+    ) -> EditorModel {
         
         let framesPerSecond = projectManifest.metadata.framesPerSecond
         
-        let emptyFrame = EditorTimelineModel.Frame(
+        let emptyFrame = EditorModel.Frame(
             hasDrawing: false,
             thumbnailURL: nil)
         
@@ -34,7 +34,7 @@ struct EditorTimelineModelGenerator {
                 projectID: projectManifest.id,
                 assetID: drawing.assetIDs.small)
             
-            let frame = EditorTimelineModel.Frame(
+            let frame = EditorModel.Frame(
                 hasDrawing: true,
                 thumbnailURL: thumbnailURL)
             
@@ -49,7 +49,7 @@ struct EditorTimelineModelGenerator {
             }
         }
         
-        return EditorTimelineModel(
+        return EditorModel(
             framesPerSecond: framesPerSecond,
             frames: frames)
     }

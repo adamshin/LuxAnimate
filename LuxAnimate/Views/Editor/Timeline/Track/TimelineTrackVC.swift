@@ -54,12 +54,12 @@ class TimelineTrackVC: UIViewController {
     
     private let cellRegistration = UICollectionView.CellRegistration<
         TimelineTrackCell, 
-        EditorTimelineModel.Frame
+        EditorModel.Frame
     > { cell, indexPath, item in }
     
     private let dot = CircleView()
     
-    private var model = EditorTimelineModel.empty
+    private var model: EditorModel = .empty
     private var focusedFrameIndex = 0
     
     private var isScrolling = false
@@ -258,7 +258,7 @@ class TimelineTrackVC: UIViewController {
     
     // MARK: - Interface
     
-    func setModel(_ model: EditorTimelineModel) {
+    func setModel(_ model: EditorModel) {
         let oldModel = self.model
         self.model = model
         

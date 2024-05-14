@@ -1,10 +1,10 @@
 //
-//  EditorTimelineModel.swift
+//  EditorModel.swift
 //
 
 import Foundation
     
-struct EditorTimelineModel {
+struct EditorModel {
     
     struct Frame {
         var hasDrawing: Bool
@@ -16,9 +16,9 @@ struct EditorTimelineModel {
     
 }
 
-extension EditorTimelineModel {
+extension EditorModel {
     
-    static let empty = EditorTimelineModel(
+    static let empty = EditorModel(
         framesPerSecond: 1,
         frames: [])
     

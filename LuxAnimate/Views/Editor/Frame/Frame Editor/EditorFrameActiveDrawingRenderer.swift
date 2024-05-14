@@ -1,5 +1,5 @@
 //
-//  EditorFrameRenderer.swift
+//  EditorFrameActiveDrawingRenderer.swift
 //
 
 import Foundation
@@ -9,26 +9,43 @@ private let onionSkinPrevColor = Color(hex: "FF9600")
 private let onionSkinNextColor = Color(hex: "2EBAFF")
 private let onionSkinAlpha: Double = 0.5
 
-class EditorFrameRenderer {
+protocol EditorFrameActiveDrawingRendererDelegate: AnyObject {
     
-    private let backgroundColor: Color
+    func textureForActiveDrawing(
+        _ r: EditorFrameActiveDrawingRenderer
+    ) -> MTLTexture?
     
-    var drawingTexture: MTLTexture?
-    var prevDrawingTexture: MTLTexture?
-    var nextDrawingTexture: MTLTexture?
+    func onionSkinPrevCount(
+        _ r: EditorFrameActiveDrawingRenderer
+    ) -> Int
     
-    var isOnionSkinOn = false
+    func onionSkinNextCount(
+        _ r: EditorFrameActiveDrawingRenderer
+    ) -> Int
     
-    let renderTarget: MTLTexture
+    func textureForPrevOnionSkinDrawing(
+        _ r: EditorFrameActiveDrawingRenderer,
+        index: Int
+    ) -> MTLTexture?
+    
+    func textureForNextOnionSkinDrawing(
+        _ r: EditorFrameActiveDrawingRenderer,
+        index: Int
+    ) -> MTLTexture?
+    
+}
+
+class EditorFrameActiveDrawingRenderer {
+    
+    weak var delegate: EditorFrameActiveDrawingRendererDelegate?
     
     private let spriteRenderer = SpriteRenderer()
     
+    let renderTarget: MTLTexture
+    
     init(
-        drawingSize: PixelSize,
-        backgroundColor: Color
+        drawingSize: PixelSize
     ) {
-        self.backgroundColor = backgroundColor
-        
         let texDesc = MTLTextureDescriptor()
         texDesc.width = drawingSize.width
         texDesc.height = drawingSize.height
@@ -47,14 +64,26 @@ class EditorFrameRenderer {
         ClearColorRenderer.drawClearColor(
             commandBuffer: commandBuffer,
             target: renderTarget,
-            color: backgroundColor)
+            color: .clear)
         
-        if let prevDrawingTexture, isOnionSkinOn {
+        // Onion skin
+        let onionSkinPrevCount = delegate?
+            .onionSkinPrevCount(self) ?? 0
+        
+        let onionSkinNextCount = delegate?
+            .onionSkinNextCount(self) ?? 0
+        
+        for index in 0 ..< onionSkinPrevCount {
+            guard let texture = delegate?
+                .textureForPrevOnionSkinDrawing(
+                    self, index: index)
+            else { continue }
+            
             spriteRenderer.drawSprites(
                 commandBuffer: commandBuffer,
                 target: renderTarget,
                 viewportSize: Size(1, 1),
-                texture: prevDrawingTexture,
+                texture: texture,
                 sprites: [
                     SpriteRenderer.Sprite(
                         size: Size(1, 1),
@@ -65,12 +94,17 @@ class EditorFrameRenderer {
                 color: onionSkinPrevColor)
         }
         
-        if let nextDrawingTexture, isOnionSkinOn {
+        for index in 0 ..< onionSkinNextCount {
+            guard let texture = delegate?
+                .textureForNextOnionSkinDrawing(
+                    self, index: index)
+            else { continue }
+            
             spriteRenderer.drawSprites(
                 commandBuffer: commandBuffer,
                 target: renderTarget,
                 viewportSize: Size(1, 1),
-                texture: nextDrawingTexture,
+                texture: texture,
                 sprites: [
                     SpriteRenderer.Sprite(
                         size: Size(1, 1),
@@ -81,7 +115,10 @@ class EditorFrameRenderer {
                 color: onionSkinNextColor)
         }
         
-        if let drawingTexture {
+        // Active drawing
+        if let drawingTexture = delegate?
+            .textureForActiveDrawing(self)
+        {
             spriteRenderer.drawSprites(
                 commandBuffer: commandBuffer,
                 target: renderTarget,

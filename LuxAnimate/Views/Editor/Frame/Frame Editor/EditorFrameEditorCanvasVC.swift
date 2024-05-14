@@ -1,5 +1,5 @@
 //
-//  EditorFrameCanvasVC.swift
+//  EditorFrameEditorCanvasVC.swift
 //
 
 import UIKit
@@ -9,16 +9,16 @@ private let minScaleLevel: Scalar = 0.1
 private let maxScaleLevel: Scalar = 30
 private let scalePixelateThreshold: Scalar = 1.0
 
-protocol EditorFrameCanvasVCDelegate: BrushGestureRecognizerGestureDelegate {
+protocol EditorFrameEditorCanvasVCDelegate: BrushGestureRecognizerGestureDelegate {
     
-    func onSelectUndo(_ vc: EditorFrameCanvasVC)
-    func onSelectRedo(_ vc: EditorFrameCanvasVC)
+    func onSelectUndo(_ vc: EditorFrameEditorCanvasVC)
+    func onSelectRedo(_ vc: EditorFrameEditorCanvasVC)
     
 }
 
-class EditorFrameCanvasVC: UIViewController {
+class EditorFrameEditorCanvasVC: UIViewController {
     
-    weak var delegate: EditorFrameCanvasVCDelegate? {
+    weak var delegate: EditorFrameEditorCanvasVCDelegate? {
         didSet {
             brushGesture.gestureDelegate = delegate
         }
@@ -67,7 +67,6 @@ class EditorFrameCanvasVC: UIViewController {
     
     override func viewIsAppearing(_ animated: Bool) {
         super.viewIsAppearing(animated)
-        
         canvasView.fitCanvasToBounds(animated: false)
     }
     
@@ -115,8 +114,8 @@ class EditorFrameCanvasVC: UIViewController {
         redoGesture.isEnabled = enabled
     }
     
-    func setSafeAreaReferenceView(_ safeAreaReferenceView: UIView) {
-        canvasView.setSafeAreaReferenceView(safeAreaReferenceView)
+    func setSafeAreaReferenceView(_ view: UIView) {
+        canvasView.setSafeAreaReferenceView(view)
     }
     
     func handleChangeSafeAreaReferenceViewFrame() {
@@ -127,7 +126,7 @@ class EditorFrameCanvasVC: UIViewController {
 
 // MARK: - Delegates
 
-extension EditorFrameCanvasVC: MovableCanvasViewDelegate {
+extension EditorFrameEditorCanvasVC: MovableCanvasViewDelegate {
     
     func canvasSize(_ v: MovableCanvasView) -> Size {
         Size(
@@ -158,7 +157,7 @@ extension EditorFrameCanvasVC: MovableCanvasViewDelegate {
     
 }
 
-extension EditorFrameCanvasVC: MetalViewDelegate {
+extension EditorFrameEditorCanvasVC: MetalViewDelegate {
     
     func draw(in layer: CAMetalLayer) {
         drawCanvas()

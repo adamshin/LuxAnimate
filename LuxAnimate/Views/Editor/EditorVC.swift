@@ -13,8 +13,11 @@ class EditorVC: UIViewController {
     private let projectID: String
     private let editor: ProjectEditor
     
-    private let timelineModelGenerator = EditorTimelineModelGenerator()
+    private let modelGenerator = EditorModelGenerator()
     private let playbackController = EditorPlaybackController()
+    
+    private var model: EditorModel = .empty
+    private var focusedFrameIndex = 0
     
     // MARK: - Init
     
@@ -22,14 +25,12 @@ class EditorVC: UIViewController {
         self.projectID = projectID
         
         editor = try ProjectEditor(projectID: projectID)
-        
-        let animationLayer = editor
-            .currentProjectManifest
-            .content.animationLayer
+        let projectManifest = editor.currentProjectManifest
         
         frameVC = EditorFrameVC(
             projectID: projectID,
-            animationLayer: animationLayer)
+            projectViewportSize: projectManifest.metadata.viewportSize,
+            drawingSize: projectManifest.content.animationLayer.size)
         
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
@@ -67,27 +68,29 @@ class EditorVC: UIViewController {
     // MARK: - Data
     
     private func setInitialData() {
-        updateTimeline(
-            projectManifest: editor.currentProjectManifest)
+        let projectManifest = editor.currentProjectManifest
+        update(projectManifest: projectManifest)
         
-        frameVC.showFrame(
-            at: timelineVC.focusedFrameIndex,
-            forceReload: true)
+        timelineVC.setFocusedFrameIndex(0)
+        frameVC.setFocusedFrameIndex(0)
     }
     
-    private func updateTimeline(projectManifest: Project.Manifest) {
-        let model = timelineModelGenerator
-            .generate(from: projectManifest)
+    private func update(projectManifest: Project.Manifest) {
+        model = modelGenerator.generate(
+            from: projectManifest)
         
-        let newFocusedFrameIndex = clamp(
-            timelineVC.focusedFrameIndex,
+        focusedFrameIndex = clamp(
+            focusedFrameIndex,
             min: 0,
             max: model.frames.count - 1)
         
-        playbackController.setModel(model)
-        
         timelineVC.setModel(model)
-        timelineVC.setFocusedFrameIndex(newFocusedFrameIndex)
+        timelineVC.setFocusedFrameIndex(focusedFrameIndex)
+        
+        frameVC.setProjectManifest(projectManifest)
+        frameVC.setFocusedFrameIndex(focusedFrameIndex)
+        
+        playbackController.setModel(model)
     }
     
 }
@@ -97,22 +100,21 @@ class EditorVC: UIViewController {
 extension EditorVC: EditorTimelineVCDelegate {
     
     func onBeginFrameScroll(_ vc: EditorTimelineVC) {
-        frameVC.setEditingEnabled(false)
+        frameVC.onBeginFrameScroll()
     }
     
     func onEndFrameScroll(_ vc: EditorTimelineVC) {
-        frameVC.setEditingEnabled(true)
+        frameVC.onEndFrameScroll()
     }
     
     func onChangeFocusedFrame(
         _ vc: EditorTimelineVC,
         index: Int
     ) {
-        frameVC.showFrame(at: index)
+        focusedFrameIndex = index
+        frameVC.setFocusedFrameIndex(index)
         
-        if playbackController.isPlaying {
-            playbackController.stopPlayback()
-        }
+        playbackController.stopPlayback()
     }
     
     func onSelectPlayPause(
@@ -122,7 +124,7 @@ extension EditorVC: EditorTimelineVCDelegate {
             playbackController.stopPlayback()
         } else {
             playbackController.startPlayback(
-                frameIndex: timelineVC.focusedFrameIndex)
+                frameIndex: focusedFrameIndex)
         }
     }
     
@@ -132,18 +134,13 @@ extension EditorVC: EditorTimelineVCDelegate {
     ) {
         try? editor.createEmptyDrawing(
             frameIndex: frameIndex)
-        
-        frameVC.handleUpdateFrame(at: frameIndex)
     }
     
     func onRequestDeleteDrawing(
         _ vc: EditorTimelineVC,
         frameIndex: Int
     ) {
-        try? editor.deleteDrawing(
-            at: frameIndex)
-        
-        frameVC.handleUpdateFrame(at: frameIndex)
+        try? editor.deleteDrawing(at: frameIndex)
     }
     
     func onRequestInsertSpacing(
@@ -151,7 +148,6 @@ extension EditorVC: EditorTimelineVCDelegate {
         frameIndex: Int
     ) {
         try? editor.insertSpacing(at: frameIndex)
-        frameVC.reloadFrame()
     }
     
     func onRequestRemoveSpacing(
@@ -159,7 +155,6 @@ extension EditorVC: EditorTimelineVCDelegate {
         frameIndex: Int
     ) {
         try? editor.removeSpacing(at: frameIndex)
-        frameVC.reloadFrame()
     }
     
     func onChangeContentAreaSize(
@@ -178,12 +173,10 @@ extension EditorVC: EditorFrameVCDelegate {
     
     func onSelectUndo(_ vc: EditorFrameVC) {
         try? editor.applyUndo()
-        frameVC.reloadFrame()
     }
     
     func onSelectRedo(_ vc: EditorFrameVC) {
         try? editor.applyRedo()
-        frameVC.reloadFrame()
     }
     
     func onEditDrawing(
@@ -198,12 +191,6 @@ extension EditorVC: EditorFrameVCDelegate {
             imageSize: imageSize)
     }
     
-    func currentProjectManifest(
-        _ vc: EditorFrameVC
-    ) -> Project.Manifest {
-        editor.currentProjectManifest
-    }
-    
 }
 
 // MARK: - Editor Delegate
@@ -211,7 +198,8 @@ extension EditorVC: EditorFrameVCDelegate {
 extension EditorVC: ProjectEditorDelegate {
     
     func onEditProject(_ editor: ProjectEditor) {
-        updateTimeline(projectManifest: editor.currentProjectManifest)
+        let projectManifest = editor.currentProjectManifest
+        update(projectManifest: projectManifest)
     }
     
 }
@@ -232,7 +220,7 @@ extension EditorVC: EditorPlaybackControllerDelegate {
         frameIndex: Int
     ) {
         timelineVC.setFocusedFrameIndex(frameIndex)
-        frameVC.showFrame(at: frameIndex)
+        frameVC.setFocusedFrameIndex(frameIndex)
     }
     
     func onEndPlayback(
