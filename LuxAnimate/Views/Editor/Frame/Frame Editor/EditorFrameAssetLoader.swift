@@ -5,9 +5,6 @@
 import Foundation
 import Metal
 
-// TODO: Replace recursion with loop when skipping
-// items. Don't want a stack overflow
-
 protocol EditorFrameAssetLoaderDelegate: AnyObject {
     func onUpdateProgress(_ loader: EditorFrameAssetLoader)
 }
@@ -126,51 +123,50 @@ class EditorFrameAssetLoader {
     }
     
     private func processNextPendingLoadItem() {
-        guard let item = pendingLoadItems.first
-        else { return }
-        
-        pendingLoadItems.removeFirst()
-        
-        if let existingAsset = loadedAssets[item.drawingID],
-            existingAsset.fullAssetID == item.assetIDs.full,
-            existingAsset.quality.rawValue >= item.quality.rawValue
-        {
-            delegate?.onUpdateProgress(self)
-            processNextPendingLoadItem() // recursion - stack overflow?
-            return
-        }
-        
-        let assetID = switch item.quality {
-        case .preview: item.assetIDs.medium
-        case .full: item.assetIDs.full
-        }
-        let assetURL = fileUrlHelper.projectAssetURL(
-            projectID: projectID,
-            assetID: assetID)
-        
-        loadQueue.async {
-            do {
-                let texture = try JXLTextureLoader.load(url: assetURL)
-                
-                let asset = LoadedAsset(
-                    fullAssetID: item.assetIDs.full,
-                    quality: item.quality,
-                    texture: texture)
-                
-                DispatchQueue.main.async {
-                    if self.drawingIDsToLoad.contains(item.drawingID) {
-                        self.loadedAssets[item.drawingID] = asset
-                        self.delegate?.onUpdateProgress(self)
-                    }
+        while let item = pendingLoadItems.first {
+            pendingLoadItems.removeFirst()
+            
+            if let existingAsset = loadedAssets[item.drawingID],
+               existingAsset.fullAssetID == item.assetIDs.full,
+               existingAsset.quality.rawValue >= item.quality.rawValue
+            {
+                delegate?.onUpdateProgress(self)
+                continue
+            }
+            
+            let assetID = switch item.quality {
+            case .preview: item.assetIDs.medium
+            case .full: item.assetIDs.full
+            }
+            let assetURL = fileUrlHelper.projectAssetURL(
+                projectID: projectID,
+                assetID: assetID)
+            
+            loadQueue.async {
+                do {
+                    let texture = try JXLTextureLoader.load(url: assetURL)
                     
-                    self.processNextPendingLoadItem()
-                }
-                
-            } catch {
-                DispatchQueue.main.async {
-                    self.processNextPendingLoadItem()
+                    let asset = LoadedAsset(
+                        fullAssetID: item.assetIDs.full,
+                        quality: item.quality,
+                        texture: texture)
+                    
+                    DispatchQueue.main.async {
+                        if self.drawingIDsToLoad.contains(item.drawingID) {
+                            self.loadedAssets[item.drawingID] = asset
+                            self.delegate?.onUpdateProgress(self)
+                        } else {
+                            print("Discarding asset")
+                        }
+                        self.processNextPendingLoadItem()
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        self.processNextPendingLoadItem()
+                    }
                 }
             }
+            return
         }
     }
     
