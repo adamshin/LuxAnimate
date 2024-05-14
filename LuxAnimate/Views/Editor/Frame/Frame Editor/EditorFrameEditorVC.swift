@@ -379,20 +379,21 @@ extension EditorFrameEditorVC: EditorFrameAssetLoaderDelegate {
         
         var needsDraw = false
         
-        if !isActiveDrawingLoaded,
-            let asset = assetLoader.asset(for: activeDrawingID)
-        {
-            switch asset.quality {
-            case .preview:
-                needsDraw = true
-                
-            case .full:
-                isActiveDrawingLoaded = true
-                brushEngine.setCanvasContents(asset.texture)
-                
-                needsDraw = true
-            }
-        }
+//        if !isActiveDrawingLoaded,
+//            let asset = assetLoader.asset(for: activeDrawingID)
+//        {
+//            switch asset.quality {
+//            case .preview:
+//                needsDraw = true
+//                
+//            case .full:
+//                isActiveDrawingLoaded = true
+//                brushEngine.setCanvasContents(asset.texture)
+//                
+//                needsDraw = true
+//            }
+//        }
+        
         if assetLoader.hasLoadedAllPendingAssets() {
             needsDraw = true
         }

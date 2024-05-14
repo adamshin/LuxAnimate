@@ -134,6 +134,9 @@ class EditorFrameAssetLoader {
             existingAsset.fullAssetID == item.assetIDs.full,
             existingAsset.quality.rawValue >= item.quality.rawValue
         {
+            DispatchQueue.main.async {
+                self.delegate?.onUpdateProgress(self)
+            }
             processNextPendingLoadItem()
             return
         }
@@ -158,6 +161,10 @@ class EditorFrameAssetLoader {
                 self.syncQueue.async {
                     self.loadedAssets[item.drawingID] = asset
                     self.processNextPendingLoadItem()
+                    
+                    DispatchQueue.main.async {
+                        self.delegate?.onUpdateProgress(self)
+                    }
                 }
                 
             } catch {
