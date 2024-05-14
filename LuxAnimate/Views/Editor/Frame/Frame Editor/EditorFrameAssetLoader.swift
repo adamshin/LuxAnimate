@@ -5,10 +5,15 @@
 import Foundation
 import Metal
 
+// TODO: Add flag to load item, saying whether to
+// notify delegate after load completes? Might be
+// the best way to have control over when to draw.
+
+// TODO: Replace recursion with loop when skipping
+// items. Don't want a stack overflow
+
 protocol EditorFrameAssetLoaderDelegate: AnyObject {
-    
     func onUpdateProgress(_ loader: EditorFrameAssetLoader)
-    
 }
 
 class EditorFrameAssetLoader {
@@ -34,15 +39,12 @@ class EditorFrameAssetLoader {
     
     private let projectID: String
     
+    private var drawingIDsToLoad: Set<String> = []
     private var pendingLoadItems: [LoadItem] = []
     private var loadedAssets: [String: LoadedAsset] = [:]
     
     private let fileUrlHelper = FileUrlHelper()
     private let textureCopier = TextureCopier()
-    
-    private let syncQueue = DispatchQueue(
-        label: "EditorFrameAssetLoader.syncQueue",
-        qos: .default)
     
     private let loadQueue = DispatchQueue(
         label: "EditorFrameAssetLoader.loadQueue",
@@ -60,6 +62,8 @@ class EditorFrameAssetLoader {
         drawings: [Project.Drawing],
         activeDrawingID: String?
     ) {
+        print("Loading assets")
+        
         // Create list of drawings to load
         var allDrawings: [Project.Drawing] = []
         var activeDrawing: Project.Drawing? = nil
@@ -74,7 +78,10 @@ class EditorFrameAssetLoader {
             }
         }
         
+        drawingIDsToLoad = Set(allDrawings.map { $0.id })
+        
         // Roll over any already-loaded assets that we can reuse
+        print("Previous loaded asset count: \(loadedAssets.count)")
         let oldLoadedAssets = loadedAssets
         loadedAssets = [:]
         
@@ -86,45 +93,51 @@ class EditorFrameAssetLoader {
             }
         }
         
+        print("Reusing assets: \(loadedAssets.count)")
+        
         // Create load items
-        pendingLoadItems = []
+        var loadItems: [LoadItem] = []
         
         for drawing in nonActiveDrawings {
-            pendingLoadItems.append(LoadItem(
+            loadItems.append(LoadItem(
                 drawingID: drawing.id,
                 assetIDs: drawing.assetIDs,
                 quality: .preview))
         }
         
         if let drawing = activeDrawing {
-            pendingLoadItems.append(LoadItem(
+            loadItems.append(LoadItem(
                 drawingID: drawing.id,
                 assetIDs: drawing.assetIDs,
                 quality: .preview))
             
-            pendingLoadItems.append(LoadItem(
+            loadItems.append(LoadItem(
                 drawingID: drawing.id,
                 assetIDs: drawing.assetIDs,
                 quality: .full))
         }
         
         for drawing in nonActiveDrawings {
-            pendingLoadItems.append(LoadItem(
+            loadItems.append(LoadItem(
                 drawingID: drawing.id,
                 assetIDs: drawing.assetIDs,
                 quality: .full))
         }
         
-        processNextPendingLoadItem()
-    }
-    
-    private func processNextPendingLoadItem() {
-        syncQueue.async {
-            self.processNextPendingLoadItemInternal()
+        // Queue up work. Wait for any pending load items
+        // to finish first
+        loadQueue.async {
+            DispatchQueue.main.async {
+                self.pendingLoadItems = loadItems
+                print("Pending items: \(self.pendingLoadItems.count)")
+                self.processNextPendingLoadItem()
+            }
         }
     }
     
-    private func processNextPendingLoadItemInternal() {
+    private func processNextPendingLoadItem() {
+        print("Processing next pending item. Pending count: \(pendingLoadItems.count), loaded asset count: \(loadedAssets.count)")
+        
         guard let item = pendingLoadItems.first
         else { return }
         
@@ -134,10 +147,9 @@ class EditorFrameAssetLoader {
             existingAsset.fullAssetID == item.assetIDs.full,
             existingAsset.quality.rawValue >= item.quality.rawValue
         {
-            DispatchQueue.main.async {
-                self.delegate?.onUpdateProgress(self)
-            }
-            processNextPendingLoadItem()
+            print("Skipping load item, already cached")
+            delegate?.onUpdateProgress(self)
+            processNextPendingLoadItem() // recursion - stack overflow?
             return
         }
         
@@ -158,17 +170,23 @@ class EditorFrameAssetLoader {
                     quality: item.quality,
                     texture: texture)
                 
-                self.syncQueue.async {
-                    self.loadedAssets[item.drawingID] = asset
-                    self.processNextPendingLoadItem()
+                DispatchQueue.main.async {
+                    print("Loaded asset")
                     
-                    DispatchQueue.main.async {
+                    if self.drawingIDsToLoad.contains(item.drawingID) {
+                        self.loadedAssets[item.drawingID] = asset
                         self.delegate?.onUpdateProgress(self)
+                    } else {
+                        print("Asset no longer needed - discarding")
                     }
+                    
+                    self.processNextPendingLoadItem()
                 }
                 
             } catch {
-                self.processNextPendingLoadItem()
+                DispatchQueue.main.async {
+                    self.processNextPendingLoadItem()
+                }
             }
         }
     }
@@ -179,23 +197,23 @@ class EditorFrameAssetLoader {
         drawings: [Project.Drawing],
         activeDrawingID: String?
     ) {
-        syncQueue.async {
-            self.loadAssetsInternal(
-                drawings: drawings,
-                activeDrawingID: activeDrawingID)
+        loadAssetsInternal(
+            drawings: drawings,
+            activeDrawingID: activeDrawingID)
+    }
+    
+    func hasPendingPreviewLoadItems() -> Bool {
+        pendingLoadItems.contains {
+            $0.quality == .preview
         }
     }
     
     func hasLoadedAllPendingAssets() -> Bool {
-        syncQueue.sync {
-            pendingLoadItems.count == 0
-        }
+        pendingLoadItems.count == 0
     }
     
     func asset(for drawingID: String) -> LoadedAsset? {
-        syncQueue.sync {
-            loadedAssets[drawingID]
-        }
+        loadedAssets[drawingID]
     }
     
     func cacheFullTexture(
@@ -206,12 +224,10 @@ class EditorFrameAssetLoader {
         do {
             let newTexture = try textureCopier.copy(texture)
             
-            syncQueue.async {
-                self.loadedAssets[drawingID] = LoadedAsset(
-                    fullAssetID: fullAssetID,
-                    quality: .full,
-                    texture: newTexture)
-            }
+            loadedAssets[drawingID] = LoadedAsset(
+                fullAssetID: fullAssetID,
+                quality: .full,
+                texture: newTexture)
             
         } catch { }
     }

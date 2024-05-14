@@ -236,27 +236,29 @@ class EditorFrameEditorVC: UIViewController {
         // and copying the brush engine canvas texture into our asset
         // loader cache.
         
-        guard let activeDrawingID else { return }
-        
-        do {
-            let imageData = try TextureDataReader
-                .read(brushEngine.canvasTexture)
-            
-            let imageSize = brushEngine.canvasSize
-            
-            delegate?.onEditDrawing(
-                self,
-                drawingID: activeDrawingID,
-                imageData: imageData,
-                imageSize: imageSize)
-            
-        } catch { }
+//        guard let activeDrawingID else { return }
+//        
+//        do {
+//            let imageData = try TextureDataReader
+//                .read(brushEngine.canvasTexture)
+//            
+//            let imageSize = brushEngine.canvasSize
+//            
+//            delegate?.onEditDrawing(
+//                self,
+//                drawingID: activeDrawingID,
+//                imageData: imageData,
+//                imageSize: imageSize)
+//            
+//        } catch { }
     }
     
     // MARK: - Rendering
     
     private func draw() {
         guard let frameScene else { return }
+        
+        print("***** DRAW *****")
         
         activeDrawingRenderer.draw()
         
@@ -282,17 +284,19 @@ class EditorFrameEditorVC: UIViewController {
     }
     
     func setFocusedFrameIndex(_ index: Int) {
+        guard focusedFrameIndex != index else { return }
         focusedFrameIndex = index
+        updateFrameData()
+    }
+    
+    func setOnionSkinOn(_ on: Bool) {
+        guard isOnionSkinOn != on else { return }
+        isOnionSkinOn = on
         updateFrameData()
     }
     
     func setPlaying(_ playing: Bool) {
         setEditingEnabled(!playing)
-    }
-    
-    func setOnionSkinOn(_ on: Bool) {
-        isOnionSkinOn = on
-        updateFrameData()
     }
     
     func onBeginFrameScroll() {
@@ -375,25 +379,42 @@ extension EditorFrameEditorVC: EditorFrameEditorCanvasVCDelegate {
 extension EditorFrameEditorVC: EditorFrameAssetLoaderDelegate {
     
     func onUpdateProgress(_ loader: EditorFrameAssetLoader) {
-//        guard let activeDrawingID else { return }
+        guard let activeDrawingID else { return }
         
         var needsDraw = false
         
-//        if !isActiveDrawingLoaded,
-//            let asset = assetLoader.asset(for: activeDrawingID)
-//        {
-//            switch asset.quality {
-//            case .preview:
-//                needsDraw = true
-//                
-//            case .full:
-//                isActiveDrawingLoaded = true
-//                brushEngine.setCanvasContents(asset.texture)
-//                
-//                needsDraw = true
-//            }
-//        }
+        // TODO: The idea here is to wait until after the
+        // active drawing is loaded to draw. We only want
+        // to trigger drawing 3 times: when all layers have
+        // loaded at preview resolution, when the active
+        // layer has loaded at full resolution, and when
+        // all layers have loaded at full resolution.
         
+        // This logic fails, however, when the active layer
+        // has been cached & reused from a previous load.
+        // In this case, the draw call fires too many
+        // times. I need to figure a way to have better
+        // control over when updates fire.
+        
+        // Temp fix: check hasPendingPreviewLoadItems.
+        // This should work for now. But I need a better
+        // solution.
+        
+        if !isActiveDrawingLoaded,
+            !assetLoader.hasPendingPreviewLoadItems(),
+            let asset = assetLoader.asset(for: activeDrawingID)
+        {
+            switch asset.quality {
+            case .preview:
+                needsDraw = true
+                
+            case .full:
+                isActiveDrawingLoaded = true
+                brushEngine.setCanvasContents(asset.texture)
+                
+                needsDraw = true
+            }
+        }
         if assetLoader.hasLoadedAllPendingAssets() {
             needsDraw = true
         }
