@@ -276,12 +276,11 @@ class EditorFrameEditorVC: UIViewController {
     // MARK: - Rendering
     
     private func draw() {
-        guard let frameScene else { return }
+        guard assetLoader.hasLoadedAssetsForAllDrawings()
+        else { return }
         
         activeDrawingRenderer.draw()
-        
-        frameSceneRenderer.draw(
-            frameScene: frameScene)
+        frameSceneRenderer.draw()
         
         canvasVC.setCanvasTexture(
             frameSceneRenderer.renderTarget)
@@ -434,12 +433,14 @@ extension EditorFrameEditorVC: EditorFrameActiveDrawingRendererDelegate {
     func onionSkinPrevCount(
         _ r: EditorFrameActiveDrawingRenderer
     ) -> Int {
+        
         prevOnionSkinDrawingIDs.count
     }
     
     func onionSkinNextCount(
         _ r: EditorFrameActiveDrawingRenderer
     ) -> Int {
+        
         nextOnionSkinDrawingIDs.count
     }
     
@@ -466,6 +467,13 @@ extension EditorFrameEditorVC: EditorFrameActiveDrawingRendererDelegate {
 }
 
 extension EditorFrameEditorVC: EditorFrameSceneRendererDelegate {
+    
+    func frameScene(
+        _ r: EditorFrameSceneRenderer
+    ) -> FrameScene? {
+        
+        frameScene
+    }
     
     func textureForDrawing(
         _ r: EditorFrameSceneRenderer,

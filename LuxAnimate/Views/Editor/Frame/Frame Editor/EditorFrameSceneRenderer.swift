@@ -7,6 +7,10 @@ import Metal
 
 protocol EditorFrameSceneRendererDelegate: AnyObject {
     
+    func frameScene(
+        _ r: EditorFrameSceneRenderer
+    ) -> FrameScene?
+    
     func textureForDrawing(
         _ r: EditorFrameSceneRenderer,
         drawingID: String
@@ -36,7 +40,10 @@ class EditorFrameSceneRenderer {
             .makeTexture(descriptor: texDesc)!
     }
     
-    func draw(frameScene: FrameScene) {
+    func draw() {
+        guard let frameScene = delegate?.frameScene(self)
+        else { return }
+        
         let commandBuffer = MetalInterface.shared
             .commandQueue.makeCommandBuffer()!
         

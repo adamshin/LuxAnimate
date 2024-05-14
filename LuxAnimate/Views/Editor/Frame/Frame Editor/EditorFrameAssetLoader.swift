@@ -12,7 +12,8 @@ protocol EditorFrameAssetLoaderDelegate: AnyObject {
 class EditorFrameAssetLoader {
     
     enum AssetQuality: Int {
-        case preview
+        case small
+        case medium
         case full
     }
     
@@ -90,14 +91,14 @@ class EditorFrameAssetLoader {
             loadItems.append(LoadItem(
                 drawingID: drawing.id,
                 assetIDs: drawing.assetIDs,
-                quality: .preview))
+                quality: .medium))
         }
         
         if let drawing = activeDrawing {
             loadItems.append(LoadItem(
                 drawingID: drawing.id,
                 assetIDs: drawing.assetIDs,
-                quality: .preview))
+                quality: .medium))
             
             loadItems.append(LoadItem(
                 drawingID: drawing.id,
@@ -135,7 +136,8 @@ class EditorFrameAssetLoader {
             }
             
             let assetID = switch item.quality {
-            case .preview: item.assetIDs.medium
+            case .small: item.assetIDs.small
+            case .medium: item.assetIDs.medium
             case .full: item.assetIDs.full
             }
             let assetURL = fileUrlHelper.projectAssetURL(
