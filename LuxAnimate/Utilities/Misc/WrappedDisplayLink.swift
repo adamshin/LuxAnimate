@@ -16,7 +16,7 @@ class WrappedDisplayLink {
             target: WeakWrapper(self),
             selector: #selector(WeakWrapper.callback))
         
-        displayLink?.add(to: .current, forMode: .default)
+        displayLink?.add(to: .current, forMode: .common)
     }
     
     deinit {

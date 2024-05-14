@@ -54,6 +54,8 @@ class EditorFrameEditorVC: UIViewController {
     private var isEditingEnabled = true
     private var isActiveDrawingLoaded = false
     
+    private var needsDraw = false
+    
     private let assetLoader: EditorFrameAssetLoader
     
     private let activeDrawingRenderer: EditorFrameActiveDrawingRenderer
@@ -62,6 +64,8 @@ class EditorFrameEditorVC: UIViewController {
     private let brushEngine: BrushEngine
     private var brushMode: BrushEngine.BrushMode = .brush
     private let brush = try! Brush(configuration: brushConfig)
+    
+    private let displayLink = WrappedDisplayLink()
     
     // MARK: - Init
     
@@ -87,6 +91,10 @@ class EditorFrameEditorVC: UIViewController {
         
         super.init(nibName: nil, bundle: nil)
         
+        displayLink.setCallback { [weak self] in
+            self?.onFrame()
+        }
+        
         assetLoader.delegate = self
         activeDrawingRenderer.delegate = self
         frameSceneRenderer.delegate = self
@@ -106,11 +114,23 @@ class EditorFrameEditorVC: UIViewController {
         canvasVC.setCanvasSize(projectViewportSize)
     }
     
+    // MARK: - Frame
+    
+    @objc private func onFrame() {
+        brushEngine.onFrame()
+        
+        if needsDraw {
+            needsDraw = false
+            draw()
+        }
+    }
+    
     // MARK: - Frame Data
     
     private func updateFrameData() {
         brushEngine.endStroke()
         
+        // TODO: Factor this code into a helper object?
         guard let projectManifest else { return }
         
         let onionSkinPrevCount = isOnionSkinOn ? onionSkinCount : 0
@@ -388,8 +408,7 @@ extension EditorFrameEditorVC: EditorFrameAssetLoaderDelegate {
         }
         
         if loader.hasLoadedAssetsForAllDrawings() {
-            // TODO: set needsDraw flag, render on displaylink tick
-            draw()
+            needsDraw = true
         }
     }
     
@@ -467,7 +486,7 @@ extension EditorFrameEditorVC: EditorFrameSceneRendererDelegate {
 extension EditorFrameEditorVC: BrushEngineDelegate {
     
     func onUpdateCanvas(_ engine: BrushEngine) {
-//        draw()
+//        needsDraw = true
     }
     
     func onFinalizeStroke(_ engine: BrushEngine) {

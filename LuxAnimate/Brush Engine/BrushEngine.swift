@@ -25,7 +25,6 @@ class BrushEngine {
     let canvasSize: PixelSize
     
     private let renderer: BrushEngineRenderer
-    private let displayLink = WrappedDisplayLink()
     
     private var brushMode: BrushMode = .brush
     private var strokeEngine: BrushStrokeEngine?
@@ -37,10 +36,6 @@ class BrushEngine {
         
         renderer = BrushEngineRenderer(
             canvasSize: canvasSize)
-        
-        displayLink.setCallback { [weak self] in
-            self?.onFrame()
-        }
     }
     
     // MARK: - Canvas
@@ -103,9 +98,7 @@ class BrushEngine {
         delegate?.onUpdateCanvas(self)
     }
     
-    // MARK: - Frame
-    
-    @objc private func onFrame() {
+    func onFrame() {
         guard let strokeEngine else { return }
         
         strokeEngine.process()
