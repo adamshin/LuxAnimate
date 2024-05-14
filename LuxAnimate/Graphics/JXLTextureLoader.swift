@@ -17,7 +17,8 @@ struct JXLTextureLoader {
             contentsOf: url)
         
         let output = try JXLDecoder.decode(
-            data: encodedData)
+            data: encodedData,
+            progress: { true })
         
         return try TextureCreator.createTexture(
             imageData: output.data,

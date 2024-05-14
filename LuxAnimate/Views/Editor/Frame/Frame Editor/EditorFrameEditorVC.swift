@@ -16,7 +16,7 @@ private let brushConfig = Brush.Configuration(
 
 private let brushColor: Color = .brushBlack
 
-private let onionSkinCount = 5
+private let onionSkinCount = 2
 
 protocol EditorFrameEditorVCDelegate: AnyObject {
     

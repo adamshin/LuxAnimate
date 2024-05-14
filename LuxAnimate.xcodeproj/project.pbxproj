@@ -352,8 +352,8 @@
 				66211EA52BF2C615005490C4 /* EditorFrameEditorVC.swift */,
 				6643CB112BE892930094B998 /* EditorFrameEditorCanvasVC.swift */,
 				66211E992BF2B7C4005490C4 /* EditorFrameAssetLoader.swift */,
-				66211EA02BF2C263005490C4 /* EditorFrameSceneRenderer.swift */,
 				66211EA22BF2C320005490C4 /* EditorFrameActiveDrawingRenderer.swift */,
+				66211EA02BF2C263005490C4 /* EditorFrameSceneRenderer.swift */,
 			);
 			path = "Frame Editor";
 			sourceTree = "<group>";

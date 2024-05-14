@@ -13,14 +13,31 @@ struct JXLDecoder {
     }
     
     enum DecodingError: Error {
+        case cancelled
         case `internal`
     }
     
-    static func decode(data: Data) throws -> Output {
-        let output = JXLDecoderShim.decodeImage(from: data)
+    static func decode(
+        data: Data,
+        progress: () -> Bool
+    ) throws -> Output {
+        
+        var isCancelled = false
+        
+        let output = JXLDecoderShim.decodeImage(
+            from: data,
+            progress: {
+                let shouldContinue = progress()
+                isCancelled = !shouldContinue
+                return shouldContinue
+            })
         
         guard let output else {
-            throw DecodingError.internal
+            if isCancelled {
+                throw DecodingError.cancelled
+            } else {
+                throw DecodingError.internal
+            }
         }
         
         return Output(

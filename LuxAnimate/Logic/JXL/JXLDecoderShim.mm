@@ -26,6 +26,7 @@
 @implementation JXLDecoderShim
 
 + (JXLDecoderShimOutput *)decodeImageFromData:(NSData *)inputData
+                                     progress:(BOOL (NS_NOESCAPE ^)(void))progress
 {
     auto runner = JxlResizableParallelRunnerMake(nullptr);
     auto dec = JxlDecoderMake(nullptr);
@@ -71,6 +72,11 @@
     JXLDecoderShimOutput *output = [[JXLDecoderShimOutput alloc] init];
     
     while (true) {
+        BOOL shouldContinue = progress();
+        if (!shouldContinue) {
+            return NULL;
+        }
+        
         JxlDecoderStatus status = JxlDecoderProcessInput(dec.get());
         
         if (status == JXL_DEC_SUCCESS) {

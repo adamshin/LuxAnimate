@@ -16,6 +16,7 @@
 
 @interface JXLDecoderShim: NSObject
 
-+ (JXLDecoderShimOutput *_Nullable)decodeImageFromData:(NSData *_Nonnull)inputData;
++ (JXLDecoderShimOutput *_Nullable)decodeImageFromData:(NSData *_Nonnull)inputData
+                                              progress:(BOOL (NS_NOESCAPE ^_Nonnull)(void))progress;
 
 @end

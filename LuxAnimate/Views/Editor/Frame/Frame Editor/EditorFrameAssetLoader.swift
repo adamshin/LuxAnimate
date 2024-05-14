@@ -127,7 +127,12 @@ class EditorFrameAssetLoader {
         while let item = pendingLoadItems.first {
             pendingLoadItems.removeFirst()
             
-            if let existingAsset = loadedAssets[item.drawingID],
+            let drawingID = item.drawingID
+            if !drawingIDsToLoad.contains(drawingID) {
+                continue
+            }
+            
+            if let existingAsset = loadedAssets[drawingID],
                existingAsset.fullAssetID == item.assetIDs.full,
                existingAsset.quality.rawValue >= item.quality.rawValue
             {
@@ -146,7 +151,27 @@ class EditorFrameAssetLoader {
             
             loadQueue.async {
                 do {
-                    let texture = try JXLTextureLoader.load(url: assetURL)
+                    let encodedData = try Data(contentsOf: assetURL)
+                    
+                    guard self.drawingIDsToLoad.contains(drawingID) else {
+                        DispatchQueue.main.async {
+                            self.processNextPendingLoadItem()
+                        }
+                        return
+                    }
+                    
+                    let output = try JXLDecoder.decode(
+                        data: encodedData,
+                        progress: {
+                            self.drawingIDsToLoad.contains(drawingID)
+                        })
+                    
+                    let texture = try TextureCreator.createTexture(
+                        imageData: output.data,
+                        width: output.width,
+                        height: output.height,
+                        mipMapped: false,
+                        usage: .shaderRead)
                     
                     let asset = LoadedAsset(
                         fullAssetID: item.assetIDs.full,
@@ -157,11 +182,10 @@ class EditorFrameAssetLoader {
                         if self.drawingIDsToLoad.contains(item.drawingID) {
                             self.loadedAssets[item.drawingID] = asset
                             self.delegate?.onUpdateProgress(self)
-                        } else {
-                            print("Discarding asset")
                         }
                         self.processNextPendingLoadItem()
                     }
+                    
                 } catch {
                     DispatchQueue.main.async {
                         self.processNextPendingLoadItem()
