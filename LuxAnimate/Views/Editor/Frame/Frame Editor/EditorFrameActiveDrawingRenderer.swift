@@ -7,7 +7,9 @@ import Metal
 
 private let onionSkinPrevColor = Color(hex: "FF9600")
 private let onionSkinNextColor = Color(hex: "2EBAFF")
+
 private let onionSkinAlpha: Double = 0.5
+private let onionSkinAlphaFalloff: Double = 0.5
 
 protocol EditorFrameActiveDrawingRendererDelegate: AnyObject {
     
@@ -70,8 +72,7 @@ class EditorFrameActiveDrawingRenderer {
         let onionSkinPrevCount = delegate?
             .onionSkinPrevCount(self) ?? 0
         
-        let onionSkinNextCount = delegate?
-            .onionSkinNextCount(self) ?? 0
+        var onionSkinPrevAlpha = onionSkinAlpha
         
         for index in 0 ..< onionSkinPrevCount {
             guard let texture = delegate?
@@ -88,11 +89,18 @@ class EditorFrameActiveDrawingRenderer {
                     SpriteRenderer.Sprite(
                         size: Size(1, 1),
                         position: Vector(0.5, 0.5),
-                        alpha: onionSkinAlpha)
+                        alpha: onionSkinPrevAlpha)
                 ],
                 colorMode: .stencil,
                 color: onionSkinPrevColor)
+            
+            onionSkinPrevAlpha *= onionSkinAlphaFalloff
         }
+        
+        let onionSkinNextCount = delegate?
+            .onionSkinNextCount(self) ?? 0
+        
+        var onionSkinNextAlpha = onionSkinAlpha
         
         for index in 0 ..< onionSkinNextCount {
             guard let texture = delegate?
@@ -109,10 +117,12 @@ class EditorFrameActiveDrawingRenderer {
                     SpriteRenderer.Sprite(
                         size: Size(1, 1),
                         position: Vector(0.5, 0.5),
-                        alpha: onionSkinAlpha)
+                        alpha: onionSkinNextAlpha)
                 ],
                 colorMode: .stencil,
                 color: onionSkinNextColor)
+            
+            onionSkinNextAlpha *= onionSkinAlphaFalloff
         }
         
         // Active drawing

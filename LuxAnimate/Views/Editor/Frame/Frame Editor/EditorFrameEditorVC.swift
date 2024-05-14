@@ -16,7 +16,7 @@ private let brushConfig = Brush.Configuration(
 
 private let brushColor: Color = .brushBlack
 
-private let onionSkinCount = 1
+private let onionSkinCount = 5
 
 protocol EditorFrameEditorVCDelegate: AnyObject {
     
@@ -375,7 +375,7 @@ extension EditorFrameEditorVC: EditorFrameEditorCanvasVCDelegate {
 extension EditorFrameEditorVC: EditorFrameAssetLoaderDelegate {
     
     func onUpdateProgress(_ loader: EditorFrameAssetLoader) {
-        guard let activeDrawingID else { return }
+//        guard let activeDrawingID else { return }
         
         var needsDraw = false
         
@@ -477,11 +477,11 @@ extension EditorFrameEditorVC: EditorFrameSceneRendererDelegate {
 extension EditorFrameEditorVC: BrushEngineDelegate {
     
     func onUpdateCanvas(_ engine: BrushEngine) {
-        draw()
+//        draw()
     }
     
     func onFinalizeStroke(_ engine: BrushEngine) {
-        applyBrushStrokeEdit()
+//        applyBrushStrokeEdit()
     }
     
 }
