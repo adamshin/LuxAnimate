@@ -5,11 +5,11 @@
 import Foundation
 import Metal
 
-private let onionSkinPrevColor = Color(hex: "FF9600")
-private let onionSkinNextColor = Color(hex: "2EBAFF")
+private let onionSkinPrevColor = Color(hex: "FF4444")
+private let onionSkinNextColor = Color(hex: "22DD55")
 
-private let onionSkinAlpha: Double = 0.5
-private let onionSkinAlphaFalloff: Double = 0.5
+private let onionSkinAlpha: Double = 0.75
+private let onionSkinAlphaFalloff: Double = 0.15
 
 protocol EditorFrameActiveDrawingRendererDelegate: AnyObject {
     
@@ -94,7 +94,7 @@ class EditorFrameActiveDrawingRenderer {
                 colorMode: .stencil,
                 color: onionSkinPrevColor)
             
-            onionSkinPrevAlpha *= onionSkinAlphaFalloff
+            onionSkinPrevAlpha -= onionSkinAlphaFalloff
         }
         
         let onionSkinNextCount = delegate?
@@ -122,7 +122,7 @@ class EditorFrameActiveDrawingRenderer {
                 colorMode: .stencil,
                 color: onionSkinNextColor)
             
-            onionSkinNextAlpha *= onionSkinAlphaFalloff
+            onionSkinNextAlpha -= onionSkinAlphaFalloff
         }
         
         // Active drawing

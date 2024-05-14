@@ -187,11 +187,15 @@ class EditorFrameAssetLoader {
     }
     
     func hasLoadedAllPendingAssets() -> Bool {
-        pendingLoadItems.count == 0
+        syncQueue.sync {
+            pendingLoadItems.count == 0
+        }
     }
     
     func asset(for drawingID: String) -> LoadedAsset? {
-        loadedAssets[drawingID]
+        syncQueue.sync {
+            loadedAssets[drawingID]
+        }
     }
     
     func cacheFullTexture(
