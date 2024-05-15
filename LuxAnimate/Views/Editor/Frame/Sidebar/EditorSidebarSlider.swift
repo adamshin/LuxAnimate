@@ -4,132 +4,208 @@
 
 import UIKit
 
+private let hPadding: CGFloat = 12
+private let vPadding: CGFloat = 6
+
+private let barWidth: CGFloat = 44
+private let barHeight: CGFloat = 150
+
+private let thumbInset: CGFloat = 5
+private let thumbHeight: CGFloat = 16
+private let selectedThumbHeight: CGFloat = 17
+
+private let pressAnimDuration: TimeInterval = 0.25
+private let selectedHPadding: CGFloat = 2
+private let selectedVPadding: CGFloat = 4
+
+private let thumbNormalColor = UIColor(white: 1, alpha: 0.7)
+private let thumbSelectedColor = UIColor(white: 1, alpha: 0.95)
+
+private let dragRate: CGFloat = 0.5
+
+protocol EditorSidebarSliderDelegate: AnyObject {
+    
+    func onBeginPress(_ v: EditorSidebarSlider)
+    func onEndPress(_ v: EditorSidebarSlider)
+    
+    func onChangeValue(_ v: EditorSidebarSlider)
+    
+}
+
 class EditorSidebarSlider: UIView {
     
-    enum ValueDisplayMode {
-        case percent(minValue: Int)
+    weak var delegate: EditorSidebarSliderDelegate?
+    
+    private let contentView = UIView()
+    private let cardView = EditorSidebarCardView()
+    private let thumbView = CircleView()
+    
+    private let pressGesture = UILongPressGestureRecognizer()
+    private let panGesture = UIPanGestureRecognizer()
+    private var panGestureStartValue: Double?
+    
+    private var isExpanded = false {
+        didSet { setNeedsLayout() }
     }
     
-    private let gamma: Double
+    private var internalValue: Double = 0
     
-    private let slider = EditorVerticalSlider()
-    private let popupView: PopupView
+    // MARK: - Init
     
-    init(
-        title: String,
-        gamma: Double,
-        valueDisplayMode: ValueDisplayMode
-    ) {
-        self.gamma = gamma
-        
-        popupView = PopupView(
-            title: title,
-            valueDisplayMode: valueDisplayMode)
-        
+    init() {
         super.init(frame: .zero)
         
-        addSubview(slider)
-        slider.pinEdges()
+        pinWidth(to: barWidth + hPadding * 2)
+        pinHeight(to: barHeight + vPadding * 2)
         
-        addSubview(popupView)
-        popupView.pin(.centerY)
-        popupView.pin(.leading, toAnchor: .trailing)
+        addSubview(contentView)
+        contentView.isUserInteractionEnabled = false
         
-        slider.delegate = self
+        contentView.addSubview(cardView)
         
-        popupView.setVisible(false, animated: false)
+        contentView.addSubview(thumbView)
+        thumbView.backgroundColor = thumbNormalColor
+        thumbView.layer.cornerCurve = .continuous
+        
+        addGestureRecognizer(pressGesture)
+        pressGesture.addTarget(self, action: #selector(onPress))
+        pressGesture.minimumPressDuration = 0
+        
+        addGestureRecognizer(panGesture)
+        panGesture.addTarget(self, action: #selector(onPan))
+        panGesture.delegate = self
     }
     
     required init?(coder: NSCoder) { fatalError() }
+    
+    // MARK: - Lifecycle
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        let hPadding: CGFloat = isExpanded ?
+            selectedHPadding : 0
+        let vPadding: CGFloat = isExpanded ?
+            selectedVPadding : 0
+        
+        let adjustedBarWidth = barWidth + hPadding * 2
+        let adjustedBarHeight = barHeight + vPadding * 2
+        
+        let adjustedThumbHeight = isExpanded ?
+            selectedThumbHeight : thumbHeight
+        
+        contentView.frame = CGRect(
+            center: bounds.center,
+            size: CGSize(
+                width: adjustedBarWidth,
+                height: adjustedBarHeight))
+        
+        cardView.frame = contentView.bounds
+        cardView.cornerRadius = thumbInset + adjustedThumbHeight / 2
+        
+        let clampedValue = clamp(internalValue, min: 0, max: 1)
+        
+        let thumbRangeInset = thumbInset + adjustedThumbHeight / 2
+        let thumbRangeStart = thumbRangeInset
+        let thumbRangeEnd = adjustedBarHeight - thumbRangeInset
+        
+        let thumbPosition = map(
+            clampedValue,
+            in: (1, 0),
+            to: (thumbRangeStart, thumbRangeEnd))
+        
+        thumbView.frame = CGRect(
+            center: CGPoint(
+                x: contentView.bounds.midX,
+                y: thumbPosition),
+            size: CGSize(
+                width: adjustedBarWidth - thumbInset * 2,
+                height: adjustedThumbHeight))
+    }
+    
+    // MARK: - Handlers
+    
+    @objc private func onPress() {
+        switch pressGesture.state {
+        case .began: 
+            showBeginPress()
+            delegate?.onBeginPress(self)
+            
+        case .changed: 
+            break
+            
+        default: 
+            showEndPress()
+            delegate?.onEndPress(self)
+        }
+    }
+    
+    @objc private func onPan() {
+        switch panGesture.state {
+        case .began:
+            panGestureStartValue = internalValue
+            
+        case .changed:
+            guard let panGestureStartValue
+            else { return }
+            
+            let translation = panGesture.translation(in: self)
+            
+            let thumbRangeSize = barHeight -
+                thumbHeight -
+                thumbInset * 2
+            
+            let dv = -translation.y / thumbRangeSize * dragRate
+            value = panGestureStartValue + dv
+            
+        default:
+            panGestureStartValue = nil
+        }
+    }
+    
+    // MARK: - UI
+    
+    private func showBeginPress() {
+        UIView.animate(springDuration: pressAnimDuration) {
+            thumbView.backgroundColor = thumbSelectedColor
+            isExpanded = true
+            layoutIfNeeded()
+        }
+    }
+    
+    private func showEndPress() {
+        UIView.animate(springDuration: pressAnimDuration) {
+            thumbView.backgroundColor = thumbNormalColor
+            isExpanded = false
+            layoutIfNeeded()
+        }
+    }
+    
+    // MARK: - Interface
     
     var value: Double {
         get {
-            pow(slider.value, gamma)
+            internalValue
         }
         set {
-            slider.value = pow(newValue, 1/gamma)
+            internalValue = clamp(newValue, min: 0, max: 1)
+            delegate?.onChangeValue(self)
+            setNeedsLayout()
         }
     }
     
 }
 
-extension EditorSidebarSlider: EditorVerticalSliderDelegate {
-    
-    func onBeginPress(_ v: EditorVerticalSlider) {
-        popupView.setVisible(true, animated: true)
-    }
-    
-    func onEndPress(_ v: EditorVerticalSlider) {
-        popupView.setVisible(false, animated: true)
-    }
-    
-    func onChangeValue(_ v: EditorVerticalSlider) {
-        popupView.updateValue(value)
-    }
-    
-}
+// MARK: - Delegates
 
-private class PopupView: UIView {
+extension EditorSidebarSlider: UIGestureRecognizerDelegate {
     
-    private let valueDisplayMode: EditorSidebarSlider.ValueDisplayMode
-    
-    private let cardView = EditorMenuCardView()
-    private let titleLabel = UILabel()
-    private let valueLabel = UILabel()
-    
-    init(
-        title: String,
-        valueDisplayMode: EditorSidebarSlider.ValueDisplayMode
-    ) {
-        self.valueDisplayMode = valueDisplayMode
-        super.init(frame: .zero)
-        
-        pinWidth(to: 110)
-        pinHeight(to: 110)
-        
-        addSubview(cardView)
-        cardView.pinEdges()
-        
-        let stack = UIStackView()
-        stack.axis = .vertical
-        stack.alignment = .center
-        stack.spacing = 2
-        cardView.addSubview(stack)
-        stack.pinCenter()
-        
-        stack.addArrangedSubview(titleLabel)
-        titleLabel.textColor = .editorLabel
-        titleLabel.font = .systemFont(ofSize: 15, weight: .medium)
-        titleLabel.text = title
-        
-        stack.addArrangedSubview(valueLabel)
-        valueLabel.textColor = .editorLabel
-        valueLabel.font = .monospacedDigitSystemFont(
-            ofSize: 21, weight: .medium)
-    }
-    
-    required init?(coder: NSCoder) { fatalError() }
-    
-    func setVisible(_ visible: Bool, animated: Bool) {
-        UIView.animate(springDuration: 0.2) {
-            if visible {
-                alpha = 1
-                transform = .identity
-            } else {
-                alpha = 0
-                transform = CGAffineTransform(
-                    scaleX: 0.9, y: 0.9)
-            }
-        }
-    }
-    
-    func updateValue(_ value: Double) {
-        switch valueDisplayMode {
-        case .percent(let minValue):
-            let percentValue = Int((value * 100).rounded())
-            let clampedValue = max(minValue, percentValue)
-            valueLabel.text = "\(clampedValue)%"
-        }
+    func gestureRecognizer(
+        _ gestureRecognizer: UIGestureRecognizer,
+        shouldRecognizeSimultaneouslyWith 
+        otherGestureRecognizer: UIGestureRecognizer
+    ) -> Bool {
+        return otherGestureRecognizer == pressGesture
     }
     
 }

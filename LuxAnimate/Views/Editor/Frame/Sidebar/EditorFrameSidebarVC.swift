@@ -12,12 +12,12 @@ private let smoothingGamma: Double = 1.5
 
 class EditorFrameSidebarVC: UIViewController {
     
-    private let sizeSlider = EditorSidebarSlider(
+    private let sizeSlider = EditorSidebarSliderContainer(
         title: "Size",
         gamma: sizeGamma,
         valueDisplayMode: .percent(minValue: 1))
     
-    private let smoothingSlider = EditorSidebarSlider(
+    private let smoothingSlider = EditorSidebarSliderContainer(
         title: "Smoothing",
         gamma: smoothingGamma,
         valueDisplayMode: .percent(minValue: 0))
