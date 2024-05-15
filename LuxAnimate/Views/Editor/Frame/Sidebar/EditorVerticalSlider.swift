@@ -5,7 +5,7 @@
 import UIKit
 
 private let hPadding: CGFloat = 12
-private let vPadding: CGFloat = 6
+private let vPadding: CGFloat = 4
 
 private let barWidth: CGFloat = 44
 private let barHeight: CGFloat = 156
@@ -14,7 +14,7 @@ private let thumbInset: CGFloat = 5
 private let thumbHeight: CGFloat = 16
 
 private let pressAnimDuration: TimeInterval = 0.25
-private let pressScaleFactor: CGFloat = (barWidth + 4) / barWidth
+private let pressScaleFactor: CGFloat = 1//(barWidth + 4) / barWidth
 
 private let thumbNormalColor = UIColor(white: 1, alpha: 0.7)
 private let thumbSelectedColor = UIColor(white: 1, alpha: 0.95)
@@ -30,6 +30,7 @@ protocol EditorVerticalSliderDelegate: AnyObject {
     
 }
 
+// TODO: Rename this?
 class EditorVerticalSlider: UIView {
     
     weak var delegate: EditorVerticalSliderDelegate?
