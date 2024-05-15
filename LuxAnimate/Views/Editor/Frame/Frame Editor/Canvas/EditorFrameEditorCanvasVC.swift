@@ -9,7 +9,7 @@ private let minScaleLevel: Scalar = 0.1
 private let maxScaleLevel: Scalar = 30
 private let scalePixelateThreshold: Scalar = 1.0
 
-protocol EditorFrameEditorCanvasVCDelegate: BrushGestureRecognizerGestureDelegate {
+protocol EditorFrameEditorCanvasVCDelegate: AnyObject {
     
     func onSelectUndo(_ vc: EditorFrameEditorCanvasVC)
     func onSelectRedo(_ vc: EditorFrameEditorCanvasVC)
@@ -18,16 +18,10 @@ protocol EditorFrameEditorCanvasVCDelegate: BrushGestureRecognizerGestureDelegat
 
 class EditorFrameEditorCanvasVC: UIViewController {
     
-    weak var delegate: EditorFrameEditorCanvasVCDelegate? {
-        didSet {
-            brushGesture.gestureDelegate = delegate
-        }
-    }
+    weak var delegate: EditorFrameEditorCanvasVCDelegate?
     
     private let metalView = MetalView()
     private let canvasView = MovableCanvasView()
-    
-    private let brushGesture = BrushGestureRecognizer()
     
     private let undoGesture = MultiFingerTapGestureRecognizer(touchCount: 2)
     private let redoGesture = MultiFingerTapGestureRecognizer(touchCount: 3)
@@ -54,8 +48,6 @@ class EditorFrameEditorCanvasVC: UIViewController {
         
         metalView.metalLayer.shouldRasterize = true
         metalView.metalLayer.rasterizationScale = 1
-        
-        canvasView.canvasContentView.addGestureRecognizer(brushGesture)
         
         canvasView.canvasContentView.addGestureRecognizer(undoGesture)
         canvasView.canvasContentView.addGestureRecognizer(redoGesture)
@@ -109,7 +101,6 @@ class EditorFrameEditorCanvasVC: UIViewController {
     }
     
     func setEditingEnabled(_ enabled: Bool) {
-        brushGesture.isEnabled = enabled
         undoGesture.isEnabled = enabled
         redoGesture.isEnabled = enabled
     }
@@ -120,6 +111,10 @@ class EditorFrameEditorCanvasVC: UIViewController {
     
     func handleChangeSafeAreaReferenceViewFrame() {
         canvasView.handleChangeSafeAreaReferenceViewFrame()
+    }
+    
+    var canvasContentView: UIView {
+        canvasView.canvasContentView
     }
     
 }

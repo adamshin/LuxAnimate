@@ -211,7 +211,7 @@ class EditorFrameAssetLoader {
         loadedAssets[drawingID]
     }
     
-    func hasLoadedAssetsForAllDrawings() -> Bool {
+    func hasAssetsForAllDrawings() -> Bool {
         !drawingIDsToLoad.contains {
             loadedAssets[$0] == nil
         }

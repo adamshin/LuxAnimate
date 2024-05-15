@@ -5,17 +5,6 @@
 import UIKit
 import Metal
 
-private let brushConfig = Brush.Configuration(
-    stampTextureName: "brush1.png",
-    stampSize: 50,
-    stampSpacing: 0.0,
-    stampAlpha: 1,
-    pressureScaling: 0.5,
-    taperLength: 0.05,
-    taperRoundness: 1.0)
-
-private let brushColor: Color = .brushBlack
-
 private let onionSkinCount = 2
 
 protocol EditorFrameEditorVCDelegate: AnyObject {
@@ -36,6 +25,12 @@ class EditorFrameEditorVC: UIViewController {
     weak var delegate: EditorFrameEditorVCDelegate?
     
     private let canvasVC = EditorFrameEditorCanvasVC()
+    private let drawingEditorVC: EditorFrameDrawingEditorVC
+    
+    private let assetLoader: EditorFrameAssetLoader
+    private let activeDrawingRenderer: EditorFrameActiveDrawingRenderer
+    private let frameSceneRenderer: EditorFrameSceneRenderer
+    private let displayLink = WrappedDisplayLink()
     
     private let projectID: String
     private let projectViewportSize: PixelSize
@@ -45,27 +40,9 @@ class EditorFrameEditorVC: UIViewController {
     private var focusedFrameIndex = 0
     private var isOnionSkinOn = false
     
-    private var activeDrawingID: String?
-    
-    private var frameScene: FrameScene?
-    private var prevOnionSkinDrawingIDs: [String] = []
-    private var nextOnionSkinDrawingIDs: [String] = []
-    
-    private var isEditingEnabled = true
-    private var isActiveDrawingLoaded = false
+    private var scene: EditorFrameEditorScene?
     
     private var needsDraw = false
-    
-    private let assetLoader: EditorFrameAssetLoader
-    
-    private let activeDrawingRenderer: EditorFrameActiveDrawingRenderer
-    private let frameSceneRenderer: EditorFrameSceneRenderer
-    
-    private let brushEngine: BrushEngine
-    private var brushMode: BrushEngine.BrushMode = .brush
-    private let brush = try! Brush(configuration: brushConfig)
-    
-    private let displayLink = WrappedDisplayLink()
     
     // MARK: - Init
     
@@ -78,6 +55,10 @@ class EditorFrameEditorVC: UIViewController {
         self.projectViewportSize = projectViewportSize
         self.drawingSize = drawingSize
         
+        drawingEditorVC = EditorFrameDrawingEditorVC(
+            drawingSize: drawingSize,
+            canvasContentView: canvasVC.canvasContentView)
+        
         assetLoader = EditorFrameAssetLoader(
             projectID: projectID)
         
@@ -87,18 +68,15 @@ class EditorFrameEditorVC: UIViewController {
         frameSceneRenderer = EditorFrameSceneRenderer(
             viewportSize: projectViewportSize)
         
-        brushEngine = BrushEngine(canvasSize: drawingSize)
-        
         super.init(nibName: nil, bundle: nil)
-        
-        displayLink.setCallback { [weak self] in
-            self?.onFrame()
-        }
         
         assetLoader.delegate = self
         activeDrawingRenderer.delegate = self
         frameSceneRenderer.delegate = self
-        brushEngine.delegate = self
+        
+        displayLink.setCallback { [weak self] in
+            self?.onFrame()
+        }
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -109,7 +87,10 @@ class EditorFrameEditorVC: UIViewController {
         super.viewDidLoad()
         
         canvasVC.delegate = self
+        drawingEditorVC.delegate = self
+        
         addChild(canvasVC, to: view)
+        addChild(drawingEditorVC, to: view)
         
         canvasVC.setCanvasSize(projectViewportSize)
     }
@@ -117,7 +98,7 @@ class EditorFrameEditorVC: UIViewController {
     // MARK: - Frame
     
     @objc private func onFrame() {
-        brushEngine.onFrame()
+        drawingEditorVC.onFrame()
         
         if needsDraw {
             needsDraw = false
@@ -128,155 +109,33 @@ class EditorFrameEditorVC: UIViewController {
     // MARK: - Frame Data
     
     private func updateFrameData() {
-        brushEngine.endStroke()
+        drawingEditorVC.endEditing()
+        drawingEditorVC.clearDrawing()
         
-        // TODO: Factor this code into a helper object?
         guard let projectManifest else { return }
         
-        let onionSkinPrevCount = isOnionSkinOn ? onionSkinCount : 0
-        let onionSkinNextCount = isOnionSkinOn ? onionSkinCount : 0
+        // Generate scene
+        let onionSkinCount = isOnionSkinOn ?
+            onionSkinCount : 0
         
-        // Calculate drawing IDs
-        let drawings = projectManifest
-            .content.animationLayer.drawings
-        
-        let drawingsForFrameResult = Self.drawingsForFrame(
-            drawings: drawings,
-            focusedFrameIndex: focusedFrameIndex,
-            onionSkinPrevCount: onionSkinPrevCount,
-            onionSkinNextCount: onionSkinNextCount)
-        
-        activeDrawingID = drawingsForFrameResult.activeDrawing?.id
-        
-        prevOnionSkinDrawingIDs = drawingsForFrameResult
-            .prevOnionSkinDrawings.map { $0.id }
-        
-        nextOnionSkinDrawingIDs = drawingsForFrameResult
-            .nextOnionSkinDrawings.map { $0.id }
-        
-        // Generate frame scene
-        let frameScene = FrameSceneGenerator.generate(
+        let scene = EditorFrameEditorScene.generate(
             projectManifest: projectManifest,
-            frameIndex: focusedFrameIndex)
+            focusedFrameIndex: focusedFrameIndex,
+            onionSkinPrevCount: onionSkinCount,
+            onionSkinNextCount: onionSkinCount)
         
-        self.frameScene = frameScene
-        
-        // Create list of drawings
-        var drawingsToLoad: [Project.Drawing] = []
-        
-        let drawingsFromFrameScene = Self.drawings(from: frameScene)
-        drawingsToLoad.append(contentsOf: drawingsFromFrameScene)
-        
-        drawingsToLoad.append(
-            contentsOf: drawingsForFrameResult.prevOnionSkinDrawings)
-        drawingsToLoad.append(
-            contentsOf: drawingsForFrameResult.nextOnionSkinDrawings)
+        self.scene = scene
         
         // Load assets
-        isActiveDrawingLoaded = false
-        
         assetLoader.loadAssets(
-            drawings: drawingsToLoad,
-            activeDrawingID: activeDrawingID)
-    }
-    
-    private struct DrawingsForFrameResult {
-        var activeDrawing: Project.Drawing?
-        var prevOnionSkinDrawings: [Project.Drawing]
-        var nextOnionSkinDrawings: [Project.Drawing]
-    }
-    
-    private static func drawingsForFrame(
-        drawings: [Project.Drawing],
-        focusedFrameIndex: Int,
-        onionSkinPrevCount: Int,
-        onionSkinNextCount: Int
-    ) -> DrawingsForFrameResult {
-        
-        let sortedDrawings = drawings.sorted {
-            $0.frameIndex < $1.frameIndex
-        }
-        let activeDrawingIndex = sortedDrawings.lastIndex {
-            $0.frameIndex <= focusedFrameIndex
-        }
-        
-        var activeDrawing: Project.Drawing?
-        var prevOnionSkinDrawings: [Project.Drawing] = []
-        var nextOnionSkinDrawings: [Project.Drawing] = []
-        
-        if let activeDrawingIndex {
-            activeDrawing = sortedDrawings[activeDrawingIndex]
-            
-            var prevDrawingIndex = activeDrawingIndex
-            for _ in 0 ..< onionSkinPrevCount {
-                prevDrawingIndex -= 1
-                if sortedDrawings.indices.contains(prevDrawingIndex) {
-                    let drawing = sortedDrawings[prevDrawingIndex]
-                    prevOnionSkinDrawings.append(drawing)
-                }
-            }
-            
-            var nextDrawingIndex = activeDrawingIndex
-            for _ in 0 ..< onionSkinNextCount {
-                nextDrawingIndex += 1
-                if sortedDrawings.indices.contains(nextDrawingIndex) {
-                    let drawing = sortedDrawings[nextDrawingIndex]
-                    nextOnionSkinDrawings.append(drawing)
-                }
-            }
-        }
-        
-        return DrawingsForFrameResult(
-            activeDrawing: activeDrawing,
-            prevOnionSkinDrawings: prevOnionSkinDrawings,
-            nextOnionSkinDrawings: nextOnionSkinDrawings)
-    }
-    
-    private static func drawings(
-        from frameScene: FrameScene
-    ) -> [Project.Drawing] {
-        
-        var result: [Project.Drawing] = []
-        
-        for layer in frameScene.layers {
-            switch layer {
-            case .drawing(let drawingLayer):
-                result.append(drawingLayer.drawing)
-            }
-        }
-        return result
-    }
-    
-    // MARK: - Editing
-    
-    private func applyBrushStrokeEdit() {
-        // TODO: This will trigger a reload of the full active drawing
-        // texture, which is unnecessary. We need to figure out how to
-        // avoid reloading. Probably by generating a full asset ID here,
-        // and copying the brush engine canvas texture into our asset
-        // loader cache.
-        
-//        guard let activeDrawingID else { return }
-//        
-//        do {
-//            let imageData = try TextureDataReader
-//                .read(brushEngine.canvasTexture)
-//            
-//            let imageSize = brushEngine.canvasSize
-//            
-//            delegate?.onEditDrawing(
-//                self,
-//                drawingID: activeDrawingID,
-//                imageData: imageData,
-//                imageSize: imageSize)
-//            
-//        } catch { }
+            drawings: scene.allDrawings,
+            activeDrawingID: scene.activeDrawingID)
     }
     
     // MARK: - Rendering
     
     private func draw() {
-        guard assetLoader.hasLoadedAssetsForAllDrawings()
+        guard assetLoader.hasAssetsForAllDrawings()
         else { return }
         
         activeDrawingRenderer.draw()
@@ -289,8 +148,8 @@ class EditorFrameEditorVC: UIViewController {
     // MARK: - Editing
     
     private func setEditingEnabled(_ enabled: Bool) {
-        isEditingEnabled = enabled
         canvasVC.setEditingEnabled(enabled)
+        drawingEditorVC.setEditingEnabled(enabled)
     }
     
     // MARK: - Interface
@@ -334,7 +193,7 @@ class EditorFrameEditorVC: UIViewController {
     
 }
 
-// MARK: - Delegates
+// MARK: - View Controller Delegates
 
 extension EditorFrameEditorVC: EditorFrameEditorCanvasVCDelegate {
     
@@ -345,68 +204,56 @@ extension EditorFrameEditorVC: EditorFrameEditorCanvasVCDelegate {
         delegate?.onSelectRedo(self)
     }
     
-    // TODO: Factor brush and other tool logic into a
-    // modal child view controller / manager object?
-    func onBeginBrushStroke(quickTap: Bool) {
-        guard isEditingEnabled, isActiveDrawingLoaded
-        else { return }
-        
-//        let scale = contentVC.toolOverlayVC.size
-//        let smoothingLevel = contentVC.toolOverlayVC.smoothing
-        let scale = 1.0
-        let smoothingLevel = 0.0
-        
-        brushEngine.beginStroke(
-            brush: brush,
-            brushMode: brushMode,
-            color: brushColor,
-            scale: scale,
-            quickTap: quickTap,
-            smoothingLevel: smoothingLevel)
-    }
+}
+
+extension EditorFrameEditorVC: EditorFrameDrawingEditorVCDelegate {
     
-    func onUpdateBrushStroke(
-        _ stroke: BrushGestureRecognizer.Stroke
+    func onUpdateCanvas(
+        _ vc: EditorFrameDrawingEditorVC
     ) {
-        guard isEditingEnabled, isActiveDrawingLoaded
-        else { return }
-        
-        let inputStroke = BrushEngineGestureAdapter
-            .convert(stroke)
-        
-        brushEngine.updateStroke(inputStroke: inputStroke)
+        needsDraw = true
     }
     
-    func onEndBrushStroke() {
-        guard isEditingEnabled, isActiveDrawingLoaded
+    func onEditDrawing(
+        _ vc: EditorFrameDrawingEditorVC,
+        imageData: Data,
+        imageSize: PixelSize
+    ) {
+        guard let activeDrawingID = scene?.activeDrawingID
         else { return }
         
-        brushEngine.endStroke()
-    }
-    
-    func onCancelBrushStroke() {
-        guard isEditingEnabled, isActiveDrawingLoaded
-        else { return }
+        // TODO: This will trigger a reload of the full active drawing
+        // texture, which is unnecessary. We need to figure out how to
+        // avoid reloading.
         
-        brushEngine.cancelStroke()
+        // We could have a flag that blocks the asset loader from
+        // reloading an asset for a given drawing. It would be set
+        // before we call onEditDrawing, and unset right after.
+        
+        delegate?.onEditDrawing(self,
+            drawingID: activeDrawingID,
+            imageData: imageData,
+            imageSize: imageSize)
     }
     
 }
 
+// MARK: - Other Delegates
+
 extension EditorFrameEditorVC: EditorFrameAssetLoaderDelegate {
     
     func onUpdateProgress(_ loader: EditorFrameAssetLoader) {
-        guard let activeDrawingID else { return }
+        guard let activeDrawingID = scene?.activeDrawingID
+        else { return }
         
-        if !isActiveDrawingLoaded,
+        if !drawingEditorVC.isDrawingSet,
            let asset = assetLoader.asset(for: activeDrawingID),
            asset.quality == .full
         {
-            isActiveDrawingLoaded = true
-            brushEngine.setCanvasContents(asset.texture)
+            drawingEditorVC.setDrawingTexture(asset.texture)
         }
         
-        if loader.hasLoadedAssetsForAllDrawings() {
+        if loader.hasAssetsForAllDrawings() {
             needsDraw = true
         }
     }
@@ -419,11 +266,11 @@ extension EditorFrameEditorVC: EditorFrameActiveDrawingRendererDelegate {
         _ r: EditorFrameActiveDrawingRenderer
     ) -> MTLTexture? {
         
-        guard let activeDrawingID else { return nil }
+        guard let activeDrawingID = scene?.activeDrawingID
+        else { return nil }
         
-        if isActiveDrawingLoaded {
-            return brushEngine.canvasTexture
-            
+        if drawingEditorVC.isDrawingSet {
+            return drawingEditorVC.drawingTexture
         } else {
             let asset = assetLoader.asset(for: activeDrawingID)
             return asset?.texture
@@ -433,23 +280,23 @@ extension EditorFrameEditorVC: EditorFrameActiveDrawingRendererDelegate {
     func onionSkinPrevCount(
         _ r: EditorFrameActiveDrawingRenderer
     ) -> Int {
-        
-        prevOnionSkinDrawingIDs.count
+        guard let scene else { return 0 }
+        return scene.prevOnionSkinDrawingIDs.count
     }
     
     func onionSkinNextCount(
         _ r: EditorFrameActiveDrawingRenderer
     ) -> Int {
-        
-        nextOnionSkinDrawingIDs.count
+        guard let scene else { return 0 }
+        return scene.nextOnionSkinDrawingIDs.count
     }
     
     func textureForPrevOnionSkinDrawing(
         _ r: EditorFrameActiveDrawingRenderer,
         index: Int
     ) -> MTLTexture? {
-        
-        let drawingID = prevOnionSkinDrawingIDs[index]
+        guard let scene else { return nil }
+        let drawingID = scene.prevOnionSkinDrawingIDs[index]
         let asset = assetLoader.asset(for: drawingID)
         return asset?.texture
     }
@@ -458,8 +305,8 @@ extension EditorFrameEditorVC: EditorFrameActiveDrawingRendererDelegate {
         _ r: EditorFrameActiveDrawingRenderer,
         index: Int
     ) -> MTLTexture? {
-        
-        let drawingID = nextOnionSkinDrawingIDs[index]
+        guard let scene else { return nil }
+        let drawingID = scene.nextOnionSkinDrawingIDs[index]
         let asset = assetLoader.asset(for: drawingID)
         return asset?.texture
     }
@@ -472,7 +319,7 @@ extension EditorFrameEditorVC: EditorFrameSceneRendererDelegate {
         _ r: EditorFrameSceneRenderer
     ) -> FrameScene? {
         
-        frameScene
+        scene?.frameScene
     }
     
     func textureForDrawing(
@@ -480,25 +327,13 @@ extension EditorFrameEditorVC: EditorFrameSceneRendererDelegate {
         drawingID: String
     ) -> MTLTexture? {
         
-        if drawingID == activeDrawingID {
+        if drawingID == scene?.activeDrawingID {
             return activeDrawingRenderer.renderTarget
             
         } else {
             let asset = assetLoader.asset(for: drawingID)
             return asset?.texture
         }
-    }
-    
-}
-
-extension EditorFrameEditorVC: BrushEngineDelegate {
-    
-    func onUpdateCanvas(_ engine: BrushEngine) {
-//        needsDraw = true
-    }
-    
-    func onFinalizeStroke(_ engine: BrushEngine) {
-//        applyBrushStrokeEdit()
     }
     
 }
