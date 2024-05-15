@@ -9,6 +9,14 @@ private let onionSkinCount = 2
 
 protocol EditorFrameEditorVCDelegate: AnyObject {
     
+    func brushScale(
+        _ vc: EditorFrameEditorVC
+    ) -> Double
+    
+    func brushSmoothing(
+        _ vc: EditorFrameEditorVC
+    ) -> Double
+    
     func onSelectUndo(_ vc: EditorFrameEditorVC)
     func onSelectRedo(_ vc: EditorFrameEditorVC)
     
@@ -207,6 +215,18 @@ extension EditorFrameEditorVC: EditorFrameEditorCanvasVCDelegate {
 }
 
 extension EditorFrameEditorVC: EditorFrameDrawingEditorVCDelegate {
+    
+    func brushScale(
+        _ vc: EditorFrameDrawingEditorVC
+    ) -> Double {
+        delegate?.brushScale(self) ?? 0
+    }
+    
+    func brushSmoothing(
+        _ vc: EditorFrameDrawingEditorVC
+    ) -> Double {
+        delegate?.brushSmoothing(self) ?? 0
+    }
     
     func onUpdateCanvas(
         _ vc: EditorFrameDrawingEditorVC

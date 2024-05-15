@@ -41,16 +41,16 @@ class EditorFrameSidebarVC: UIViewController {
         stack.addArrangedSubview(jogWheelButton)
         stack.addArrangedSubview(smoothingSlider)
         
-        size = defaultSize
-        smoothing = defaultSmoothing
+        brushSize = defaultSize
+        brushSmoothing = defaultSmoothing
     }
     
-    var size: Double {
+    var brushSize: Double {
         get { sizeSlider.value }
         set { sizeSlider.value = newValue }
     }
     
-    var smoothing: Double {
+    var brushSmoothing: Double {
         get { smoothingSlider.value }
         set { smoothingSlider.value = newValue }
     }

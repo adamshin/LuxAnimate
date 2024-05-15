@@ -56,7 +56,7 @@ class BrushStrokeEngine {
         color: Color,
         scale: Double,
         quickTap: Bool,
-        smoothingLevel: Double
+        smoothing: Double
     ) {
         self.brush = brush
         self.color = color
@@ -65,7 +65,7 @@ class BrushStrokeEngine {
         inputInterpolationProcessor = .init()
         
         smoothingProcessor = .init(
-            smoothingLevel: smoothingLevel)
+            smoothing: smoothing)
         
         pressureFilteringProcessor = .init()
         

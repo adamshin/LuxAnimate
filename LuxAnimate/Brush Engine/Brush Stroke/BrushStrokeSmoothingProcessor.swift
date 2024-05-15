@@ -21,9 +21,9 @@ class BrushStrokeSmoothingProcessor {
     
     private var lastFinalizedState: State
     
-    init(smoothingLevel: Double) {
+    init(smoothing: Double) {
         let windowSize = clamp(
-            Int(smoothingLevel * Double(maxSmoothingWindowSize)),
+            Int(smoothing * Double(maxSmoothingWindowSize)),
             min: minSmoothingWindowSize,
             max: maxSmoothingWindowSize)
         

@@ -109,6 +109,18 @@ class EditorFrameVC: UIViewController {
 
 extension EditorFrameVC: EditorFrameEditorVCDelegate {
     
+    func brushScale(
+        _ vc: EditorFrameEditorVC
+    ) -> Double {
+        sidebarVC.brushSize
+    }
+    
+    func brushSmoothing(
+        _ vc: EditorFrameEditorVC
+    ) -> Double {
+        sidebarVC.brushSmoothing
+    }
+    
     func onSelectUndo(_ vc: EditorFrameEditorVC) {
         delegate?.onSelectUndo(self)
     }

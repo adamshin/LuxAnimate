@@ -56,7 +56,7 @@ class BrushEngine {
         color: Color,
         scale: Double,
         quickTap: Bool,
-        smoothingLevel: Double
+        smoothing: Double
     ) {
         self.brushMode = brushMode
         
@@ -65,7 +65,7 @@ class BrushEngine {
             color: color,
             scale: scale,
             quickTap: quickTap,
-            smoothingLevel: smoothingLevel)
+            smoothing: smoothing)
     }
     
     func updateStroke(

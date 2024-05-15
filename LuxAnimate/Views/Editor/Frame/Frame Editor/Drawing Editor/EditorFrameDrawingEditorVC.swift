@@ -21,6 +21,14 @@ private let brushColor: Color = .brushBlack
 
 protocol EditorFrameDrawingEditorVCDelegate: AnyObject {
     
+    func brushScale(
+        _ vc: EditorFrameDrawingEditorVC
+    ) -> Double
+    
+    func brushSmoothing(
+        _ vc: EditorFrameDrawingEditorVC
+    ) -> Double
+    
     func onUpdateCanvas(
         _ vc: EditorFrameDrawingEditorVC)
     
@@ -106,10 +114,8 @@ extension EditorFrameDrawingEditorVC: BrushGestureRecognizerGestureDelegate {
         guard isEditingEnabled, isDrawingSet
         else { return }
         
-//        let scale = contentVC.toolOverlayVC.size
-//        let smoothingLevel = contentVC.toolOverlayVC.smoothing
-        let scale = 1.0
-        let smoothingLevel = 0.0
+        let scale = delegate?.brushScale(self) ?? 0
+        let smoothing = delegate?.brushSmoothing(self) ?? 0
         
         brushEngine.beginStroke(
             brush: brush,
@@ -117,7 +123,7 @@ extension EditorFrameDrawingEditorVC: BrushGestureRecognizerGestureDelegate {
             color: brushColor,
             scale: scale,
             quickTap: quickTap,
-            smoothingLevel: smoothingLevel)
+            smoothing: smoothing)
     }
     
     func onUpdateBrushStroke(
