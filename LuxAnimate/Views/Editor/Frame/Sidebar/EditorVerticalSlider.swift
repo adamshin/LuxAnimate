@@ -5,16 +5,18 @@
 import UIKit
 
 private let hPadding: CGFloat = 12
-private let vPadding: CGFloat = 4
+private let vPadding: CGFloat = 6
 
 private let barWidth: CGFloat = 44
-private let barHeight: CGFloat = 156
+private let barHeight: CGFloat = 150
 
 private let thumbInset: CGFloat = 5
 private let thumbHeight: CGFloat = 16
+private let selectedThumbHeight: CGFloat = 17
 
 private let pressAnimDuration: TimeInterval = 0.25
-private let pressScaleFactor: CGFloat = 1//(barWidth + 4) / barWidth
+private let selectedHPadding: CGFloat = 2
+private let selectedVPadding: CGFloat = 4
 
 private let thumbNormalColor = UIColor(white: 1, alpha: 0.7)
 private let thumbSelectedColor = UIColor(white: 1, alpha: 0.95)
@@ -43,6 +45,10 @@ class EditorVerticalSlider: UIView {
     private let panGesture = UIPanGestureRecognizer()
     private var panGestureStartValue: Double?
     
+    private var isExpanded = false {
+        didSet { setNeedsLayout() }
+    }
+    
     private var internalValue: Double = 0
     
     // MARK: - Init
@@ -57,7 +63,6 @@ class EditorVerticalSlider: UIView {
         contentView.isUserInteractionEnabled = false
         
         contentView.addSubview(cardView)
-        cardView.cornerRadius = thumbInset + thumbHeight / 2
         
         contentView.addSubview(thumbView)
         thumbView.backgroundColor = thumbNormalColor
@@ -79,31 +84,44 @@ class EditorVerticalSlider: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        contentView.bounds = bounds
-        contentView.center = bounds.center
+        let hPadding: CGFloat = isExpanded ?
+            selectedHPadding : 0
+        let vPadding: CGFloat = isExpanded ?
+            selectedVPadding : 0
         
-        cardView.frame = CGRect(
+        let adjustedBarWidth = barWidth + hPadding * 2
+        let adjustedBarHeight = barHeight + vPadding * 2
+        
+        let adjustedThumbHeight = isExpanded ?
+            selectedThumbHeight : thumbHeight
+        
+        contentView.frame = CGRect(
             center: bounds.center,
-            size: CGSize(width: barWidth, height: barHeight))
+            size: CGSize(
+                width: adjustedBarWidth,
+                height: adjustedBarHeight))
+        
+        cardView.frame = contentView.bounds
+        cardView.cornerRadius = thumbInset + adjustedThumbHeight / 2
         
         let clampedValue = clamp(internalValue, min: 0, max: 1)
         
-        let thumbRangeInset = thumbInset + thumbHeight / 2
+        let thumbRangeInset = thumbInset + adjustedThumbHeight / 2
         let thumbRangeStart = thumbRangeInset
-        let thumbRangeEnd = barHeight - thumbRangeInset
+        let thumbRangeEnd = adjustedBarHeight - thumbRangeInset
         
-        let thumbPosition =
-            vPadding +
-            thumbRangeStart +
-            (1 - clampedValue) * (thumbRangeEnd - thumbRangeStart)
+        let thumbPosition = map(
+            clampedValue,
+            in: (1, 0),
+            to: (thumbRangeStart, thumbRangeEnd))
         
         thumbView.frame = CGRect(
             center: CGPoint(
-                x: bounds.midX,
+                x: contentView.bounds.midX,
                 y: thumbPosition),
             size: CGSize(
-                width: barWidth - thumbInset * 2,
-                height: thumbHeight))
+                width: adjustedBarWidth - thumbInset * 2,
+                height: adjustedThumbHeight))
     }
     
     // MARK: - Handlers
@@ -151,17 +169,16 @@ class EditorVerticalSlider: UIView {
     private func showBeginPress() {
         UIView.animate(springDuration: pressAnimDuration) {
             thumbView.backgroundColor = thumbSelectedColor
-            
-            contentView.transform = CGAffineTransform(
-                scaleX: pressScaleFactor,
-                y: pressScaleFactor)
+            isExpanded = true
+            layoutIfNeeded()
         }
     }
     
     private func showEndPress() {
         UIView.animate(springDuration: pressAnimDuration) {
             thumbView.backgroundColor = thumbNormalColor
-            contentView.transform = .identity
+            isExpanded = false
+            layoutIfNeeded()
         }
     }
     

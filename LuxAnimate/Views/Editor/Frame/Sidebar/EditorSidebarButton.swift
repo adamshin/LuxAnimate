@@ -6,7 +6,7 @@ import UIKit
 
 private let size: CGFloat = 44
 private let hPadding: CGFloat = 12
-private let vPadding: CGFloat = 4
+private let vPadding: CGFloat = 6
 
 class EditorSidebarButton: UIView {
     
