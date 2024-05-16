@@ -50,6 +50,7 @@
 		66211EB22BF3FE40005490C4 /* EditorSidebarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66211EB12BF3FE40005490C4 /* EditorSidebarButton.swift */; };
 		66211EB52BF549E1005490C4 /* EditorFrameDrawingEditorVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66211EB42BF549E1005490C4 /* EditorFrameDrawingEditorVC.swift */; };
 		66211EB82BF54F63005490C4 /* EditorFrameEditorScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66211EB72BF54F63005490C4 /* EditorFrameEditorScene.swift */; };
+		66211EBA2BF6138F005490C4 /* ProjectEditorWorkQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66211EB92BF6138F005490C4 /* ProjectEditorWorkQueue.swift */; };
 		662232562BE062A900C8813F /* EditorFrameVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662232552BE062A900C8813F /* EditorFrameVC.swift */; };
 		6622325B2BE0750300C8813F /* EditorCollapsibleContentVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6622325A2BE0750300C8813F /* EditorCollapsibleContentVC.swift */; };
 		662232682BE07FA500C8813F /* EditorTimelineVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662232662BE07D6500C8813F /* EditorTimelineVC.swift */; };
@@ -166,6 +167,7 @@
 		66211EB12BF3FE40005490C4 /* EditorSidebarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorSidebarButton.swift; sourceTree = "<group>"; };
 		66211EB42BF549E1005490C4 /* EditorFrameDrawingEditorVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorFrameDrawingEditorVC.swift; sourceTree = "<group>"; };
 		66211EB72BF54F63005490C4 /* EditorFrameEditorScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorFrameEditorScene.swift; sourceTree = "<group>"; };
+		66211EB92BF6138F005490C4 /* ProjectEditorWorkQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectEditorWorkQueue.swift; sourceTree = "<group>"; };
 		662232552BE062A900C8813F /* EditorFrameVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorFrameVC.swift; sourceTree = "<group>"; };
 		6622325A2BE0750300C8813F /* EditorCollapsibleContentVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorCollapsibleContentVC.swift; sourceTree = "<group>"; };
 		662232602BE07D6500C8813F /* TimelineToolbarVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineToolbarVC.swift; sourceTree = "<group>"; };
@@ -790,9 +792,10 @@
 		66D084902BA5702C00EB8556 /* Project */ = {
 			isa = PBXGroup;
 			children = (
+				66211EAF2BF31A49005490C4 /* ProjectHelper.swift */,
 				660CD12F2BA92FF500C8C7B5 /* ProjectEditSession.swift */,
 				66311CD72BD73B3700D53489 /* ProjectEditor.swift */,
-				66211EAF2BF31A49005490C4 /* ProjectHelper.swift */,
+				66211EB92BF6138F005490C4 /* ProjectEditorWorkQueue.swift */,
 			);
 			path = Project;
 			sourceTree = "<group>";
@@ -902,6 +905,7 @@
 				66099BBD2BDB32F500243D9F /* BrushStrokeInputInterpolationProcessor.swift in Sources */,
 				66211E922BEF24A5005490C4 /* TimelineToolbarFrameWidgetScrubberVC.swift in Sources */,
 				664B593F2BC5A9AA003FA90E /* AppConfig.swift in Sources */,
+				66211EBA2BF6138F005490C4 /* ProjectEditorWorkQueue.swift in Sources */,
 				6662D89D2BBDF46F00B4C1D4 /* Geometry+UIKit.swift in Sources */,
 				66211E942BEF2A13005490C4 /* TimelineToolbarFrameWidgetScrubberCell.swift in Sources */,
 				66AD3A8A2BEC46BD002B294A /* EditorSidebarSliderContainer.swift in Sources */,
