@@ -19,6 +19,7 @@ class ProjectEditorWorkQueue {
         task: @escaping () -> Void
     ) {
         queueSemaphore.wait()
+        
         queue.async {
             task()
             self.queueSemaphore.signal()

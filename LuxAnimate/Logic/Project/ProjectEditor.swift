@@ -110,8 +110,8 @@ extension ProjectEditor {
         drawingID: String,
         texture: MTLTexture
     ) throws {
-        // TODO: Do this asynchronously
-        queue.enqueueSync {
+        
+        queue.enqueue {
             do {
                 let createdAssets = try self.createDrawingAssets(
                     texture: texture)
@@ -141,10 +141,12 @@ extension ProjectEditor {
                     newProjectManifest: projectManifest,
                     newAssets: createdAssets.newAssets)
                 
+                DispatchQueue.main.async {
+                    self.delegate?.onEditProject(self)
+                }
+                
             } catch { }
         }
-        
-        delegate?.onEditProject(self)
     }
     
     // MARK: - Delete Drawing

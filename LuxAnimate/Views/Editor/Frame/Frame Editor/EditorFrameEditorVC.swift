@@ -116,9 +116,6 @@ class EditorFrameEditorVC: UIViewController {
     // MARK: - Frame Data
     
     private func updateFrameData() {
-        drawingEditorVC.endEditing()
-        drawingEditorVC.clearDrawing()
-        
         guard let projectManifest else { return }
         
         // Generate scene
@@ -131,7 +128,21 @@ class EditorFrameEditorVC: UIViewController {
             onionSkinPrevCount: onionSkinCount,
             onionSkinNextCount: onionSkinCount)
         
+        // TESTING
+        // We need to check if the current update was
+        // triggered by a drawing edit. If so, don't reload
+        // assets and don't interrupt drawing. This is an
+        // overly sensitive test that will also block
+        // undo/redo.
+        if scene.activeDrawingID == self.scene?.activeDrawingID {
+            return
+        }
+        
         self.scene = scene
+        
+        // Clear drawing editor
+        drawingEditorVC.endEditing()
+        drawingEditorVC.clearDrawing()
         
         // Load assets
         assetLoader.loadAssets(
