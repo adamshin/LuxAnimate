@@ -41,14 +41,6 @@ struct EditorModelGenerator {
             frames[drawing.frameIndex] = frame
         }
         
-        // Propagate thumbnails forward
-        for index in frames.indices.dropFirst() {
-            if !frames[index].hasDrawing {
-                let thumbnailURL = frames[index - 1].thumbnailURL
-                frames[index].thumbnailURL = thumbnailURL
-            }
-        }
-        
         return EditorModel(
             framesPerSecond: framesPerSecond,
             frames: frames)

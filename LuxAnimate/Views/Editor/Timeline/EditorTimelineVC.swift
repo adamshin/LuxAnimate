@@ -185,9 +185,7 @@ extension EditorTimelineVC: TimelineTrackVCDelegate {
     
     func onSelectFocusedFrame(_ vc: TimelineTrackVC, index: Int) {
         let frame = model.frames[index]
-        if frame.hasDrawing {
-            showFrameMenu(frameIndex: index)
-        } else {
+        if !frame.hasDrawing {
             delegate?.onRequestCreateDrawing(self,
                 frameIndex: index)
         }

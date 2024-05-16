@@ -8,7 +8,7 @@ private let cellCornerRadius: CGFloat = 8
 private let cellBorderColor = UIColor(white: 1, alpha: 0.1)
 
 private let canvasBackgroundColor: UIColor = .white
-private let noDrawingImageAlpha: CGFloat = 0.15
+private let noDrawingImageAlpha: CGFloat = 0.2
 
 private let longPressDuration: TimeInterval = 0.5
 
