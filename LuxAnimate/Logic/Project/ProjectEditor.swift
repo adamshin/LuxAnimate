@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import Metal
 
 protocol ProjectEditorDelegate: AnyObject {
     
@@ -38,13 +39,11 @@ extension ProjectEditor {
     
     func createDrawing(
         frameIndex: Int,
-        imageData: Data,
-        imageSize: PixelSize
+        texture: MTLTexture
     ) throws {
         
         let createdAssets = try createDrawingAssets(
-            imageData: imageData,
-            imageSize: imageSize)
+            texture: texture)
         
         let drawing = Project.Drawing(
             id: UUID().uuidString,
@@ -80,10 +79,15 @@ extension ProjectEditor {
         let imageSize = projectManifest.content.animationLayer.size
         let imageData = Self.emptyImageData(size: imageSize)
         
+        let texture = try TextureCreator.createTexture(
+            imageData: imageData,
+            width: imageSize.width,
+            height: imageSize.height,
+            mipMapped: false)
+        
         try createDrawing(
             frameIndex: frameIndex,
-            imageData: imageData,
-            imageSize: imageSize)
+            texture: texture)
     }
     
     private static func emptyImageData(
@@ -97,13 +101,11 @@ extension ProjectEditor {
     
     func editDrawing(
         drawingID: String,
-        imageData: Data,
-        imageSize: PixelSize
+        texture: MTLTexture
     ) throws {
         
         let createdAssets = try createDrawingAssets(
-            imageData: imageData,
-            imageSize: imageSize)
+            texture: texture)
         
         var projectManifest = editSession.currentProjectManifest
         
@@ -233,14 +235,20 @@ extension ProjectEditor {
     }
     
     private func createDrawingAssets(
-        imageData: Data,
-        imageSize: PixelSize
+        texture: MTLTexture
     ) throws -> CreatedDrawingAssets {
         
-        let imageAspectRatio =
-            Double(imageSize.width) /
-            Double(imageSize.height)
+        let imageWidth = texture.width
+        let imageHeight = texture.height
         
+        let imageAspectRatio =
+            Double(imageWidth) /
+            Double(imageHeight)
+        
+        // Read full data
+        let imageData = try TextureDataReader.read(texture)
+        
+        // Resize images
         let mediumImageSize = PixelSize(
             fitting: PixelSize(
                 width: AppConfig.assetPreviewMediumSize,
@@ -253,18 +261,13 @@ extension ProjectEditor {
                 height: AppConfig.assetPreviewSmallSize),
             aspectRatio: imageAspectRatio)
         
-        // Resize images
         let mediumImageData = try imageResizer.resize(
-            imageData: imageData,
-            width: imageSize.width,
-            height: imageSize.height,
+            imageTexture: texture,
             targetWidth: mediumImageSize.width,
             targetHeight: mediumImageSize.height)
         
         let smallImageData = try imageResizer.resize(
-            imageData: imageData,
-            width: imageSize.width,
-            height: imageSize.height,
+            imageTexture: texture,
             targetWidth: smallImageSize.width,
             targetHeight: smallImageSize.height)
         
@@ -272,8 +275,8 @@ extension ProjectEditor {
         let fullEncodedData = try! JXLEncoder.encode(
             input: .init(
                 data: imageData,
-                width: imageSize.width,
-                height: imageSize.height),
+                width: imageWidth,
+                height: imageHeight),
             lossless: true,
             quality: 100,
             effort: 1)

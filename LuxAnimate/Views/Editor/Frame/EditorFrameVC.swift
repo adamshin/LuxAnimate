@@ -14,8 +14,7 @@ protocol EditorFrameVCDelegate: AnyObject {
     func onEditDrawing(
         _ vc: EditorFrameVC,
         drawingID: String,
-        imageData: Data,
-        imageSize: PixelSize)
+        texture: MTLTexture)
     
 }
 
@@ -131,14 +130,12 @@ extension EditorFrameVC: EditorFrameEditorVCDelegate {
     func onEditDrawing(
         _ vc: EditorFrameEditorVC,
         drawingID: String,
-        imageData: Data,
-        imageSize: PixelSize
+        texture: MTLTexture
     ) {
         delegate?.onEditDrawing(
             self,
             drawingID: drawingID,
-            imageData: imageData,
-            imageSize: imageSize)
+            texture: texture)
     }
     
 }

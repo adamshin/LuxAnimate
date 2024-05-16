@@ -31,7 +31,6 @@ enum Project {
     // MARK: - Content
     
     struct Content: Codable {
-        // TODO: Multiple animation layers, scenes, etc
         var animationLayer: AnimationLayer
     }
     

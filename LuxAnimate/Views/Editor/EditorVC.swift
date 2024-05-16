@@ -182,13 +182,11 @@ extension EditorVC: EditorFrameVCDelegate {
     func onEditDrawing(
         _ vc: EditorFrameVC,
         drawingID: String,
-        imageData: Data,
-        imageSize: PixelSize
+        texture: MTLTexture
     ) {
         try? editor.editDrawing(
             drawingID: drawingID,
-            imageData: imageData,
-            imageSize: imageSize)
+            texture: texture)
     }
     
 }

@@ -34,8 +34,7 @@ protocol EditorFrameDrawingEditorVCDelegate: AnyObject {
     
     func onEditDrawing(
         _ vc: EditorFrameDrawingEditorVC,
-        imageData: Data,
-        imageSize: PixelSize)
+        texture: MTLTexture)
     
 }
 
@@ -161,17 +160,8 @@ extension EditorFrameDrawingEditorVC: BrushEngineDelegate {
     }
     
     func onFinalizeStroke(_ engine: BrushEngine) {
-        do {
-            let imageData = try TextureDataReader
-                .read(brushEngine.canvasTexture)
-            
-            let imageSize = brushEngine.canvasSize
-            
             delegate?.onEditDrawing(self,
-                imageData: imageData,
-                imageSize: imageSize)
-            
-        } catch { }
+                texture: brushEngine.canvasTexture)
     }
     
 }

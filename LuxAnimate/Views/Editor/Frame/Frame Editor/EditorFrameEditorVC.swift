@@ -23,8 +23,7 @@ protocol EditorFrameEditorVCDelegate: AnyObject {
     func onEditDrawing(
         _ vc: EditorFrameEditorVC,
         drawingID: String,
-        imageData: Data,
-        imageSize: PixelSize)
+        texture: MTLTexture)
     
 }
 
@@ -236,24 +235,18 @@ extension EditorFrameEditorVC: EditorFrameDrawingEditorVCDelegate {
     
     func onEditDrawing(
         _ vc: EditorFrameDrawingEditorVC,
-        imageData: Data,
-        imageSize: PixelSize
+        texture: MTLTexture
     ) {
         guard let activeDrawingID = scene?.activeDrawingID
         else { return }
         
-        // TODO: This will trigger a reload of the full active drawing
-        // texture, which is unnecessary. We need to figure out how to
-        // avoid reloading.
-        
-        // We could have a flag that blocks the asset loader from
-        // reloading an asset for a given drawing. It would be set
-        // before we call onEditDrawing, and unset right after.
+        assetLoader.preCacheFullTexture(
+            texture: texture,
+            drawingID: activeDrawingID)
         
         delegate?.onEditDrawing(self,
             drawingID: activeDrawingID,
-            imageData: imageData,
-            imageSize: imageSize)
+            texture: texture)
     }
     
 }

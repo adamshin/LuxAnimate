@@ -37,6 +37,8 @@ class EditorFrameAssetLoader {
     private var pendingLoadItems: [LoadItem] = []
     private var loadedAssets: [String: LoadedAsset] = [:]
     
+    private var preCachedFullTextures: [String: MTLTexture] = [:]
+    
     private let fileUrlHelper = FileUrlHelper()
     private let textureCopier = TextureCopier()
     
@@ -72,17 +74,26 @@ class EditorFrameAssetLoader {
         
         drawingIDsToLoad = Set(allDrawings.map { $0.id })
         
-        // Roll over any already-loaded assets that we can reuse
+        // Roll over any precached or already-loaded
+        // assets that we can reuse
         let oldLoadedAssets = loadedAssets
         loadedAssets = [:]
         
         for drawing in allDrawings {
-            if let existingAsset = oldLoadedAssets[drawing.id],
+            if let texture = preCachedFullTextures[drawing.id] {
+                loadedAssets[drawing.id] = LoadedAsset(
+                    fullAssetID: drawing.assetIDs.full,
+                    quality: .full,
+                    texture: texture)
+                
+            } else if let existingAsset = oldLoadedAssets[drawing.id],
                 existingAsset.fullAssetID == drawing.assetIDs.full
             {
                 loadedAssets[drawing.id] = existingAsset
             }
         }
+        
+        preCachedFullTextures = [:]
         
         // Create load items
         var loadItems: [LoadItem] = []
@@ -217,18 +228,13 @@ class EditorFrameAssetLoader {
         }
     }
     
-    func cacheFullTexture(
+    func preCacheFullTexture(
         texture: MTLTexture,
-        drawingID: String,
-        fullAssetID: String
+        drawingID: String
     ) {
         do {
             let newTexture = try textureCopier.copy(texture)
-            
-            loadedAssets[drawingID] = LoadedAsset(
-                fullAssetID: fullAssetID,
-                quality: .full,
-                texture: newTexture)
+            preCachedFullTextures[drawingID] = newTexture
             
         } catch { }
     }
