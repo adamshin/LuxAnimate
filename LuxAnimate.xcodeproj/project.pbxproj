@@ -779,8 +779,8 @@
 		66D0848D2BA56E7800EB8556 /* Editor */ = {
 			isa = PBXGroup;
 			children = (
-				662232542BE0629F00C8813F /* Frame */,
 				662232582BE074B200C8813F /* Timeline */,
+				662232542BE0629F00C8813F /* Frame */,
 				66E523512BD341A500794751 /* EditorVC.swift */,
 				66AD3A872BEC34CD002B294A /* EditorPlaybackController.swift */,
 				6643CB0F2BE6CE120094B998 /* EditorModel.swift */,

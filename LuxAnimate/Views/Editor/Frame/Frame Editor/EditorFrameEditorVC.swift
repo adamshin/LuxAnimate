@@ -118,10 +118,8 @@ class EditorFrameEditorVC: UIViewController {
     private func updateFrameData() {
         guard let projectManifest else { return }
         
-        guard !drawingEditorVC.hasActiveEdit else {
-            print("Blocking update due to active edit")
-            return
-        }
+        guard !drawingEditorVC.hasActiveEdit
+        else { return }
         
         // Generate scene
         let onionSkinCount = isOnionSkinOn ?
@@ -139,7 +137,6 @@ class EditorFrameEditorVC: UIViewController {
         self.scene = scene
         
 //        if didChangeActiveDrawing {
-            print("Clearing drawing")
             drawingEditorVC.clearDrawing()
 //        }
         
@@ -195,13 +192,9 @@ class EditorFrameEditorVC: UIViewController {
         setEditingEnabled(!playing)
     }
     
-    func onBeginFrameScroll() {
-        setEditingEnabled(false)
-    }
+    func onBeginFrameScroll() { }
     
-    func onEndFrameScroll() {
-        setEditingEnabled(true)
-    }
+    func onEndFrameScroll() { }
     
     func setSafeAreaReferenceView(_ view: UIView) {
         canvasVC.setSafeAreaReferenceView(view)

@@ -83,16 +83,9 @@ class EditorFrameDrawingEditorVC: UIViewController {
     }
     
     func setDrawingTextureIfNeeded(_ texture: MTLTexture) {
-        guard !isDrawingSet else {
-            print("Not setting drawing texture - already set")
-            return
-        }
-        guard !hasActiveBrushStroke else {
-            print("Not setting drawing texture - active brush stroke")
-            return
-        }
+        guard !isDrawingSet else { return }
+        guard !hasActiveBrushStroke else { return }
         
-        print("Setting drawing!!!")
         isDrawingSet = true
         brushEngine.endStroke()
         brushEngine.setCanvasContents(texture)
@@ -103,6 +96,7 @@ class EditorFrameDrawingEditorVC: UIViewController {
     }
     
     func endActiveEdit() {
+        brushGesture.reset()
         brushEngine.endStroke()
         hasActiveBrushStroke = false
     }
