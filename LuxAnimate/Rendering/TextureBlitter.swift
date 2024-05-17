@@ -12,7 +12,8 @@ struct TextureBlitter {
     
     static func blit(
         from src: MTLTexture,
-        to dst: MTLTexture
+        to dst: MTLTexture,
+        waitUntilCompleted: Bool = false
     ) throws {
         
         guard src.width == dst.width,
@@ -27,6 +28,10 @@ struct TextureBlitter {
         blitEncoder.endEncoding()
         
         commandBuffer.commit()
+        
+        if waitUntilCompleted {
+            commandBuffer.waitUntilCompleted()
+        }
     }
     
 }

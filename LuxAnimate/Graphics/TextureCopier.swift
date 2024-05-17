@@ -30,7 +30,8 @@ struct TextureCopier {
         
         try TextureBlitter.blit(
             from: texture,
-            to: newTexture)
+            to: newTexture,
+            waitUntilCompleted: true)
         
         return newTexture
     }
