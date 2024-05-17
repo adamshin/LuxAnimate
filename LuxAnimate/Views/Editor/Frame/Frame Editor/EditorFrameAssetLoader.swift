@@ -40,7 +40,6 @@ class EditorFrameAssetLoader {
     private var preCachedFullTextures: [String: MTLTexture] = [:]
     
     private let fileUrlHelper = FileUrlHelper()
-    private let textureCopier = TextureCopier()
     
     private let loadQueue = DispatchQueue(
         label: "EditorFrameAssetLoader.loadQueue",
@@ -233,7 +232,7 @@ class EditorFrameAssetLoader {
         drawingID: String
     ) {
         do {
-            let newTexture = try textureCopier.copy(texture)
+            let newTexture = try TextureCopier.copy(texture)
             preCachedFullTextures[drawingID] = newTexture
             
         } catch { }

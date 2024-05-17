@@ -45,11 +45,13 @@ class EditorFrameDrawingEditorVC: UIViewController {
     private let brushGesture = BrushGestureRecognizer()
     
     private let brushEngine: BrushEngine
-    private var brushMode: BrushEngine.BrushMode = .brush
     private let brush = try! Brush(configuration: brushConfig)
     
-    private(set) var isDrawingSet = false
+    private var isDrawingSet = false
+    
     private var isEditingEnabled = true
+    private var hasActiveBrushStroke = false
+    private var brushMode: BrushEngine.BrushMode = .brush
     
     // MARK: - Init
     
@@ -80,7 +82,17 @@ class EditorFrameDrawingEditorVC: UIViewController {
         isDrawingSet = false
     }
     
-    func setDrawingTexture(_ texture: MTLTexture) {
+    func setDrawingTextureIfNeeded(_ texture: MTLTexture) {
+        guard !isDrawingSet else {
+            print("Not setting drawing texture - already set")
+            return
+        }
+        guard !hasActiveBrushStroke else {
+            print("Not setting drawing texture - active brush stroke")
+            return
+        }
+        
+        print("Setting drawing!!!")
         isDrawingSet = true
         brushEngine.endStroke()
         brushEngine.setCanvasContents(texture)
@@ -90,8 +102,9 @@ class EditorFrameDrawingEditorVC: UIViewController {
         brushEngine.onFrame()
     }
     
-    func endEditing() {
+    func endActiveEdit() {
         brushEngine.endStroke()
+        hasActiveBrushStroke = false
     }
     
     func setEditingEnabled(_ enabled: Bool) {
@@ -99,8 +112,12 @@ class EditorFrameDrawingEditorVC: UIViewController {
         brushGesture.isEnabled = enabled
     }
     
-    var drawingTexture: MTLTexture {
-        brushEngine.canvasTexture
+    var hasActiveEdit: Bool {
+        hasActiveBrushStroke
+    }
+    
+    var drawingTexture: MTLTexture? {
+        isDrawingSet ? brushEngine.canvasTexture : nil
     }
     
 }
@@ -112,6 +129,8 @@ extension EditorFrameDrawingEditorVC: BrushGestureRecognizerGestureDelegate {
     func onBeginBrushStroke(quickTap: Bool) {
         guard isEditingEnabled, isDrawingSet
         else { return }
+        
+        hasActiveBrushStroke = true
         
         let scale = delegate?.brushScale(self) ?? 0
         let smoothing = delegate?.brushSmoothing(self) ?? 0
@@ -142,6 +161,7 @@ extension EditorFrameDrawingEditorVC: BrushGestureRecognizerGestureDelegate {
         else { return }
         
         brushEngine.endStroke()
+        hasActiveBrushStroke = false
     }
     
     func onCancelBrushStroke() {
@@ -149,6 +169,7 @@ extension EditorFrameDrawingEditorVC: BrushGestureRecognizerGestureDelegate {
         else { return }
         
         brushEngine.cancelStroke()
+        hasActiveBrushStroke = false
     }
     
 }
@@ -160,8 +181,14 @@ extension EditorFrameDrawingEditorVC: BrushEngineDelegate {
     }
     
     func onFinalizeStroke(_ engine: BrushEngine) {
+        do {
+            let texture = try TextureCopier
+                .copy(brushEngine.canvasTexture)
+            
             delegate?.onEditDrawing(self,
-                texture: brushEngine.canvasTexture)
+                texture: texture)
+            
+        } catch { }
     }
     
 }

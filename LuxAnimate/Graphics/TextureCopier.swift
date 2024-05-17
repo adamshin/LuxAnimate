@@ -6,13 +6,11 @@ import Metal
 
 struct TextureCopier {
     
-    private let textureBlitter = TextureBlitter()
-    
     enum Error: Swift.Error {
         case unknown
     }
     
-    func copy(
+    static func copy(
         _ texture: MTLTexture,
         usage: MTLTextureUsage = .shaderRead
     ) throws -> MTLTexture {
@@ -30,7 +28,7 @@ struct TextureCopier {
         let newTexture = MetalInterface.shared.device
             .makeTexture(descriptor: desc)!
         
-        try textureBlitter.blit(
+        try TextureBlitter.blit(
             from: texture,
             to: newTexture)
         

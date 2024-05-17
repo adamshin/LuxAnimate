@@ -118,6 +118,11 @@ class EditorFrameEditorVC: UIViewController {
     private func updateFrameData() {
         guard let projectManifest else { return }
         
+        guard !drawingEditorVC.hasActiveEdit else {
+            print("Blocking update due to active edit")
+            return
+        }
+        
         // Generate scene
         let onionSkinCount = isOnionSkinOn ?
             onionSkinCount : 0
@@ -128,23 +133,16 @@ class EditorFrameEditorVC: UIViewController {
             onionSkinPrevCount: onionSkinCount,
             onionSkinNextCount: onionSkinCount)
         
-        // TESTING
-        // We need to check if the current update was
-        // triggered by a drawing edit. If so, don't reload
-        // assets and don't interrupt drawing. This is an
-        // overly sensitive test that will also block
-        // undo/redo.
-        if scene.activeDrawingID == self.scene?.activeDrawingID {
-            return
-        }
+//        let didChangeActiveDrawing =
+//            self.scene?.activeDrawingID != scene.activeDrawingID
         
         self.scene = scene
         
-        // Clear drawing editor
-        drawingEditorVC.endEditing()
-        drawingEditorVC.clearDrawing()
+//        if didChangeActiveDrawing {
+            print("Clearing drawing")
+            drawingEditorVC.clearDrawing()
+//        }
         
-        // Load assets
         assetLoader.loadAssets(
             drawings: scene.allDrawings,
             activeDrawingID: scene.activeDrawingID)
@@ -180,12 +178,16 @@ class EditorFrameEditorVC: UIViewController {
     func setFocusedFrameIndex(_ index: Int) {
         guard focusedFrameIndex != index else { return }
         focusedFrameIndex = index
+        
+        drawingEditorVC.endActiveEdit()
         updateFrameData()
     }
     
     func setOnionSkinOn(_ on: Bool) {
         guard isOnionSkinOn != on else { return }
         isOnionSkinOn = on
+        
+        drawingEditorVC.endActiveEdit()
         updateFrameData()
     }
     
@@ -270,11 +272,10 @@ extension EditorFrameEditorVC: EditorFrameAssetLoaderDelegate {
         guard let activeDrawingID = scene?.activeDrawingID
         else { return }
         
-        if !drawingEditorVC.isDrawingSet,
-           let asset = assetLoader.asset(for: activeDrawingID),
+        if let asset = assetLoader.asset(for: activeDrawingID),
            asset.quality == .full
         {
-            drawingEditorVC.setDrawingTexture(asset.texture)
+            drawingEditorVC.setDrawingTextureIfNeeded(asset.texture)
         }
         
         if loader.hasAssetsForAllDrawings() {
@@ -293,8 +294,8 @@ extension EditorFrameEditorVC: EditorFrameActiveDrawingRendererDelegate {
         guard let activeDrawingID = scene?.activeDrawingID
         else { return nil }
         
-        if drawingEditorVC.isDrawingSet {
-            return drawingEditorVC.drawingTexture
+        if let texture = drawingEditorVC.drawingTexture {
+            return texture
         } else {
             let asset = assetLoader.asset(for: activeDrawingID)
             return asset?.texture

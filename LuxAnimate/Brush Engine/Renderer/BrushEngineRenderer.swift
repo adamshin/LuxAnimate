@@ -9,7 +9,6 @@ class BrushEngineRenderer {
     private let canvasSize: PixelSize
     
     private let stampRenderer = BrushEngineStampRenderer()
-    private let textureBlitter = TextureBlitter()
     
     private let originalCanvasTexture: MTLTexture
     private let partialStrokeCanvasTexture: MTLTexture
@@ -43,15 +42,15 @@ class BrushEngineRenderer {
     
     func setCanvasContents(_ texture: MTLTexture) {
         do {
-            try textureBlitter.blit(
+            try TextureBlitter.blit(
                 from: texture,
                 to: originalCanvasTexture)
             
-            try textureBlitter.blit(
+            try TextureBlitter.blit(
                 from: texture,
                 to: partialStrokeCanvasTexture)
             
-            try textureBlitter.blit(
+            try TextureBlitter.blit(
                 from: texture,
                 to: fullStrokeCanvasTexture)
             
@@ -85,7 +84,7 @@ class BrushEngineRenderer {
             color: stroke.color,
             erase: erase)
         
-        try? textureBlitter.blit(
+        try? TextureBlitter.blit(
             from: partialStrokeCanvasTexture,
             to: fullStrokeCanvasTexture)
         
@@ -106,11 +105,11 @@ class BrushEngineRenderer {
     func finalizeStroke() {
         drawnFinalizedStampCount = 0
         
-        try? textureBlitter.blit(
+        try? TextureBlitter.blit(
             from: fullStrokeCanvasTexture,
             to: originalCanvasTexture)
         
-        try? textureBlitter.blit(
+        try? TextureBlitter.blit(
             from: fullStrokeCanvasTexture,
             to: partialStrokeCanvasTexture)
     }
@@ -118,11 +117,11 @@ class BrushEngineRenderer {
     func cancelStroke() {
         drawnFinalizedStampCount = 0
         
-        try? textureBlitter.blit(
+        try? TextureBlitter.blit(
             from: originalCanvasTexture,
             to: fullStrokeCanvasTexture)
         
-        try? textureBlitter.blit(
+        try? TextureBlitter.blit(
             from: originalCanvasTexture,
             to: partialStrokeCanvasTexture)
     }

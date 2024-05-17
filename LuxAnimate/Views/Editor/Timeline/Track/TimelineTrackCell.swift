@@ -17,7 +17,7 @@ private let buttonSelectAnimateOutDuration: CGFloat = 0.25
 private let buttonSelectAnimateAlpha: CGFloat = 0.75
 private let buttonSelectAnimateScale: CGFloat = (64 - 6) / 64
 
-private let plusIconColor = UIColor(white: 0.8, alpha: 1)
+private let plusIconColor = UIColor(white: 1, alpha: 0.75)
 
 private let plusIconAnimateScale: CGFloat = 0.3
 private let plusIconAnimateInDuration: CGFloat = 0.3

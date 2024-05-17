@@ -4,13 +4,13 @@
 
 import Metal
 
-class TextureBlitter {
+struct TextureBlitter {
     
     enum Error: Swift.Error {
         case differentTextureSizes
     }
     
-    func blit(
+    static func blit(
         from src: MTLTexture,
         to dst: MTLTexture
     ) throws {
