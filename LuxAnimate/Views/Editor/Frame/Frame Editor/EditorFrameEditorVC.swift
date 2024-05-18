@@ -143,6 +143,10 @@ class EditorFrameEditorVC: UIViewController {
         assetLoader.loadAssets(
             drawings: scene.allDrawings,
             activeDrawingID: scene.activeDrawingID)
+        
+        if assetLoader.hasAssetsForAllDrawings() {
+            needsDraw = true
+        }
     }
     
     // MARK: - Rendering
