@@ -26,13 +26,16 @@ struct BrushEngineStampRenderer {
         let stampsToDraw = stamps[startIndex ..< endIndex]
         
         let sprites = stampsToDraw.map { stamp in
+            let offsetPosition = stamp.position
+                + stamp.offset * stamp.size
+            
             let paddingScale: Double =
                 stamp.size < paddingSizeThreshold ?
                 3 : 1
             
             return SpriteRenderer.Sprite(
                 size: Size(stamp.size, stamp.size),
-                position: stamp.position,
+                position: offsetPosition,
                 rotation: stamp.rotation,
                 alpha: stamp.alpha,
                 paddingScale: paddingScale)

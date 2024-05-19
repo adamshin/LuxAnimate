@@ -9,7 +9,14 @@ private let minStampSize: Double = 1.0
 
 private let maxTaperTime: TimeInterval = 0.2
 
-private  let pressureSensitivity: Double = 1.5
+private let pressureSensitivity: Double = 1.5
+
+// Testing
+private let sizeJitterFrequency: Double = 0.1
+private let sizeJitterPersistence: Double = 0.5
+private let sizeJitterAmount: Double = 0.4
+
+private let offsetJitterAmount: Double = 0.1
 
 class BrushStrokeStampProcessor {
     
@@ -24,6 +31,10 @@ class BrushStrokeStampProcessor {
     private let scale: Double
     private let ignoreTaper: Bool
     
+    private let sizeJitterGenerator: PerlinNoiseGenerator
+    private let offsetXJitterGenerator: PerlinNoiseGenerator
+    private let offsetYJitterGenerator: PerlinNoiseGenerator
+    
     private var lastFinalizedState: State
     
     init(
@@ -35,6 +46,21 @@ class BrushStrokeStampProcessor {
         self.scale = scale
         self.ignoreTaper = ignoreTaper
         
+        sizeJitterGenerator = PerlinNoiseGenerator(
+            frequency: sizeJitterFrequency,
+            octaveCount: 2,
+            persistence: sizeJitterPersistence)
+        
+        offsetXJitterGenerator = PerlinNoiseGenerator(
+            frequency: sizeJitterFrequency,
+            octaveCount: 2,
+            persistence: sizeJitterPersistence)
+        
+        offsetYJitterGenerator = PerlinNoiseGenerator(
+            frequency: sizeJitterFrequency,
+            octaveCount: 2,
+            persistence: sizeJitterPersistence)
+        
         lastFinalizedState = State(
             stamps: [],
             segmentIndex: 0,
@@ -44,6 +70,9 @@ class BrushStrokeStampProcessor {
     func process(
         samples: [BrushStrokeEngine.Sample]
     ) -> [BrushStrokeEngine.Stamp] {
+        // TODO: Simplify this so we're not checking
+        // distance so much. Current implementation is
+        // too expensive.
         
         guard !samples.isEmpty else { return [] }
         
@@ -55,6 +84,7 @@ class BrushStrokeStampProcessor {
         
         if state.stamps.isEmpty {
             let firstStamp = stamp(
+                stampIndex: 0,
                 sample: firstSample,
                 endTimeOffset: endTimeOffset)
             
@@ -91,6 +121,7 @@ class BrushStrokeStampProcessor {
                     sample2: segmentEndSample)
                 
                 let stamp = stamp(
+                    stampIndex: state.stamps.count,
                     sample: interpolatedSample,
                     endTimeOffset: endTimeOffset)
                 
@@ -139,6 +170,7 @@ class BrushStrokeStampProcessor {
     }
     
     private func stamp(
+        stampIndex: Int,
         sample: BrushStrokeEngine.Sample,
         endTimeOffset: TimeInterval
     ) -> BrushStrokeEngine.Stamp {
@@ -159,9 +191,23 @@ class BrushStrokeStampProcessor {
             in: (0, 1),
             to: (minStampSize, brush.configuration.stampSize))
         
+        // TODO: calculate stamp distance properly
+        let stampDistance = Double(stampIndex) / scaledBrushSize
+        let sizeJitterNoise = sizeJitterGenerator
+            .value(at: stampDistance)
+        
+        let jitterIntensity = clamp(map(pressure, in: (0.5, 1), to: (1, 0.5)), min: 0, max: 1)
+        let jitterScale = 1 + sizeJitterAmount * sizeJitterNoise * jitterIntensity
+        
         let size = scaledBrushSize
             * pressureScale
             * taperScale
+            * jitterScale
+        
+        let offset = Vector(
+            offsetXJitterGenerator.value(at: stampDistance) * offsetJitterAmount * jitterIntensity,
+            offsetYJitterGenerator.value(at: stampDistance) * offsetJitterAmount * jitterIntensity)
+        
         let clampedSize = max(size, minStampSize)
         
         let rotation = Self.rotation(from: sample.azimuth)
@@ -172,6 +218,7 @@ class BrushStrokeStampProcessor {
         
         return BrushStrokeEngine.Stamp(
             size: clampedSize,
+            offset: offset,
             position: sample.position,
             rotation: rotation,
             alpha: alpha,

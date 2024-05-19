@@ -17,6 +17,7 @@ extension BrushStrokeEngine {
     
     struct Stamp {
         var size: Double
+        var offset: Vector
         var position: Vector
         var rotation: Double
         var alpha: Double

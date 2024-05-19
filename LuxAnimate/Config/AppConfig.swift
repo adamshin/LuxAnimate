@@ -15,4 +15,13 @@ struct AppConfig {
     
     static let brushRenderDebug = false
     
+    static let brushConfig = Brush.Configuration(
+        stampTextureName: "brush1.png",
+        stampSize: 50,
+        stampSpacing: 0.0,
+        stampAlpha: 1,
+        pressureScaling: 2.0,
+        taperLength: 0.1,
+        taperRoundness: 1.0)
+    
 }

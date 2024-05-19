@@ -8,15 +8,6 @@ import Metal
 // For now, this is just the brush tool.
 // We'll need to add other modes and overlays.
 
-private let brushConfig = Brush.Configuration(
-    stampTextureName: "brush1.png",
-    stampSize: 50,
-    stampSpacing: 0.0,
-    stampAlpha: 1,
-    pressureScaling: 2.0,
-    taperLength: 0.05,
-    taperRoundness: 1.0)
-
 private let brushColor: Color = .brushBlack
 
 protocol EditorFrameDrawingEditorVCDelegate: AnyObject {
@@ -45,7 +36,9 @@ class EditorFrameDrawingEditorVC: UIViewController {
     private let brushGesture = BrushGestureRecognizer()
     
     private let brushEngine: BrushEngine
-    private let brush = try! Brush(configuration: brushConfig)
+    
+    private let brush = try! Brush(
+        configuration: AppConfig.brushConfig)
     
     private var isDrawingSet = false
     
