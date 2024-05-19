@@ -5,7 +5,7 @@
 import Metal
 import MetalKit
 
-struct Brush {
+extension Brush {
     
     struct Configuration {
         var stampTextureName: String
@@ -23,29 +23,18 @@ struct Brush {
         case textureNotFound
     }
     
-    var stampSize: Double
-    var stampSpacing: Double
-    var stampAlpha: Double
+}
+
+struct Brush {
     
-    var pressureScaling: Double
-    
-    var taperLength: Double
-    var taperRoundness: Double
-    
+    var configuration: Configuration
     var stampTexture: MTLTexture
     
     init(
         configuration c: Configuration
     ) throws {
         
-        stampSize = c.stampSize
-        stampSpacing = c.stampSpacing
-        stampAlpha = c.stampAlpha
-        
-        pressureScaling = c.pressureScaling
-        
-        taperLength = c.taperLength
-        taperRoundness = c.taperRoundness
+        self.configuration = c
         
         guard let stampTextureURL = Bundle.main.url(
             forResource: c.stampTextureName,
@@ -63,7 +52,8 @@ struct Brush {
             options: [
                 .textureStorageMode: MTLStorageMode.private.rawValue,
                 .textureUsage: MTLTextureUsage.shaderRead.rawValue,
-                .generateMipmaps: true
+                .generateMipmaps: true,
+//                .SRGB: true,
             ])
     }
     

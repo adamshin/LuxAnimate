@@ -87,17 +87,19 @@ class BrushStrokeEngine {
     func process() {
         guard let inputStroke else { return }
         
-        let samples1 = inputInterpolationProcessor.process(
-            samples: inputStroke.samples)
+        var samples = inputStroke.samples
         
-        let samples2 = smoothingProcessor.process(
-            samples: samples1)
+        samples = inputInterpolationProcessor
+            .process(samples: samples)
         
-        let samples3 = pressureFilteringProcessor.process(
-            samples: samples2)
-
-        let stamps = stampProcessor.process(
-            samples: samples3)
+        samples = pressureFilteringProcessor
+            .process(samples: samples)
+        
+        samples = smoothingProcessor
+            .process(samples: samples)
+        
+        let stamps = stampProcessor
+            .process(samples: samples)
         
         outputStroke.stamps = stamps
     }

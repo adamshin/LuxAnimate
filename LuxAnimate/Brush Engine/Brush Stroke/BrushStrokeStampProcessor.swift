@@ -72,7 +72,7 @@ class BrushStrokeStampProcessor {
                     segmentEndSample.position - prevStamp.position
                 
                 let distanceThreshold = max(
-                    prevStamp.size * brush.stampSpacing,
+                    prevStamp.size * brush.configuration.stampSpacing,
                     minStampDistance)
                 
                 if prevStampToSegmentEnd.lengthSquared() <
@@ -147,7 +147,7 @@ class BrushStrokeStampProcessor {
             sample.pressure * pressureSensitivity,
             min: 0, max: 1)
         
-        let pressureScale = 1 + brush.pressureScaling * pressure
+        let pressureScale = 1 + brush.configuration.pressureScaling * pressure
         
         let (taperScale, isInTaperEnd) = combinedTaper(
             sampleTimeOffset: sample.timeOffset,
@@ -157,7 +157,7 @@ class BrushStrokeStampProcessor {
         let scaledBrushSize = map(
             scale,
             in: (0, 1),
-            to: (minStampSize, brush.stampSize))
+            to: (minStampSize, brush.configuration.stampSize))
         
         let size = scaledBrushSize
             * pressureScale
@@ -166,7 +166,7 @@ class BrushStrokeStampProcessor {
         
         let rotation = Self.rotation(from: sample.azimuth)
         
-        let alpha = brush.stampAlpha
+        let alpha = brush.configuration.stampAlpha
         
         let isFinalized = sample.isFinalized && !isInTaperEnd
         
@@ -199,7 +199,7 @@ class BrushStrokeStampProcessor {
             taperTime = 0
         } else {
             taperTime =
-                clamp(brush.taperLength, min: 0, max: 1)
+                clamp(brush.configuration.taperLength, min: 0, max: 1)
                 * maxTaperTime
         }
         
@@ -244,7 +244,7 @@ class BrushStrokeStampProcessor {
         let s1 = 1 - x * x
         let s2 = sqrt(s1)
         
-        let c2 = clamp(brush.taperRoundness, min: 0, max: 1)
+        let c2 = clamp(brush.configuration.taperRoundness, min: 0, max: 1)
         let c1 = 1 - c2
         
         return s1 * c1 + s2 * c2

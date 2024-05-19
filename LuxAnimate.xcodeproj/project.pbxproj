@@ -263,8 +263,8 @@
 			children = (
 				66099BAF2BDB32F500243D9F /* BrushStrokeEngine.swift */,
 				66099BB02BDB32F500243D9F /* BrushStrokeInputInterpolationProcessor.swift */,
-				66099BB22BDB32F500243D9F /* BrushStrokeSmoothingProcessor.swift */,
 				66099BB12BDB32F500243D9F /* BrushStrokePressureFilteringProcessor.swift */,
+				66099BB22BDB32F500243D9F /* BrushStrokeSmoothingProcessor.swift */,
 				66099BB42BDB32F500243D9F /* BrushStrokeStampProcessor.swift */,
 			);
 			path = "Brush Stroke";
