@@ -17,6 +17,11 @@ extension Brush {
         
         var taperLength: Double
         var taperRoundness: Double
+        
+        var sizeWobble: Double
+        var offsetWobble: Double
+        var wobbleFrequency: Double
+        var wobblePressureAttenuation: Double
     }
     
     enum LoadError: Error {
@@ -27,14 +32,14 @@ extension Brush {
 
 struct Brush {
     
-    var configuration: Configuration
+    var config: Configuration
     var stampTexture: MTLTexture
     
     init(
         configuration c: Configuration
     ) throws {
         
-        self.configuration = c
+        self.config = c
         
         guard let stampTextureURL = Bundle.main.url(
             forResource: c.stampTextureName,

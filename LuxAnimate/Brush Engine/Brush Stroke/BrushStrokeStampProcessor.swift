@@ -5,18 +5,14 @@
 import Foundation
 
 private let minStampDistance: Double = 1.0
-private let minStampSize: Double = 1.0
+private let minStampSize: Double = 0.5
 
 private let maxTaperTime: TimeInterval = 0.2
 
 private let pressureSensitivity: Double = 1.5
 
-// Testing
-private let sizeJitterFrequency: Double = 0.1
-private let sizeJitterPersistence: Double = 0.5
-private let sizeJitterAmount: Double = 0.4
-
-private let offsetJitterAmount: Double = 0.1
+private let wobbleOctaveCount = 2
+private let wobblePersistence: Double = 0.5
 
 class BrushStrokeStampProcessor {
     
@@ -31,9 +27,9 @@ class BrushStrokeStampProcessor {
     private let scale: Double
     private let ignoreTaper: Bool
     
-    private let sizeJitterGenerator: PerlinNoiseGenerator
-    private let offsetXJitterGenerator: PerlinNoiseGenerator
-    private let offsetYJitterGenerator: PerlinNoiseGenerator
+    private let sizeWobbleGenerator: PerlinNoiseGenerator
+    private let offsetXWobbleGenerator: PerlinNoiseGenerator
+    private let offsetYWobbleGenerator: PerlinNoiseGenerator
     
     private var lastFinalizedState: State
     
@@ -46,20 +42,20 @@ class BrushStrokeStampProcessor {
         self.scale = scale
         self.ignoreTaper = ignoreTaper
         
-        sizeJitterGenerator = PerlinNoiseGenerator(
-            frequency: sizeJitterFrequency,
-            octaveCount: 2,
-            persistence: sizeJitterPersistence)
+        sizeWobbleGenerator = PerlinNoiseGenerator(
+            frequency: brush.config.wobbleFrequency,
+            octaveCount: wobbleOctaveCount,
+            persistence: wobblePersistence)
         
-        offsetXJitterGenerator = PerlinNoiseGenerator(
-            frequency: sizeJitterFrequency,
-            octaveCount: 2,
-            persistence: sizeJitterPersistence)
+        offsetXWobbleGenerator = PerlinNoiseGenerator(
+            frequency: brush.config.wobbleFrequency,
+            octaveCount: wobbleOctaveCount,
+            persistence: wobblePersistence)
         
-        offsetYJitterGenerator = PerlinNoiseGenerator(
-            frequency: sizeJitterFrequency,
-            octaveCount: 2,
-            persistence: sizeJitterPersistence)
+        offsetYWobbleGenerator = PerlinNoiseGenerator(
+            frequency: brush.config.wobbleFrequency,
+            octaveCount: wobbleOctaveCount,
+            persistence: wobblePersistence)
         
         lastFinalizedState = State(
             stamps: [],
@@ -84,7 +80,7 @@ class BrushStrokeStampProcessor {
         
         if state.stamps.isEmpty {
             let firstStamp = stamp(
-                stampIndex: 0,
+                strokeDistance: 0,
                 sample: firstSample,
                 endTimeOffset: endTimeOffset)
             
@@ -102,18 +98,16 @@ class BrushStrokeStampProcessor {
                     segmentEndSample.position - prevStamp.position
                 
                 let distanceThreshold = max(
-                    prevStamp.size * brush.configuration.stampSpacing,
+                    prevStamp.size * brush.config.stampSpacing,
                     minStampDistance)
                 
                 if prevStampToSegmentEnd.lengthSquared() <
                     distanceThreshold * distanceThreshold
-                {
-                    break
-                }
+                { break }
                 
-                let stampPosition =
-                    prevStamp.position +
-                    prevStampToSegmentEnd.normalized() * distanceThreshold
+                let stampDelta = prevStampToSegmentEnd.normalized() * distanceThreshold
+                let stampPosition = prevStamp.position + stampDelta
+                let strokeDistance = prevStamp.strokeDistance + stampDelta.length()
                 
                 let interpolatedSample = Self.interpolatedSample(
                     position: stampPosition,
@@ -121,7 +115,7 @@ class BrushStrokeStampProcessor {
                     sample2: segmentEndSample)
                 
                 let stamp = stamp(
-                    stampIndex: state.stamps.count,
+                    strokeDistance: strokeDistance,
                     sample: interpolatedSample,
                     endTimeOffset: endTimeOffset)
                 
@@ -170,58 +164,72 @@ class BrushStrokeStampProcessor {
     }
     
     private func stamp(
-        stampIndex: Int,
+        strokeDistance: Double,
         sample: BrushStrokeEngine.Sample,
         endTimeOffset: TimeInterval
     ) -> BrushStrokeEngine.Stamp {
+        
+        let scaledBrushSize = map(
+            scale,
+            in: (0, 1),
+            to: (minStampSize, brush.config.stampSize))
         
         let pressure = clamp(
             sample.pressure * pressureSensitivity,
             min: 0, max: 1)
         
-        let pressureScale = 1 + brush.configuration.pressureScaling * pressure
+        let pressureScale = 1
+            + brush.config.pressureScaling
+            * 2 * (pressure - 0.5)
         
         let (taperScale, isInTaperEnd) = combinedTaper(
             sampleTimeOffset: sample.timeOffset,
             endTimeOffset: endTimeOffset)
         
-        // TODO: Allow brushes to control minimum size more explicitly?
-        let scaledBrushSize = map(
-            scale,
-            in: (0, 1),
-            to: (minStampSize, brush.configuration.stampSize))
+        let wobbleDistance = strokeDistance / scaledBrushSize
+        let wobbleIntensity = 1
+            - brush.config.wobblePressureAttenuation
+            * pow(pressure, 3)
         
-        // TODO: calculate stamp distance properly
-        let stampDistance = Double(stampIndex) / scaledBrushSize
-        let sizeJitterNoise = sizeJitterGenerator
-            .value(at: stampDistance)
-        
-        let jitterIntensity = clamp(map(pressure, in: (0.5, 1), to: (1, 0.5)), min: 0, max: 1)
-        let jitterScale = 1 + sizeJitterAmount * sizeJitterNoise * jitterIntensity
+        let sizeWobbleValue = sizeWobbleGenerator
+            .value(at: wobbleDistance)
+        let wobbleScale = 1 
+            + brush.config.sizeWobble
+            * sizeWobbleValue
+            * wobbleIntensity
         
         let size = scaledBrushSize
             * pressureScale
             * taperScale
-            * jitterScale
-        
-        let offset = Vector(
-            offsetXJitterGenerator.value(at: stampDistance) * offsetJitterAmount * jitterIntensity,
-            offsetYJitterGenerator.value(at: stampDistance) * offsetJitterAmount * jitterIntensity)
+            * wobbleScale
         
         let clampedSize = max(size, minStampSize)
         
         let rotation = Self.rotation(from: sample.azimuth)
         
-        let alpha = brush.configuration.stampAlpha
+        let alpha = brush.config.stampAlpha
+        
+        let offsetX = offsetXWobbleGenerator.value(at: wobbleDistance)
+            * brush.config.offsetWobble
+            * wobbleIntensity
+        let offsetY = offsetYWobbleGenerator.value(at: wobbleDistance)
+            * brush.config.offsetWobble
+            * wobbleIntensity
+        
+        var offset = Vector(offsetX, offsetY)
+        if offset.lengthSquared() > 1.0 {
+            offset = offset.normalized()
+        }
         
         let isFinalized = sample.isFinalized && !isInTaperEnd
         
         return BrushStrokeEngine.Stamp(
             size: clampedSize,
-            offset: offset,
             position: sample.position,
             rotation: rotation,
             alpha: alpha,
+            offset: offset,
+            strokeDistance: strokeDistance,
             isFinalized: isFinalized)
     }
     
@@ -246,7 +254,7 @@ class BrushStrokeStampProcessor {
             taperTime = 0
         } else {
             taperTime =
-                clamp(brush.configuration.taperLength, min: 0, max: 1)
+                clamp(brush.config.taperLength, min: 0, max: 1)
                 * maxTaperTime
         }
         
@@ -291,7 +299,7 @@ class BrushStrokeStampProcessor {
         let s1 = 1 - x * x
         let s2 = sqrt(s1)
         
-        let c2 = clamp(brush.configuration.taperRoundness, min: 0, max: 1)
+        let c2 = clamp(brush.config.taperRoundness, min: 0, max: 1)
         let c1 = 1 - c2
         
         return s1 * c1 + s2 * c2

@@ -5,7 +5,7 @@
 import UIKit
 import Metal
 
-private let onionSkinCount = 2
+private let onionSkinCount = 1
 
 protocol EditorFrameEditorVCDelegate: AnyObject {
     
