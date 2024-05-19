@@ -13,7 +13,7 @@ private let brushConfig = Brush.Configuration(
     stampSize: 50,
     stampSpacing: 0.0,
     stampAlpha: 1,
-    pressureScaling: 0.5,
+    pressureScaling: 2.0,
     taperLength: 0.05,
     taperRoundness: 1.0)
 

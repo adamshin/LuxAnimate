@@ -4,8 +4,8 @@
 
 import Foundation
 
-private let maxPressureIncrease: Double = 0.05
-private let maxPressureDecrease: Double = 0.05 // TODO: Turn this down?
+private let maxPressureIncrease: Double = 0.02
+private let maxPressureDecrease: Double = 0.01
 
 class BrushStrokePressureFilteringProcessor {
     
