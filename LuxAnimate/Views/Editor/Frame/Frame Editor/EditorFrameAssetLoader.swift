@@ -228,11 +228,11 @@ class EditorFrameAssetLoader {
     }
     
     func preCacheFullTexture(
-        texture: MTLTexture,
+        drawingTexture: MTLTexture,
         drawingID: String
     ) {
         do {
-            let newTexture = try TextureCopier.copy(texture)
+            let newTexture = try TextureCopier.copy(drawingTexture)
             preCachedFullTextures[drawingID] = newTexture
             
         } catch { }

@@ -5,27 +5,22 @@
 import UIKit
 import Metal
 
-// For now, this is just the brush tool.
-// We'll need to add other modes and overlays.
-
-private let brushColor: Color = .brushBlack
-
 protocol EditorFrameDrawingEditorVCDelegate: AnyObject {
     
-    func brushScale(
-        _ vc: EditorFrameDrawingEditorVC
-    ) -> Double
+    func onSetBrushScale(
+        _ vc: EditorFrameDrawingEditorVC,
+        _ brushScale: Double)
     
-    func brushSmoothing(
-        _ vc: EditorFrameDrawingEditorVC
-    ) -> Double
+    func onSetBrushSmoothing(
+        _ vc: EditorFrameDrawingEditorVC,
+        _ brushSmoothing: Double)
     
-    func onUpdateCanvas(
+    func onUpdateActiveDrawingTexture(
         _ vc: EditorFrameDrawingEditorVC)
     
     func onEditDrawing(
         _ vc: EditorFrameDrawingEditorVC,
-        texture: MTLTexture)
+        drawingTexture: MTLTexture)
     
 }
 
@@ -33,32 +28,30 @@ class EditorFrameDrawingEditorVC: UIViewController {
     
     weak var delegate: EditorFrameDrawingEditorVCDelegate?
     
-    private let brushGesture = BrushGestureRecognizer()
+    private let drawingSize: PixelSize
+    private let canvasContentView: UIView
     
-    private let brushEngine: BrushEngine
+    private let drawingTexture: MTLTexture
+    private var isDrawingTextureSet = false
     
-    private let brush = try! Brush(
-        configuration: AppConfig.brushConfig)
-    
-    private var isDrawingSet = false
-    
-    private var isEditingEnabled = true
-    private var hasActiveBrushStroke = false
-    private var brushMode: BrushEngine.BrushMode = .brush
+    private var activeToolVC: DrawingEditorToolVC?
     
     // MARK: - Init
     
     init(
         drawingSize: PixelSize,
         canvasContentView: UIView
-    ) {
-        brushEngine = BrushEngine(canvasSize: drawingSize)
+    ) throws {
+        
+        self.drawingSize = drawingSize
+        self.canvasContentView = canvasContentView
+        
+        drawingTexture = try TextureCreator
+            .createEmptyTexture(
+                size: drawingSize,
+                mipMapped: false)
         
         super.init(nibName: nil, bundle: nil)
-        brushEngine.delegate = self
-        
-        canvasContentView.addGestureRecognizer(brushGesture)
-        brushGesture.gestureDelegate = self
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -69,113 +62,84 @@ class EditorFrameDrawingEditorVC: UIViewController {
         view = PassthroughView()
     }
     
-    // MARK: - Interface
-    
-    func clearDrawing() {
-        isDrawingSet = false
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        selectBrushTool()
     }
     
-    func setDrawingTextureIfNeeded(_ texture: MTLTexture) {
-        guard !isDrawingSet else { return }
-        guard !hasActiveBrushStroke else { return }
+    // MARK: - Tools
+    
+    private func selectBrushTool() {
+        let vc = DrawingEditorBrushToolVC(
+            brushMode: .brush,
+            drawingSize: drawingSize,
+            canvasContentView: canvasContentView)
         
-        isDrawingSet = true
-        brushEngine.endStroke()
-        brushEngine.setCanvasContents(texture)
+        addChild(vc, to: view)
+        activeToolVC = vc
+        // TODO: Notify delegate about slider values
+    }
+    
+    // MARK: - Interface
+    
+    func clearDrawingTexture() {
+        isDrawingTextureSet = false
+        activeToolVC?.clearDrawingTexture()
+    }
+    
+    func setDrawingTexture(_ drawingTexture: MTLTexture) {
+        do {
+            try TextureBlitter.blit(
+                from: drawingTexture,
+                to: self.drawingTexture)
+            
+            isDrawingTextureSet = true
+            
+            activeToolVC?.setDrawingTexture(drawingTexture)
+            
+        } catch { }
     }
     
     func onFrame() {
-        brushEngine.onFrame()
+        activeToolVC?.onFrame()
     }
     
     func endActiveEdit() {
-        brushGesture.reset()
-        brushEngine.endStroke()
-        hasActiveBrushStroke = false
+        activeToolVC?.endActiveEdit()
     }
     
     func setEditingEnabled(_ enabled: Bool) {
-        isEditingEnabled = enabled
-        brushGesture.isEnabled = enabled
+        activeToolVC?.setEditingEnabled(enabled)
     }
     
-    var hasActiveEdit: Bool {
-        hasActiveBrushStroke
-    }
-    
-    var drawingTexture: MTLTexture? {
-        isDrawingSet ? brushEngine.canvasTexture : nil
+    var activeDrawingTexture: MTLTexture? {
+        activeToolVC?.activeDrawingTexture
     }
     
 }
 
 // MARK: - Delegates
 
-extension EditorFrameDrawingEditorVC: BrushGestureRecognizerGestureDelegate {
+extension EditorFrameDrawingEditorVC: DrawingEditorToolVCDelegate {
     
-    func onBeginBrushStroke(quickTap: Bool) {
-        guard isEditingEnabled, isDrawingSet
-        else { return }
-        
-        hasActiveBrushStroke = true
-        
-        let scale = delegate?.brushScale(self) ?? 0
-        let smoothing = delegate?.brushSmoothing(self) ?? 0
-        
-        brushEngine.beginStroke(
-            brush: brush,
-            brushMode: brushMode,
-            color: brushColor,
-            scale: scale,
-            quickTap: quickTap,
-            smoothing: smoothing)
-    }
-    
-    func onUpdateBrushStroke(
-        _ stroke: BrushGestureRecognizer.Stroke
+    func onUpdateActiveDrawingTexture(
+        _ vc: any DrawingEditorToolVC
     ) {
-        guard isEditingEnabled, isDrawingSet
-        else { return }
-        
-        let inputStroke = BrushEngineGestureAdapter
-            .convert(stroke)
-        
-        brushEngine.updateStroke(inputStroke: inputStroke)
+        delegate?.onUpdateActiveDrawingTexture(self)
     }
     
-    func onEndBrushStroke() {
-        guard isEditingEnabled, isDrawingSet
-        else { return }
-        
-        brushEngine.endStroke()
-        hasActiveBrushStroke = false
-    }
-    
-    func onCancelBrushStroke() {
-        guard isEditingEnabled, isDrawingSet
-        else { return }
-        
-        brushEngine.cancelStroke()
-        hasActiveBrushStroke = false
-    }
-    
-}
-
-extension EditorFrameDrawingEditorVC: BrushEngineDelegate {
-    
-    func onUpdateCanvas(_ engine: BrushEngine) {
-        delegate?.onUpdateCanvas(self)
-    }
-    
-    func onFinalizeStroke(_ engine: BrushEngine) {
+    func onEditDrawing(
+        _ vc: any DrawingEditorToolVC,
+        drawingTexture: any MTLTexture
+    ) {
         do {
-            let texture = try TextureCopier
-                .copy(brushEngine.canvasTexture)
-            
-            delegate?.onEditDrawing(self,
-                texture: texture)
-            
+            try TextureBlitter.blit(
+                from: drawingTexture,
+                to: self.drawingTexture)
         } catch { }
+        
+        delegate?.onEditDrawing(self,
+            drawingTexture: drawingTexture)
     }
     
 }

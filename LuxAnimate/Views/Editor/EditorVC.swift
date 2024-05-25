@@ -27,7 +27,7 @@ class EditorVC: UIViewController {
         editor = try ProjectEditor(projectID: projectID)
         let projectManifest = editor.currentProjectManifest
         
-        frameVC = EditorFrameVC(
+        frameVC = try EditorFrameVC(
             projectID: projectID,
             projectViewportSize: projectManifest.metadata.viewportSize,
             drawingSize: projectManifest.content.animationLayer.size)
@@ -182,11 +182,13 @@ extension EditorVC: EditorFrameVCDelegate {
     func onEditDrawing(
         _ vc: EditorFrameVC,
         drawingID: String,
-        texture: MTLTexture
+        drawingTexture: MTLTexture,
+        editContext: Any?
     ) {
         try? editor.editDrawing(
             drawingID: drawingID,
-            texture: texture)
+            drawingTexture: drawingTexture,
+            editContext: editContext)
     }
     
 }

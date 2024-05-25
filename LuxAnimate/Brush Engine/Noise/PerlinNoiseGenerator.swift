@@ -78,7 +78,7 @@ private func perlin1D(x: Double, seed: UInt64) -> Double {
     
     // Hash function to get pseudo-random gradients
     func hash(_ i: UInt64) -> UInt64 {
-        var rng = SplitMixGenerator(seed: seed + i)
+        var rng = SplitMixRandomNumberGenerator(seed: seed + i)
         return UInt64.random(in: 0...255, using: &rng)
     }
     

@@ -7,17 +7,24 @@ import Metal
 class BrushEngineRenderer {
     
     private let canvasSize: PixelSize
+    private let erase: Bool
     
     private let stampRenderer = BrushEngineStampRenderer()
+    private let spriteRenderer = SpriteRenderer()
     
-    private let originalCanvasTexture: MTLTexture
+    let renderTarget: MTLTexture
+    
+    private let baseCanvasTexture: MTLTexture
     private let partialStrokeCanvasTexture: MTLTexture
     private let fullStrokeCanvasTexture: MTLTexture
     
     private var drawnFinalizedStampCount = 0
     
-    init(canvasSize: PixelSize) {
+    // MARK: - Init
+    
+    init(canvasSize: PixelSize, erase: Bool) {
         self.canvasSize = canvasSize
+        self.erase = erase
         
         let texDesc = MTLTextureDescriptor()
         texDesc.width = canvasSize.width
@@ -26,7 +33,10 @@ class BrushEngineRenderer {
         texDesc.storageMode = .shared
         texDesc.usage = [.renderTarget, .shaderRead]
         
-        originalCanvasTexture = MetalInterface.shared
+        renderTarget = MetalInterface.shared
+            .device.makeTexture(descriptor: texDesc)!
+        
+        baseCanvasTexture = MetalInterface.shared
             .device.makeTexture(descriptor: texDesc)!
         
         partialStrokeCanvasTexture = MetalInterface.shared
@@ -36,36 +46,58 @@ class BrushEngineRenderer {
             .device.makeTexture(descriptor: texDesc)!
     }
     
-    var canvasTexture: MTLTexture {
-        fullStrokeCanvasTexture
+    // MARK: - Helpers
+    
+    private static func finalizedStampCount(
+        for stroke: BrushStrokeEngine.OutputStroke,
+        startingAt startCount: Int
+    ) -> Int {
+        var count = startCount
+        while count < stroke.stamps.count {
+            if stroke.stamps[count].isFinalized {
+                count += 1
+            } else {
+                break
+            }
+        }
+        return count
     }
     
-    func setCanvasContents(_ texture: MTLTexture) {
+    // MARK: - Interface
+    
+    // This should be combined with the begin stroke function?
+    func setBaseCanvasTexture(_ texture: MTLTexture) {
         do {
             try TextureBlitter.blit(
                 from: texture,
-                to: originalCanvasTexture)
-            
-            try TextureBlitter.blit(
-                from: texture,
-                to: partialStrokeCanvasTexture)
-            
-            try TextureBlitter.blit(
-                from: texture,
-                to: fullStrokeCanvasTexture)
-            
+                to: baseCanvasTexture)
         } catch { }
+    }
+    
+    func beginStroke() {
+        drawnFinalizedStampCount = 0
+        
+        let commandBuffer = MetalInterface.shared
+            .commandQueue.makeCommandBuffer()!
+        
+        ClearColorRenderer.drawClearColor(
+            commandBuffer: commandBuffer,
+            target: partialStrokeCanvasTexture,
+            color: .clear)
+        
+        ClearColorRenderer.drawClearColor(
+            commandBuffer: commandBuffer,
+            target: fullStrokeCanvasTexture,
+            color: .clear)
+        
+        commandBuffer.commit()
     }
     
     func update(
         stroke: BrushStrokeEngine.OutputStroke,
         brushMode: BrushEngine.BrushMode
-    ) {
-        let erase = switch brushMode {
-        case .brush: false
-        case .erase: true
-        }
-        
+    ) { 
+        // Draw stroke
         let viewportSize = Size(
             Scalar(canvasSize.width),
             Scalar(canvasSize.height))
@@ -81,8 +113,7 @@ class BrushEngineRenderer {
             startIndex: drawnFinalizedStampCount,
             endIndex: finalizedStampCount,
             brush: stroke.brush,
-            color: stroke.color,
-            erase: erase)
+            color: stroke.color)
         
         try? TextureBlitter.blit(
             from: partialStrokeCanvasTexture,
@@ -96,50 +127,48 @@ class BrushEngineRenderer {
             endIndex: stroke.stamps.count,
             brush: stroke.brush,
             color: AppConfig.brushRenderDebug ? 
-                Color.debugRed : stroke.color,
-            erase: erase)
+                Color.debugRed : stroke.color)
         
         drawnFinalizedStampCount = finalizedStampCount
+        
+        // Draw to render target
+        try? TextureBlitter.blit(
+            from: baseCanvasTexture,
+            to: renderTarget)
+        
+        let commandBuffer = MetalInterface.shared
+            .commandQueue.makeCommandBuffer()!
+        
+        spriteRenderer.drawSprites(
+            commandBuffer: commandBuffer,
+            target: renderTarget,
+            viewportSize: Size(1, 1),
+            texture: fullStrokeCanvasTexture,
+            sprites: [
+                SpriteRenderer.Sprite(
+                    size: Size(1, 1),
+                    position: Vector(0.5, 0.5))
+            ],
+            blendMode: erase ? .normal : .erase,
+            sampleMode: .nearest)
+        
+        commandBuffer.commit()
     }
     
     func finalizeStroke() {
         drawnFinalizedStampCount = 0
         
         try? TextureBlitter.blit(
-            from: fullStrokeCanvasTexture,
-            to: originalCanvasTexture)
-        
-        try? TextureBlitter.blit(
-            from: fullStrokeCanvasTexture,
-            to: partialStrokeCanvasTexture)
+            from: renderTarget,
+            to: baseCanvasTexture)
     }
     
     func cancelStroke() {
         drawnFinalizedStampCount = 0
         
         try? TextureBlitter.blit(
-            from: originalCanvasTexture,
-            to: fullStrokeCanvasTexture)
-        
-        try? TextureBlitter.blit(
-            from: originalCanvasTexture,
-            to: partialStrokeCanvasTexture)
-    }
-    
-    private static func finalizedStampCount(
-        for stroke: BrushStrokeEngine.OutputStroke,
-        startingAt startCount: Int
-    ) -> Int {
-        
-        var count = startCount
-        while count < stroke.stamps.count {
-            if stroke.stamps[count].isFinalized {
-                count += 1
-            } else {
-                break
-            }
-        }
-        return count
+            from: baseCanvasTexture,
+            to: renderTarget)
     }
     
 }

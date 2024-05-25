@@ -4,6 +4,10 @@
 
 import Metal
 
+// TODO: Reevaluate how this all works.
+// Where should interim textures be stored?
+// We don't want to take up more memory than necessary
+
 extension BrushEngine {
     
     enum BrushMode {
@@ -22,44 +26,51 @@ class BrushEngine {
     
     weak var delegate: BrushEngineDelegate?
     
-    let canvasSize: PixelSize
+    private let canvasSize: PixelSize
+    private let brushMode: BrushMode
     
     private let renderer: BrushEngineRenderer
     
-    private var brushMode: BrushMode = .brush
     private var strokeEngine: BrushStrokeEngine?
     
     // MARK: - Initializer
     
-    init(canvasSize: PixelSize) {
+    init(
+        canvasSize: PixelSize,
+        brushMode: BrushMode
+    ) {
         self.canvasSize = canvasSize
+        self.brushMode = brushMode
+        
+        let erase = switch brushMode {
+        case .brush: false
+        case .erase: true
+        }
         
         renderer = BrushEngineRenderer(
-            canvasSize: canvasSize)
+            canvasSize: canvasSize,
+            erase: erase)
     }
     
     // MARK: - Canvas
     
-    func setCanvasContents(_ texture: MTLTexture) {
-        renderer.setCanvasContents(texture)
+    func setBaseCanvasTexture(_ texture: MTLTexture) {
+        renderer.setBaseCanvasTexture(texture)
     }
     
-    var canvasTexture: MTLTexture {
-        renderer.canvasTexture
+    var canvas: MTLTexture {
+        renderer.renderTarget
     }
     
     // MARK: - Stroke
     
     func beginStroke(
         brush: Brush,
-        brushMode: BrushMode,
         color: Color,
         scale: Double,
         quickTap: Bool,
         smoothing: Double
     ) {
-        self.brushMode = brushMode
-        
         strokeEngine = BrushStrokeEngine(
             brush: brush,
             color: color,

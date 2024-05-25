@@ -1,10 +1,10 @@
 //
-//  SplitMixGenerator.swift
+//  SplitMixRandomNumberGenerator.swift
 //
 
 import Foundation
 
-struct SplitMixGenerator: RandomNumberGenerator {
+struct SplitMixRandomNumberGenerator: RandomNumberGenerator {
     
     private var state: UInt64
 

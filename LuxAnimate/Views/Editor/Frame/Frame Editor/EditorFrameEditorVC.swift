@@ -9,13 +9,13 @@ private let onionSkinCount = 1
 
 protocol EditorFrameEditorVCDelegate: AnyObject {
     
-    func brushScale(
-        _ vc: EditorFrameEditorVC
-    ) -> Double
+    func onSetBrushScale(
+        _ vc: EditorFrameEditorVC,
+        _ brushScale: Double)
     
-    func brushSmoothing(
-        _ vc: EditorFrameEditorVC
-    ) -> Double
+    func onSetBrushSmoothing(
+        _ vc: EditorFrameEditorVC,
+        _ brushSmoothing: Double)
     
     func onSelectUndo(_ vc: EditorFrameEditorVC)
     func onSelectRedo(_ vc: EditorFrameEditorVC)
@@ -23,7 +23,16 @@ protocol EditorFrameEditorVCDelegate: AnyObject {
     func onEditDrawing(
         _ vc: EditorFrameEditorVC,
         drawingID: String,
-        texture: MTLTexture)
+        drawingTexture: MTLTexture,
+        editContext: Any?)
+    
+}
+
+extension EditorFrameEditorVC {
+    
+    struct EditContext {
+        var origin: EditorFrameEditorVC
+    }
     
 }
 
@@ -44,6 +53,7 @@ class EditorFrameEditorVC: UIViewController {
     private let drawingSize: PixelSize
     
     private var projectManifest: Project.Manifest?
+    private var editContext: Any?
     private var focusedFrameIndex = 0
     private var isOnionSkinOn = false
     
@@ -57,12 +67,12 @@ class EditorFrameEditorVC: UIViewController {
         projectID: String,
         projectViewportSize: PixelSize,
         drawingSize: PixelSize
-    ) {
+    ) throws {
         self.projectID = projectID
         self.projectViewportSize = projectViewportSize
         self.drawingSize = drawingSize
         
-        drawingEditorVC = EditorFrameDrawingEditorVC(
+        drawingEditorVC = try EditorFrameDrawingEditorVC(
             drawingSize: drawingSize,
             canvasContentView: canvasVC.canvasContentView)
         
@@ -118,8 +128,11 @@ class EditorFrameEditorVC: UIViewController {
     private func updateFrameData() {
         guard let projectManifest else { return }
         
-        guard !drawingEditorVC.hasActiveEdit
-        else { return }
+        if let c = editContext as? EditorFrameEditorVC.EditContext,
+            c.origin == self 
+        {
+            return
+        }
         
         // Generate scene
         let onionSkinCount = isOnionSkinOn ?
@@ -131,14 +144,9 @@ class EditorFrameEditorVC: UIViewController {
             onionSkinPrevCount: onionSkinCount,
             onionSkinNextCount: onionSkinCount)
         
-//        let didChangeActiveDrawing =
-//            self.scene?.activeDrawingID != scene.activeDrawingID
-        
         self.scene = scene
         
-//        if didChangeActiveDrawing {
-            drawingEditorVC.clearDrawing()
-//        }
+        drawingEditorVC.clearDrawingTexture()
         
         assetLoader.loadAssets(
             drawings: scene.allDrawings,
@@ -171,8 +179,12 @@ class EditorFrameEditorVC: UIViewController {
     
     // MARK: - Interface
     
-    func setProjectManifest(_ projectManifest: Project.Manifest) {
+    func setProjectManifest(
+        _ projectManifest: Project.Manifest,
+        editContext: Any?
+    ) {
         self.projectManifest = projectManifest
+        self.editContext = editContext
         updateFrameData()
     }
     
@@ -225,19 +237,21 @@ extension EditorFrameEditorVC: EditorFrameEditorCanvasVCDelegate {
 
 extension EditorFrameEditorVC: EditorFrameDrawingEditorVCDelegate {
     
-    func brushScale(
-        _ vc: EditorFrameDrawingEditorVC
-    ) -> Double {
-        delegate?.brushScale(self) ?? 0
+    func onSetBrushScale(
+        _ vc: EditorFrameDrawingEditorVC,
+        _ brushScale: Double
+    ) {
+        delegate?.onSetBrushScale(self, brushScale)
     }
     
-    func brushSmoothing(
-        _ vc: EditorFrameDrawingEditorVC
-    ) -> Double {
-        delegate?.brushSmoothing(self) ?? 0
+    func onSetBrushSmoothing(
+        _ vc: EditorFrameDrawingEditorVC,
+        _ brushSmoothing: Double
+    ) {
+        delegate?.onSetBrushSmoothing(self, brushSmoothing)
     }
     
-    func onUpdateCanvas(
+    func onUpdateActiveDrawingTexture(
         _ vc: EditorFrameDrawingEditorVC
     ) {
         needsDraw = true
@@ -245,18 +259,19 @@ extension EditorFrameEditorVC: EditorFrameDrawingEditorVCDelegate {
     
     func onEditDrawing(
         _ vc: EditorFrameDrawingEditorVC,
-        texture: MTLTexture
+        drawingTexture: MTLTexture
     ) {
         guard let activeDrawingID = scene?.activeDrawingID
         else { return }
         
         assetLoader.preCacheFullTexture(
-            texture: texture,
+            drawingTexture: drawingTexture,
             drawingID: activeDrawingID)
         
         delegate?.onEditDrawing(self,
             drawingID: activeDrawingID,
-            texture: texture)
+            drawingTexture: drawingTexture,
+            editContext: EditContext(origin: self))
     }
     
 }
@@ -272,7 +287,7 @@ extension EditorFrameEditorVC: EditorFrameAssetLoaderDelegate {
         if let asset = assetLoader.asset(for: activeDrawingID),
            asset.quality == .full
         {
-            drawingEditorVC.setDrawingTextureIfNeeded(asset.texture)
+            drawingEditorVC.setDrawingTexture(asset.texture)
         }
         
         if loader.hasAssetsForAllDrawings() {
@@ -291,7 +306,7 @@ extension EditorFrameEditorVC: EditorFrameActiveDrawingRendererDelegate {
         guard let activeDrawingID = scene?.activeDrawingID
         else { return nil }
         
-        if let texture = drawingEditorVC.drawingTexture {
+        if let texture = drawingEditorVC.activeDrawingTexture {
             return texture
         } else {
             let asset = assetLoader.asset(for: activeDrawingID)

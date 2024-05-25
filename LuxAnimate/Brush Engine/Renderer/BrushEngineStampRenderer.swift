@@ -17,12 +17,8 @@ struct BrushEngineStampRenderer {
         startIndex: Int,
         endIndex: Int,
         brush: Brush,
-        color: Color,
-        erase: Bool
-    ) {
-        let blendMode: BlendMode = erase ?
-            .erase : .normal
-        
+        color: Color
+    ) { 
         let stampsToDraw = stamps[startIndex ..< endIndex]
         
         let sprites = stampsToDraw.map { stamp in
@@ -50,13 +46,12 @@ struct BrushEngineStampRenderer {
             viewportSize: viewportSize,
             texture: brush.stampTexture,
             sprites: sprites,
-            blendMode: blendMode,
+            blendMode: .normal,
             sampleMode: .linearClampEdgeToBlack,
             colorMode: .brush,
             color: color)
         
         commandBuffer.commit()
-        commandBuffer.waitUntilCompleted()
     }
     
 }

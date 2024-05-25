@@ -14,7 +14,8 @@ protocol EditorFrameVCDelegate: AnyObject {
     func onEditDrawing(
         _ vc: EditorFrameVC,
         drawingID: String,
-        texture: MTLTexture)
+        drawingTexture: MTLTexture,
+        editContext: Any?)
     
 }
 
@@ -36,10 +37,10 @@ class EditorFrameVC: UIViewController {
         projectID: String,
         projectViewportSize: PixelSize,
         drawingSize: PixelSize
-    ) {
+    ) throws {
         self.projectID = projectID
         
-        frameEditorVC = EditorFrameEditorVC(
+        frameEditorVC = try EditorFrameEditorVC(
             projectID: projectID,
             projectViewportSize: projectViewportSize,
             drawingSize: drawingSize)
@@ -108,16 +109,18 @@ class EditorFrameVC: UIViewController {
 
 extension EditorFrameVC: EditorFrameEditorVCDelegate {
     
-    func brushScale(
-        _ vc: EditorFrameEditorVC
-    ) -> Double {
-        sidebarVC.brushSize
+    func onSetBrushScale(
+        _ vc: EditorFrameEditorVC,
+        _ brushScale: Double
+    ) {
+        sidebarVC.brushScale = brushScale
     }
     
-    func brushSmoothing(
-        _ vc: EditorFrameEditorVC
-    ) -> Double {
-        sidebarVC.brushSmoothing
+    func onSetBrushSmoothing(
+        _ vc: EditorFrameEditorVC,
+        _ brushSmoothing: Double
+    ) {
+        sidebarVC.brushSmoothing = brushSmoothing
     }
     
     func onSelectUndo(_ vc: EditorFrameEditorVC) {
@@ -130,12 +133,13 @@ extension EditorFrameVC: EditorFrameEditorVCDelegate {
     func onEditDrawing(
         _ vc: EditorFrameEditorVC,
         drawingID: String,
-        texture: MTLTexture
+        drawingTexture: MTLTexture,
+        editContext: Any?
     ) {
-        delegate?.onEditDrawing(
-            self,
+        delegate?.onEditDrawing(self,
             drawingID: drawingID,
-            texture: texture)
+            drawingTexture: drawingTexture,
+            editContext: editContext)
     }
     
 }

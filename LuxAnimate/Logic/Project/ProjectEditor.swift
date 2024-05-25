@@ -7,7 +7,9 @@ import Metal
 
 protocol ProjectEditorDelegate: AnyObject {
     
-    func onEditProject(_ editor: ProjectEditor)
+    func onEditProject(
+        _ editor: ProjectEditor,
+        editContext: Any?)
     
 }
 
@@ -74,7 +76,7 @@ extension ProjectEditor {
             } catch { }
         }
         
-        delegate?.onEditProject(self)
+        delegate?.onEditProject(self, editContext: nil)
     }
     
     func createEmptyDrawing(
@@ -83,13 +85,11 @@ extension ProjectEditor {
         
         let projectManifest = editSession.currentProjectManifest
         
-        let imageSize = projectManifest.content.animationLayer.size
-        let imageData = Self.emptyImageData(size: imageSize)
+        let imageSize = projectManifest.content
+            .animationLayer.size
         
-        let texture = try TextureCreator.createTexture(
-            imageData: imageData,
-            width: imageSize.width,
-            height: imageSize.height,
+        let texture = try TextureCreator.createEmptyTexture(
+            size: imageSize,
             mipMapped: false)
         
         try createDrawing(
@@ -97,19 +97,15 @@ extension ProjectEditor {
             texture: texture)
     }
     
-    private static func emptyImageData(
-        size: PixelSize
-    ) -> Data {
-        let byteCount = size.width * size.height * 4
-        return Data(repeating: 0, count: byteCount)
-    }
-    
     // MARK: - Edit Drawing
     
     func editDrawing(
         drawingID: String,
-        texture: MTLTexture
+        drawingTexture: MTLTexture,
+        editContext: Any?
     ) throws {
+        
+        let texture = try TextureCopier.copy(drawingTexture)
         
         queue.enqueue {
             do {
@@ -142,7 +138,9 @@ extension ProjectEditor {
                     newAssets: createdAssets.newAssets)
                 
                 DispatchQueue.main.async {
-                    self.delegate?.onEditProject(self)
+                    self.delegate?.onEditProject(
+                        self,
+                        editContext: editContext)
                 }
                 
             } catch { }
@@ -178,7 +176,7 @@ extension ProjectEditor {
             } catch { }
         }
         
-        delegate?.onEditProject(self)
+        delegate?.onEditProject(self, editContext: nil)
     }
     
     // MARK: - Spacing
@@ -203,7 +201,7 @@ extension ProjectEditor {
             } catch { }
         }
         
-        delegate?.onEditProject(self)
+        delegate?.onEditProject(self, editContext: nil)
     }
     
     func removeSpacing(at frameIndex: Int) throws {
@@ -241,7 +239,7 @@ extension ProjectEditor {
             } catch { }
         }
         
-        delegate?.onEditProject(self)
+        delegate?.onEditProject(self, editContext: nil)
     }
     
     // MARK: - Undo / Redo
@@ -252,7 +250,7 @@ extension ProjectEditor {
                 try self.editSession.applyUndo()
             } catch { }
         }
-        delegate?.onEditProject(self)
+        delegate?.onEditProject(self, editContext: nil)
     }
     
     func applyRedo() throws {
@@ -261,7 +259,7 @@ extension ProjectEditor {
                 try self.editSession.applyRedo()
             } catch { }
         }
-        delegate?.onEditProject(self)
+        delegate?.onEditProject(self, editContext: nil)
     }
     
     // MARK: - Assets
