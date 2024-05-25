@@ -83,16 +83,13 @@
             return output;
             
         } else if (status == JXL_DEC_ERROR) {
-            fprintf(stderr, "Decoder error\n");
             return NULL;
             
         } else if (status == JXL_DEC_NEED_MORE_INPUT) {
-            fprintf(stderr, "Error, already provided all input\n");
             return NULL;
             
         } else if (status == JXL_DEC_BASIC_INFO) {
             if (JXL_DEC_SUCCESS != JxlDecoderGetBasicInfo(dec.get(), &info)) {
-                fprintf(stderr, "JxlDecoderGetBasicInfo failed\n");
                 return NULL;
             }
             
@@ -113,7 +110,6 @@
                     &format,
                     &bufferSize)
             ) {
-                fprintf(stderr, "JxlDecoderImageOutBufferSize failed\n");
                 return NULL;
             }
             
@@ -126,14 +122,12 @@
                     (void *)output.data.bytes,
                     bufferSize)
             ) {
-                fprintf(stderr, "JxlDecoderSetImageOutBuffer failed\n");
                 return NULL;
             }
             
         } else if (status == JXL_DEC_FULL_IMAGE) {
             
         } else {
-            fprintf(stderr, "Unknown decoder status\n");
             return NULL;
         }
     }
