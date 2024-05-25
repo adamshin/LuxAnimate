@@ -2,34 +2,35 @@
 //  BrushEngine.swift
 //
 
+import Foundation
 import Metal
 
-// TODO: Reevaluate how this all works.
-// Where should interim textures be stored?
-// We don't want to take up more memory than necessary
+protocol BrushEngineDelegate: AnyObject {
+    
+    func onUpdateActiveCanvasTexture(
+        _ e: BrushEngine)
+    
+    func onFinalizeStroke(
+        _ e: BrushEngine,
+        canvasTexture: MTLTexture)
+    
+}
 
 extension BrushEngine {
-    
     enum BrushMode {
         case brush
         case erase
     }
-    
-}
-
-protocol BrushEngineDelegate: AnyObject {
-    func onUpdateCanvas(_ engine: BrushEngine)
-    func onFinalizeStroke(_ engine: BrushEngine)
 }
 
 class BrushEngine {
     
     weak var delegate: BrushEngineDelegate?
     
-    private let canvasSize: PixelSize
-    private let brushMode: BrushMode
+    private let canvasTexture: MTLTexture
     
     private let renderer: BrushEngineRenderer
+    private let strokeRenderer: BrushEngineStrokeRenderer
     
     private var strokeEngine: BrushStrokeEngine?
     
@@ -39,30 +40,39 @@ class BrushEngine {
         canvasSize: PixelSize,
         brushMode: BrushMode
     ) {
-        self.canvasSize = canvasSize
-        self.brushMode = brushMode
-        
-        let erase = switch brushMode {
-        case .brush: false
-        case .erase: true
-        }
+        canvasTexture = try! TextureCreator
+            .createEmptyTexture(
+                size: canvasSize,
+                mipMapped: false)
         
         renderer = BrushEngineRenderer(
             canvasSize: canvasSize,
-            erase: erase)
+            brushMode: brushMode)
+        
+        strokeRenderer = BrushEngineStrokeRenderer(
+            canvasSize: canvasSize)
     }
     
-    // MARK: - Canvas
+    // MARK: - Rendering
     
-    func setBaseCanvasTexture(_ texture: MTLTexture) {
-        renderer.setBaseCanvasTexture(texture)
+    private func draw() {
+        renderer.draw(
+            baseCanvasTexture: canvasTexture,
+            strokeTexture: strokeRenderer.fullStrokeTexture)
     }
     
-    var canvas: MTLTexture {
+    // MARK: - Interface
+    
+    func setCanvasTexture(_ texture: MTLTexture) {
+        try? TextureBlitter.blit(
+            from: texture,
+            to: canvasTexture)
+        draw()
+    }
+    
+    var activeCanvasTexture: MTLTexture {
         renderer.renderTarget
     }
-    
-    // MARK: - Stroke
     
     func beginStroke(
         brush: Brush,
@@ -88,37 +98,49 @@ class BrushEngine {
     func endStroke() {
         guard let strokeEngine else { return }
         
-        strokeEngine.process()
+        strokeEngine.processInput()
         
-        renderer.update(
-            stroke: strokeEngine.outputStroke,
-            brushMode: brushMode)
+        strokeRenderer.drawIncrementalStroke(
+            stroke: strokeEngine.outputStroke)
         
-        renderer.finalizeStroke()
+        draw()
+        
+        try? TextureBlitter.blit(
+            from: renderer.renderTarget,
+            to: canvasTexture,
+            waitUntilCompleted: true)
+        
+        strokeRenderer.clearStroke()
+        draw()
         
         self.strokeEngine = nil
         
-        delegate?.onUpdateCanvas(self)
-        delegate?.onFinalizeStroke(self)
+        delegate?.onUpdateActiveCanvasTexture(self)
+        
+        delegate?.onFinalizeStroke(self,
+            canvasTexture: canvasTexture)
     }
     
     func cancelStroke() {
-        renderer.cancelStroke()
+        strokeRenderer.clearStroke()
+        draw()
+        
         self.strokeEngine = nil
         
-        delegate?.onUpdateCanvas(self)
+        delegate?.onUpdateActiveCanvasTexture(self)
     }
     
     func onFrame() {
         guard let strokeEngine else { return }
         
-        strokeEngine.process()
+        strokeEngine.processInput()
         
-        renderer.update(
-            stroke: strokeEngine.outputStroke,
-            brushMode: brushMode)
+        strokeRenderer.drawIncrementalStroke(
+            stroke: strokeEngine.outputStroke)
         
-        delegate?.onUpdateCanvas(self)
+        draw()
+        
+        delegate?.onUpdateActiveCanvasTexture(self)
     }
     
 }

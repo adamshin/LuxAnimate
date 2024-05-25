@@ -88,7 +88,7 @@ class BrushStrokeEngine {
         self.inputStroke = inputStroke
     }
     
-    func process() {
+    func processInput() {
         guard let inputStroke else { return }
         
         var samples = inputStroke.samples
