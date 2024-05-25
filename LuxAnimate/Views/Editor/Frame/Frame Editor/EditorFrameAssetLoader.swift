@@ -29,6 +29,8 @@ class EditorFrameAssetLoader {
         var texture: MTLTexture
     }
     
+    private struct SkipLoadError: Error { }
+    
     weak var delegate: EditorFrameAssetLoaderDelegate?
     
     private let projectID: String
@@ -150,14 +152,13 @@ class EditorFrameAssetLoader {
             
             loadQueue.async {
                 do {
+                    guard self.drawingIDsToLoad.contains(drawingID) 
+                    else { throw SkipLoadError() }
+                    
                     let encodedData = try Data(contentsOf: assetURL)
                     
-                    guard self.drawingIDsToLoad.contains(drawingID) else {
-                        DispatchQueue.main.async {
-                            self.processNextPendingLoadItem()
-                        }
-                        return
-                    }
+                    guard self.drawingIDsToLoad.contains(drawingID) 
+                    else { throw SkipLoadError() }
                     
                     let output = try JXLDecoder.decode(
                         data: encodedData,
