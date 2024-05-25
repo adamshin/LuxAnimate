@@ -178,8 +178,9 @@ class EditorFrameAssetLoader {
                     
                     let texture = try TextureCreator.createTexture(
                         imageData: output.data,
-                        width: output.width,
-                        height: output.height,
+                        size: PixelSize(
+                            width: output.width,
+                            height: output.height),
                         mipMapped: false,
                         usage: .shaderRead)
                     

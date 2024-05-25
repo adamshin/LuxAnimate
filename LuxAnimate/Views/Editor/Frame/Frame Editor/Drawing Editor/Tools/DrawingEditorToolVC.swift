@@ -16,7 +16,6 @@ protocol DrawingEditorToolVCDelegate: AnyObject {
     
 }
 
-
 protocol DrawingEditorToolVC: UIViewController {
     
     var delegate: DrawingEditorToolVCDelegate? { get set }
@@ -30,7 +29,7 @@ protocol DrawingEditorToolVC: UIViewController {
     
     var activeDrawingTexture: MTLTexture? { get }
     
-    func setBrushScale(_ brushScale: Double)
-    func setBrushSmoothing(_ brushSmoothing: Double)
+    var brushScale: Double { get set }
+    var brushSmoothing: Double { get set }
     
 }

@@ -22,8 +22,9 @@ struct JXLTextureLoader {
         
         return try TextureCreator.createTexture(
             imageData: output.data,
-            width: output.width,
-            height: output.height,
+            size: PixelSize(
+                width: output.width,
+                height: output.height),
             mipMapped: mipMapped,
             usage: usage)
     }

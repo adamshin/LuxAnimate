@@ -298,13 +298,11 @@ extension ProjectEditor {
         
         let mediumImageData = try imageResizer.resize(
             imageTexture: texture,
-            targetWidth: mediumImageSize.width,
-            targetHeight: mediumImageSize.height)
+            targetSize: mediumImageSize)
         
         let smallImageData = try imageResizer.resize(
             imageTexture: texture,
-            targetWidth: smallImageSize.width,
-            targetHeight: smallImageSize.height)
+            targetSize: smallImageSize)
         
         // Encode images
         let fullEncodedData = try! JXLEncoder.encode(

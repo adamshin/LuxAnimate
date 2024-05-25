@@ -5,6 +5,10 @@
 import UIKit
 import Metal
 
+// TODO: Load and save values
+private let defaultBrushScale: Double = 0.2
+private let defaultBrushSmoothing: Double = 0
+
 private let brushColor: Color = .brushBlack
 
 class DrawingEditorBrushToolVC:
@@ -16,8 +20,8 @@ class DrawingEditorBrushToolVC:
     
     private let brushEngine: BrushEngine
     
-    private var scale: Double = 0
-    private var smoothing: Double = 0
+    var brushScale: Double = defaultBrushScale
+    var brushSmoothing: Double = defaultBrushSmoothing
     
     private let brush = try! Brush(
         configuration: AppConfig.brushConfig)
@@ -36,7 +40,9 @@ class DrawingEditorBrushToolVC:
     ) {
         self.brushMode = brushMode
         
-        brushEngine = BrushEngine(canvasSize: drawingSize)
+        brushEngine = BrushEngine(
+            canvasSize: drawingSize,
+            brushMode: .paint)
         
         super.init(nibName: nil, bundle: nil)
         brushEngine.delegate = self
@@ -61,10 +67,9 @@ class DrawingEditorBrushToolVC:
     
     func setDrawingTexture(_ texture: MTLTexture) {
         guard !isDrawingSet else { return }
-        
         isDrawingSet = true
-        brushEngine.endStroke()
-        brushEngine.setCanvasContents(texture)
+        
+        brushEngine.setCanvasTexture(texture)
     }
     
     func onFrame() {
@@ -77,20 +82,18 @@ class DrawingEditorBrushToolVC:
     }
     
     func setEditingEnabled(_ enabled: Bool) {
+        if !enabled {
+            endActiveEdit()
+        }
+        
         isEditingEnabled = enabled
         brushGesture.isEnabled = enabled
     }
     
     var activeDrawingTexture: MTLTexture? {
-        isDrawingSet ? brushEngine.canvasTexture : nil
-    }
-    
-    func setBrushScale(_ brushScale: Double) {
-        self.scale = brushScale
-    }
-    
-    func setBrushSmoothing(_ brushSmoothing: Double) {
-        self.smoothing = brushSmoothing
+        isDrawingSet ? 
+            brushEngine.activeCanvasTexture :
+            nil
     }
     
 }
@@ -105,19 +108,15 @@ extension DrawingEditorBrushToolVC: BrushGestureRecognizerGestureDelegate {
         
         brushEngine.beginStroke(
             brush: brush,
-            brushMode: brushMode,
             color: brushColor,
-            scale: scale,
+            scale: brushScale,
             quickTap: quickTap,
-            smoothing: smoothing)
+            smoothing: brushSmoothing)
     }
     
     func onUpdateBrushStroke(
         _ stroke: BrushGestureRecognizer.Stroke
     ) {
-        guard isDrawingSet, isEditingEnabled
-        else { return }
-        
         let inputStroke = BrushEngineGestureAdapter
             .convert(stroke)
         
@@ -125,16 +124,10 @@ extension DrawingEditorBrushToolVC: BrushGestureRecognizerGestureDelegate {
     }
     
     func onEndBrushStroke() {
-        guard isDrawingSet, isEditingEnabled
-        else { return }
-        
         brushEngine.endStroke()
     }
     
     func onCancelBrushStroke() {
-        guard isDrawingSet, isEditingEnabled
-        else { return }
-        
         brushEngine.cancelStroke()
     }
     
@@ -142,13 +135,18 @@ extension DrawingEditorBrushToolVC: BrushGestureRecognizerGestureDelegate {
 
 extension DrawingEditorBrushToolVC: BrushEngineDelegate {
     
-    func onUpdateCanvas(_ engine: BrushEngine) {
+    func onUpdateActiveCanvasTexture(
+        _ e: BrushEngine
+    ) {
         delegate?.onUpdateActiveDrawingTexture(self)
     }
     
-    func onFinalizeStroke(_ engine: BrushEngine) {
+    func onFinalizeStroke(
+        _ e: BrushEngine,
+        canvasTexture: MTLTexture
+    ) {
         delegate?.onEditDrawing(self,
-            drawingTexture: brushEngine.canvasTexture)
+            drawingTexture: canvasTexture)
     }
     
 }

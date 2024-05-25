@@ -11,33 +11,28 @@ struct ImageResizer {
     
     func resize(
         imageData: Data,
-        width: Int,
-        height: Int,
-        targetWidth: Int,
-        targetHeight: Int
+        size: PixelSize,
+        targetSize: PixelSize
     ) throws -> Data {
         
         let imageTexture = try TextureCreator.createTexture(
             imageData: imageData,
-            width: width,
-            height: height,
+            size: size,
             mipMapped: true)
         
         return try resize(
             imageTexture: imageTexture,
-            targetWidth: targetWidth,
-            targetHeight: targetHeight)
+            targetSize: targetSize)
     }
     
     func resize(
         imageTexture: MTLTexture,
-        targetWidth: Int,
-        targetHeight: Int
+        targetSize: PixelSize
     ) throws -> Data {
         
         let texDesc = MTLTextureDescriptor()
-        texDesc.width = targetWidth
-        texDesc.height = targetHeight
+        texDesc.width = targetSize.width
+        texDesc.height = targetSize.height
         texDesc.pixelFormat = AppConfig.pixelFormat
         texDesc.storageMode = .shared
         texDesc.usage = .renderTarget

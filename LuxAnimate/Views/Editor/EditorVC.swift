@@ -69,13 +69,19 @@ class EditorVC: UIViewController {
     
     private func setInitialData() {
         let projectManifest = editor.currentProjectManifest
-        update(projectManifest: projectManifest)
+        
+        update(
+            projectManifest: projectManifest,
+            editContext: nil)
         
         timelineVC.setFocusedFrameIndex(0)
         frameVC.setFocusedFrameIndex(0)
     }
     
-    private func update(projectManifest: Project.Manifest) {
+    private func update(
+        projectManifest: Project.Manifest,
+        editContext: Any?
+    ) {
         model = modelGenerator.generate(
             from: projectManifest)
         
@@ -87,7 +93,9 @@ class EditorVC: UIViewController {
         timelineVC.setModel(model)
         timelineVC.setFocusedFrameIndex(focusedFrameIndex)
         
-        frameVC.setProjectManifest(projectManifest)
+        frameVC.setProjectManifest(
+            projectManifest,
+            editContext: editContext)
         frameVC.setFocusedFrameIndex(focusedFrameIndex)
         
         playbackController.setModel(model)
@@ -197,9 +205,14 @@ extension EditorVC: EditorFrameVCDelegate {
 
 extension EditorVC: ProjectEditorDelegate {
     
-    func onEditProject(_ editor: ProjectEditor) {
+    func onEditProject(
+        _ editor: ProjectEditor,
+        editContext: Any?
+    ) {
         let projectManifest = editor.currentProjectManifest
-        update(projectManifest: projectManifest)
+        update(
+            projectManifest: projectManifest,
+            editContext: editContext)
     }
     
 }

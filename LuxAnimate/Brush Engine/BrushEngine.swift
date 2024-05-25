@@ -18,7 +18,7 @@ protocol BrushEngineDelegate: AnyObject {
 
 extension BrushEngine {
     enum BrushMode {
-        case brush
+        case paint
         case erase
     }
 }
@@ -64,6 +64,8 @@ class BrushEngine {
     // MARK: - Interface
     
     func setCanvasTexture(_ texture: MTLTexture) {
+        endStroke()
+        
         try? TextureBlitter.blit(
             from: texture,
             to: canvasTexture)

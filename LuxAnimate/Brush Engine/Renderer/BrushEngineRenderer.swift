@@ -17,7 +17,7 @@ class BrushEngineRenderer {
         brushMode: BrushEngine.BrushMode
     ) {
         strokeBlendMode = switch brushMode {
-        case .brush: .normal
+        case .paint: .normal
         case .erase: .erase
         }
         

@@ -71,13 +71,17 @@ class EditorFrameDrawingEditorVC: UIViewController {
     
     private func selectBrushTool() {
         let vc = DrawingEditorBrushToolVC(
-            brushMode: .brush,
+            brushMode: .paint,
             drawingSize: drawingSize,
             canvasContentView: canvasContentView)
         
+        vc.delegate = self
         addChild(vc, to: view)
         activeToolVC = vc
-        // TODO: Notify delegate about slider values
+        
+        // TODO: is this the right way of passing these values around?
+        delegate?.onSetBrushScale(self, vc.brushScale)
+        delegate?.onSetBrushSmoothing(self, vc.brushSmoothing)
     }
     
     // MARK: - Interface

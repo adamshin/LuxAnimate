@@ -70,8 +70,13 @@ class EditorFrameVC: UIViewController {
     
     // MARK: - Interface
     
-    func setProjectManifest(_ projectManifest: Project.Manifest) {
-        frameEditorVC.setProjectManifest(projectManifest)
+    func setProjectManifest(
+        _ projectManifest: Project.Manifest,
+        editContext: Any?
+    ) {
+        frameEditorVC.setProjectManifest(
+            projectManifest,
+            editContext: editContext)
     }
     
     func setFocusedFrameIndex(_ index: Int) {
