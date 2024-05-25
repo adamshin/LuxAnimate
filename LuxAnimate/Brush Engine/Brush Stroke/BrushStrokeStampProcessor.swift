@@ -14,6 +14,8 @@ private let pressureSensitivity: Double = 1.5
 private let wobbleOctaveCount = 2
 private let wobblePersistence: Double = 0.5
 
+private let maxStampsPerUpdate = 500
+
 class BrushStrokeStampProcessor {
     
     struct State {
@@ -87,6 +89,8 @@ class BrushStrokeStampProcessor {
             state.stamps.append(firstStamp)
         }
         
+        var addedStampCount = 0
+        
         while state.segmentIndex < samples.count - 1 {
             let segmentStartSample = samples[state.segmentIndex]
             let segmentEndSample = samples[state.segmentIndex + 1]
@@ -136,6 +140,14 @@ class BrushStrokeStampProcessor {
                 if state.isFinalized {
                     lastFinalizedState = state
                 }
+                
+                addedStampCount += 1
+                if addedStampCount > maxStampsPerUpdate {
+                    break
+                }
+            }
+            if addedStampCount > maxStampsPerUpdate {
+                break
             }
         }
         

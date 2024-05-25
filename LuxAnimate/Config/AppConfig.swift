@@ -43,10 +43,10 @@ struct AppConfig {
     
     static let paintBrushConfig3 = Brush.Configuration(
         stampTextureName: "brush1.png",
-        stampSize: 200,
+        stampSize: 300,
         stampSpacing: 0,
         stampAlpha: 1,
-        pressureScaling: 1.0,
+        pressureScaling: 0.5,
         taperLength: 0,
         taperRoundness: 0,
         sizeWobble: 0,
