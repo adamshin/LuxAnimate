@@ -257,7 +257,7 @@ class ProjectEditSession {
     var isUndoAvailable: Bool { !undoHistoryEntries.isEmpty }
     var isRedoAvailable: Bool { !redoHistoryEntries.isEmpty }
     
-    func consumeHistoryEntry(
+    private func consumeHistoryEntry(
         entryID consumedHistoryEntryID: String
     ) throws -> String {
         // Setup

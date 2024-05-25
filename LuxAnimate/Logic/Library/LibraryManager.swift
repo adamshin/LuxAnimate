@@ -4,11 +4,6 @@
 
 import Foundation
 
-private let defaultCanvasSize = PixelSize(
-    width: 1920, height: 1080)
-
-private let defaultFramesPerSecond = 12
-
 struct LibraryManager {
     
     struct LibraryProject {
@@ -27,6 +22,8 @@ struct LibraryManager {
     
     private let encoder = JSONFileEncoder()
     private let decoder = JSONFileDecoder()
+    
+    private let projectCreator = ProjectCreator()
     
     // MARK: - Internal Methods
     
@@ -121,23 +118,8 @@ struct LibraryManager {
     }
     
     func createProject(name: String) throws -> String {
-        let projectID = UUID().uuidString
-        
-        let projectURL = fileUrlHelper
-            .projectURL(for: projectID)
-        let projectManifestURL = fileUrlHelper
-            .projectManifestURL(for: projectID)
-        
-        try fileManager.createDirectory(
-            at: projectURL,
-            withIntermediateDirectories: false)
-        
-        let projectManifest = createNewProjectManifest(
-            id: projectID,
-            name: name)
-        
-        let projectManifestData = try encoder.encode(projectManifest)
-        try projectManifestData.write(to: projectManifestURL)
+        let projectID = try projectCreator
+            .createProject(name: name)
         
         var libraryManifest = try getLibraryManifest()
         let project = LibraryManifest.Project(id: projectID)
@@ -186,36 +168,6 @@ struct LibraryManager {
             libraryManifest.projects.remove(at: projectIndex)
             try setLibraryManifest(libraryManifest)
         }
-    }
-    
-    // MARK: - Project Manifest
-    
-    private func createNewProjectManifest(
-        id: String,
-        name: String
-    ) -> Project.Manifest {
-        
-        let now = Date()
-        
-        let metadata = Project.Metadata(
-            viewportSize: defaultCanvasSize,
-            viewportMaxSize: defaultCanvasSize,
-            framesPerSecond: defaultFramesPerSecond)
-        
-        let content = Project.Content(
-            animationLayer: Project.AnimationLayer(
-                id: UUID().uuidString,
-                name: "Layer",
-                size: defaultCanvasSize,
-                drawings: []))
-        
-        return Project.Manifest(
-            id: id,
-            name: name,
-            createdAt: now,
-            metadata: metadata,
-            content: content,
-            assetIDs: [])
     }
     
 }
