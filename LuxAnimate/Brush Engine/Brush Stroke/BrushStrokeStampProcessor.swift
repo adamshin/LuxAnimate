@@ -18,7 +18,9 @@ class BrushStrokeStampProcessor {
     
     struct State {
         var stamps: [BrushStrokeEngine.Stamp]
+        
         var segmentIndex: Int
+        var lastStampDistanceAlongSegment: Double
         
         var isFinalized: Bool
     }
@@ -60,15 +62,13 @@ class BrushStrokeStampProcessor {
         lastFinalizedState = State(
             stamps: [],
             segmentIndex: 0,
+            lastStampDistanceAlongSegment: 0,
             isFinalized: true)
     }
         
     func process(
         samples: [BrushStrokeEngine.Sample]
     ) -> [BrushStrokeEngine.Stamp] {
-        // TODO: Simplify this so we're not checking
-        // distance so much. Current implementation is
-        // too expensive.
         
         guard !samples.isEmpty else { return [] }
         
@@ -91,26 +91,35 @@ class BrushStrokeStampProcessor {
             let segmentStartSample = samples[state.segmentIndex]
             let segmentEndSample = samples[state.segmentIndex + 1]
             
+            let segmentStartToEnd =
+                segmentEndSample.position -
+                segmentStartSample.position
+            
+            let segmentLength = segmentStartToEnd.length()
+            
             while true {
                 let prevStamp = state.stamps.last!
                 
-                let prevStampToSegmentEnd =
-                    segmentEndSample.position - prevStamp.position
-                
-                let distanceThreshold = max(
+                let distanceToNextStamp = max(
                     prevStamp.size * brush.config.stampSpacing,
                     minStampDistance)
                 
-                if prevStampToSegmentEnd.lengthSquared() <
-                    distanceThreshold * distanceThreshold
-                { break }
+                let nextStampDistanceAlongSegment =
+                    state.lastStampDistanceAlongSegment +
+                    distanceToNextStamp
                 
-                let stampDelta = prevStampToSegmentEnd.normalized() * distanceThreshold
-                let stampPosition = prevStamp.position + stampDelta
-                let strokeDistance = prevStamp.strokeDistance + stampDelta.length()
+                if nextStampDistanceAlongSegment > segmentLength {
+                    state.segmentIndex += 1
+                    state.lastStampDistanceAlongSegment -= segmentLength
+                    break
+                }
+                
+                let strokeDistance = prevStamp.strokeDistance + distanceToNextStamp
+                
+                let progressBetweenSamples = nextStampDistanceAlongSegment / segmentLength
                 
                 let interpolatedSample = Self.interpolatedSample(
-                    position: stampPosition,
+                    progressBetweenSamples: progressBetweenSamples,
                     sample1: segmentStartSample,
                     sample2: segmentEndSample)
                 
@@ -120,34 +129,30 @@ class BrushStrokeStampProcessor {
                     endTimeOffset: endTimeOffset)
                 
                 state.stamps.append(stamp)
+                state.lastStampDistanceAlongSegment = nextStampDistanceAlongSegment
+                
                 state.isFinalized = state.isFinalized && stamp.isFinalized
                 
                 if state.isFinalized {
                     lastFinalizedState = state
                 }
             }
-            
-            state.segmentIndex += 1
         }
         
         return state.stamps
     }
     
     private static func interpolatedSample(
-        position: Vector,
+        progressBetweenSamples: Double,
         sample1 s1: BrushStrokeEngine.Sample,
         sample2 s2: BrushStrokeEngine.Sample
     ) -> BrushStrokeEngine.Sample {
         
-        let d1 = (s1.position - position).length()
-        let d2 = (s2.position - position).length()
-        let d = max(d1 + d2, 0.001)
-        let r = clamp(d2 / d, min: 0, max: 1)
-        
-        let c1 = r
-        let c2 = 1 - r
+        let c1 = 1 - progressBetweenSamples
+        let c2 = progressBetweenSamples
         
         let timeOffset = c1 * s1.timeOffset + c2 * s2.timeOffset
+        let position = c1 * s1.position + c2 * s2.position
         let pressure = c1 * s1.pressure + c2 * s2.pressure
         let altitude = c1 * s1.altitude + c2 * s2.altitude
         let azimuth = c1 * s1.azimuth + c2 * s2.azimuth
