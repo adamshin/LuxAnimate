@@ -34,6 +34,7 @@ class EditorFrameDrawingEditorVC: UIViewController {
     private let drawingTexture: MTLTexture
     private var isDrawingTextureSet = false
     
+    private let toolContainerVC = PassthroughContainerViewController()
     private var activeToolVC: DrawingEditorToolVC?
     
     // MARK: - Init
@@ -64,20 +65,20 @@ class EditorFrameDrawingEditorVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        selectBrushTool()
+        addChild(toolContainerVC, to: view)
     }
     
     // MARK: - Tools
     
-    private func selectBrushTool() {
-        let vc = DrawingEditorBrushToolVC(
-            brushMode: .paint,
-            drawingSize: drawingSize,
-            canvasContentView: canvasContentView)
-        
+    private func activateToolVC(_ vc: DrawingEditorToolVC) {
         vc.delegate = self
-        addChild(vc, to: view)
+        toolContainerVC.show(vc)
+        
         activeToolVC = vc
+        
+        if isDrawingTextureSet {
+            vc.setDrawingTexture(drawingTexture)
+        }
         
         // TODO: is this the right way of passing these values around?
         delegate?.onSetBrushScale(self, vc.brushScale)
@@ -120,6 +121,26 @@ class EditorFrameDrawingEditorVC: UIViewController {
         activeToolVC?.activeDrawingTexture
     }
     
+    func selectBrushTool() {
+        let vc = DrawingEditorBrushToolVC(
+            brushConfig: AppConfig.paintBrushConfig,
+            brushMode: .paint,
+            drawingSize: drawingSize,
+            canvasContentView: canvasContentView)
+        
+        activateToolVC(vc)
+    }
+    
+    func selectEraseTool() {
+        let vc = DrawingEditorBrushToolVC(
+            brushConfig: AppConfig.eraseBrushConfig,
+            brushMode: .erase,
+            drawingSize: drawingSize,
+            canvasContentView: canvasContentView)
+        
+        activateToolVC(vc)
+    }
+    
 }
 
 // MARK: - Delegates
@@ -144,6 +165,16 @@ extension EditorFrameDrawingEditorVC: DrawingEditorToolVCDelegate {
         
         delegate?.onEditDrawing(self,
             drawingTexture: drawingTexture)
+    }
+    
+}
+
+// MARK: - Passthrough Container
+
+private class PassthroughContainerViewController: ContainerViewController {
+    
+    override func loadView() {
+        view = PassthroughView()
     }
     
 }

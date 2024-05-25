@@ -111,6 +111,8 @@ class EditorFrameEditorVC: UIViewController {
         addChild(drawingEditorVC, to: view)
         
         canvasVC.setCanvasSize(projectViewportSize)
+        
+        drawingEditorVC.selectBrushTool()
     }
     
     // MARK: - Frame
@@ -227,6 +229,14 @@ class EditorFrameEditorVC: UIViewController {
     
     func handleChangeSafeAreaReferenceViewFrame() {
         canvasVC.handleChangeSafeAreaReferenceViewFrame()
+    }
+    
+    func selectBrushTool() {
+        drawingEditorVC.selectBrushTool()
+    }
+    
+    func selectEraseTool() {
+        drawingEditorVC.selectEraseTool()
     }
     
 }

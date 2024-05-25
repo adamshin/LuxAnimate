@@ -155,12 +155,10 @@ extension EditorFrameVC: EditorFrameToolbarVCDelegate {
         delegate?.onSelectBack(self)
     }
     func onSelectBrush(_ vc: EditorFrameToolbarVC) {
-        // TODO: Notify frame editor vc?
-//        brushMode = .brush
+        frameEditorVC.selectBrushTool()
     }
     func onSelectErase(_ vc: EditorFrameToolbarVC) {
-        // TODO: Notify frame editor vc?
-//        brushMode = .erase
+        frameEditorVC.selectEraseTool()
     }
     func onSelectUndo(_ vc: EditorFrameToolbarVC) {
         delegate?.onSelectUndo(self)

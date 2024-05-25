@@ -19,14 +19,12 @@ class DrawingEditorBrushToolVC:
     private let brushMode: BrushEngine.BrushMode
     
     private let brushEngine: BrushEngine
+    private let brush: Brush
+    
+    private let brushGesture = BrushGestureRecognizer()
     
     var brushScale: Double = defaultBrushScale
     var brushSmoothing: Double = defaultBrushSmoothing
-    
-    private let brush = try! Brush(
-        configuration: AppConfig.brushConfig)
-    
-    private let brushGesture = BrushGestureRecognizer()
     
     private var isDrawingSet = false
     private var isEditingEnabled = true
@@ -34,6 +32,7 @@ class DrawingEditorBrushToolVC:
     // MARK: - Init
     
     init(
+        brushConfig: Brush.Configuration,
         brushMode: BrushEngine.BrushMode,
         drawingSize: PixelSize,
         canvasContentView: UIView
@@ -42,7 +41,9 @@ class DrawingEditorBrushToolVC:
         
         brushEngine = BrushEngine(
             canvasSize: drawingSize,
-            brushMode: .paint)
+            brushMode: brushMode)
+        
+        brush = try! Brush(configuration: brushConfig)
         
         super.init(nibName: nil, bundle: nil)
         brushEngine.delegate = self
@@ -52,6 +53,10 @@ class DrawingEditorBrushToolVC:
     }
     
     required init?(coder: NSCoder) { fatalError() }
+    
+    deinit {
+        brushGesture.view?.removeGestureRecognizer(brushGesture)
+    }
     
     // MARK: - Lifecycle
     
