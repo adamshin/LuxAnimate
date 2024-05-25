@@ -32,6 +32,7 @@ extension EditorFrameEditorVC {
     
     struct EditContext {
         var origin: EditorFrameEditorVC
+        var focusedFrameIndex: Int
         var activeDrawingID: String
     }
     
@@ -129,7 +130,6 @@ class EditorFrameEditorVC: UIViewController {
         guard let projectManifest else { return }
         
         // Reset drawing editor
-        drawingEditorVC.endActiveEdit()
         drawingEditorVC.clearDrawingTexture()
         
         // Generate scene
@@ -185,23 +185,31 @@ class EditorFrameEditorVC: UIViewController {
         if let scene,
             let c = editContext as? EditContext,
             c.origin == self,
+            c.focusedFrameIndex == focusedFrameIndex,
             c.activeDrawingID == scene.activeDrawingID
-        { return }
+        {
+            return
+        }
         
+        drawingEditorVC.endActiveEdit()
         updateScene()
     }
     
     func setFocusedFrameIndex(_ index: Int) {
         guard focusedFrameIndex != index else { return }
-        focusedFrameIndex = index
         
+        drawingEditorVC.endActiveEdit()
+        
+        focusedFrameIndex = index
         updateScene()
     }
     
     func setOnionSkinOn(_ on: Bool) {
         guard isOnionSkinOn != on else { return }
-        isOnionSkinOn = on
         
+        drawingEditorVC.endActiveEdit()
+        
+        isOnionSkinOn = on
         updateScene()
     }
     
@@ -268,6 +276,7 @@ extension EditorFrameEditorVC: EditorFrameDrawingEditorVCDelegate {
         
         let editContext = EditContext(
             origin: self,
+            focusedFrameIndex: focusedFrameIndex,
             activeDrawingID: activeDrawingID)
         
         delegate?.onEditDrawing(self,
