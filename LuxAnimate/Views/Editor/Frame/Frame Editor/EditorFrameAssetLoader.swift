@@ -37,8 +37,6 @@ class EditorFrameAssetLoader {
     private var pendingLoadItems: [LoadItem] = []
     private var loadedAssets: [String: LoadedAsset] = [:]
     
-    private var preCachedFullTextures: [String: MTLTexture] = [:]
-    
     private let fileUrlHelper = FileUrlHelper()
     
     private let loadQueue = DispatchQueue(
@@ -73,26 +71,17 @@ class EditorFrameAssetLoader {
         
         drawingIDsToLoad = Set(allDrawings.map { $0.id })
         
-        // Roll over any precached or already-loaded
-        // assets that we can reuse
+        // Reuse any already-loaded assets
         let oldLoadedAssets = loadedAssets
         loadedAssets = [:]
         
         for drawing in allDrawings {
-            if let texture = preCachedFullTextures[drawing.id] {
-                loadedAssets[drawing.id] = LoadedAsset(
-                    fullAssetID: drawing.assetIDs.full,
-                    quality: .full,
-                    texture: texture)
-                
-            } else if let existingAsset = oldLoadedAssets[drawing.id],
+            if let existingAsset = oldLoadedAssets[drawing.id],
                 existingAsset.fullAssetID == drawing.assetIDs.full
             {
                 loadedAssets[drawing.id] = existingAsset
             }
         }
-        
-        preCachedFullTextures = [:]
         
         // Create load items
         var loadItems: [LoadItem] = []
@@ -123,8 +112,8 @@ class EditorFrameAssetLoader {
                 quality: .full))
         }
         
-        // Queue up work. Wait for any pending load items
-        // to finish first
+        // Queue up work.
+        // Wait for any pending load items to finish first
         loadQueue.async {
             DispatchQueue.main.async {
                 self.pendingLoadItems = loadItems
@@ -226,17 +215,6 @@ class EditorFrameAssetLoader {
         !drawingIDsToLoad.contains {
             loadedAssets[$0] == nil
         }
-    }
-    
-    func preCacheFullTexture(
-        drawingTexture: MTLTexture,
-        drawingID: String
-    ) {
-        do {
-            let newTexture = try TextureCopier.copy(drawingTexture)
-            preCachedFullTextures[drawingID] = newTexture
-            
-        } catch { }
     }
     
 }

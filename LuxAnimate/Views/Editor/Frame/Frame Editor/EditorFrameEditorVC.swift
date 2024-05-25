@@ -32,6 +32,7 @@ extension EditorFrameEditorVC {
     
     struct EditContext {
         var origin: EditorFrameEditorVC
+        var activeDrawingID: String
     }
     
 }
@@ -181,8 +182,10 @@ class EditorFrameEditorVC: UIViewController {
     ) {
         self.projectManifest = projectManifest
         
-        if let c = editContext as? EditContext,
-            c.origin == self
+        if let scene,
+            let c = editContext as? EditContext,
+            c.origin == self,
+            c.activeDrawingID == scene.activeDrawingID
         { return }
         
         updateScene()
@@ -263,14 +266,14 @@ extension EditorFrameEditorVC: EditorFrameDrawingEditorVCDelegate {
         guard let activeDrawingID = scene?.activeDrawingID
         else { return }
         
-        assetLoader.preCacheFullTexture(
-            drawingTexture: drawingTexture,
-            drawingID: activeDrawingID)
+        let editContext = EditContext(
+            origin: self,
+            activeDrawingID: activeDrawingID)
         
         delegate?.onEditDrawing(self,
             drawingID: activeDrawingID,
             drawingTexture: drawingTexture,
-            editContext: EditContext(origin: self))
+            editContext: editContext)
     }
     
 }
