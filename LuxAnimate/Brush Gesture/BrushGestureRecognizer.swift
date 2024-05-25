@@ -6,7 +6,7 @@ import UIKit
 
 struct BrushStrokeGestureConfig {
     
-    static let pencilOnly = false
+    static let pencilOnly = true
     static let usePredictedTouches = true
     
     static let fingerActivationDelay: TimeInterval = 0.25

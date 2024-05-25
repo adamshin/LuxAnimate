@@ -53,7 +53,6 @@ class EditorFrameEditorVC: UIViewController {
     private let drawingSize: PixelSize
     
     private var projectManifest: Project.Manifest?
-    private var editContext: Any?
     private var focusedFrameIndex = 0
     private var isOnionSkinOn = false
     
@@ -123,16 +122,14 @@ class EditorFrameEditorVC: UIViewController {
         }
     }
     
-    // MARK: - Frame Data
+    // MARK: - Scene
     
-    private func updateFrameData() {
+    private func updateScene() {
         guard let projectManifest else { return }
         
-        if let c = editContext as? EditorFrameEditorVC.EditContext,
-            c.origin == self 
-        {
-            return
-        }
+        // Reset drawing editor
+        drawingEditorVC.endActiveEdit()
+        drawingEditorVC.clearDrawingTexture()
         
         // Generate scene
         let onionSkinCount = isOnionSkinOn ?
@@ -146,8 +143,7 @@ class EditorFrameEditorVC: UIViewController {
         
         self.scene = scene
         
-        drawingEditorVC.clearDrawingTexture()
-        
+        // Load assets
         assetLoader.loadAssets(
             drawings: scene.allDrawings,
             activeDrawingID: scene.activeDrawingID)
@@ -184,24 +180,26 @@ class EditorFrameEditorVC: UIViewController {
         editContext: Any?
     ) {
         self.projectManifest = projectManifest
-        self.editContext = editContext
-        updateFrameData()
+        
+        if let c = editContext as? EditContext,
+            c.origin == self
+        { return }
+        
+        updateScene()
     }
     
     func setFocusedFrameIndex(_ index: Int) {
         guard focusedFrameIndex != index else { return }
         focusedFrameIndex = index
         
-        drawingEditorVC.endActiveEdit()
-        updateFrameData()
+        updateScene()
     }
     
     func setOnionSkinOn(_ on: Bool) {
         guard isOnionSkinOn != on else { return }
         isOnionSkinOn = on
         
-        drawingEditorVC.endActiveEdit()
-        updateFrameData()
+        updateScene()
     }
     
     func setPlaying(_ playing: Bool) {
@@ -229,6 +227,7 @@ extension EditorFrameEditorVC: EditorFrameEditorCanvasVCDelegate {
     func onSelectUndo(_ vc: EditorFrameEditorCanvasVC) {
         delegate?.onSelectUndo(self)
     }
+    
     func onSelectRedo(_ vc: EditorFrameEditorCanvasVC) {
         delegate?.onSelectRedo(self)
     }
