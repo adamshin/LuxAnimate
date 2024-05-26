@@ -66,7 +66,8 @@ struct SpriteRenderer {
         
         renderEncoder.setRenderPipelineState(pipelineState)
         
-        var vertices: [SpriteVertex] = []
+        var vertices = Array<SpriteVertex>()
+        vertices.reserveCapacity(sprites.count * 6)
         
         for s in sprites {
             var t = Matrix3.identity
