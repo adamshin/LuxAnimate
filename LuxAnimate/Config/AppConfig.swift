@@ -15,20 +15,9 @@ struct AppConfig {
     
     static let brushRenderDebug = false
     
-    static let paintBrushConfig1 = Brush.Configuration(
-        stampTextureName: "brush1.png",
-        stampSize: 50,
-        stampSpacing: 0.0,
-        stampAlpha: 1,
-        pressureScaling: 0.3,
-        taperLength: 0.1,
-        taperRoundness: 1.0,
-        sizeWobble: 0.1,
-        offsetWobble: 0.1,
-        wobbleFrequency: 0.5,
-        wobblePressureAttenuation: 0.6)
+    static let paintBrushConfig = wobbleBrushConfig
     
-    static let paintBrushConfig2 = Brush.Configuration(
+    static let wobbleBrushConfig = Brush.Configuration(
         stampTextureName: "brush1.png",
         stampSize: 100,
         stampSpacing: 0.0,
@@ -41,7 +30,20 @@ struct AppConfig {
         wobbleFrequency: 0.25,
         wobblePressureAttenuation: 0.5)
     
-    static let paintBrushConfig3 = Brush.Configuration(
+    static let penBrushConfig = Brush.Configuration(
+        stampTextureName: "brush1.png",
+        stampSize: 50,
+        stampSpacing: 0.0,
+        stampAlpha: 1,
+        pressureScaling: 0.3,
+        taperLength: 0,
+        taperRoundness: 1,
+        sizeWobble: 0.1,
+        offsetWobble: 0.05,
+        wobbleFrequency: 0.7,
+        wobblePressureAttenuation: 0.6)
+    
+    static let roundBrushConfig = Brush.Configuration(
         stampTextureName: "brush1.png",
         stampSize: 300,
         stampSpacing: 0,
@@ -53,8 +55,6 @@ struct AppConfig {
         offsetWobble: 0,
         wobbleFrequency: 0,
         wobblePressureAttenuation: 0)
-    
-    static let paintBrushConfig = paintBrushConfig3
     
     static let eraseBrushConfig = Brush.Configuration(
         stampTextureName: "brush1.png",

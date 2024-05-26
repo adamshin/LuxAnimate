@@ -130,7 +130,6 @@ class EditorFrameDrawingEditorVC: UIViewController {
         
         activateToolVC(vc)
     }
-    
     func selectEraseTool() {
         let vc = DrawingEditorBrushToolVC(
             brushConfig: AppConfig.eraseBrushConfig,
@@ -139,6 +138,13 @@ class EditorFrameDrawingEditorVC: UIViewController {
             canvasContentView: canvasContentView)
         
         activateToolVC(vc)
+    }
+    
+    func setBrushScale(_ brushScale: Double) {
+        activeToolVC?.brushScale = brushScale
+    }
+    func setBrushSmoothing(_ brushSmoothing: Double) {
+        activeToolVC?.brushSmoothing = brushSmoothing
     }
     
 }

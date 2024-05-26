@@ -59,6 +59,7 @@ class EditorFrameVC: UIViewController {
         
         frameEditorVC.delegate = self
         toolbarVC.delegate = self
+        sidebarVC.delegate = self
         
         addChild(frameEditorVC, to: bodyView.frameEditorContainer)
         addChild(toolbarVC, to: bodyView.toolbarContainer)
@@ -168,6 +169,24 @@ extension EditorFrameVC: EditorFrameToolbarVCDelegate {
     }
     func onSetTraceOn(_ vc: EditorFrameToolbarVC, on: Bool) {
         frameEditorVC.setOnionSkinOn(on)
+    }
+    
+}
+
+extension EditorFrameVC: EditorFrameSidebarVCDelegate {
+    
+    func onSetBrushScale(
+        _ vc: EditorFrameSidebarVC,
+        _ brushScale: Double
+    ) {
+        frameEditorVC.setBrushScale(brushScale)
+    }
+    
+    func onSetBrushSmoothing(
+        _ vc: EditorFrameSidebarVC,
+        _ brushSmoothing: Double
+    ) {
+        frameEditorVC.setBrushSmoothing(brushSmoothing)
     }
     
 }

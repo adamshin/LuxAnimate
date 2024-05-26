@@ -5,11 +5,15 @@
 import UIKit
 import Metal
 
-// TODO: Load and save values
 private let defaultBrushScale: Double = 0.2
 private let defaultBrushSmoothing: Double = 0
 
 private let brushColor: Color = .brushBlack
+
+private var lastPaintBrushScale: Double?
+private var lastPaintBrushSmoothing: Double?
+private var lastEraseBrushScale: Double?
+private var lastEraseBrushSmoothing: Double?
 
 class DrawingEditorBrushToolVC:
     UIViewController, DrawingEditorToolVC
@@ -23,8 +27,26 @@ class DrawingEditorBrushToolVC:
     
     private let brushGesture = BrushGestureRecognizer()
     
-    var brushScale: Double = defaultBrushScale
-    var brushSmoothing: Double = defaultBrushSmoothing
+    var brushScale: Double = 0 {
+        didSet {
+            switch brushMode {
+            case .paint:
+                lastPaintBrushScale = brushScale
+            case .erase:
+                lastEraseBrushScale = brushScale
+            }
+        }
+    }
+    var brushSmoothing: Double = 0 {
+        didSet {
+            switch brushMode {
+            case .paint:
+                lastPaintBrushSmoothing = brushSmoothing
+            case .erase:
+                lastEraseBrushSmoothing = brushSmoothing
+            }
+        }
+    }
     
     private var isDrawingSet = false
     private var isEditingEnabled = true
@@ -50,6 +72,15 @@ class DrawingEditorBrushToolVC:
         
         canvasContentView.addGestureRecognizer(brushGesture)
         brushGesture.gestureDelegate = self
+        
+        switch brushMode {
+        case .paint:
+            brushScale = lastPaintBrushScale ?? defaultBrushScale
+            brushSmoothing = lastPaintBrushSmoothing ?? defaultBrushSmoothing
+        case .erase:
+            brushScale = lastEraseBrushScale ?? defaultBrushScale
+            brushSmoothing = lastEraseBrushSmoothing ?? defaultBrushSmoothing
+        }
     }
     
     required init?(coder: NSCoder) { fatalError() }

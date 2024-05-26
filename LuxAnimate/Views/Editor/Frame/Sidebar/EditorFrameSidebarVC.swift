@@ -4,13 +4,24 @@
 
 import UIKit
 
-private let defaultScale: Double = 0.2
-private let defaultSmoothing: Double = 0
-
 private let scaleGamma: Double = 2.0
 private let smoothingGamma: Double = 1.5
 
+protocol EditorFrameSidebarVCDelegate: AnyObject {
+    
+    func onSetBrushScale(
+        _ vc: EditorFrameSidebarVC,
+        _ brushScale: Double)
+    
+    func onSetBrushSmoothing(
+        _ vc: EditorFrameSidebarVC,
+        _ brushSmoothing: Double)
+    
+}
+
 class EditorFrameSidebarVC: UIViewController {
+    
+    weak var delegate: EditorFrameSidebarVCDelegate?
     
     private let scaleSlider = EditorSidebarSliderContainer(
         title: "Size",
@@ -41,8 +52,8 @@ class EditorFrameSidebarVC: UIViewController {
         stack.addArrangedSubview(jogWheelButton)
         stack.addArrangedSubview(smoothingSlider)
         
-        brushScale = defaultScale
-        brushSmoothing = defaultSmoothing
+        scaleSlider.delegate = self
+        smoothingSlider.delegate = self
     }
     
     var brushScale: Double {
@@ -53,6 +64,19 @@ class EditorFrameSidebarVC: UIViewController {
     var brushSmoothing: Double {
         get { smoothingSlider.value }
         set { smoothingSlider.value = newValue }
+    }
+    
+}
+
+extension EditorFrameSidebarVC: EditorSidebarSliderContainerDelegate {
+    
+    func onChangeValue(_ v: EditorSidebarSliderContainer) {
+        if v == scaleSlider {
+            delegate?.onSetBrushScale(self, brushScale)
+        }
+        if v == smoothingSlider {
+            delegate?.onSetBrushSmoothing(self, brushSmoothing)
+        }
     }
     
 }

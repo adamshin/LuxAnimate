@@ -4,7 +4,13 @@
 
 import UIKit
 
+protocol EditorSidebarSliderContainerDelegate: AnyObject {
+    func onChangeValue(_ v: EditorSidebarSliderContainer)
+}
+
 class EditorSidebarSliderContainer: UIView {
+    
+    weak var delegate: EditorSidebarSliderContainerDelegate?
     
     enum ValueDisplayMode {
         case percent(minValue: Int)
@@ -65,6 +71,7 @@ extension EditorSidebarSliderContainer: EditorSidebarSliderDelegate {
     
     func onChangeValue(_ v: EditorSidebarSlider) {
         popupView.updateValue(value)
+        delegate?.onChangeValue(self)
     }
     
 }

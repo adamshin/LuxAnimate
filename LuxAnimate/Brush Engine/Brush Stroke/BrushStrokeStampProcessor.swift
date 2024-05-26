@@ -14,7 +14,7 @@ private let pressureSensitivity: Double = 1.5
 private let wobbleOctaveCount = 2
 private let wobblePersistence: Double = 0.5
 
-private let maxStampsPerUpdate = 500
+private let maxStampsPerUpdate = 2000
 
 class BrushStrokeStampProcessor {
     

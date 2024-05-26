@@ -5,7 +5,7 @@
 import UIKit
 import Metal
 
-private let onionSkinCount = 1
+private let onionSkinCount = 2
 
 protocol EditorFrameEditorVCDelegate: AnyObject {
     
@@ -234,9 +234,15 @@ class EditorFrameEditorVC: UIViewController {
     func selectBrushTool() {
         drawingEditorVC.selectBrushTool()
     }
-    
     func selectEraseTool() {
         drawingEditorVC.selectEraseTool()
+    }
+    
+    func setBrushScale(_ brushScale: Double) {
+        drawingEditorVC.setBrushScale(brushScale)
+    }
+    func setBrushSmoothing(_ brushSmoothing: Double) {
+        drawingEditorVC.setBrushSmoothing(brushSmoothing)
     }
     
 }
