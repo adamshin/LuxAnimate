@@ -18,7 +18,7 @@ struct LibraryManager {
     }
     
     private let fileManager = FileManager.default
-    private let fileUrlHelper = FileUrlHelper()
+    private let fileURLHelper = FileUrlHelper()
     
     private let encoder = JSONFileEncoder()
     private let decoder = JSONFileDecoder()
@@ -28,7 +28,7 @@ struct LibraryManager {
     // MARK: - Internal Methods
     
     private func createLibraryDirectoryIfNeeded() throws {
-        let url = fileUrlHelper.libraryDirectoryURL
+        let url = fileURLHelper.libraryDirectoryURL
         if fileManager.fileExists(atPath: url.path()) {
             return
         }
@@ -40,7 +40,7 @@ struct LibraryManager {
     private func createLibraryManifestIfNeeded() throws {
         try createLibraryDirectoryIfNeeded()
         
-        let url = fileUrlHelper.libraryManifestURL
+        let url = fileURLHelper.libraryManifestURL
         if fileManager.fileExists(atPath: url.path()) {
             return
         }
@@ -52,7 +52,7 @@ struct LibraryManager {
     private func getLibraryManifest() throws -> LibraryManifest {
         try createLibraryManifestIfNeeded()
         
-        let url = fileUrlHelper.libraryManifestURL
+        let url = fileURLHelper.libraryManifestURL
         let data = try Data(contentsOf: url)
         
         return try decoder.decode(LibraryManifest.self, from: data)
@@ -61,7 +61,7 @@ struct LibraryManager {
     private func setLibraryManifest(
         _ libraryManifest: LibraryManifest
     ) throws {
-        let url = fileUrlHelper.libraryManifestURL
+        let url = fileURLHelper.libraryManifestURL
         
         let data = try encoder.encode(libraryManifest)
         try data.write(to: url)
@@ -77,9 +77,9 @@ struct LibraryManager {
         for manifestProject in libraryManifest.projects {
             let projectID = manifestProject.id
             
-            let projectURL = fileUrlHelper
+            let projectURL = fileURLHelper
                 .projectURL(for: projectID)
-            let projectManifestURL = fileUrlHelper
+            let projectManifestURL = fileURLHelper
                 .projectManifestURL(for: projectID)
             
             guard let projectManifestData = try? Data(
@@ -91,20 +91,25 @@ struct LibraryManager {
                 from: projectManifestData)
             else { continue }
             
-            let firstDrawing = projectManifest.content
-                .animationLayer
-                .drawings
-                .sorted { $0.frameIndex < $1.frameIndex }
-                .first
-            
-            let thumbnailURL: URL?
-            if let firstDrawing {
-                thumbnailURL = fileUrlHelper.projectAssetURL(
+            let thumbnailURL: URL? = {
+                guard let layer = projectManifest
+                    .content.scenes.first?.layers.first
+                else { return nil }
+                
+                guard case let .animation(animationLayerContent)
+                    = layer.content
+                else { return nil }
+                
+                guard let firstDrawing = animationLayerContent
+                    .drawings
+                    .sorted(using: KeyPathComparator(\.frameIndex))
+                    .first
+                else { return nil }
+                
+                return fileURLHelper.projectAssetURL(
                     projectID: projectID,
                     assetID: firstDrawing.assetIDs.medium)
-            } else {
-                thumbnailURL = nil
-            }
+            }()
             
             let project = LibraryProject(
                 id: projectID,
@@ -136,7 +141,7 @@ struct LibraryManager {
             throw RenameError.invalidName
         }
         
-        let projectManifestURL = fileUrlHelper
+        let projectManifestURL = fileURLHelper
             .projectManifestURL(for: projectID)
         
         let projectManifestData = try Data(
@@ -156,7 +161,7 @@ struct LibraryManager {
     }
     
     func deleteProject(projectID: String) throws {
-        let projectURL = fileUrlHelper
+        let projectURL = fileURLHelper
             .projectURL(for: projectID)
         
         try fileManager.removeItem(at: projectURL)

@@ -1,5 +1,5 @@
 //
-//  SharedModels.swift
+//  MiscModels.swift
 //
 
 import Foundation

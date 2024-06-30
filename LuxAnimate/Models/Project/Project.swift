@@ -23,21 +23,38 @@ enum Project {
     
     struct Metadata: Codable {
         var viewportSize: PixelSize
-        var viewportMaxSize: PixelSize
-        
         var framesPerSecond: Int
     }
     
     // MARK: - Content
     
     struct Content: Codable {
-        var animationLayer: AnimationLayer
+        var scenes: [Scene]
     }
     
-    struct AnimationLayer: Codable {
+    struct Scene: Codable {
         var id: String
         var name: String
         
+        var frameCount: Int
+        var backgroundColor: Color
+        
+        var layers: [SceneLayer]
+    }
+    
+    struct SceneLayer: Codable {
+        var id: String
+        var name: String
+        
+        var content: SceneLayerContent
+    }
+    
+    enum SceneLayerContent: Codable {
+        case animation(AnimationSceneLayerContent)
+        // TODO: Image, video, layer group
+    }
+    
+    struct AnimationSceneLayerContent: Codable {
         var size: PixelSize
         var drawings: [Drawing]
     }

@@ -4,6 +4,7 @@
 
 import Foundation
 
+// Make this part of EditorFrameEditorScene?
 struct FrameScene {
     
     var backgroundColor: Color
@@ -16,9 +17,7 @@ enum FrameSceneLayer {
 }
 
 struct FrameSceneDrawingLayer {
-    
     var drawing: Project.Drawing
-    
 }
 
 // MARK: - Generation
@@ -33,7 +32,7 @@ extension FrameScene {
         var layers: [FrameSceneLayer] = []
         
         let drawings = projectManifest
-            .content.animationLayer.drawings
+            .content.scene.animationLayer.drawings
         
         if let drawing = ProjectHelper.drawingForFrame(
             drawings: drawings,

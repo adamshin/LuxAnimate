@@ -60,6 +60,12 @@ struct FileUrlHelper {
             directoryHint: .isDirectory)
     }
     
+    func renderCacheDirectoryURL() -> URL {
+        cacheDirectoryURL.appending(
+            path: "renderCache",
+            directoryHint: .isDirectory)
+    }
+    
     func projectAssetURL(
         projectID: String,
         assetID: String

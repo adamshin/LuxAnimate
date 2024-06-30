@@ -10,8 +10,8 @@ struct AppConfig {
     static let pixelFormat: MTLPixelFormat = .rgba8Unorm
     static let metalLayerPixelFormat: MTLPixelFormat = .bgra8Unorm
     
-    static let assetPreviewMediumSize = 1200
-    static let assetPreviewSmallSize = 300
+    static let assetPreviewMediumSize = 1280
+    static let assetPreviewSmallSize = 270
     
     static let brushRenderDebug = false
     

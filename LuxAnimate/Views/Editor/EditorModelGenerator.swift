@@ -4,15 +4,20 @@
 
 import Foundation
 
-private let displayedFrameCount = 100
-
 struct EditorModelGenerator {
     
-    private let fileUrlHelper = FileUrlHelper()
+    private let fileURLHelper = FileUrlHelper()
     
     func generate(
         from projectManifest: Project.Manifest
     ) -> EditorModel {
+        
+        let scene = projectManifest.content.scenes.first!
+        
+        let animationLayerContent = switch scene.layers.first!.content {
+        case let .animation(animationLayerContent):
+            animationLayerContent
+        }
         
         let framesPerSecond = projectManifest.metadata.framesPerSecond
         
@@ -22,15 +27,15 @@ struct EditorModelGenerator {
         
         var frames = Array(
             repeating: emptyFrame,
-            count: displayedFrameCount)
+            count: scene.frameCount)
         
         // Put drawings on frames
-        let drawings = projectManifest.content.animationLayer.drawings
+        let drawings = animationLayerContent.drawings
         for drawing in drawings {
             guard frames.indices.contains(drawing.frameIndex)
             else { continue }
             
-            let thumbnailURL = fileUrlHelper.projectAssetURL(
+            let thumbnailURL = fileURLHelper.projectAssetURL(
                 projectID: projectManifest.id,
                 assetID: drawing.assetIDs.small)
             

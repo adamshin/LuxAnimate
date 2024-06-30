@@ -13,7 +13,7 @@ private let defaultFramesPerSecond = 12
 struct ProjectCreator {
     
     private let fileManager = FileManager.default
-    private let fileUrlHelper = FileUrlHelper()
+    private let fileURLHelper = FileUrlHelper()
     
     private let encoder = JSONFileEncoder()
     private let decoder = JSONFileDecoder()
@@ -35,9 +35,9 @@ struct ProjectCreator {
         
         let projectID = UUID().uuidString
         
-        let projectURL = fileUrlHelper
+        let projectURL = fileURLHelper
             .projectURL(for: projectID)
-        let projectManifestURL = fileUrlHelper
+        let projectManifestURL = fileURLHelper
             .projectManifestURL(for: projectID)
         
         try fileManager.createDirectory(
@@ -63,15 +63,26 @@ struct ProjectCreator {
         
         let metadata = Project.Metadata(
             viewportSize: defaultCanvasSize,
-            viewportMaxSize: defaultCanvasSize,
             framesPerSecond: defaultFramesPerSecond)
         
+        let animSceneLayerContent = Project.AnimationSceneLayerContent(
+            size: defaultCanvasSize,
+            drawings: [])
+        
+        let animSceneLayer = Project.SceneLayer(
+            id: UUID().uuidString,
+            name: "Layer",
+            content: .animation(animSceneLayerContent))
+        
+        let scene = Project.Scene(
+            id: UUID().uuidString,
+            name: "Scene",
+            frameCount: 100,
+            backgroundColor: .white,
+            layers: [animSceneLayer])
+        
         let content = Project.Content(
-            animationLayer: Project.AnimationLayer(
-                id: UUID().uuidString,
-                name: "Layer",
-                size: defaultCanvasSize,
-                drawings: []))
+            scene: scene)
         
         return Project.Manifest(
             id: id,

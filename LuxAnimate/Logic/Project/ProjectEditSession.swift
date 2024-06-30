@@ -24,7 +24,7 @@ class ProjectEditSession {
     private let projectID: String
     
     private let fileManager = FileManager.default
-    private let fileUrlHelper = FileUrlHelper()
+    private let fileURLHelper = FileUrlHelper()
     
     private let encoder = JSONFileEncoder()
     private let decoder = JSONFileDecoder()
@@ -39,7 +39,7 @@ class ProjectEditSession {
     init(projectID: String) throws {
         self.projectID = projectID
         
-        let projectManifestURL = fileUrlHelper
+        let projectManifestURL = fileURLHelper
             .projectManifestURL(for: projectID)
         
         let projectManifestData = try Data(
@@ -65,7 +65,7 @@ class ProjectEditSession {
     // MARK: - Edit History
     
     private func historyDirectoryURL() -> URL {
-        fileUrlHelper.projectHistoryDirectoryURL(
+        fileURLHelper.projectHistoryDirectoryURL(
             for: projectID)
     }
     
@@ -139,7 +139,7 @@ class ProjectEditSession {
     private func assetURLInProject(
         assetID: String
     ) -> URL {
-        fileUrlHelper
+        fileURLHelper
             .projectURL(for: projectID)
             .appending(path: assetID)
     }
@@ -197,7 +197,7 @@ class ProjectEditSession {
         // Setup
         let oldProjectManifest = self.currentProjectManifest
         
-        let projectManifestURL = fileUrlHelper
+        let projectManifestURL = fileURLHelper
             .projectManifestURL(for: projectID)
         
         // Clear redo history
@@ -263,9 +263,9 @@ class ProjectEditSession {
         // Setup
         let currentProjectManifest = self.currentProjectManifest
         
-        let projectURL = fileUrlHelper.projectURL(for: projectID)
+        let projectURL = fileURLHelper.projectURL(for: projectID)
         
-        let projectManifestURL = fileUrlHelper
+        let projectManifestURL = fileURLHelper
             .projectManifestURL(for: projectID)
         
         let consumedHistoryEntryURL = historyEntryURL(
