@@ -22,6 +22,8 @@ extension Brush {
         var offsetWobble: Double
         var wobbleFrequency: Double
         var wobblePressureAttenuation: Double
+        
+        var baseSmoothing: Double
     }
     
     enum LoadError: Error {

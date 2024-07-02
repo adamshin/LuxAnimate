@@ -69,6 +69,7 @@ class BrushStrokeEngine {
         inputInterpolationProcessor = .init()
         
         smoothingProcessor = .init(
+            brush: brush,
             smoothing: smoothing)
         
         pressureFilteringProcessor = .init()
