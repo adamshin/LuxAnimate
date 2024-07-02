@@ -14,11 +14,19 @@ class JSONFileEncoder: JSONEncoder {
     
     override init() {
         super.init()
-        self.dateEncodingStrategy = .custom {
+        
+        outputFormatting = [.sortedKeys]
+        
+        dateEncodingStrategy = .custom {
             var container = $1.singleValueContainer()
             let string = dateFormatter.string(from: $0)
             try container.encode(string)
         }
+        
+        nonConformingFloatEncodingStrategy = .convertToString(
+            positiveInfinity: "inf",
+            negativeInfinity: "-inf",
+            nan: "nan")
     }
     
 }
@@ -27,7 +35,8 @@ class JSONFileDecoder: JSONDecoder {
     
     override init() {
         super.init()
-        self.dateDecodingStrategy = .custom {
+        
+        dateDecodingStrategy = .custom {
             let container = try $0.singleValueContainer()
             let string = try container.decode(String.self)
             if let date = dateFormatter.date(from: string) {
@@ -37,6 +46,11 @@ class JSONFileDecoder: JSONDecoder {
                 in: container,
                 debugDescription: "Invalid date: \(string)")
         }
+        
+        nonConformingFloatDecodingStrategy = .convertFromString(
+            positiveInfinity: "inf",
+            negativeInfinity: "-inf",
+            nan: "nan")
     }
     
 }

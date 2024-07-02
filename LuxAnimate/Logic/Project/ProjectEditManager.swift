@@ -1,12 +1,12 @@
 //
-//  ProjectEditSession.swift
+//  ProjectEditManager.swift
 //
 
 import Foundation
 
 private let undoHistoryLimit = 100
 
-extension ProjectEditSession {
+extension ProjectEditManager {
     
     struct NewAsset {
         var id: String
@@ -19,17 +19,17 @@ extension ProjectEditSession {
     
 }
 
-class ProjectEditSession {
+class ProjectEditManager {
     
     private let projectID: String
     
     private let fileManager = FileManager.default
-    private let fileURLHelper = FileUrlHelper()
+    private let fileURLHelper = FileURLHelper()
     
     private let encoder = JSONFileEncoder()
     private let decoder = JSONFileDecoder()
     
-    private(set) var currentProjectManifest: Project.Manifest
+    private(set) var projectManifest: Project.Manifest
     
     private var undoHistoryEntries: [HistoryEntry]
     private var redoHistoryEntries: [HistoryEntry]
@@ -45,7 +45,7 @@ class ProjectEditSession {
         let projectManifestData = try Data(
             contentsOf: projectManifestURL)
         
-        currentProjectManifest = try decoder.decode(
+        projectManifest = try decoder.decode(
             Project.Manifest.self,
             from: projectManifestData)
         
@@ -195,7 +195,7 @@ class ProjectEditSession {
     ) throws {
         
         // Setup
-        let oldProjectManifest = self.currentProjectManifest
+        let oldProjectManifest = self.projectManifest
         
         let projectManifestURL = fileURLHelper
             .projectManifestURL(for: projectID)
@@ -204,7 +204,7 @@ class ProjectEditSession {
         clearRedoHistory()
         
         // Create new history entry
-        let historyEntryID = UUID().uuidString
+        let historyEntryID = IDGenerator.id()
         try createHistoryEntryDirectory(entryID: historyEntryID)
         
         // Copy old project manifest to history entry
@@ -213,7 +213,7 @@ class ProjectEditSession {
         
         let historyEntryProjectManifestURL =
             historyEntryURL.appending(
-                path: FileUrlHelper.projectManifestFileName)
+                path: FileURLHelper.projectManifestFileName)
         
         try fileManager.copyItem(
             at: projectManifestURL,
@@ -229,7 +229,7 @@ class ProjectEditSession {
         try newProjectManifestData.write(to: projectManifestURL)
         
         // Update current project manifest
-        self.currentProjectManifest = newProjectManifest
+        self.projectManifest = newProjectManifest
         
         // Find assets referenced in the old manifest but not the
         // new one. Move these to the new history entry
@@ -261,7 +261,7 @@ class ProjectEditSession {
         entryID consumedHistoryEntryID: String
     ) throws -> String {
         // Setup
-        let currentProjectManifest = self.currentProjectManifest
+        let currentProjectManifest = self.projectManifest
         
         let projectURL = fileURLHelper.projectURL(for: projectID)
         
@@ -272,7 +272,7 @@ class ProjectEditSession {
             entryID: consumedHistoryEntryID)
         
         let consumedProjectManifestURL = consumedHistoryEntryURL
-            .appending(path: FileUrlHelper.projectManifestFileName)
+            .appending(path: FileURLHelper.projectManifestFileName)
         
         let consumedProjectManifestData = try Data(
             contentsOf: consumedProjectManifestURL)
@@ -282,7 +282,7 @@ class ProjectEditSession {
             from: consumedProjectManifestData)
         
         // Create new history entry
-        let createdHistoryEntryID = UUID().uuidString
+        let createdHistoryEntryID = IDGenerator.id()
         try createHistoryEntryDirectory(entryID: createdHistoryEntryID)
         
         // Copy current project manifest to new history entry
@@ -290,7 +290,7 @@ class ProjectEditSession {
             entryID: createdHistoryEntryID)
         
         let createdHistoryEntryProjectManifestURL = createdHistoryEntryURL
-            .appending(path: FileUrlHelper.projectManifestFileName)
+            .appending(path: FileURLHelper.projectManifestFileName)
         
         try fileManager.copyItem(
             at: projectManifestURL,
@@ -303,7 +303,7 @@ class ProjectEditSession {
             
         for fileURL in consumedEntryFileURLs {
             let fileName = fileURL.lastPathComponent
-            if fileName == FileUrlHelper.projectManifestFileName { continue }
+            if fileName == FileURLHelper.projectManifestFileName { continue }
             
             let destinationURL = projectURL
                 .appendingPathComponent(fileName)
@@ -314,14 +314,14 @@ class ProjectEditSession {
         // Replace project manifest with consumed entry manifest
         let consumedEntryProjectManifestURL = 
             consumedHistoryEntryURL.appending(
-                path: FileUrlHelper.projectManifestFileName)
+                path: FileURLHelper.projectManifestFileName)
         
         _ = try fileManager.replaceItemAt(
             projectManifestURL,
             withItemAt: consumedEntryProjectManifestURL)
         
         // Update current project manifest
-        self.currentProjectManifest = consumedProjectManifest
+        self.projectManifest = consumedProjectManifest
         
         // Delete the consumed history entry
         try removeHistoryEntryDirectory(entryID: consumedHistoryEntryID)

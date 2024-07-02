@@ -9,7 +9,7 @@ class RenderCacheManager {
     private let projectID: String
     
     private let fileManager = FileManager.default
-    private let fileURLHelper = FileUrlHelper()
+    private let fileURLHelper = FileURLHelper()
     
     init(projectID: String) throws {
         self.projectID = projectID

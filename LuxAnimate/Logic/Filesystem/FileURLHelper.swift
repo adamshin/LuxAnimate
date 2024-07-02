@@ -1,10 +1,10 @@
 //
-//  FileUrlHelper.swift
+//  FileURLHelper.swift
 //
 
 import Foundation
 
-struct FileUrlHelper {
+struct FileURLHelper {
     
     static let libraryManifestFileName = "manifest"
     static let projectManifestFileName = "manifest"

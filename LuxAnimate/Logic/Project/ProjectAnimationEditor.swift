@@ -1,43 +1,134 @@
 //
-//  ProjectEditor.swift
+//  ProjectAnimationEditor.swift
 //
 
 import Foundation
 import Metal
 
-protocol ProjectEditorDelegate: AnyObject {
+protocol ProjectAnimationEditorDelegate: AnyObject {
     
     func onEditProject(
-        _ editor: ProjectEditor,
+        _ editor: ProjectAnimationEditor,
         editContext: Any?)
     
 }
 
-class ProjectEditor {
+class ProjectAnimationEditor {
     
-    weak var delegate: ProjectEditorDelegate?
+    weak var delegate: ProjectAnimationEditorDelegate?
     
     private let projectID: String
-    private let editSession: ProjectEditSession
+    private let sceneID: String
+    private let sceneLayerID: String
     
-    private let queue = ProjectEditorWorkQueue()
+    private let editManager: ProjectEditManager
     
+    private let fileURLHelper = FileURLHelper()
+    private let workQueue = ProjectAnimationEditorWorkQueue()
     private let imageResizer = ImageResizer()
     
-    init(projectID: String) throws {
-        self.projectID = projectID
-        
-        editSession = try ProjectEditSession(
-            projectID: projectID)
+    private let encoder = JSONFileEncoder()
+    private let decoder = JSONFileDecoder()
+    
+    private var projectManifest: Project.Manifest
+    private var sceneManifest: Project.SceneManifest
+    
+    enum InitError: Error {
+        case sceneNotFound
     }
     
-    var currentProjectManifest: Project.Manifest {
-        editSession.currentProjectManifest
+    // MARK: - Init
+    
+    init(
+        projectID: String,
+        sceneID: String,
+        sceneLayerID: String,
+        editManager: ProjectEditManager
+    ) throws {
+        
+        self.projectID = projectID
+        self.sceneID = sceneID
+        self.sceneLayerID = sceneLayerID
+        self.editManager = editManager
+        
+        self.projectManifest = editManager.projectManifest
+        
+        guard let scene = projectManifest.content.scenes
+            .first(where: { $0.id == sceneID })
+        else { throw InitError.sceneNotFound }
+        
+        let sceneManifestURL = fileURLHelper.projectAssetURL(
+            projectID: projectID,
+            assetID: scene.manifestAssetID)
+        
+        let sceneManifestData = try Data(
+            contentsOf: sceneManifestURL)
+        
+        sceneManifest = try decoder.decode(
+            Project.SceneManifest.self,
+            from: sceneManifestData)
+    }
+    
+    // MARK: - Edit
+    
+    private func applySceneEdit(
+        newSceneManifest: Project.SceneManifest,
+        newSceneAssets: [ProjectEditManager.NewAsset]
+    ) throws {
+        
+        let contentMetadata = projectManifest.content.metadata
+        
+        // Generate scene render manifest
+        let sceneRenderManifest = ProjectSceneRenderManifestGenerator
+            .generate(
+                contentMetadata: contentMetadata,
+                sceneManifest: newSceneManifest)
+        
+        // Encode data
+        let sceneManifestData = try encoder.encode(newSceneManifest)
+        let sceneRenderManifestData = try encoder.encode(sceneRenderManifest)
+        
+        // Generate asset IDs
+        let sceneManifestAssetID = IDGenerator.id()
+        let sceneRenderManifestAssetID = IDGenerator.id()
+        
+        // Add scene manifests to asset list
+        var newAssets = newSceneAssets
+        
+        let sceneManifestAsset = ProjectEditManager.NewAsset(
+            id: sceneManifestAssetID,
+            data: sceneManifestData)
+        
+        let sceneRenderManifestAsset = ProjectEditManager.NewAsset(
+            id: sceneRenderManifestAssetID,
+            data: sceneRenderManifestData)
+        
+        newAssets.append(sceneManifestAsset)
+        newAssets.append(sceneRenderManifestAsset)
+        
+        // Update project manifest
+        var newProjectManifest = projectManifest
+        
+        var scenes = newProjectManifest.content.scenes
+        for i in scenes.indices {
+            if scenes[i].id == sceneID {
+                scenes[i].manifestAssetID = sceneManifestAssetID
+            }
+        }
+        newProjectManifest.content.scenes = scenes
+        
+        for newAsset in newAssets {
+            newProjectManifest.assetIDs.insert(newAsset.id)
+        }
+        
+        try editManager.applyEdit(
+            newProjectManifest: newProjectManifest,
+            newAssets: newAssets)
     }
     
 }
 
-extension ProjectEditor {
+extension ProjectAnimationEditor {
     
     // MARK: - Create Drawing
     
@@ -46,17 +137,18 @@ extension ProjectEditor {
         texture: MTLTexture
     ) throws {
         
-        queue.enqueueSync {
+        workQueue.enqueueSync {
             do {
+                let projectManifest = self.editManager.currentProjectManifest
+                
+                
                 let createdAssets = try self.createDrawingAssets(
                     texture: texture)
                 
                 let drawing = Project.Drawing(
-                    id: UUID().uuidString,
+                    id: IDGenerator.id(),
                     frameIndex: frameIndex,
                     assetIDs: createdAssets.assetIDs)
-                
-                var projectManifest = self.editSession.currentProjectManifest
                 
                 guard !projectManifest.content.animationLayer.drawings
                     .contains(where: { $0.frameIndex == frameIndex })
@@ -107,7 +199,7 @@ extension ProjectEditor {
         
         let texture = try TextureCopier.copy(drawingTexture)
         
-        queue.enqueue {
+        workQueue.enqueue {
             do {
                 let createdAssets = try self.createDrawingAssets(
                     texture: texture)
@@ -150,7 +242,7 @@ extension ProjectEditor {
     // MARK: - Delete Drawing
     
     func deleteDrawing(at frameIndex: Int) throws {
-        queue.enqueueSync {
+        workQueue.enqueueSync {
             do {
                 var projectManifest = self.editSession.currentProjectManifest
                 
@@ -182,7 +274,7 @@ extension ProjectEditor {
     // MARK: - Spacing
     
     func insertSpacing(at frameIndex: Int) throws {
-        queue.enqueueSync {
+        workQueue.enqueueSync {
             do {
                 var projectManifest = self.editSession.currentProjectManifest
                 var drawings = projectManifest.content.animationLayer.drawings
@@ -205,7 +297,7 @@ extension ProjectEditor {
     }
     
     func removeSpacing(at frameIndex: Int) throws {
-        queue.enqueueSync {
+        workQueue.enqueueSync {
             do {
                 var projectManifest = self.editSession.currentProjectManifest
                 var drawings = projectManifest.content.animationLayer.drawings
@@ -245,7 +337,7 @@ extension ProjectEditor {
     // MARK: - Undo / Redo
     
     func applyUndo() throws {
-        queue.enqueueSync {
+        workQueue.enqueueSync {
             do {
                 try self.editSession.applyUndo()
             } catch { }
@@ -254,7 +346,7 @@ extension ProjectEditor {
     }
     
     func applyRedo() throws {
-        queue.enqueueSync {
+        workQueue.enqueueSync {
             do {
                 try self.editSession.applyRedo()
             } catch { }
@@ -266,7 +358,7 @@ extension ProjectEditor {
     
     private struct CreatedDrawingAssets {
         var assetIDs: Project.DrawingAssetIDGroup
-        var newAssets: [ProjectEditSession.NewAsset]
+        var newAssets: [ProjectEditManager.NewAsset]
     }
     
     private func createDrawingAssets(
@@ -333,16 +425,16 @@ extension ProjectEditor {
             effort: 1)
         
         // Create assets
-        let fullAsset = ProjectEditSession.NewAsset(
-            id: UUID().uuidString,
+        let fullAsset = ProjectEditManager.NewAsset(
+            id: IDGenerator.id(),
             data: fullEncodedData)
         
-        let mediumAsset = ProjectEditSession.NewAsset(
-            id: UUID().uuidString,
+        let mediumAsset = ProjectEditManager.NewAsset(
+            id: IDGenerator.id(),
             data: mediumEncodedData)
         
-        let smallAsset = ProjectEditSession.NewAsset(
-            id: UUID().uuidString,
+        let smallAsset = ProjectEditManager.NewAsset(
+            id: IDGenerator.id(),
             data: smallEncodedData)
         
         return CreatedDrawingAssets(
@@ -358,3 +450,4 @@ extension ProjectEditor {
     }
     
 }
+

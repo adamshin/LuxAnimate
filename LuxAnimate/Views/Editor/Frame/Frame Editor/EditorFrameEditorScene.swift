@@ -134,3 +134,73 @@ extension EditorFrameEditorScene {
     }
     
 }
+
+// TODO: Clean up and refactor this. It won't be used
+// elsewhere in the project like originally planned.
+
+struct FrameScene {
+    
+    var backgroundColor: Color
+    var layers: [FrameSceneLayer]
+    
+}
+
+enum FrameSceneLayer {
+    case drawing(FrameSceneDrawingLayer)
+}
+
+struct FrameSceneDrawingLayer {
+    var drawing: Project.Drawing
+}
+
+// MARK: - Generation
+
+extension FrameScene {
+    
+    static func generate(
+        projectManifest: Project.Manifest,
+        frameIndex: Int
+    ) -> FrameScene {
+        
+        var layers: [FrameSceneLayer] = []
+        
+        let drawings = projectManifest
+            .content.scene.animationLayer.drawings
+        
+        if let drawing = ProjectHelper.drawingForFrame(
+            drawings: drawings,
+            frameIndex: frameIndex)
+        {
+            let layer = FrameSceneLayer.drawing(
+                FrameSceneDrawingLayer(
+                    drawing: drawing))
+            
+            layers.append(layer)
+        }
+        
+        return FrameScene(
+            backgroundColor: .white,
+            layers: layers)
+    }
+    
+}
+
+// MARK: - Helper
+
+private struct ProjectHelper {
+    
+    static func drawingForFrame(
+        drawings: [Project.Drawing],
+        frameIndex: Int
+    ) -> Project.Drawing? {
+        
+        let sortedDrawings = drawings.sorted {
+            $0.frameIndex < $1.frameIndex
+        }
+        return sortedDrawings.last {
+            $0.frameIndex <= frameIndex
+        }
+    }
+    
+}
+

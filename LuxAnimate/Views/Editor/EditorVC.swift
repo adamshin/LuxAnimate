@@ -11,7 +11,7 @@ class EditorVC: UIViewController {
     private let frameVC: EditorFrameVC
     
     private let projectID: String
-    private let editor: ProjectEditor
+    private let editor: ProjectContentEditor
     
     private let modelGenerator = EditorModelGenerator()
     private let playbackController = EditorPlaybackController()
@@ -24,7 +24,7 @@ class EditorVC: UIViewController {
     init(projectID: String) throws {
         self.projectID = projectID
         
-        editor = try ProjectEditor(projectID: projectID)
+        editor = try ProjectContentEditor(projectID: projectID)
         let projectManifest = editor.currentProjectManifest
         
         frameVC = try EditorFrameVC(
@@ -203,10 +203,10 @@ extension EditorVC: EditorFrameVCDelegate {
 
 // MARK: - Editor Delegate
 
-extension EditorVC: ProjectEditorDelegate {
+extension EditorVC: ProjectContentEditorDelegate {
     
     func onEditProject(
-        _ editor: ProjectEditor,
+        _ editor: ProjectContentEditor,
         editContext: Any?
     ) {
         let projectManifest = editor.currentProjectManifest

@@ -13,7 +13,7 @@ private let defaultFramesPerSecond = 12
 struct ProjectCreator {
     
     private let fileManager = FileManager.default
-    private let fileURLHelper = FileUrlHelper()
+    private let fileURLHelper = FileURLHelper()
     
     private let encoder = JSONFileEncoder()
     private let decoder = JSONFileDecoder()
@@ -33,7 +33,7 @@ struct ProjectCreator {
         name: String
     ) throws -> String {
         
-        let projectID = UUID().uuidString
+        let projectID = IDGenerator.id()
         
         let projectURL = fileURLHelper
             .projectURL(for: projectID)
@@ -65,24 +65,7 @@ struct ProjectCreator {
             viewportSize: defaultCanvasSize,
             framesPerSecond: defaultFramesPerSecond)
         
-        let animSceneLayerContent = Project.AnimationSceneLayerContent(
-            size: defaultCanvasSize,
-            drawings: [])
-        
-        let animSceneLayer = Project.SceneLayer(
-            id: UUID().uuidString,
-            name: "Layer",
-            content: .animation(animSceneLayerContent))
-        
-        let scene = Project.Scene(
-            id: UUID().uuidString,
-            name: "Scene",
-            frameCount: 100,
-            backgroundColor: .white,
-            layers: [animSceneLayer])
-        
-        let content = Project.Content(
-            scene: scene)
+        let content = Project.Content(scenes: [])
         
         return Project.Manifest(
             id: id,
@@ -97,11 +80,13 @@ struct ProjectCreator {
         projectID: String
     ) throws {
         
-        let editor = try ProjectEditor(
-            projectID: projectID)
+        // TODO: Create empty scene and drawing
         
-        try editor.createEmptyDrawing(
-            frameIndex: 0)
+//        let editor = try ProjectContentEditor(
+//            projectID: projectID)
+//        
+//        try editor.createEmptyDrawing(
+//            frameIndex: 0)
     }
     
 }

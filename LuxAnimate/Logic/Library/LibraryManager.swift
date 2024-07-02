@@ -18,7 +18,7 @@ struct LibraryManager {
     }
     
     private let fileManager = FileManager.default
-    private let fileURLHelper = FileUrlHelper()
+    private let fileURLHelper = FileURLHelper()
     
     private let encoder = JSONFileEncoder()
     private let decoder = JSONFileDecoder()

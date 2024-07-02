@@ -1,16 +1,16 @@
 //
-//  ProjectEditorWorkQueue.swift
+//  ProjectAnimationEditorWorkQueue.swift
 //
 
 import Foundation
 
 private let maxTaskCount = 3
 
-class ProjectEditorWorkQueue {
+class ProjectAnimationEditorWorkQueue {
     
     private let queue = DispatchQueue(
-        label: "ProjectEditorWorkQueue.queue",
-        qos: .userInteractive)
+        label: "ProjectAnimationEditorWorkQueue.queue",
+        qos: .userInteractive) // Should this be background priority?
     
     private let queueSemaphore = DispatchSemaphore(
         value: maxTaskCount)

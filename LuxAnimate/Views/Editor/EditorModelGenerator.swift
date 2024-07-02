@@ -6,7 +6,7 @@ import Foundation
 
 struct EditorModelGenerator {
     
-    private let fileURLHelper = FileUrlHelper()
+    private let fileURLHelper = FileURLHelper()
     
     func generate(
         from projectManifest: Project.Manifest

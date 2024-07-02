@@ -39,7 +39,7 @@ class EditorFrameAssetLoader {
     private var pendingLoadItems: [LoadItem] = []
     private var loadedAssets: [String: LoadedAsset] = [:]
     
-    private let fileURLHelper = FileUrlHelper()
+    private let fileURLHelper = FileURLHelper()
     
     private let loadQueue = DispatchQueue(
         label: "EditorFrameAssetLoader.loadQueue",
