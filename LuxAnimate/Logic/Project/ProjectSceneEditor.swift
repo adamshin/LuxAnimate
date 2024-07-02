@@ -103,7 +103,11 @@ class ProjectSceneEditor {
         var scenes = newProjectManifest.content.scenes
         for i in scenes.indices {
             if scenes[i].id == sceneID {
+                newProjectManifest.assetIDs.remove(scenes[i].manifestAssetID)
+                newProjectManifest.assetIDs.remove(scenes[i].renderManifestAssetID)
+                
                 scenes[i].manifestAssetID = sceneManifestAssetID
+                scenes[i].renderManifestAssetID = sceneRenderManifestAssetID
             }
         }
         newProjectManifest.content.scenes = scenes
@@ -113,27 +117,27 @@ class ProjectSceneEditor {
         }
         
         // Apply edit
+        self.projectManifest = newProjectManifest
+        self.sceneManifest = newSceneManifest
+        
         try editManager.applyEdit(
             newProjectManifest: newProjectManifest,
             newAssets: newAssets)
-        
-        self.projectManifest = newProjectManifest
-        self.sceneManifest = newSceneManifest
     }
     
     // MARK: - Undo/Redo
     
-    var isUndoAvailable: Bool { editManager.isUndoAvailable }
-    var isRedoAvailable: Bool { editManager.isRedoAvailable }
-    
-    func applyUndo() throws -> Bool {
-        try editManager.applyUndo()
-        // TODO: Reload scene manifest. Make sure it still exists
-    }
-    
-    func applyRedo() throws -> Bool {
-        try editManager.applyRedo()
-        // TODO: Reload scene manifest. Make sure it still exists
-    }
+//    var isUndoAvailable: Bool { editManager.isUndoAvailable }
+//    var isRedoAvailable: Bool { editManager.isRedoAvailable }
+//    
+//    func applyUndo() throws -> Bool {
+//        try editManager.applyUndo()
+//        // TODO: Reload scene manifest. Make sure it still exists
+//    }
+//    
+//    func applyRedo() throws -> Bool {
+//        try editManager.applyRedo()
+//        // TODO: Reload scene manifest. Make sure it still exists
+//    }
     
 }
