@@ -105,7 +105,7 @@
 		66789ACE2C3332A90020EACE /* ProjectAnimationEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66789ACD2C3332A90020EACE /* ProjectAnimationEditor.swift */; };
 		66789AD42C3340070020EACE /* ProjectSceneRenderManifestGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66789AD32C3340070020EACE /* ProjectSceneRenderManifestGenerator.swift */; };
 		66789AD62C3359770020EACE /* ProjectSceneEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66789AD52C3359770020EACE /* ProjectSceneEditor.swift */; };
-		667BF74B2BA655CB003E3430 /* FileURLHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667BF74A2BA655CB003E3430 /* FileURLHelper.swift */; };
+		667BF74B2BA655CB003E3430 /* FileHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667BF74A2BA655CB003E3430 /* FileHelper.swift */; };
 		66A653042C209DFB0060A216 /* XXHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A653032C209DFB0060A216 /* XXHash.swift */; };
 		66A653062C20AFE70060A216 /* xxhash.c in Sources */ = {isa = PBXBuildFile; fileRef = 66A653052C20AFE70060A216 /* xxhash.c */; };
 		66AD3A882BEC34CD002B294A /* EditorPlaybackController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66AD3A872BEC34CD002B294A /* EditorPlaybackController.swift */; };
@@ -242,7 +242,7 @@
 		66789ACD2C3332A90020EACE /* ProjectAnimationEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectAnimationEditor.swift; sourceTree = "<group>"; };
 		66789AD32C3340070020EACE /* ProjectSceneRenderManifestGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectSceneRenderManifestGenerator.swift; sourceTree = "<group>"; };
 		66789AD52C3359770020EACE /* ProjectSceneEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectSceneEditor.swift; sourceTree = "<group>"; };
-		667BF74A2BA655CB003E3430 /* FileURLHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileURLHelper.swift; sourceTree = "<group>"; };
+		667BF74A2BA655CB003E3430 /* FileHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileHelper.swift; sourceTree = "<group>"; };
 		66A653022C2099440060A216 /* xxhash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = xxhash.h; sourceTree = "<group>"; };
 		66A653032C209DFB0060A216 /* XXHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XXHash.swift; sourceTree = "<group>"; };
 		66A653052C20AFE70060A216 /* xxhash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = xxhash.c; sourceTree = "<group>"; };
@@ -678,12 +678,12 @@
 			path = Project;
 			sourceTree = "<group>";
 		};
-		667BF7492BA655B6003E3430 /* Filesystem */ = {
+		667BF7492BA655B6003E3430 /* File */ = {
 			isa = PBXGroup;
 			children = (
-				667BF74A2BA655CB003E3430 /* FileURLHelper.swift */,
+				667BF74A2BA655CB003E3430 /* FileHelper.swift */,
 			);
-			path = Filesystem;
+			path = File;
 			sourceTree = "<group>";
 		};
 		66A05B782BDC7B6700434245 /* Toolbar */ = {
@@ -850,10 +850,10 @@
 		66D0847F2BA3ED7E00EB8556 /* Logic */ = {
 			isa = PBXGroup;
 			children = (
-				667BF7492BA655B6003E3430 /* Filesystem */,
 				66D084802BA3FDF200EB8556 /* Library */,
 				66789ACF2C3336880020EACE /* Project */,
 				66789ABE2C29E8F20020EACE /* Render Preview */,
+				667BF7492BA655B6003E3430 /* File */,
 				66789AC72C332D630020EACE /* ID */,
 				660CD1312BAE4CFA00C8C7B5 /* Coding */,
 				663259482BB669AE00460F70 /* JXL */,
@@ -983,7 +983,7 @@
 				6613C1F42BE2E72E0019E667 /* EditorMenuCardView.swift in Sources */,
 				66CE18FD2C1B852F0078AA68 /* PreviewFrameRenderer.swift in Sources */,
 				66D084822BA3FDFC00EB8556 /* LibraryManager.swift in Sources */,
-				667BF74B2BA655CB003E3430 /* FileURLHelper.swift in Sources */,
+				667BF74B2BA655CB003E3430 /* FileHelper.swift in Sources */,
 				66311CE22BD740D900D53489 /* JXLTextureLoader.swift in Sources */,
 				664B59462BC5A9D1003FA90E /* BrushGestureRecognizerStroke.swift in Sources */,
 				66D0846D2BA3CEC300EB8556 /* CGGeometry.swift in Sources */,

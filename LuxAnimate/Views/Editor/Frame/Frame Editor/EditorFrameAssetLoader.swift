@@ -39,8 +39,6 @@ class EditorFrameAssetLoader {
     private var pendingLoadItems: [LoadItem] = []
     private var loadedAssets: [String: LoadedAsset] = [:]
     
-    private let fileURLHelper = FileURLHelper()
-    
     private let loadQueue = DispatchQueue(
         label: "EditorFrameAssetLoader.loadQueue",
         qos: .background)
@@ -146,7 +144,7 @@ class EditorFrameAssetLoader {
             case .medium: item.assetIDs.medium
             case .full: item.assetIDs.full
             }
-            let assetURL = fileURLHelper.projectAssetURL(
+            let assetURL = FileHelper.shared.projectAssetURL(
                 projectID: projectID,
                 assetID: assetID)
             

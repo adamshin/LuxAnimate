@@ -23,12 +23,8 @@ class ProjectAnimationEditor {
     
     private let editManager: ProjectEditManager
     
-    private let fileURLHelper = FileURLHelper()
     private let workQueue = ProjectAnimationEditorWorkQueue()
     private let imageResizer = ImageResizer()
-    
-    private let encoder = JSONFileEncoder()
-    private let decoder = JSONFileDecoder()
     
     private var projectManifest: Project.Manifest
     private var sceneManifest: Project.SceneManifest
@@ -57,14 +53,14 @@ class ProjectAnimationEditor {
             .first(where: { $0.id == sceneID })
         else { throw InitError.sceneNotFound }
         
-        let sceneManifestURL = fileURLHelper.projectAssetURL(
+        let sceneManifestURL = FileHelper.shared.projectAssetURL(
             projectID: projectID,
             assetID: scene.manifestAssetID)
         
         let sceneManifestData = try Data(
             contentsOf: sceneManifestURL)
         
-        sceneManifest = try decoder.decode(
+        sceneManifest = try JSONFileDecoder.shared.decode(
             Project.SceneManifest.self,
             from: sceneManifestData)
     }
@@ -85,8 +81,8 @@ class ProjectAnimationEditor {
                 sceneManifest: newSceneManifest)
         
         // Encode data
-        let sceneManifestData = try encoder.encode(newSceneManifest)
-        let sceneRenderManifestData = try encoder.encode(sceneRenderManifest)
+        let sceneManifestData = try JSONFileEncoder.shared.encode(newSceneManifest)
+        let sceneRenderManifestData = try JSONFileEncoder.shared.encode(sceneRenderManifest)
         
         // Generate asset IDs
         let sceneManifestAssetID = IDGenerator.id()

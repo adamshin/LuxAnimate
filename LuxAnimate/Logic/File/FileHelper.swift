@@ -1,13 +1,15 @@
 //
-//  FileURLHelper.swift
+//  FileHelper.swift
 //
 
 import Foundation
 
-struct FileURLHelper {
+struct FileHelper {
     
-    static let libraryManifestFileName = "manifest"
-    static let projectManifestFileName = "manifest"
+    static let libraryManifestFileName = "libraryManifest"
+    static let projectManifestFileName = "projectManifest"
+    
+    static let shared = FileHelper()
     
     private let fileManager = FileManager.default
     
@@ -44,8 +46,8 @@ struct FileURLHelper {
     }
     
     func projectManifestURL(for projectID: String) -> URL {
-        projectURL(for: projectID)
-            .appending(path: Self.projectManifestFileName)
+        projectURL(for: projectID).appending(
+            path: Self.projectManifestFileName)
     }
     
     func historyDirectoryURL() -> URL {

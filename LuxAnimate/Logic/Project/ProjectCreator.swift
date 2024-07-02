@@ -13,10 +13,6 @@ private let defaultFramesPerSecond = 12
 struct ProjectCreator {
     
     private let fileManager = FileManager.default
-    private let fileURLHelper = FileURLHelper()
-    
-    private let encoder = JSONFileEncoder()
-    private let decoder = JSONFileDecoder()
     
     func createProject(
         name: String
@@ -35,9 +31,9 @@ struct ProjectCreator {
         
         let projectID = IDGenerator.id()
         
-        let projectURL = fileURLHelper
+        let projectURL = FileHelper.shared
             .projectURL(for: projectID)
-        let projectManifestURL = fileURLHelper
+        let projectManifestURL = FileHelper.shared
             .projectManifestURL(for: projectID)
         
         try fileManager.createDirectory(
@@ -48,7 +44,7 @@ struct ProjectCreator {
             id: projectID,
             name: name)
         
-        let projectManifestData = try encoder.encode(projectManifest)
+        let projectManifestData = try JSONFileEncoder.shared.encode(projectManifest)
         try projectManifestData.write(to: projectManifestURL)
         
         return projectID
@@ -61,17 +57,18 @@ struct ProjectCreator {
         
         let now = Date()
         
-        let metadata = Project.Metadata(
+        let contentMetadata = Project.ContentMetadata(
             viewportSize: defaultCanvasSize,
             framesPerSecond: defaultFramesPerSecond)
         
-        let content = Project.Content(scenes: [])
+        let content = Project.Content(
+            metadata: contentMetadata,
+            scenes: [])
         
         return Project.Manifest(
             id: id,
             name: name,
             createdAt: now,
-            metadata: metadata,
             content: content,
             assetIDs: [])
     }

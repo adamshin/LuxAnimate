@@ -9,7 +9,6 @@ class RenderCacheManager {
     private let projectID: String
     
     private let fileManager = FileManager.default
-    private let fileURLHelper = FileURLHelper()
     
     init(projectID: String) throws {
         self.projectID = projectID
@@ -19,7 +18,7 @@ class RenderCacheManager {
     
     private func projectRenderCacheDirectoryURL()
     -> URL {
-        fileURLHelper.renderCacheDirectoryURL()
+        FileHelper.shared.renderCacheDirectoryURL()
             .appending(
                 path: projectID,
                 directoryHint: .isDirectory)

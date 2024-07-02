@@ -6,8 +6,6 @@ import Foundation
 
 struct EditorModelGenerator {
     
-    private let fileURLHelper = FileURLHelper()
-    
     func generate(
         from projectManifest: Project.Manifest
     ) -> EditorModel {
@@ -35,7 +33,7 @@ struct EditorModelGenerator {
             guard frames.indices.contains(drawing.frameIndex)
             else { continue }
             
-            let thumbnailURL = fileURLHelper.projectAssetURL(
+            let thumbnailURL = FileHelper.shared.projectAssetURL(
                 projectID: projectManifest.id,
                 assetID: drawing.assetIDs.small)
             

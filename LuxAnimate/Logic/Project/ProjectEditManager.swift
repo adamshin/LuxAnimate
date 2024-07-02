@@ -24,10 +24,6 @@ class ProjectEditManager {
     private let projectID: String
     
     private let fileManager = FileManager.default
-    private let fileURLHelper = FileURLHelper()
-    
-    private let encoder = JSONFileEncoder()
-    private let decoder = JSONFileDecoder()
     
     private(set) var projectManifest: Project.Manifest
     
@@ -39,13 +35,13 @@ class ProjectEditManager {
     init(projectID: String) throws {
         self.projectID = projectID
         
-        let projectManifestURL = fileURLHelper
+        let projectManifestURL = FileHelper.shared
             .projectManifestURL(for: projectID)
         
         let projectManifestData = try Data(
             contentsOf: projectManifestURL)
         
-        projectManifest = try decoder.decode(
+        projectManifest = try JSONFileDecoder.shared.decode(
             Project.Manifest.self,
             from: projectManifestData)
         
@@ -65,7 +61,7 @@ class ProjectEditManager {
     // MARK: - Edit History
     
     private func historyDirectoryURL() -> URL {
-        fileURLHelper.projectHistoryDirectoryURL(
+        FileHelper.shared.projectHistoryDirectoryURL(
             for: projectID)
     }
     
@@ -139,7 +135,7 @@ class ProjectEditManager {
     private func assetURLInProject(
         assetID: String
     ) -> URL {
-        fileURLHelper
+        FileHelper.shared
             .projectURL(for: projectID)
             .appending(path: assetID)
     }
@@ -197,7 +193,7 @@ class ProjectEditManager {
         // Setup
         let oldProjectManifest = self.projectManifest
         
-        let projectManifestURL = fileURLHelper
+        let projectManifestURL = FileHelper.shared
             .projectManifestURL(for: projectID)
         
         // Clear redo history
@@ -213,7 +209,7 @@ class ProjectEditManager {
         
         let historyEntryProjectManifestURL =
             historyEntryURL.appending(
-                path: FileURLHelper.projectManifestFileName)
+                path: FileHelper.projectManifestFileName)
         
         try fileManager.copyItem(
             at: projectManifestURL,
@@ -225,7 +221,7 @@ class ProjectEditManager {
         }
         
         // Write new project manifest
-        let newProjectManifestData = try encoder.encode(newProjectManifest)
+        let newProjectManifestData = try JSONFileEncoder.shared.encode(newProjectManifest)
         try newProjectManifestData.write(to: projectManifestURL)
         
         // Update current project manifest
@@ -263,21 +259,21 @@ class ProjectEditManager {
         // Setup
         let currentProjectManifest = self.projectManifest
         
-        let projectURL = fileURLHelper.projectURL(for: projectID)
+        let projectURL = FileHelper.shared.projectURL(for: projectID)
         
-        let projectManifestURL = fileURLHelper
+        let projectManifestURL = FileHelper.shared
             .projectManifestURL(for: projectID)
         
         let consumedHistoryEntryURL = historyEntryURL(
             entryID: consumedHistoryEntryID)
         
         let consumedProjectManifestURL = consumedHistoryEntryURL
-            .appending(path: FileURLHelper.projectManifestFileName)
+            .appending(path: FileHelper.projectManifestFileName)
         
         let consumedProjectManifestData = try Data(
             contentsOf: consumedProjectManifestURL)
         
-        let consumedProjectManifest = try decoder.decode(
+        let consumedProjectManifest = try JSONFileDecoder.shared.decode(
             Project.Manifest.self,
             from: consumedProjectManifestData)
         
@@ -290,7 +286,7 @@ class ProjectEditManager {
             entryID: createdHistoryEntryID)
         
         let createdHistoryEntryProjectManifestURL = createdHistoryEntryURL
-            .appending(path: FileURLHelper.projectManifestFileName)
+            .appending(path: FileHelper.projectManifestFileName)
         
         try fileManager.copyItem(
             at: projectManifestURL,
@@ -303,7 +299,7 @@ class ProjectEditManager {
             
         for fileURL in consumedEntryFileURLs {
             let fileName = fileURL.lastPathComponent
-            if fileName == FileURLHelper.projectManifestFileName { continue }
+            if fileName == FileHelper.shared.projectManifestFileName { continue }
             
             let destinationURL = projectURL
                 .appendingPathComponent(fileName)
@@ -314,7 +310,7 @@ class ProjectEditManager {
         // Replace project manifest with consumed entry manifest
         let consumedEntryProjectManifestURL = 
             consumedHistoryEntryURL.appending(
-                path: FileURLHelper.projectManifestFileName)
+                path: FileHelper.projectManifestFileName)
         
         _ = try fileManager.replaceItemAt(
             projectManifestURL,

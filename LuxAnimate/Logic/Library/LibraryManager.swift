@@ -18,17 +18,13 @@ struct LibraryManager {
     }
     
     private let fileManager = FileManager.default
-    private let fileURLHelper = FileURLHelper()
-    
-    private let encoder = JSONFileEncoder()
-    private let decoder = JSONFileDecoder()
     
     private let projectCreator = ProjectCreator()
     
     // MARK: - Internal Methods
     
     private func createLibraryDirectoryIfNeeded() throws {
-        let url = fileURLHelper.libraryDirectoryURL
+        let url = FileHelper.shared.libraryDirectoryURL
         if fileManager.fileExists(atPath: url.path()) {
             return
         }
@@ -40,7 +36,7 @@ struct LibraryManager {
     private func createLibraryManifestIfNeeded() throws {
         try createLibraryDirectoryIfNeeded()
         
-        let url = fileURLHelper.libraryManifestURL
+        let url = FileHelper.shared.libraryManifestURL
         if fileManager.fileExists(atPath: url.path()) {
             return
         }
@@ -52,18 +48,18 @@ struct LibraryManager {
     private func getLibraryManifest() throws -> LibraryManifest {
         try createLibraryManifestIfNeeded()
         
-        let url = fileURLHelper.libraryManifestURL
+        let url = FileHelper.shared.libraryManifestURL
         let data = try Data(contentsOf: url)
         
-        return try decoder.decode(LibraryManifest.self, from: data)
+        return try JSONFileDecoder.shared.decode(LibraryManifest.self, from: data)
     }
     
     private func setLibraryManifest(
         _ libraryManifest: LibraryManifest
     ) throws {
-        let url = fileURLHelper.libraryManifestURL
+        let url = FileHelper.shared.libraryManifestURL
         
-        let data = try encoder.encode(libraryManifest)
+        let data = try JSONFileEncoder.shared.encode(libraryManifest)
         try data.write(to: url)
     }
     
@@ -77,16 +73,16 @@ struct LibraryManager {
         for manifestProject in libraryManifest.projects {
             let projectID = manifestProject.id
             
-            let projectURL = fileURLHelper
+            let projectURL = FileHelper.shared
                 .projectURL(for: projectID)
-            let projectManifestURL = fileURLHelper
+            let projectManifestURL = FileHelper.shared
                 .projectManifestURL(for: projectID)
             
             guard let projectManifestData = try? Data(
                 contentsOf: projectManifestURL)
             else { continue }
             
-            guard let projectManifest = try? decoder.decode(
+            guard let projectManifest = try? JSONFileEncoder.shared.decode(
                 Project.Manifest.self,
                 from: projectManifestData)
             else { continue }
@@ -106,7 +102,7 @@ struct LibraryManager {
                     .first
                 else { return nil }
                 
-                return fileURLHelper.projectAssetURL(
+                return FileHelper.shared.projectAssetURL(
                     projectID: projectID,
                     assetID: firstDrawing.assetIDs.medium)
             }()
@@ -141,7 +137,7 @@ struct LibraryManager {
             throw RenameError.invalidName
         }
         
-        let projectManifestURL = fileURLHelper
+        let projectManifestURL = FileHelper.shared
             .projectManifestURL(for: projectID)
         
         let projectManifestData = try Data(
@@ -161,7 +157,7 @@ struct LibraryManager {
     }
     
     func deleteProject(projectID: String) throws {
-        let projectURL = fileURLHelper
+        let projectURL = FileHelper.shared
             .projectURL(for: projectID)
         
         try fileManager.removeItem(at: projectURL)

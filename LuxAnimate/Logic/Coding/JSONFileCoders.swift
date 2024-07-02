@@ -12,6 +12,8 @@ private let dateFormatter: ISO8601DateFormatter = {
 
 class JSONFileEncoder: JSONEncoder {
     
+    static let shared = JSONFileEncoder()
+    
     override init() {
         super.init()
         
@@ -32,6 +34,8 @@ class JSONFileEncoder: JSONEncoder {
 }
 
 class JSONFileDecoder: JSONDecoder {
+    
+    static let shared = JSONFileDecoder()
     
     override init() {
         super.init()
