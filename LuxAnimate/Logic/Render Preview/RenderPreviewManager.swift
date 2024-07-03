@@ -18,8 +18,8 @@ class RenderPreviewManager {
     }
     
     func update(projectManifest: Project.Manifest) {
-        let previewManifest = RenderPreviewManifest.generate(
-            projectManifest: projectManifest)
+//        let previewManifest = RenderPreviewManifest.generate(
+//            projectManifest: projectManifest)
         
         // TODO: Re-render invalid frames
     }

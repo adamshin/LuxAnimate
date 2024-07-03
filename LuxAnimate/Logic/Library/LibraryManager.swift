@@ -82,36 +82,37 @@ struct LibraryManager {
                 contentsOf: projectManifestURL)
             else { continue }
             
-            guard let projectManifest = try? JSONFileEncoder.shared.decode(
+            guard let projectManifest = try? JSONFileDecoder.shared.decode(
                 Project.Manifest.self,
                 from: projectManifestData)
             else { continue }
             
-            let thumbnailURL: URL? = {
-                guard let layer = projectManifest
-                    .content.scenes.first?.layers.first
-                else { return nil }
-                
-                guard case let .animation(animationLayerContent)
-                    = layer.content
-                else { return nil }
-                
-                guard let firstDrawing = animationLayerContent
-                    .drawings
-                    .sorted(using: KeyPathComparator(\.frameIndex))
-                    .first
-                else { return nil }
-                
-                return FileHelper.shared.projectAssetURL(
-                    projectID: projectID,
-                    assetID: firstDrawing.assetIDs.medium)
-            }()
+//            let thumbnailURL: URL? = {
+//                guard let layer = projectManifest
+//                    .content.scenes.first?.layers.first
+//                else { return nil }
+//                
+//                guard case let .animation(animationLayerContent)
+//                    = layer.content
+//                else { return nil }
+//                
+//                guard let firstDrawing = animationLayerContent
+//                    .drawings
+//                    .sorted(using: KeyPathComparator(\.frameIndex))
+//                    .first
+//                else { return nil }
+//                
+//                return FileHelper.shared.projectAssetURL(
+//                    projectID: projectID,
+//                    assetID: firstDrawing.assetIDs.medium)
+//            }()
             
             let project = LibraryProject(
                 id: projectID,
                 url: projectURL,
                 name: projectManifest.name,
-                thumbnailURL: thumbnailURL)
+                thumbnailURL: nil)
+//                thumbnailURL: thumbnailURL)
             
             projects.append(project)
         }
@@ -143,14 +144,13 @@ struct LibraryManager {
         let projectManifestData = try Data(
             contentsOf: projectManifestURL)
         
-        var projectManifest = try decoder.decode(
+        var projectManifest = try JSONFileDecoder.shared.decode(
             Project.Manifest.self,
             from: projectManifestData)
         
         projectManifest.name = name
         
-        let newProjectManifestData = 
-            try encoder.encode(projectManifest)
+        let newProjectManifestData = try JSONFileEncoder.shared.encode(projectManifest)
         
         try newProjectManifestData
             .write(to: projectManifestURL)

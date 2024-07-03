@@ -25,6 +25,8 @@ extension EditorFrameEditorScene {
         onionSkinNextCount: Int
     ) -> EditorFrameEditorScene {
         
+        fatalError()
+        /*
         // Find active drawing and onion skins
         let drawings = projectManifest
             .content.animationLayer.drawings
@@ -64,6 +66,7 @@ extension EditorFrameEditorScene {
             prevOnionSkinDrawingIDs: prevOnionSkinDrawingIDs,
             nextOnionSkinDrawingIDs: nextOnionSkinDrawingIDs,
             allDrawings: allDrawings)
+         */
     }
     
     private struct DrawingsForFrameResult {
@@ -164,6 +167,7 @@ extension FrameScene {
         
         var layers: [FrameSceneLayer] = []
         
+        /*
         let drawings = projectManifest
             .content.scene.animationLayer.drawings
         
@@ -177,6 +181,7 @@ extension FrameScene {
             
             layers.append(layer)
         }
+         */
         
         return FrameScene(
             backgroundColor: .white,

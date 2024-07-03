@@ -2,6 +2,8 @@
 //  EditorVC.swift
 //
 
+/*
+
 import UIKit
 import PhotosUI
 
@@ -244,3 +246,4 @@ extension EditorVC: EditorPlaybackControllerDelegate {
     }
     
 }
+ */

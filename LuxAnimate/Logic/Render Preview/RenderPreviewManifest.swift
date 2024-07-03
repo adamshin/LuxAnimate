@@ -4,6 +4,8 @@
 
 import Foundation
 
+/*
+
 struct RenderPreviewManifest {
     
     struct FrameLocation: Hashable {
@@ -149,3 +151,4 @@ private struct AnimationSceneLayerProvider: SceneLayerProvider {
     }
     
 }
+*/

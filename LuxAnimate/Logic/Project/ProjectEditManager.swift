@@ -299,7 +299,7 @@ class ProjectEditManager {
             
         for fileURL in consumedEntryFileURLs {
             let fileName = fileURL.lastPathComponent
-            if fileName == FileHelper.shared.projectManifestFileName { continue }
+            if fileName == FileHelper.projectManifestFileName { continue }
             
             let destinationURL = projectURL
                 .appendingPathComponent(fileName)

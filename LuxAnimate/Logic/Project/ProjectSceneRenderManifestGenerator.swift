@@ -15,7 +15,7 @@ struct ProjectSceneRenderManifestGenerator {
             frameRenderManifests: [:],
             frameRenderManifestFingerprintsByFrameIndex: [])
         
-        var layerProviders = sceneManifest.layers.map {
+        let layerProviders = sceneManifest.layers.map {
             Self.createSceneLayerProvider(
                 sceneManifest: sceneManifest,
                 layer: $0)
