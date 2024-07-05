@@ -165,9 +165,9 @@ extension FrameScene {
         frameIndex: Int
     ) -> FrameScene {
         
+        /*
         var layers: [FrameSceneLayer] = []
         
-        /*
         let drawings = projectManifest
             .content.scene.animationLayer.drawings
         
@@ -181,11 +181,13 @@ extension FrameScene {
             
             layers.append(layer)
         }
-         */
         
         return FrameScene(
             backgroundColor: .white,
             layers: layers)
+         */
+        
+        return FrameScene(backgroundColor: .white, layers: [])
     }
     
 }

@@ -61,7 +61,7 @@ class ProjectEditManager {
     // MARK: - Edit History
     
     private func historyDirectoryURL() -> URL {
-        FileHelper.shared.projectHistoryDirectoryURL(
+        FileHelper.shared.projectEditHistoryDirectoryURL(
             for: projectID)
     }
     
