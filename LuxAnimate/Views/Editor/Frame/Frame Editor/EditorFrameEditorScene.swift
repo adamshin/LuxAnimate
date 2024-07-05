@@ -12,7 +12,7 @@ struct EditorFrameEditorScene {
     var prevOnionSkinDrawingIDs: [String]
     var nextOnionSkinDrawingIDs: [String]
     
-    var allDrawings: [Project.Drawing]
+    var allDrawings: [Scene.Drawing]
     
 }
 
@@ -70,13 +70,13 @@ extension EditorFrameEditorScene {
     }
     
     private struct DrawingsForFrameResult {
-        var activeDrawing: Project.Drawing?
-        var prevOnionSkinDrawings: [Project.Drawing]
-        var nextOnionSkinDrawings: [Project.Drawing]
+        var activeDrawing: Scene.Drawing?
+        var prevOnionSkinDrawings: [Scene.Drawing]
+        var nextOnionSkinDrawings: [Scene.Drawing]
     }
     
     private static func drawingsForFrame(
-        drawings: [Project.Drawing],
+        drawings: [Scene.Drawing],
         focusedFrameIndex: Int,
         onionSkinPrevCount: Int,
         onionSkinNextCount: Int
@@ -89,9 +89,9 @@ extension EditorFrameEditorScene {
             $0.frameIndex <= focusedFrameIndex
         }
         
-        var activeDrawing: Project.Drawing?
-        var prevOnionSkinDrawings: [Project.Drawing] = []
-        var nextOnionSkinDrawings: [Project.Drawing] = []
+        var activeDrawing: Scene.Drawing?
+        var prevOnionSkinDrawings: [Scene.Drawing] = []
+        var nextOnionSkinDrawings: [Scene.Drawing] = []
         
         if let activeDrawingIndex {
             activeDrawing = sortedDrawings[activeDrawingIndex]
@@ -123,9 +123,9 @@ extension EditorFrameEditorScene {
     
     private static func drawings(
         from frameScene: FrameScene
-    ) -> [Project.Drawing] {
+    ) -> [Scene.Drawing] {
         
-        var result: [Project.Drawing] = []
+        var result: [Scene.Drawing] = []
         
         for layer in frameScene.layers {
             switch layer {
@@ -153,7 +153,7 @@ enum FrameSceneLayer {
 }
 
 struct FrameSceneDrawingLayer {
-    var drawing: Project.Drawing
+    var drawing: Scene.Drawing
 }
 
 // MARK: - Generation
@@ -197,9 +197,9 @@ extension FrameScene {
 private struct ProjectHelper {
     
     static func drawingForFrame(
-        drawings: [Project.Drawing],
+        drawings: [Scene.Drawing],
         frameIndex: Int
-    ) -> Project.Drawing? {
+    ) -> Scene.Drawing? {
         
         let sortedDrawings = drawings.sorted {
             $0.frameIndex < $1.frameIndex

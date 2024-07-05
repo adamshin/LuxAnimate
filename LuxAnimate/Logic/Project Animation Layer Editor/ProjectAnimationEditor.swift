@@ -5,6 +5,7 @@
 import Foundation
 import Metal
 
+/*
 protocol ProjectAnimationEditorDelegate: AnyObject {
     
     func onEditProject(
@@ -446,4 +447,5 @@ extension ProjectAnimationEditor {
 //    }
     
 }
-
+ 
+ */

@@ -1,12 +1,12 @@
 //
-//  ProjectEditor2.swift
+//  ProjectEditor.swift
 //
 
 import Foundation
 
 private let editHistoryLimit = 100
 
-extension ProjectEditor2 {
+extension ProjectEditor {
     
     struct Asset {
         var id: String
@@ -15,7 +15,7 @@ extension ProjectEditor2 {
     
 }
 
-class ProjectEditor2 {
+class ProjectEditor {
     
     private let projectID: String
     
@@ -271,77 +271,6 @@ class ProjectEditor2 {
         try fileManager.moveItem(at: srcURL, to: dstURL)
     }
     
-    // MARK: - Edit
-    
-    func applyEdit(
-        newProjectManifest: Project.Manifest,
-        newAssets: [Asset]
-    ) throws {
-        
-        try workQueue.enqueueSync {
-            try self.applyEditInternal(
-                newProjectManifest: newProjectManifest,
-                newAssets: newAssets)
-        }
-    }
-    
-    func applyEditInternal(
-        newProjectManifest: Project.Manifest,
-        newAssets: [Asset]
-    ) throws {
-        
-        // Setup
-        let oldProjectManifest = self.projectManifest
-        
-        let projectManifestURL = FileHelper.shared
-            .projectManifestURL(for: projectID)
-        
-        // Clear redo history
-        try removeAllEditHistoryEntries(
-            in: redoHistoryDirectoryURL())
-        
-        // Create new undo history entry
-        let entryURL = try pushNewEditHistoryEntry(
-            in: undoHistoryDirectoryURL())
-        
-        // Copy old project manifest to history entry
-        let historyEntryProjectManifestURL =
-            entryURL.appending(
-                path: FileHelper.projectManifestFileName)
-        
-        try fileManager.copyItem(
-            at: projectManifestURL,
-            to: historyEntryProjectManifestURL)
-        
-        // Write new assets to project directory
-        for asset in newAssets {
-            try writeAssetToProject(asset)
-        }
-        
-        // Write new project manifest
-        let newProjectManifestData = try 
-            JSONFileEncoder.shared.encode(newProjectManifest)
-        
-        try newProjectManifestData.write(to: projectManifestURL)
-        
-        // Find assets referenced in the old manifest but not the
-        // new one. Move these to the new history entry
-        let oldAssetIDs = oldProjectManifest.assetIDs
-        let newAssetIDs = newProjectManifest.assetIDs
-        
-        let diffAssetIDs = oldAssetIDs.subtracting(newAssetIDs)
-        
-        for diffAssetID in diffAssetIDs {
-            try moveAssetInProjectToEditHistoryEntry(
-                assetID: diffAssetID,
-                entryURL: entryURL)
-        }
-        
-        // Update state
-        self.projectManifest = newProjectManifest
-        updateAvailableUndoRedoCount()
-    }
-    
     // MARK: - Undo/Redo
     
     func applyUndo() throws {
@@ -442,6 +371,103 @@ class ProjectEditor2 {
         
         // Update state
         self.projectManifest = consumedProjectManifest
+        updateAvailableUndoRedoCount()
+    }
+    
+    // MARK: - Edit
+    
+    func applyEdit(
+        newProjectManifest: Project.Manifest,
+        newAssets: [Asset]
+    ) throws {
+        
+        try workQueue.enqueueSync {
+            try self.applyEditInternal(
+                newProjectManifest: newProjectManifest,
+                newAssets: newAssets)
+        }
+    }
+    
+    func applyEditContent(
+        newContent: Project.Content,
+        newAssets: [Asset]
+    ) throws {
+        
+        var newProjectManifest = projectManifest
+        
+        var assetIDs = newContent.nonSceneAssetIDs
+        
+        for scene in newContent.scenes {
+            assetIDs.insert(scene.manifestAssetID)
+            assetIDs.insert(scene.renderManifestAssetID)
+            assetIDs = assetIDs.union(scene.sceneAssetIDs)
+        }
+        
+        newProjectManifest.content = newContent
+        newProjectManifest.assetIDs = assetIDs
+        
+        try applyEdit(
+            newProjectManifest: newProjectManifest,
+            newAssets: newAssets)
+    }
+    
+    private func applyEditInternal(
+        newProjectManifest: Project.Manifest,
+        newAssets: [Asset]
+    ) throws {
+        
+        // Setup
+        let oldProjectManifest = self.projectManifest
+        
+        let projectManifestURL = FileHelper.shared
+            .projectManifestURL(for: projectID)
+        
+        // Clear redo history
+        try removeAllEditHistoryEntries(
+            in: redoHistoryDirectoryURL())
+        
+        // Create new undo history entry
+        let entryURL = try pushNewEditHistoryEntry(
+            in: undoHistoryDirectoryURL())
+        
+        // Copy old project manifest to history entry
+        let historyEntryProjectManifestURL =
+            entryURL.appending(
+                path: FileHelper.projectManifestFileName)
+        
+        try fileManager.copyItem(
+            at: projectManifestURL,
+            to: historyEntryProjectManifestURL)
+        
+        // Write new assets to project directory
+        for asset in newAssets {
+            guard newProjectManifest.assetIDs.contains(asset.id)
+            else { continue }
+            
+            try writeAssetToProject(asset)
+        }
+        
+        // Write new project manifest
+        let newProjectManifestData = try
+            JSONFileEncoder.shared.encode(newProjectManifest)
+        
+        try newProjectManifestData.write(to: projectManifestURL)
+        
+        // Find assets referenced in the old manifest but not the
+        // new one. Move these to the new history entry
+        let oldAssetIDs = oldProjectManifest.assetIDs
+        let newAssetIDs = newProjectManifest.assetIDs
+        
+        let diffAssetIDs = oldAssetIDs.subtracting(newAssetIDs)
+        
+        for diffAssetID in diffAssetIDs {
+            try moveAssetInProjectToEditHistoryEntry(
+                assetID: diffAssetID,
+                entryURL: entryURL)
+        }
+        
+        // Update state
+        self.projectManifest = newProjectManifest
         updateAvailableUndoRedoCount()
     }
     

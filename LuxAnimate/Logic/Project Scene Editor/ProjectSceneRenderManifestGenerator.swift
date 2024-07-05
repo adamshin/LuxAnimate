@@ -8,10 +8,10 @@ struct ProjectSceneRenderManifestGenerator {
     
     static func generate(
         contentMetadata: Project.ContentMetadata,
-        sceneManifest: Project.SceneManifest
-    ) -> Project.SceneRenderManifest {
+        sceneManifest: Scene.Manifest
+    ) -> Scene.RenderManifest {
         
-        var sceneRenderManifest = Project.SceneRenderManifest(
+        var sceneRenderManifest = Scene.RenderManifest(
             frameRenderManifests: [:],
             frameRenderManifestFingerprintsByFrameIndex: [])
         
@@ -22,7 +22,7 @@ struct ProjectSceneRenderManifestGenerator {
         }
         
         for frameIndex in 0 ..< sceneManifest.frameCount {
-            var frameRenderManifest = Project.FrameRenderManifest(
+            var frameRenderManifest = Scene.FrameRenderManifest(
                 viewportSize: contentMetadata.viewportSize,
                 backgroundColor: sceneManifest.backgroundColor,
                 layers: [])
@@ -45,8 +45,8 @@ struct ProjectSceneRenderManifestGenerator {
     }
     
     private static func createSceneLayerProvider(
-        sceneManifest: Project.SceneManifest,
-        layer: Project.SceneLayer
+        sceneManifest: Scene.Manifest,
+        layer: Scene.Layer
     ) -> any FrameLayerProvider {
         
         switch layer.content {
@@ -65,7 +65,7 @@ private protocol FrameLayerProvider {
     
     func layer(
         at frameIndex: Int
-    ) -> Project.FrameRenderManifest.Layer?
+    ) -> Scene.FrameRenderManifest.Layer?
     
 }
 
@@ -73,12 +73,12 @@ private struct AnimationFrameLayerProvider: FrameLayerProvider {
     
     private let layerSize: PixelSize
     
-    private let sortedDrawings: [Project.Drawing]
+    private let sortedDrawings: [Scene.Drawing]
     private let frameIndexesToSortedDrawingIndexes: [Int?]
     
     init(
-        layer: Project.SceneLayer,
-        layerContent: Project.AnimationSceneLayerContent
+        layer: Scene.Layer,
+        layerContent: Scene.AnimationLayerContent
     ) {
         self.layerSize = layer.size
         
@@ -109,7 +109,7 @@ private struct AnimationFrameLayerProvider: FrameLayerProvider {
     
     func layer(
         at frameIndex: Int
-    ) -> Project.FrameRenderManifest.Layer? {
+    ) -> Scene.FrameRenderManifest.Layer? {
         
         guard let sortedDrawingIndex =
             frameIndexesToSortedDrawingIndexes[frameIndex]
@@ -117,13 +117,12 @@ private struct AnimationFrameLayerProvider: FrameLayerProvider {
         
         let drawing = sortedDrawings[sortedDrawingIndex]
         
-        let drawingContent = Project.FrameRenderManifest.DrawingLayerContent(
+        let drawingContent = Scene.FrameRenderManifest.DrawingLayerContent(
             assetIDs: drawing.assetIDs)
         
-        return Project.FrameRenderManifest.Layer(
+        return Scene.FrameRenderManifest.Layer(
             size: layerSize,
             content: .drawing(drawingContent))
     }
     
 }
-

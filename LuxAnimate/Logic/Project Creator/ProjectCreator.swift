@@ -63,7 +63,8 @@ struct ProjectCreator {
         
         let content = Project.Content(
             metadata: contentMetadata,
-            scenes: [])
+            scenes: [], 
+            nonSceneAssetIDs: [])
         
         return Project.Manifest(
             id: id,

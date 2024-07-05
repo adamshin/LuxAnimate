@@ -19,7 +19,7 @@ class EditorFrameAssetLoader {
     
     struct LoadItem {
         var drawingID: String
-        var assetIDs: Project.DrawingAssetIDGroup
+        var assetIDs: Scene.DrawingAssetIDGroup
         var quality: AssetQuality
     }
     
@@ -52,13 +52,13 @@ class EditorFrameAssetLoader {
     // MARK: - Loading
     
     private func loadAssetsInternal(
-        drawings: [Project.Drawing],
+        drawings: [Scene.Drawing],
         activeDrawingID: String?
     ) {
         // Create list of drawings to load
-        var allDrawings: [Project.Drawing] = []
-        var activeDrawing: Project.Drawing? = nil
-        var nonActiveDrawings: [Project.Drawing] = []
+        var allDrawings: [Scene.Drawing] = []
+        var activeDrawing: Scene.Drawing? = nil
+        var nonActiveDrawings: [Scene.Drawing] = []
         
         for drawing in drawings {
             allDrawings.append(drawing)
@@ -198,7 +198,7 @@ class EditorFrameAssetLoader {
     // MARK: - Interface
     
     func loadAssets(
-        drawings: [Project.Drawing],
+        drawings: [Scene.Drawing],
         activeDrawingID: String?
     ) {
         loadAssetsInternal(

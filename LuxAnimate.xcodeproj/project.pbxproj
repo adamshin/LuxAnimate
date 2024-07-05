@@ -34,7 +34,6 @@
 		660ABA452C0049F700B5C668 /* DrawingEditorToolVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660ABA442C0049F700B5C668 /* DrawingEditorToolVC.swift */; };
 		660ABA472C0165E900B5C668 /* BrushEngineRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660ABA462C0165E900B5C668 /* BrushEngineRenderer.swift */; };
 		660ABA492C01926A00B5C668 /* ProjectCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660ABA482C01926A00B5C668 /* ProjectCreator.swift */; };
-		660CD1302BA92FF500C8C7B5 /* ProjectEditManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660CD12F2BA92FF500C8C7B5 /* ProjectEditManager.swift */; };
 		660CD1332BAE4D0E00C8C7B5 /* JSONFileCoders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660CD1322BAE4D0E00C8C7B5 /* JSONFileCoders.swift */; };
 		6613C1F42BE2E72E0019E667 /* EditorMenuCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6613C1F32BE2E72E0019E667 /* EditorMenuCardView.swift */; };
 		6614C1D12BB8AD93000FCC78 /* JXLDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6614C1D02BB8AD93000FCC78 /* JXLDecoder.swift */; };
@@ -72,7 +71,7 @@
 		6632594C2BB66C1A00460F70 /* JXLEncoderShim.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6632594B2BB66C1A00460F70 /* JXLEncoderShim.mm */; };
 		6632594E2BB6725B00460F70 /* JXLEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6632594D2BB6725B00460F70 /* JXLEncoder.swift */; };
 		6632595F2BB6E94E00460F70 /* libjxl.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6632595E2BB6E94E00460F70 /* libjxl.xcframework */; };
-		663D40D42C35EA9C004B8591 /* ProjectEditor2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663D40D32C35EA9C004B8591 /* ProjectEditor2.swift */; };
+		663D40D42C35EA9C004B8591 /* ProjectEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663D40D32C35EA9C004B8591 /* ProjectEditor.swift */; };
 		6643CAF52BE31CC00094B998 /* ChromeBlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6643CAF42BE31CC00094B998 /* ChromeBlurView.swift */; };
 		6643CAF72BE3431A0094B998 /* EditorMenuDismissGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6643CAF62BE3431A0094B998 /* EditorMenuDismissGestureRecognizer.swift */; };
 		6643CAFD2BE38AD40094B998 /* EditorSidebarCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6643CAFC2BE38AD40094B998 /* EditorSidebarCardView.swift */; };
@@ -115,6 +114,7 @@
 		66B2BE422BCB55FF0072AC1B /* MiscModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B2BE412BCB55FF0072AC1B /* MiscModels.swift */; };
 		66B491B32BD9993F008A2A2E /* TextureCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B491B22BD9993F008A2A2E /* TextureCreator.swift */; };
 		66BC01692C35FA1200D2E2AD /* ProjectEditorWorkQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BC01682C35FA1200D2E2AD /* ProjectEditorWorkQueue.swift */; };
+		66BC016F2C3890B100D2E2AD /* Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BC016E2C3890B100D2E2AD /* Scene.swift */; };
 		66CE18FD2C1B852F0078AA68 /* PreviewFrameRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66CE18FC2C1B852F0078AA68 /* PreviewFrameRenderer.swift */; };
 		66CE19012C1BA8BC0078AA68 /* RenderCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66CE19002C1BA8BC0078AA68 /* RenderCacheManager.swift */; };
 		66D0843D2BA3840C00EB8556 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0843C2BA3840C00EB8556 /* AppDelegate.swift */; };
@@ -169,7 +169,6 @@
 		660ABA442C0049F700B5C668 /* DrawingEditorToolVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingEditorToolVC.swift; sourceTree = "<group>"; };
 		660ABA462C0165E900B5C668 /* BrushEngineRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrushEngineRenderer.swift; sourceTree = "<group>"; };
 		660ABA482C01926A00B5C668 /* ProjectCreator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectCreator.swift; sourceTree = "<group>"; };
-		660CD12F2BA92FF500C8C7B5 /* ProjectEditManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectEditManager.swift; sourceTree = "<group>"; };
 		660CD1322BAE4D0E00C8C7B5 /* JSONFileCoders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONFileCoders.swift; sourceTree = "<group>"; };
 		6613C1F32BE2E72E0019E667 /* EditorMenuCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorMenuCardView.swift; sourceTree = "<group>"; };
 		6614C1D02BB8AD93000FCC78 /* JXLDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JXLDecoder.swift; sourceTree = "<group>"; };
@@ -209,7 +208,7 @@
 		6632594B2BB66C1A00460F70 /* JXLEncoderShim.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = JXLEncoderShim.mm; sourceTree = "<group>"; };
 		6632594D2BB6725B00460F70 /* JXLEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JXLEncoder.swift; sourceTree = "<group>"; };
 		6632595E2BB6E94E00460F70 /* libjxl.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libjxl.xcframework; sourceTree = "<group>"; };
-		663D40D32C35EA9C004B8591 /* ProjectEditor2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectEditor2.swift; sourceTree = "<group>"; };
+		663D40D32C35EA9C004B8591 /* ProjectEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectEditor.swift; sourceTree = "<group>"; };
 		6643CAF42BE31CC00094B998 /* ChromeBlurView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromeBlurView.swift; sourceTree = "<group>"; };
 		6643CAF62BE3431A0094B998 /* EditorMenuDismissGestureRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorMenuDismissGestureRecognizer.swift; sourceTree = "<group>"; };
 		6643CAFC2BE38AD40094B998 /* EditorSidebarCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorSidebarCardView.swift; sourceTree = "<group>"; };
@@ -255,6 +254,7 @@
 		66B2BE412BCB55FF0072AC1B /* MiscModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiscModels.swift; sourceTree = "<group>"; };
 		66B491B22BD9993F008A2A2E /* TextureCreator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextureCreator.swift; sourceTree = "<group>"; };
 		66BC01682C35FA1200D2E2AD /* ProjectEditorWorkQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectEditorWorkQueue.swift; sourceTree = "<group>"; };
+		66BC016E2C3890B100D2E2AD /* Scene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scene.swift; sourceTree = "<group>"; };
 		66CE18FC2C1B852F0078AA68 /* PreviewFrameRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewFrameRenderer.swift; sourceTree = "<group>"; };
 		66CE19002C1BA8BC0078AA68 /* RenderCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderCacheManager.swift; sourceTree = "<group>"; };
 		66D084392BA3840C00EB8556 /* LuxAnimate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LuxAnimate.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -579,13 +579,13 @@
 			path = JXL;
 			sourceTree = "<group>";
 		};
-		663D40D22C35EA88004B8591 /* Project 2 */ = {
+		663D40D22C35EA88004B8591 /* Project Editor */ = {
 			isa = PBXGroup;
 			children = (
-				663D40D32C35EA9C004B8591 /* ProjectEditor2.swift */,
+				663D40D32C35EA9C004B8591 /* ProjectEditor.swift */,
 				66BC01682C35FA1200D2E2AD /* ProjectEditorWorkQueue.swift */,
 			);
-			path = "Project 2";
+			path = "Project Editor";
 			sourceTree = "<group>";
 		};
 		6643CB022BE4672A0094B998 /* Menu */ = {
@@ -636,6 +636,7 @@
 			isa = PBXGroup;
 			children = (
 				66D084872BA4060E00EB8556 /* Project.swift */,
+				66BC016E2C3890B100D2E2AD /* Scene.swift */,
 			);
 			path = Project;
 			sourceTree = "<group>";
@@ -678,25 +679,20 @@
 			path = ID;
 			sourceTree = "<group>";
 		};
-		66789ACF2C3336880020EACE /* Project */ = {
+		66789ACF2C3336880020EACE /* Project Creator */ = {
 			isa = PBXGroup;
 			children = (
 				660ABA482C01926A00B5C668 /* ProjectCreator.swift */,
-				660CD12F2BA92FF500C8C7B5 /* ProjectEditManager.swift */,
-				66789AD52C3359770020EACE /* ProjectSceneEditor.swift */,
-				66789AD32C3340070020EACE /* ProjectSceneRenderManifestGenerator.swift */,
-				66789ACD2C3332A90020EACE /* ProjectAnimationEditor.swift */,
-				66211EB92BF6138F005490C4 /* ProjectAnimationEditorWorkQueue.swift */,
 			);
-			path = Project;
+			path = "Project Creator";
 			sourceTree = "<group>";
 		};
-		667BF7492BA655B6003E3430 /* File */ = {
+		667BF7492BA655B6003E3430 /* File Helper */ = {
 			isa = PBXGroup;
 			children = (
 				667BF74A2BA655CB003E3430 /* FileHelper.swift */,
 			);
-			path = File;
+			path = "File Helper";
 			sourceTree = "<group>";
 		};
 		66A05B782BDC7B6700434245 /* Toolbar */ = {
@@ -716,6 +712,24 @@
 				66A653052C20AFE70060A216 /* xxhash.c */,
 			);
 			path = XXHash;
+			sourceTree = "<group>";
+		};
+		66BC016C2C3880F200D2E2AD /* Project Scene Editor */ = {
+			isa = PBXGroup;
+			children = (
+				66789AD52C3359770020EACE /* ProjectSceneEditor.swift */,
+				66789AD32C3340070020EACE /* ProjectSceneRenderManifestGenerator.swift */,
+			);
+			path = "Project Scene Editor";
+			sourceTree = "<group>";
+		};
+		66BC016D2C38810200D2E2AD /* Project Animation Layer Editor */ = {
+			isa = PBXGroup;
+			children = (
+				66789ACD2C3332A90020EACE /* ProjectAnimationEditor.swift */,
+				66211EB92BF6138F005490C4 /* ProjectAnimationEditorWorkQueue.swift */,
+			);
+			path = "Project Animation Layer Editor";
 			sourceTree = "<group>";
 		};
 		66D084302BA3840B00EB8556 = {
@@ -864,10 +878,12 @@
 			isa = PBXGroup;
 			children = (
 				66D084802BA3FDF200EB8556 /* Library */,
-				66789ACF2C3336880020EACE /* Project */,
-				663D40D22C35EA88004B8591 /* Project 2 */,
+				66789ACF2C3336880020EACE /* Project Creator */,
+				663D40D22C35EA88004B8591 /* Project Editor */,
+				66BC016C2C3880F200D2E2AD /* Project Scene Editor */,
+				66BC016D2C38810200D2E2AD /* Project Animation Layer Editor */,
 				66789ABE2C29E8F20020EACE /* Render Preview */,
-				667BF7492BA655B6003E3430 /* File */,
+				667BF7492BA655B6003E3430 /* File Helper */,
 				66789AC72C332D630020EACE /* ID */,
 				660CD1312BAE4CFA00C8C7B5 /* Coding */,
 				663259482BB669AE00460F70 /* JXL */,
@@ -1028,12 +1044,12 @@
 				66099BC12BDB32F500243D9F /* BrushStrokeStampProcessor.swift in Sources */,
 				662232682BE07FA500C8813F /* EditorTimelineVC.swift in Sources */,
 				6643CAFD2BE38AD40094B998 /* EditorSidebarCardView.swift in Sources */,
+				66BC016F2C3890B100D2E2AD /* Scene.swift in Sources */,
 				6643CB082BE488800094B998 /* EditorMenuPositioningView.swift in Sources */,
 				66D084842BA3FE2E00EB8556 /* LibraryContentVC.swift in Sources */,
 				6643CAF52BE31CC00094B998 /* ChromeBlurView.swift in Sources */,
 				66D0846F2BA3CEC300EB8556 /* Indirect.swift in Sources */,
 				6643CB0E2BE593730094B998 /* TouchCancellingCollectionView.swift in Sources */,
-				660CD1302BA92FF500C8C7B5 /* ProjectEditManager.swift in Sources */,
 				66D084782BA3CEC300EB8556 /* UIViewController+Extensions.swift in Sources */,
 				66211EAE2BF3159B005490C4 /* TextureCopier.swift in Sources */,
 				6643CB062BE483030094B998 /* EditorMenuView.swift in Sources */,
@@ -1075,7 +1091,7 @@
 				6662D88F2BBD1F2200B4C1D4 /* CanvasMultiGestureRecognizerState.swift in Sources */,
 				664B597F2BC71B2F003FA90E /* MetalView.swift in Sources */,
 				66099BD32BDB527B00243D9F /* WrappedDisplayLink.swift in Sources */,
-				663D40D42C35EA9C004B8591 /* ProjectEditor2.swift in Sources */,
+				663D40D42C35EA9C004B8591 /* ProjectEditor.swift in Sources */,
 				660CD1332BAE4D0E00C8C7B5 /* JSONFileCoders.swift in Sources */,
 				6622325B2BE0750300C8813F /* EditorCollapsibleContentVC.swift in Sources */,
 				6622326B2BE07FB000C8813F /* TimelineTrackCell.swift in Sources */,
