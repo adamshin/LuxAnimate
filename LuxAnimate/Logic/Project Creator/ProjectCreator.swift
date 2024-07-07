@@ -63,15 +63,13 @@ struct ProjectCreator {
         
         let content = Project.Content(
             metadata: contentMetadata,
-            scenes: [], 
-            nonSceneAssetIDs: [])
+            scenes: [])
         
         return Project.Manifest(
             id: id,
             name: name,
             createdAt: now,
-            content: content,
-            assetIDs: [])
+            content: content)
     }
     
     private func setupInitialContent(

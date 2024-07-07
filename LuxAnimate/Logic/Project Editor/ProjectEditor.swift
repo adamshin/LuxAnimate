@@ -271,6 +271,21 @@ class ProjectEditor {
         try fileManager.moveItem(at: srcURL, to: dstURL)
     }
     
+    private static func allAssetIDs(
+        in projectManifest: Project.Manifest
+    ) -> Set<String> {
+        
+        var assetIDs = Set<String>()
+        
+        for scene in projectManifest.content.scenes {
+            assetIDs.insert(scene.manifestAssetID)
+            assetIDs.insert(scene.renderManifestAssetID)
+            assetIDs = assetIDs.union(scene.sceneAssetIDs)
+        }
+        
+        return assetIDs
+    }
+    
     // MARK: - Undo/Redo
     
     func applyUndo() throws {
@@ -358,8 +373,8 @@ class ProjectEditor {
         
         // Find assets referenced in the old manifest but not the
         // new one. Move these to the new history entry directory
-        let oldAssetIDs = currentProjectManifest.assetIDs
-        let newAssetIDs = consumedProjectManifest.assetIDs
+        let oldAssetIDs = Self.allAssetIDs(in: currentProjectManifest)
+        let newAssetIDs = Self.allAssetIDs(in: consumedProjectManifest)
         
         let diffAssetIDs = oldAssetIDs.subtracting(newAssetIDs)
         
@@ -386,29 +401,6 @@ class ProjectEditor {
                 newProjectManifest: newProjectManifest,
                 newAssets: newAssets)
         }
-    }
-    
-    func applyEditContent(
-        newContent: Project.Content,
-        newAssets: [Asset]
-    ) throws {
-        
-        var newProjectManifest = projectManifest
-        
-        var assetIDs = newContent.nonSceneAssetIDs
-        
-        for scene in newContent.scenes {
-            assetIDs.insert(scene.manifestAssetID)
-            assetIDs.insert(scene.renderManifestAssetID)
-            assetIDs = assetIDs.union(scene.sceneAssetIDs)
-        }
-        
-        newProjectManifest.content = newContent
-        newProjectManifest.assetIDs = assetIDs
-        
-        try applyEdit(
-            newProjectManifest: newProjectManifest,
-            newAssets: newAssets)
     }
     
     private func applyEditInternal(
@@ -440,8 +432,11 @@ class ProjectEditor {
             to: historyEntryProjectManifestURL)
         
         // Write new assets to project directory
+        let oldAssetIDs = Self.allAssetIDs(in: oldProjectManifest)
+        let newAssetIDs = Self.allAssetIDs(in: newProjectManifest)
+        
         for asset in newAssets {
-            guard newProjectManifest.assetIDs.contains(asset.id)
+            guard newAssetIDs.contains(asset.id)
             else { continue }
             
             try writeAssetToProject(asset)
@@ -455,9 +450,6 @@ class ProjectEditor {
         
         // Find assets referenced in the old manifest but not the
         // new one. Move these to the new history entry
-        let oldAssetIDs = oldProjectManifest.assetIDs
-        let newAssetIDs = newProjectManifest.assetIDs
-        
         let diffAssetIDs = oldAssetIDs.subtracting(newAssetIDs)
         
         for diffAssetID in diffAssetIDs {

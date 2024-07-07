@@ -8,7 +8,7 @@ protocol ProjectSceneEditorDelegate: AnyObject {
     
     func applyEdit(
         _ e: ProjectSceneEditor,
-        newProjectContent: Project.Content,
+        newProjectManifest: Project.Manifest,
         newAssets: [ProjectEditor.Asset])
 }
 
@@ -19,7 +19,7 @@ class ProjectSceneEditor {
     private let projectID: String
     private let sceneID: String
     
-    private var projectContent: Project.Content
+    private var projectManifest: Project.Manifest
     private var sceneManifest: Scene.Manifest
     
     enum InitError: Error {
@@ -39,18 +39,18 @@ class ProjectSceneEditor {
     init(
         projectID: String,
         sceneID: String,
-        projectContent: Project.Content
+        projectManifest: Project.Manifest
     ) throws {
         
         self.projectID = projectID
         self.sceneID = sceneID
         
-        self.projectContent = projectContent
+        self.projectManifest = projectManifest
         
         guard let sceneManifest = try Self.loadSceneManifest(
             projectID: projectID,
             sceneID: sceneID,
-            projectContent: projectContent)
+            projectManifest: projectManifest)
         else {
             throw InitError.sceneNotFound
         }
@@ -62,10 +62,10 @@ class ProjectSceneEditor {
     private static func loadSceneManifest(
         projectID: String,
         sceneID: String,
-        projectContent: Project.Content
+        projectManifest: Project.Manifest
     ) throws -> Scene.Manifest? {
         
-        guard let scene = projectContent.scenes
+        guard let scene = projectManifest.content.scenes
             .first(where: { $0.id == sceneID })
         else {
             return nil
@@ -85,16 +85,16 @@ class ProjectSceneEditor {
     
     // MARK: - Update
     
-    func update(projectContent: Project.Content) throws {
+    func update(projectManifest: Project.Manifest) throws {
         guard let sceneManifest = try Self.loadSceneManifest(
             projectID: projectID,
             sceneID: sceneID,
-            projectContent: projectContent)
+            projectManifest: projectManifest)
         else {
             throw UpdateError.sceneNotFound
         }
         
-        self.projectContent = projectContent
+        self.projectManifest = projectManifest
         self.sceneManifest = sceneManifest
     }
     
@@ -105,14 +105,14 @@ class ProjectSceneEditor {
         newSceneAssets: [ProjectEditor.Asset]
     ) throws {
         
-        guard let sceneIndex = projectContent.scenes
+        guard let sceneIndex = projectManifest.content.scenes
             .firstIndex(where: { $0.id == sceneID })
         else {
             throw EditError.sceneNotFound
         }
         
-        let projectScene = projectContent.scenes[sceneIndex]
-        let contentMetadata = projectContent.metadata
+        let projectScene = projectManifest.content.scenes[sceneIndex]
+        let contentMetadata = projectManifest.content.metadata
         
         // Generate scene render manifest
         let sceneRenderManifest = ProjectSceneRenderManifestGenerator
@@ -130,7 +130,18 @@ class ProjectSceneEditor {
         let sceneManifestAssetID = IDGenerator.id()
         let sceneRenderManifestAssetID = IDGenerator.id()
         
-        // Add scene manifests to asset list
+        // Update scene
+        var newProjectScene = projectScene
+        
+        newProjectScene.manifestAssetID = sceneManifestAssetID
+        newProjectScene.renderManifestAssetID = sceneRenderManifestAssetID
+        newProjectScene.sceneAssetIDs = newSceneManifest.assetIDs
+        
+        // Update project manifest
+        var newProjectManifest = projectManifest
+        projectManifest.content.scenes[sceneIndex] = newProjectScene
+        
+        // Create asset list
         var newProjectAssets = newSceneAssets
         
         newProjectAssets.append(ProjectEditor.Asset(
@@ -141,25 +152,14 @@ class ProjectSceneEditor {
             id: sceneRenderManifestAssetID,
             data: sceneRenderManifestData))
         
-        // Update scene
-        var newProjectScene = projectScene
-        
-        newProjectScene.manifestAssetID = sceneManifestAssetID
-        newProjectScene.renderManifestAssetID = sceneRenderManifestAssetID
-        newProjectScene.sceneAssetIDs = newSceneManifest.assetIDs
-        
-        // Update project content
-        var newProjectContent = projectContent
-        newProjectContent.scenes[sceneIndex] = newProjectScene
-        
         // Apply edit
         delegate?.applyEdit(
             self,
-            newProjectContent: newProjectContent,
+            newProjectManifest: newProjectManifest,
             newAssets: newProjectAssets)
         
         // Update state
-        self.projectContent = newProjectContent
+        self.projectManifest = newProjectManifest
         self.sceneManifest = newSceneManifest
     }
     

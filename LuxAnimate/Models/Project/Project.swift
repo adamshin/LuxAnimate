@@ -14,8 +14,6 @@ enum Project {
         var createdAt: Date
         
         var content: Content
-        
-        var assetIDs: Set<String>
     }
     
     // MARK: - Content
@@ -23,8 +21,6 @@ enum Project {
     struct Content: Codable {
         var metadata: ContentMetadata
         var scenes: [Scene]
-        
-        var nonSceneAssetIDs: Set<String>
     }
     
     struct ContentMetadata: Codable {

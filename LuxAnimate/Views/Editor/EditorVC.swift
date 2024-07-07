@@ -5,7 +5,6 @@
 /*
 
 import UIKit
-import PhotosUI
 
 class EditorVC: UIViewController {
     
