@@ -38,7 +38,7 @@ enum Scene {
         var id: String
         var frameIndex: Int
         
-        var assetIDs: DrawingAssetIDGroup
+        var assetIDs: DrawingAssetIDGroup?
     }
     
     struct DrawingAssetIDGroup: Codable {

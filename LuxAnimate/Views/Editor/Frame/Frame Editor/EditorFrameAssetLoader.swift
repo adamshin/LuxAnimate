@@ -19,7 +19,7 @@ class EditorFrameAssetLoader {
     
     struct LoadItem {
         var drawingID: String
-        var assetIDs: Scene.DrawingAssetIDGroup
+        var assetIDs: Scene.DrawingAssetIDGroup?
         var quality: AssetQuality
     }
     
@@ -77,7 +77,7 @@ class EditorFrameAssetLoader {
         
         for drawing in allDrawings {
             if let existingAsset = oldLoadedAssets[drawing.id],
-                existingAsset.fullAssetID == drawing.assetIDs.full
+                existingAsset.fullAssetID == drawing.assetIDs?.full
             {
                 loadedAssets[drawing.id] = existingAsset
             }
@@ -131,8 +131,13 @@ class EditorFrameAssetLoader {
                 continue
             }
             
+            guard let assetIDs = item.assetIDs else {
+                delegate?.onUpdateProgress(self)
+                continue
+            }
+            
             if let existingAsset = loadedAssets[drawingID],
-               existingAsset.fullAssetID == item.assetIDs.full,
+               existingAsset.fullAssetID == item.assetIDs?.full,
                existingAsset.quality.rawValue >= item.quality.rawValue
             {
                 delegate?.onUpdateProgress(self)
@@ -140,9 +145,9 @@ class EditorFrameAssetLoader {
             }
             
             let assetID = switch item.quality {
-            case .small: item.assetIDs.small
-            case .medium: item.assetIDs.medium
-            case .full: item.assetIDs.full
+            case .small: assetIDs.small
+            case .medium: assetIDs.medium
+            case .full: assetIDs.full
             }
             let assetURL = FileHelper.shared.projectAssetURL(
                 projectID: projectID,
@@ -173,7 +178,7 @@ class EditorFrameAssetLoader {
                         usage: .shaderRead)
                     
                     let asset = LoadedAsset(
-                        fullAssetID: item.assetIDs.full,
+                        fullAssetID: assetIDs.full,
                         quality: item.quality,
                         texture: texture)
                     

@@ -117,8 +117,12 @@ private struct AnimationFrameLayerProvider: FrameLayerProvider {
         
         let drawing = sortedDrawings[sortedDrawingIndex]
         
-        let drawingContent = Scene.FrameRenderManifest.DrawingLayerContent(
-            assetIDs: drawing.assetIDs)
+        guard let assetIDs = drawing.assetIDs else {
+            return nil
+        }
+        
+        let drawingContent = Scene.FrameRenderManifest
+            .DrawingLayerContent(assetIDs: assetIDs)
         
         return Scene.FrameRenderManifest.Layer(
             size: layerSize,

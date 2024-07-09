@@ -20,7 +20,7 @@ enum Project {
     
     struct Content: Codable {
         var metadata: ContentMetadata
-        var scenes: [Scene]
+        var scenes: [SceneRef]
     }
     
     struct ContentMetadata: Codable {
@@ -28,7 +28,7 @@ enum Project {
         var framesPerSecond: Int
     }
     
-    struct Scene: Codable {
+    struct SceneRef: Codable {
         var id: String
         var name: String
         
