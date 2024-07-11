@@ -4,7 +4,7 @@
 
 import Foundation
 
-private let editHistoryLimit = 100
+private let editHistoryLimit = 20
 
 extension ProjectEditor {
     
@@ -125,7 +125,7 @@ class ProjectEditor {
                  order: increment ? .reverse : .forward))
         
         for (url, index) in urlsAndIndexes {
-            let newIndex = index + 1
+            let newIndex = increment ? index + 1 : index - 1
             
             if newIndex > maxCount - 1 {
                 try fileManager.removeItem(at: url)
@@ -277,10 +277,10 @@ class ProjectEditor {
         
         var assetIDs = Set<String>()
         
-        for scene in projectManifest.content.scenes {
-            assetIDs.insert(scene.manifestAssetID)
-            assetIDs.insert(scene.renderManifestAssetID)
-            assetIDs = assetIDs.union(scene.sceneAssetIDs)
+        for sceneRef in projectManifest.content.sceneRefs {
+            assetIDs.insert(sceneRef.manifestAssetID)
+            assetIDs.insert(sceneRef.renderManifestAssetID)
+            assetIDs = assetIDs.union(sceneRef.sceneAssetIDs)
         }
         
         return assetIDs

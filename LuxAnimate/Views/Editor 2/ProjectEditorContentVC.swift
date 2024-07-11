@@ -10,12 +10,15 @@ protocol ProjectEditorContentVCDelegate: AnyObject {
     func onSelectRemoveScene(_ vc: ProjectEditorContentVC)
     func onSelectUndo(_ vc: ProjectEditorContentVC)
     func onSelectRedo(_ vc: ProjectEditorContentVC)
+    func onSelectBack(_ vc: ProjectEditorContentVC)
     
 }
 
 class ProjectEditorContentVC: UIViewController {
     
     weak var delegate: ProjectEditorContentVCDelegate?
+    
+    private let infoLabel = UILabel()
     
     private let addSceneButton = UIButton(type: .system)
     private let removeSceneButton = UIButton(type: .system)
@@ -25,6 +28,20 @@ class ProjectEditorContentVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .editorBackground
+        
+        let backButton = UIButton(type: .system)
+        backButton.setTitle("Done", for: .normal)
+        backButton.titleLabel?.font = .systemFont(ofSize: 18, weight: .medium)
+        view.addSubview(backButton)
+        backButton.pinEdges([.top, .trailing], padding: 24)
+        backButton.addHandler { [weak self] in
+            guard let self else { return }
+            self.delegate?.onSelectBack(self)
+        }
+        
+        view.addSubview(infoLabel)
+        infoLabel.pinEdges([.leading, .top], padding: 24)
+        infoLabel.numberOfLines = 0
         
         let buttonStack = UIStackView()
         buttonStack.axis = .horizontal
@@ -64,10 +81,12 @@ class ProjectEditorContentVC: UIViewController {
     }
     
     func update(
+        infoText: String,
         removeSceneEnabled: Bool,
         undoEnabled: Bool,
         redoEnabled: Bool
     ) {
+        infoLabel.text = infoText
         removeSceneButton.isEnabled = removeSceneEnabled
         undoButton.isEnabled = undoEnabled
         redoButton.isEnabled = redoEnabled

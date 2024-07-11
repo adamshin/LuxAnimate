@@ -1,31 +1,23 @@
 //
-//  ProjectSceneEditHelper.swift
+//  SceneEditHelper.swift
 //
 
 import Foundation
 
-protocol ProjectSceneEditHelperDelegate: AnyObject {
+protocol SceneEditHelperDelegate: AnyObject {
     
     func applyEdit(
-        _ e: ProjectSceneEditHelper,
+        _ e: SceneEditHelper,
         newProjectManifest: Project.Manifest,
         newAssets: [ProjectEditor.Asset])
 }
 
-class ProjectSceneEditHelper {
+class SceneEditHelper {
     
-    weak var delegate: ProjectSceneEditHelperDelegate?
-    
-    private let projectID: String
+    weak var delegate: SceneEditHelperDelegate?
     
     enum EditError: Error {
         case sceneNotFound
-    }
-    
-    // MARK: - Init
-    
-    init(projectID: String) {
-        self.projectID = projectID
     }
     
     // MARK: - Create Scene
@@ -50,7 +42,7 @@ class ProjectSceneEditHelper {
             assetIDs: [])
         
         // Generate scene render manifest
-        let sceneRenderManifest = ProjectSceneRenderManifestGenerator
+        let sceneRenderManifest = SceneRenderManifestGenerator
             .generate(
                 contentMetadata: contentMetadata,
                 sceneManifest: sceneManifest)
@@ -75,7 +67,7 @@ class ProjectSceneEditHelper {
         
         // Update project manifest
         var newProjectManifest = projectManifest
-        newProjectManifest.content.scenes.append(newSceneRef)
+        newProjectManifest.content.sceneRefs.append(newSceneRef)
         
         // Create asset list
         var newProjectAssets: [ProjectEditor.Asset] = []
@@ -102,14 +94,14 @@ class ProjectSceneEditHelper {
         sceneID: String
     ) throws {
         
-        guard let sceneIndex = projectManifest.content.scenes
+        guard let sceneIndex = projectManifest.content.sceneRefs
             .firstIndex(where: { $0.id == sceneID })
         else {
             throw EditError.sceneNotFound
         }
         
         var newProjectManifest = projectManifest
-        newProjectManifest.content.scenes.remove(at: sceneIndex)
+        newProjectManifest.content.sceneRefs.remove(at: sceneIndex)
         
         delegate?.applyEdit(
             self,
@@ -126,17 +118,17 @@ class ProjectSceneEditHelper {
         newSceneAssets: [ProjectEditor.Asset]
     ) throws {
         
-        guard let sceneIndex = projectManifest.content.scenes
+        guard let sceneIndex = projectManifest.content.sceneRefs
             .firstIndex(where: { $0.id == sceneID })
         else {
             throw EditError.sceneNotFound
         }
         
-        let sceneRef = projectManifest.content.scenes[sceneIndex]
+        let sceneRef = projectManifest.content.sceneRefs[sceneIndex]
         let contentMetadata = projectManifest.content.metadata
         
         // Generate scene render manifest
-        let sceneRenderManifest = ProjectSceneRenderManifestGenerator
+        let sceneRenderManifest = SceneRenderManifestGenerator
             .generate(
                 contentMetadata: contentMetadata,
                 sceneManifest: newSceneManifest)
@@ -160,7 +152,7 @@ class ProjectSceneEditHelper {
         
         // Update project manifest
         var newProjectManifest = projectManifest
-        newProjectManifest.content.scenes[sceneIndex] = newSceneRef
+        newProjectManifest.content.sceneRefs[sceneIndex] = newSceneRef
         
         // Create asset list
         var newProjectAssets = newSceneAssets

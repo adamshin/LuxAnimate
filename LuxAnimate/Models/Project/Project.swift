@@ -20,7 +20,7 @@ enum Project {
     
     struct Content: Codable {
         var metadata: ContentMetadata
-        var scenes: [SceneRef]
+        var sceneRefs: [SceneRef]
     }
     
     struct ContentMetadata: Codable {

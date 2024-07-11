@@ -1,10 +1,10 @@
 //
-//  ProjectSceneRenderManifestGenerator.swift
+//  SceneRenderManifestGenerator.swift
 //
 
 import Foundation
 
-struct ProjectSceneRenderManifestGenerator {
+struct SceneRenderManifestGenerator {
     
     static func generate(
         contentMetadata: Project.ContentMetadata,

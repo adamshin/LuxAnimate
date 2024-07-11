@@ -103,8 +103,8 @@
 		66789AC42C2C81470020EACE /* RenderPreviewManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66789AC32C2C81470020EACE /* RenderPreviewManifest.swift */; };
 		66789AC92C332D710020EACE /* IDGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66789AC82C332D710020EACE /* IDGenerator.swift */; };
 		66789ACE2C3332A90020EACE /* ProjectAnimationEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66789ACD2C3332A90020EACE /* ProjectAnimationEditor.swift */; };
-		66789AD42C3340070020EACE /* ProjectSceneRenderManifestGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66789AD32C3340070020EACE /* ProjectSceneRenderManifestGenerator.swift */; };
-		66789AD62C3359770020EACE /* ProjectSceneEditHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66789AD52C3359770020EACE /* ProjectSceneEditHelper.swift */; };
+		66789AD42C3340070020EACE /* SceneRenderManifestGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66789AD32C3340070020EACE /* SceneRenderManifestGenerator.swift */; };
+		66789AD62C3359770020EACE /* SceneEditHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66789AD52C3359770020EACE /* SceneEditHelper.swift */; };
 		667BF74B2BA655CB003E3430 /* FileHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667BF74A2BA655CB003E3430 /* FileHelper.swift */; };
 		66A653042C209DFB0060A216 /* XXHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A653032C209DFB0060A216 /* XXHash.swift */; };
 		66A653062C20AFE70060A216 /* xxhash.c in Sources */ = {isa = PBXBuildFile; fileRef = 66A653052C20AFE70060A216 /* xxhash.c */; };
@@ -244,8 +244,8 @@
 		66789AC32C2C81470020EACE /* RenderPreviewManifest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderPreviewManifest.swift; sourceTree = "<group>"; };
 		66789AC82C332D710020EACE /* IDGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IDGenerator.swift; sourceTree = "<group>"; };
 		66789ACD2C3332A90020EACE /* ProjectAnimationEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectAnimationEditor.swift; sourceTree = "<group>"; };
-		66789AD32C3340070020EACE /* ProjectSceneRenderManifestGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectSceneRenderManifestGenerator.swift; sourceTree = "<group>"; };
-		66789AD52C3359770020EACE /* ProjectSceneEditHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectSceneEditHelper.swift; sourceTree = "<group>"; };
+		66789AD32C3340070020EACE /* SceneRenderManifestGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneRenderManifestGenerator.swift; sourceTree = "<group>"; };
+		66789AD52C3359770020EACE /* SceneEditHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneEditHelper.swift; sourceTree = "<group>"; };
 		667BF74A2BA655CB003E3430 /* FileHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileHelper.swift; sourceTree = "<group>"; };
 		66A653022C2099440060A216 /* xxhash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = xxhash.h; sourceTree = "<group>"; };
 		66A653032C209DFB0060A216 /* XXHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XXHash.swift; sourceTree = "<group>"; };
@@ -718,13 +718,13 @@
 			path = XXHash;
 			sourceTree = "<group>";
 		};
-		66BC016C2C3880F200D2E2AD /* Project Scene Edit Helper */ = {
+		66BC016C2C3880F200D2E2AD /* Scene Edit Helper */ = {
 			isa = PBXGroup;
 			children = (
-				66789AD52C3359770020EACE /* ProjectSceneEditHelper.swift */,
-				66789AD32C3340070020EACE /* ProjectSceneRenderManifestGenerator.swift */,
+				66789AD52C3359770020EACE /* SceneEditHelper.swift */,
+				66789AD32C3340070020EACE /* SceneRenderManifestGenerator.swift */,
 			);
-			path = "Project Scene Edit Helper";
+			path = "Scene Edit Helper";
 			sourceTree = "<group>";
 		};
 		66BC016D2C38810200D2E2AD /* Project Animation Layer Editor */ = {
@@ -894,7 +894,7 @@
 				66D084802BA3FDF200EB8556 /* Library */,
 				66789ACF2C3336880020EACE /* Project Creator */,
 				663D40D22C35EA88004B8591 /* Project Editor */,
-				66BC016C2C3880F200D2E2AD /* Project Scene Edit Helper */,
+				66BC016C2C3880F200D2E2AD /* Scene Edit Helper */,
 				66BC016D2C38810200D2E2AD /* Project Animation Layer Editor */,
 				66789ABE2C29E8F20020EACE /* Render Preview */,
 				667BF7492BA655B6003E3430 /* File Helper */,
@@ -1036,7 +1036,7 @@
 				66FE7A2C2C21035D00464A82 /* Data.swift in Sources */,
 				66211E922BEF24A5005490C4 /* TimelineToolbarFrameWidgetScrubberVC.swift in Sources */,
 				664B593F2BC5A9AA003FA90E /* AppConfig.swift in Sources */,
-				66789AD42C3340070020EACE /* ProjectSceneRenderManifestGenerator.swift in Sources */,
+				66789AD42C3340070020EACE /* SceneRenderManifestGenerator.swift in Sources */,
 				66211EBA2BF6138F005490C4 /* ProjectAnimationEditorWorkQueue.swift in Sources */,
 				6662D89D2BBDF46F00B4C1D4 /* Geometry+UIKit.swift in Sources */,
 				66789AC42C2C81470020EACE /* RenderPreviewManifest.swift in Sources */,
@@ -1086,7 +1086,7 @@
 				660ABA492C01926A00B5C668 /* ProjectCreator.swift in Sources */,
 				66BC01722C38A61100D2E2AD /* ProjectEditorVC.swift in Sources */,
 				6662D8852BBB5D4500B4C1D4 /* JXLDecoderShim.mm in Sources */,
-				66789AD62C3359770020EACE /* ProjectSceneEditHelper.swift in Sources */,
+				66789AD62C3359770020EACE /* SceneEditHelper.swift in Sources */,
 				66099BC72BDB33DF00243D9F /* TextureBlitter.swift in Sources */,
 				66311CDD2BD7403100D53489 /* SpriteRenderer.swift in Sources */,
 				66099BBF2BDB32F500243D9F /* BrushStrokeSmoothingProcessor.swift in Sources */,

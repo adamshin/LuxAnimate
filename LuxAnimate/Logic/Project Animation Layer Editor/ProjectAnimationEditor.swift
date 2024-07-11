@@ -76,7 +76,7 @@ class ProjectAnimationEditor {
         let contentMetadata = projectManifest.content.metadata
         
         // Generate scene render manifest
-        let sceneRenderManifest = ProjectSceneRenderManifestGenerator
+        let sceneRenderManifest = SceneRenderManifestGenerator
             .generate(
                 contentMetadata: contentMetadata,
                 sceneManifest: newSceneManifest)

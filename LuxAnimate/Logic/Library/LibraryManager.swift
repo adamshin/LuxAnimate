@@ -160,7 +160,15 @@ struct LibraryManager {
         let projectURL = FileHelper.shared
             .projectURL(for: projectID)
         
+        let editHistoryDirectoryURL = FileHelper.shared
+            .projectEditHistoryDirectoryURL(for: projectID)
+        
+//        let renderCacheDirectoryURL = FileHelper.shared
+//            .renderCacheDirectoryURL(for: projectID)
+        
         try fileManager.removeItem(at: projectURL)
+        try fileManager.removeItem(at: editHistoryDirectoryURL)
+//        try fileManager.removeItem(at: renderCacheDirectoryURL)
         
         var libraryManifest = try getLibraryManifest()
         if let projectIndex = libraryManifest.projects
