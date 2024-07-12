@@ -6,11 +6,16 @@ import UIKit
 
 protocol ProjectEditorContentVCDelegate: AnyObject {
     
+    func onSelectBack(_ vc: ProjectEditorContentVC)
+    
     func onSelectAddScene(_ vc: ProjectEditorContentVC)
     func onSelectRemoveScene(_ vc: ProjectEditorContentVC)
     func onSelectUndo(_ vc: ProjectEditorContentVC)
     func onSelectRedo(_ vc: ProjectEditorContentVC)
-    func onSelectBack(_ vc: ProjectEditorContentVC)
+    
+    func onSelectScene(
+        _ vc: ProjectEditorContentVC,
+        sceneID: String)
     
 }
 
@@ -18,78 +23,163 @@ class ProjectEditorContentVC: UIViewController {
     
     weak var delegate: ProjectEditorContentVCDelegate?
     
-    private let infoLabel = UILabel()
+    private var projectManifest: Project.Manifest?
+    private var undoCount = 0
+    private var redoCount = 0
     
-    private let addSceneButton = UIButton(type: .system)
-    private let removeSceneButton = UIButton(type: .system)
-    private let undoButton = UIButton(type: .system)
-    private let redoButton = UIButton(type: .system)
+    private lazy var backButton = UIBarButtonItem(
+        title: "Back", style: .done,
+        target: self, action: #selector(onSelectBack))
+    private lazy var addSceneButton = UIBarButtonItem(
+        title: "Add Scene", style: .plain,
+        target: self, action: #selector(onSelectAddScene))
+    private lazy var removeSceneButton = UIBarButtonItem(
+        title: "Remove Scene", style: .plain,
+        target: self, action: #selector(onSelectRemoveScene))
+    private lazy var undoButton = UIBarButtonItem(
+        title: "Undo", style: .plain,
+        target: self, action: #selector(onSelectUndo))
+    private lazy var redoButton = UIBarButtonItem(
+        title: "Redo", style: .plain,
+        target: self, action: #selector(onSelectRedo))
+    
+    private let tableView = UITableView(
+        frame: .zero,
+        style: .insetGrouped)
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .editorBackground
         
-        let backButton = UIButton(type: .system)
-        backButton.setTitle("Done", for: .normal)
-        backButton.titleLabel?.font = .systemFont(ofSize: 18, weight: .medium)
-        view.addSubview(backButton)
-        backButton.pinEdges([.top, .trailing], padding: 24)
-        backButton.addHandler { [weak self] in
-            guard let self else { return }
-            self.delegate?.onSelectBack(self)
-        }
+        navigationItem.leftBarButtonItem = backButton
+        navigationItem.rightBarButtonItems = [
+            redoButton,
+            UIBarButtonItem.fixedSpace(20),
+            undoButton,
+            UIBarButtonItem.fixedSpace(20),
+            removeSceneButton,
+            UIBarButtonItem.fixedSpace(20),
+            addSceneButton,
+        ]
         
-        view.addSubview(infoLabel)
-        infoLabel.pinEdges([.leading, .top], padding: 24)
-        infoLabel.numberOfLines = 0
+        view.addSubview(tableView)
+        tableView.pinEdges()
         
-        let buttonStack = UIStackView()
-        buttonStack.axis = .horizontal
-        buttonStack.spacing = 40
-        
-        view.addSubview(buttonStack)
-        buttonStack.pinEdges(.bottom, padding: 40)
-        buttonStack.pin(.centerX)
-        buttonStack.pinHeight(to: 48)
-        
-        addSceneButton.setTitle("Add Scene", for: .normal)
-        removeSceneButton.setTitle("Remove Scene", for: .normal)
-        undoButton.setTitle("Undo", for: .normal)
-        redoButton.setTitle("Redo", for: .normal)
-        
-        buttonStack.addArrangedSubview(addSceneButton)
-        buttonStack.addArrangedSubview(removeSceneButton)
-        buttonStack.addArrangedSubview(undoButton)
-        buttonStack.addArrangedSubview(redoButton)
-        
-        addSceneButton.addHandler { [weak self] in
-            guard let self else { return }
-            self.delegate?.onSelectAddScene(self)
-        }
-        removeSceneButton.addHandler { [weak self] in
-            guard let self else { return }
-            self.delegate?.onSelectRemoveScene(self)
-        }
-        undoButton.addHandler { [weak self] in
-            guard let self else { return }
-            self.delegate?.onSelectUndo(self)
-        }
-        redoButton.addHandler { [weak self] in
-            guard let self else { return }
-            self.delegate?.onSelectRedo(self)
-        }
+        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.register(UITableViewCell.self)
+    }
+    
+    @objc private func onSelectBack() {
+        delegate?.onSelectBack(self)
+    }
+    @objc private func onSelectAddScene() {
+        delegate?.onSelectAddScene(self)
+    }
+    @objc private func onSelectRemoveScene() {
+        delegate?.onSelectRemoveScene(self)
+    }
+    @objc private func onSelectUndo() {
+        delegate?.onSelectUndo(self)
+    }
+    @objc private func onSelectRedo() {
+        delegate?.onSelectRedo(self)
     }
     
     func update(
-        infoText: String,
-        removeSceneEnabled: Bool,
-        undoEnabled: Bool,
-        redoEnabled: Bool
+        projectManifest: Project.Manifest,
+        undoCount: Int,
+        redoCount: Int
     ) {
-        infoLabel.text = infoText
-        removeSceneButton.isEnabled = removeSceneEnabled
-        undoButton.isEnabled = undoEnabled
-        redoButton.isEnabled = redoEnabled
+        self.projectManifest = projectManifest
+        self.undoCount = undoCount
+        self.redoCount = redoCount
+        
+        updateButtons()
+        tableView.reloadData()
+    }
+    
+    private func updateButtons() {
+        guard let projectManifest else { return }
+        
+        removeSceneButton.isEnabled =
+            projectManifest.content.sceneRefs.count > 0
+        
+        undoButton.isEnabled = undoCount > 0
+        redoButton.isEnabled = redoCount > 0
+    }
+    
+}
+
+// MARK: - Table View
+
+extension ProjectEditorContentVC: UITableViewDataSource {
+    
+    func numberOfSections(
+        in tableView: UITableView
+    ) -> Int {
+        2
+    }
+    
+    func tableView(
+        _ tableView: UITableView,
+        numberOfRowsInSection section: Int
+    ) -> Int {
+        switch section {
+        case 0: 
+            2
+        case 1: 
+            projectManifest?.content.sceneRefs.count ?? 0
+        default:
+            0
+        }
+    }
+    
+    func tableView(
+        _ tableView: UITableView,
+        cellForRowAt indexPath: IndexPath
+    ) -> UITableViewCell {
+        
+        let cell = tableView.dequeue(
+            UITableViewCell.self,
+            for: indexPath)
+        
+        guard let projectManifest else { return cell }
+        
+        switch indexPath.section {
+        case 0:
+            switch indexPath.row {
+            case 0:
+                cell.textLabel?.text = "Project ID: \(projectManifest.id)"
+            case 1:
+                cell.textLabel?.text = "Project Name: \(projectManifest.name)"
+            default:
+                break
+            }
+        case 1:
+            let sceneRef = projectManifest.content.sceneRefs[indexPath.row]
+            cell.textLabel?.text = "Scene ID: \(sceneRef.id)"
+        default:
+            break
+        }
+        
+        return cell
+    }
+    
+}
+
+extension ProjectEditorContentVC: UITableViewDelegate {
+    
+    func tableView(
+        _ tableView: UITableView,
+        didSelectRowAt indexPath: IndexPath
+    ) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        if indexPath.section == 1 {
+            guard let projectManifest else { return }
+            let sceneRef = projectManifest.content.sceneRefs[indexPath.row]
+            delegate?.onSelectScene(self, sceneID: sceneRef.id)
+        }
     }
     
 }

@@ -41,7 +41,10 @@ class ProjectEditorVC: UIViewController {
         super.viewDidLoad()
         
         contentVC.delegate = self
-        addChild(contentVC, to: view)
+        
+        let navController = UINavigationController(
+            rootViewController: contentVC)
+        addChild(navController, to: view)
         
         updateUI()
     }
@@ -51,25 +54,10 @@ class ProjectEditorVC: UIViewController {
     // MARK: - UI
     
     private func updateUI() {
-        var infoText = """
-            Project ID: \(projectEditor.projectManifest.id)
-            Project Name: \(projectEditor.projectManifest.name)
-            
-            Undo Count: \(projectEditor.availableUndoCount)
-            Redo Count: \(projectEditor.availableRedoCount)
-            \n
-            """
-        for sceneRef in projectEditor.projectManifest.content.sceneRefs {
-            infoText += "Scene ID: \(sceneRef.id)\n"
-        }
-        
-        let hasScenes = !projectManifest.content.sceneRefs.isEmpty
-        
         contentVC.update(
-            infoText: infoText,
-            removeSceneEnabled: hasScenes,
-            undoEnabled: projectEditor.availableUndoCount > 0,
-            redoEnabled: projectEditor.availableRedoCount > 0)
+            projectManifest: projectEditor.projectManifest,
+            undoCount: projectEditor.availableUndoCount,
+            redoCount: projectEditor.availableRedoCount)
     }
     
     // MARK: - Logic
@@ -123,6 +111,10 @@ class ProjectEditorVC: UIViewController {
 
 extension ProjectEditorVC: ProjectEditorContentVCDelegate {
     
+    func onSelectBack(_ vc: ProjectEditorContentVC) {
+        dismiss(animated: true)
+    }
+    
     func onSelectAddScene(_ vc: ProjectEditorContentVC) {
         addScene()
     }
@@ -139,8 +131,15 @@ extension ProjectEditorVC: ProjectEditorContentVCDelegate {
         redo()
     }
     
-    func onSelectBack(_ vc: ProjectEditorContentVC) {
-        dismiss(animated: true)
+    func onSelectScene(
+        _ vc: ProjectEditorContentVC,
+        sceneID: String
+    ) {
+        let vc = SceneEditorVC(
+            projectID: projectID,
+            sceneID: sceneID)
+        
+        present(vc, animated: true)
     }
     
 }
