@@ -111,8 +111,13 @@ private struct AnimationFrameLayerProvider: FrameLayerProvider {
         at frameIndex: Int
     ) -> Scene.FrameRenderManifest.Layer? {
         
+        let adjustedFrameIndex = clamp(
+            frameIndex,
+            min: 0,
+            max: frameIndexesToSortedDrawingIndexes.count - 1)
+        
         guard let sortedDrawingIndex =
-            frameIndexesToSortedDrawingIndexes[frameIndex]
+            frameIndexesToSortedDrawingIndexes[adjustedFrameIndex]
         else { return nil }
         
         let drawing = sortedDrawings[sortedDrawingIndex]

@@ -1,20 +1,10 @@
 //
-//  SceneEditHelper.swift
+//  ProjectEditHelper.swift
 //
 
 import Foundation
 
-protocol SceneEditHelperDelegate: AnyObject {
-    
-    func applyEdit(
-        _ e: SceneEditHelper,
-        newProjectManifest: Project.Manifest,
-        newAssets: [ProjectEditor.Asset])
-}
-
-class SceneEditHelper {
-    
-    weak var delegate: SceneEditHelperDelegate?
+struct ProjectEditHelper {
     
     enum EditError: Error {
         case sceneNotFound
@@ -22,7 +12,8 @@ class SceneEditHelper {
     
     // MARK: - Create Scene
     
-    func createScene(
+    static func createScene(
+        projectEditor: ProjectEditor,
         projectManifest: Project.Manifest,
         name: String,
         frameCount: Int,
@@ -81,15 +72,15 @@ class SceneEditHelper {
             data: sceneRenderManifestData))
         
         // Apply edit
-        delegate?.applyEdit(
-            self,
+        try projectEditor.applyEdit(
             newProjectManifest: newProjectManifest,
             newAssets: newProjectAssets)
     }
     
     // MARK: - Delete Scene
     
-    func deleteScene(
+    static func deleteScene(
+        projectEditor: ProjectEditor,
         projectManifest: Project.Manifest,
         sceneID: String
     ) throws {
@@ -103,15 +94,15 @@ class SceneEditHelper {
         var newProjectManifest = projectManifest
         newProjectManifest.content.sceneRefs.remove(at: sceneIndex)
         
-        delegate?.applyEdit(
-            self,
+        try projectEditor.applyEdit(
             newProjectManifest: newProjectManifest,
             newAssets: [])
     }
     
     // MARK: - Edit Scene
     
-    func applySceneEdit(
+    static func applySceneEdit(
+        projectEditor: ProjectEditor,
         projectManifest: Project.Manifest,
         sceneID: String,
         newSceneManifest: Scene.Manifest,
@@ -166,8 +157,7 @@ class SceneEditHelper {
             data: sceneRenderManifestData))
         
         // Apply edit
-        delegate?.applyEdit(
-            self,
+        try projectEditor.applyEdit(
             newProjectManifest: newProjectManifest,
             newAssets: newProjectAssets)
     }

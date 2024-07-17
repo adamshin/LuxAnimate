@@ -1,29 +1,32 @@
 //
-//  ProjectEditorContentVC.swift
+//  SceneEditorContentVC.swift
 //
 
 import UIKit
 
-protocol ProjectEditorContentVCDelegate: AnyObject {
+protocol SceneEditorContentVCDelegate: AnyObject {
     
-    func onSelectBack(_ vc: ProjectEditorContentVC)
+    func onSelectBack(_ vc: SceneEditorContentVC)
     
-    func onSelectAddScene(_ vc: ProjectEditorContentVC)
-    func onSelectRemoveScene(_ vc: ProjectEditorContentVC)
-    func onSelectUndo(_ vc: ProjectEditorContentVC)
-    func onSelectRedo(_ vc: ProjectEditorContentVC)
+    func onSelectAddLayer(_ vc: SceneEditorContentVC)
+    func onSelectRemoveLayer(_ vc: SceneEditorContentVC)
+    func onSelectUndo(_ vc: SceneEditorContentVC)
+    func onSelectRedo(_ vc: SceneEditorContentVC)
     
-    func onSelectScene(
-        _ vc: ProjectEditorContentVC,
-        sceneID: String)
+    func onSelectLayer(
+        _ vc: SceneEditorContentVC,
+        layerID: String)
     
 }
 
-class ProjectEditorContentVC: UIViewController {
+class SceneEditorContentVC: UIViewController {
     
-    weak var delegate: ProjectEditorContentVCDelegate?
+    weak var delegate: SceneEditorContentVCDelegate?
     
     private var projectManifest: Project.Manifest?
+    private var sceneRef: Project.SceneRef?
+    private var sceneManifest: Scene.Manifest?
+    
     private var undoCount = 0
     private var redoCount = 0
     
@@ -31,12 +34,12 @@ class ProjectEditorContentVC: UIViewController {
         title: "Back", style: .done,
         target: self, action: #selector(onSelectBack))
     
-    private lazy var addSceneButton = UIBarButtonItem(
-        title: "Add Scene", style: .plain,
-        target: self, action: #selector(onSelectAddScene))
-    private lazy var removeSceneButton = UIBarButtonItem(
-        title: "Remove Scene", style: .plain,
-        target: self, action: #selector(onSelectRemoveScene))
+    private lazy var addLayerButton = UIBarButtonItem(
+        title: "Add Layer", style: .plain,
+        target: self, action: #selector(onSelectAddLayer))
+    private lazy var removeLayerButton = UIBarButtonItem(
+        title: "Remove Layer", style: .plain,
+        target: self, action: #selector(onSelectRemoveLayer))
     private lazy var undoButton = UIBarButtonItem(
         title: "Undo", style: .plain,
         target: self, action: #selector(onSelectUndo))
@@ -57,9 +60,9 @@ class ProjectEditorContentVC: UIViewController {
             UIBarButtonItem.fixedSpace(20),
             undoButton,
             UIBarButtonItem.fixedSpace(20),
-            removeSceneButton,
+            removeLayerButton,
             UIBarButtonItem.fixedSpace(20),
-            addSceneButton,
+            addLayerButton,
         ]
         
         view.addSubview(tableView)
@@ -73,11 +76,11 @@ class ProjectEditorContentVC: UIViewController {
     @objc private func onSelectBack() {
         delegate?.onSelectBack(self)
     }
-    @objc private func onSelectAddScene() {
-        delegate?.onSelectAddScene(self)
+    @objc private func onSelectAddLayer() {
+        delegate?.onSelectAddLayer(self)
     }
-    @objc private func onSelectRemoveScene() {
-        delegate?.onSelectRemoveScene(self)
+    @objc private func onSelectRemoveLayer() {
+        delegate?.onSelectRemoveLayer(self)
     }
     @objc private func onSelectUndo() {
         delegate?.onSelectUndo(self)
@@ -88,10 +91,21 @@ class ProjectEditorContentVC: UIViewController {
     
     func update(
         projectManifest: Project.Manifest,
+        sceneRef: Project.SceneRef,
+        sceneManifest: Scene.Manifest
+    ) {
+        self.projectManifest = projectManifest
+        self.sceneRef = sceneRef
+        self.sceneManifest = sceneManifest
+        
+        updateButtons()
+        tableView.reloadData()
+    }
+    
+    func update(
         undoCount: Int,
         redoCount: Int
     ) {
-        self.projectManifest = projectManifest
         self.undoCount = undoCount
         self.redoCount = redoCount
         
@@ -100,10 +114,10 @@ class ProjectEditorContentVC: UIViewController {
     }
     
     private func updateButtons() {
-        guard let projectManifest else { return }
+        guard let sceneManifest else { return }
         
-        removeSceneButton.isEnabled =
-            projectManifest.content.sceneRefs.count > 0
+        removeLayerButton.isEnabled =
+            sceneManifest.layers.count > 0
         
         undoButton.isEnabled = undoCount > 0
         redoButton.isEnabled = redoCount > 0
@@ -113,7 +127,7 @@ class ProjectEditorContentVC: UIViewController {
 
 // MARK: - Table View
 
-extension ProjectEditorContentVC: UITableViewDataSource {
+extension SceneEditorContentVC: UITableViewDataSource {
     
     func numberOfSections(
         in tableView: UITableView
@@ -126,10 +140,10 @@ extension ProjectEditorContentVC: UITableViewDataSource {
         numberOfRowsInSection section: Int
     ) -> Int {
         switch section {
-        case 0: 
+        case 0:
             2
-        case 1: 
-            projectManifest?.content.sceneRefs.count ?? 0
+        case 1:
+            sceneManifest?.layers.count ?? 0
         default:
             0
         }
@@ -144,21 +158,24 @@ extension ProjectEditorContentVC: UITableViewDataSource {
             UITableViewCell.self,
             for: indexPath)
         
-        guard let projectManifest else { return cell }
+        guard
+            let sceneRef,
+            let sceneManifest
+        else { return cell }
         
         switch indexPath.section {
         case 0:
             switch indexPath.row {
             case 0:
-                cell.textLabel?.text = "Project ID: \(projectManifest.id)"
+                cell.textLabel?.text = "Scene ID: \(sceneRef.id)"
             case 1:
-                cell.textLabel?.text = "Project Name: \(projectManifest.name)"
+                cell.textLabel?.text = "Scene Name: \(sceneRef.name)"
             default:
                 break
             }
         case 1:
-            let sceneRef = projectManifest.content.sceneRefs[indexPath.row]
-            cell.textLabel?.text = "Scene ID: \(sceneRef.id)"
+            let layer = sceneManifest.layers[indexPath.row]
+            cell.textLabel?.text = "Layer ID: \(layer.id)"
         default:
             break
         }
@@ -168,7 +185,7 @@ extension ProjectEditorContentVC: UITableViewDataSource {
     
 }
 
-extension ProjectEditorContentVC: UITableViewDelegate {
+extension SceneEditorContentVC: UITableViewDelegate {
     
     func tableView(
         _ tableView: UITableView,
@@ -177,9 +194,9 @@ extension ProjectEditorContentVC: UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         
         if indexPath.section == 1 {
-            guard let projectManifest else { return }
-            let sceneRef = projectManifest.content.sceneRefs[indexPath.row]
-            delegate?.onSelectScene(self, sceneID: sceneRef.id)
+            guard let sceneManifest else { return }
+            let layer = sceneManifest.layers[indexPath.row]
+            delegate?.onSelectLayer(self, layerID: layer.id)
         }
     }
     

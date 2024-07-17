@@ -10,10 +10,9 @@ class ProjectEditorVC: UIViewController {
     
     private let projectID: String
     
-    private var projectManifest: Project.Manifest
-    
     private let projectEditor: ProjectEditor
-    private let sceneEditHelper: SceneEditHelper
+    
+    private weak var sceneEditorVC: SceneEditorVC?
     
     // MARK: - Init
     
@@ -23,14 +22,8 @@ class ProjectEditorVC: UIViewController {
         projectEditor = try ProjectEditor(
             projectID: projectID)
         
-        sceneEditHelper = SceneEditHelper()
-        
-        projectManifest = projectEditor.projectManifest
-        
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
-        
-        sceneEditHelper.delegate = self
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -51,7 +44,7 @@ class ProjectEditorVC: UIViewController {
     
     override var prefersStatusBarHidden: Bool { true }
     
-    // MARK: - UI
+    // MARK: - Update
     
     private func updateUI() {
         contentVC.update(
@@ -66,11 +59,14 @@ class ProjectEditorVC: UIViewController {
         let projectManifest = projectEditor.projectManifest
         
         do {
-            try sceneEditHelper.createScene(
+            try ProjectEditHelper.createScene(
+                projectEditor: projectEditor,
                 projectManifest: projectManifest,
                 name: "Scene",
                 frameCount: 100,
                 backgroundColor: .white)
+            
+            updateUI()
             
         } catch { }
     }
@@ -82,9 +78,12 @@ class ProjectEditorVC: UIViewController {
         else { return }
         
         do {
-            try sceneEditHelper.deleteScene(
+            try ProjectEditHelper.deleteScene(
+                projectEditor: projectEditor,
                 projectManifest: projectManifest,
                 sceneID: lastSceneRef.id)
+                
+            updateUI()
             
         } catch { }
     }
@@ -92,7 +91,15 @@ class ProjectEditorVC: UIViewController {
     private func undo() {
         do {
             try projectEditor.applyUndo()
+            
             updateUI()
+            
+            sceneEditorVC?.update(
+                projectManifest: projectEditor.projectManifest)
+            
+            sceneEditorVC?.update(
+                undoCount: projectEditor.availableUndoCount,
+                redoCount: projectEditor.availableRedoCount)
             
         } catch { }
     }
@@ -100,7 +107,15 @@ class ProjectEditorVC: UIViewController {
     private func redo() {
         do {
             try projectEditor.applyRedo()
+            
             updateUI()
+            
+            sceneEditorVC?.update(
+                projectManifest: projectEditor.projectManifest)
+            
+            sceneEditorVC?.update(
+                undoCount: projectEditor.availableUndoCount,
+                redoCount: projectEditor.availableRedoCount)
             
         } catch { }
     }
@@ -139,24 +154,50 @@ extension ProjectEditorVC: ProjectEditorContentVCDelegate {
             projectID: projectID,
             sceneID: sceneID)
         
+        vc.delegate = self
+        
+        sceneEditorVC = vc
         present(vc, animated: true)
+        
+        vc.update(
+            projectManifest: projectEditor.projectManifest)
+        
+        vc.update(
+            undoCount: projectEditor.availableUndoCount,
+            redoCount: projectEditor.availableRedoCount)
     }
     
 }
 
-extension ProjectEditorVC: SceneEditHelperDelegate {
+extension ProjectEditorVC: SceneEditorVCDelegate {
     
-    func applyEdit(
-        _ e: SceneEditHelper,
-        newProjectManifest: Project.Manifest,
-        newAssets: [ProjectEditor.Asset]
+    func onRequestUndo(_ vc: SceneEditorVC) {
+        undo()
+    }
+    
+    func onRequestRedo(_ vc: SceneEditorVC) {
+        redo()
+    }
+    
+    func onRequestApplyEdit(
+        _ vc: SceneEditorVC,
+        sceneID: String,
+        newSceneManifest: Scene.Manifest,
+        newSceneAssets: [ProjectEditor.Asset]
     ) {
         do {
-            try projectEditor.applyEdit(
-                newProjectManifest: newProjectManifest,
-                newAssets: newAssets)
+            try ProjectEditHelper.applySceneEdit(
+                projectEditor: projectEditor,
+                projectManifest: projectEditor.projectManifest,
+                sceneID: sceneID,
+                newSceneManifest: newSceneManifest,
+                newSceneAssets: newSceneAssets)
             
             updateUI()
+            
+            sceneEditorVC?.update(
+                undoCount: projectEditor.availableUndoCount,
+                redoCount: projectEditor.availableRedoCount)
             
         } catch { }
     }
