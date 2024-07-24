@@ -6,12 +6,10 @@ import UIKit
 
 protocol EditorFrameToolbarVCDelegate: AnyObject {
     func onSelectBack(_ vc: EditorFrameToolbarVC)
-    func onSelectBrush(_ vc: EditorFrameToolbarVC)
-    func onSelectErase(_ vc: EditorFrameToolbarVC)
+    func onSelectBrushTool(_ vc: EditorFrameToolbarVC)
+    func onSelectEraseTool(_ vc: EditorFrameToolbarVC)
     func onSelectUndo(_ vc: EditorFrameToolbarVC)
     func onSelectRedo(_ vc: EditorFrameToolbarVC)
-    
-    func onSetTraceOn(_ vc: EditorFrameToolbarVC, on: Bool)
 }
 
 class EditorFrameToolbarVC: UIViewController {
@@ -19,8 +17,6 @@ class EditorFrameToolbarVC: UIViewController {
     weak var delegate: EditorFrameToolbarVCDelegate?
     
     let bodyView = EditorFrameToolbarView()
-    
-    private var isTraceOn = false
     
     override func loadView() {
         view = bodyView
@@ -35,19 +31,13 @@ class EditorFrameToolbarVC: UIViewController {
         }
         bodyView.brushButton.addHandler { [weak self] in
             guard let self else { return }
-            self.bodyView.selectBrush()
-            self.delegate?.onSelectBrush(self)
+            self.bodyView.selectBrushTool()
+            self.delegate?.onSelectBrushTool(self)
         }
         bodyView.eraseButton.addHandler { [weak self] in
             guard let self else { return }
-            self.bodyView.selectErase()
-            self.delegate?.onSelectErase(self)
-        }
-        bodyView.traceButton.addHandler { [weak self] in
-            guard let self else { return }
-            self.isTraceOn.toggle()
-            self.bodyView.setTraceOn(self.isTraceOn)
-            self.delegate?.onSetTraceOn(self, on: self.isTraceOn)
+            self.bodyView.selectEraseTool()
+            self.delegate?.onSelectEraseTool(self)
         }
         bodyView.undoButton.addHandler { [weak self] in
             guard let self else { return }
@@ -58,8 +48,7 @@ class EditorFrameToolbarVC: UIViewController {
             self.delegate?.onSelectRedo(self)
         }
         
-        bodyView.selectBrush()
-        bodyView.setTraceOn(isTraceOn)
+        bodyView.selectBrushTool()
     }
     
 }

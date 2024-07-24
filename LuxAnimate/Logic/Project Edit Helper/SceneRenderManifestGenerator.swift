@@ -71,7 +71,7 @@ private protocol FrameLayerProvider {
 
 private struct AnimationFrameLayerProvider: FrameLayerProvider {
     
-    private let layerSize: PixelSize
+    private let layerContentSize: PixelSize
     
     private let sortedDrawings: [Scene.Drawing]
     private let frameIndexesToSortedDrawingIndexes: [Int?]
@@ -80,7 +80,7 @@ private struct AnimationFrameLayerProvider: FrameLayerProvider {
         layer: Scene.Layer,
         layerContent: Scene.AnimationLayerContent
     ) {
-        self.layerSize = layer.size
+        self.layerContentSize = layer.contentSize
         
         sortedDrawings = layerContent.drawings.sorted(
             using: KeyPathComparator(\.frameIndex))
@@ -130,7 +130,7 @@ private struct AnimationFrameLayerProvider: FrameLayerProvider {
             .DrawingLayerContent(assetIDs: assetIDs)
         
         return Scene.FrameRenderManifest.Layer(
-            size: layerSize,
+            contentSize: layerContentSize,
             content: .drawing(drawingContent))
     }
     

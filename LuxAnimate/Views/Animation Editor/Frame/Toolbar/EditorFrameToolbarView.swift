@@ -17,16 +17,30 @@ private let iconConfig = UIImage.SymbolConfiguration(
 class EditorFrameToolbarView: UIView {
     
     let backButton = {
-        let button = UIButton(type: .system)
-        let image = UIImage(
-            systemName: "chevron.backward",
-            withConfiguration: UIImage.SymbolConfiguration(
-                pointSize: 22,
-                weight: .medium,
-                scale: .medium))
-        button.setImage(image, for: .normal)
-        button.tintColor = .editorLabel
-        button.pinWidth(to: buttonWidth)
+        var config = UIButton.Configuration.plain()
+        config.title = "Done"
+        config.baseForegroundColor = .editorLabel
+        config.titleTextAttributesTransformer = .init { attr in
+            var newAttr = attr
+            newAttr.font = .systemFont(
+                ofSize: 17,
+                weight: .medium)
+            return newAttr
+        }
+        config.contentInsets.leading = 26
+        config.contentInsets.trailing = 26
+        
+        let button = UIButton(configuration: config)
+        button.configurationUpdateHandler = { button in
+            switch button.state {
+            case .highlighted:
+                button.configuration?.baseForegroundColor =
+                    .editorLabel.withAlphaComponent(0.2)
+            default:
+                button.configuration?.baseForegroundColor = 
+                    .editorLabel
+            }
+        }
         return button
     }()
     
@@ -44,17 +58,6 @@ class EditorFrameToolbarView: UIView {
         let button = UIButton(type: .system)
         let image = UIImage(
             systemName: "eraser.fill",
-            withConfiguration: iconConfig)
-        button.setImage(image, for: .normal)
-        button.tintColor = .editorLabel
-        button.pinWidth(to: buttonWidth)
-        return button
-    }()
-    
-    let traceButton = {
-        let button = UIButton(type: .system)
-        let image = UIImage(
-            systemName: "square.on.square.dashed",
             withConfiguration: iconConfig)
         button.setImage(image, for: .normal)
         button.tintColor = .editorLabel
@@ -108,7 +111,7 @@ class EditorFrameToolbarView: UIView {
         leftStack.axis = .horizontal
         addSubview(leftStack)
         leftStack.pinEdges(.vertical)
-        leftStack.pinEdges(.leading, padding: padding)
+        leftStack.pinEdges(.leading)
         
         let rightStack = UIStackView()
         rightStack.axis = .horizontal
@@ -118,7 +121,6 @@ class EditorFrameToolbarView: UIView {
         
         // Icons
         leftStack.addArrangedSubview(backButton)
-        leftStack.setCustomSpacing(8, after: backButton)
         
         let separator = UIView()
         leftStack.addArrangedSubview(separator)
@@ -134,24 +136,19 @@ class EditorFrameToolbarView: UIView {
         leftStack.addArrangedSubview(brushButton)
         leftStack.addArrangedSubview(eraseButton)
         
-        rightStack.addArrangedSubview(traceButton)
         rightStack.addArrangedSubview(undoButton)
         rightStack.addArrangedSubview(redoButton)
     }
     
     required init?(coder: NSCoder) { fatalError() }
     
-    func selectBrush() {
+    func selectBrushTool() {
         brushButton.tintColor = .tint
         eraseButton.tintColor = .editorLabel
     }
-    func selectErase() {
+    func selectEraseTool() {
         brushButton.tintColor = .editorLabel
         eraseButton.tintColor = .tint
-    }
-    func setTraceOn(_ on: Bool) {
-        traceButton.tintColor = on ?
-            .tint : .editorLabel
     }
     
 }

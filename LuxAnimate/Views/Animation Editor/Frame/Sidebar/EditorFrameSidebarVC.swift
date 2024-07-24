@@ -33,8 +33,6 @@ class EditorFrameSidebarVC: UIViewController {
         gamma: smoothingGamma,
         valueDisplayMode: .percent(minValue: 0))
     
-    private let jogWheelButton = EditorSidebarButton()
-    
     override func loadView() {
         view = PassthroughView()
     }
@@ -49,7 +47,6 @@ class EditorFrameSidebarVC: UIViewController {
         stack.pin(.centerY)
         
         stack.addArrangedSubview(scaleSlider)
-        stack.addArrangedSubview(jogWheelButton)
         stack.addArrangedSubview(smoothingSlider)
         
         scaleSlider.delegate = self

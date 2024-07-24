@@ -36,14 +36,14 @@ class EditorFrameVC: UIViewController {
     init(
         projectID: String,
         projectViewportSize: PixelSize,
-        drawingSize: PixelSize
+        layerContentSize: PixelSize
     ) throws {
         self.projectID = projectID
         
         frameEditorVC = try EditorFrameEditorVC(
             projectID: projectID,
             projectViewportSize: projectViewportSize,
-            drawingSize: drawingSize)
+            layerContentSize: layerContentSize)
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -155,10 +155,10 @@ extension EditorFrameVC: EditorFrameToolbarVCDelegate {
     func onSelectBack(_ vc: EditorFrameToolbarVC) {
         delegate?.onSelectBack(self)
     }
-    func onSelectBrush(_ vc: EditorFrameToolbarVC) {
+    func onSelectBrushTool(_ vc: EditorFrameToolbarVC) {
         frameEditorVC.selectBrushTool()
     }
-    func onSelectErase(_ vc: EditorFrameToolbarVC) {
+    func onSelectEraseTool(_ vc: EditorFrameToolbarVC) {
         frameEditorVC.selectEraseTool()
     }
     func onSelectUndo(_ vc: EditorFrameToolbarVC) {
@@ -166,9 +166,6 @@ extension EditorFrameVC: EditorFrameToolbarVCDelegate {
     }
     func onSelectRedo(_ vc: EditorFrameToolbarVC) {
         delegate?.onSelectRedo(self)
-    }
-    func onSetTraceOn(_ vc: EditorFrameToolbarVC, on: Bool) {
-        frameEditorVC.setOnionSkinOn(on)
     }
     
 }

@@ -4,7 +4,7 @@
 
 import UIKit
 
-private let newLayerSize = PixelSize(
+private let newLayerContentSize = PixelSize(
     width: 1920, height: 1080)
 
 protocol SceneEditorVCDelegate: AnyObject {
@@ -32,6 +32,8 @@ class SceneEditorVC: UIViewController {
     private var projectManifest: Project.Manifest?
     private var sceneRef: Project.SceneRef?
     private var sceneManifest: Scene.Manifest?
+    
+    private weak var animationEditorVC: AnimationEditorVC?
     
     // MARK: - Init
     
@@ -105,6 +107,8 @@ class SceneEditorVC: UIViewController {
             
             updateContentVCModels()
             
+            // TODO: Update animationEditorVC!
+            
         } catch { }
     }
     
@@ -115,6 +119,8 @@ class SceneEditorVC: UIViewController {
         contentVC.update(
             undoCount: undoCount,
             redoCount: redoCount)
+        
+        // TODO: Update animationEditorVC!
     }
     
 }
@@ -136,7 +142,7 @@ extension SceneEditorVC: SceneEditorContentVCDelegate {
         let layer = Scene.Layer(
             id: IDGenerator.id(),
             name: "Animation Layer",
-            size: newLayerSize,
+            contentSize: newLayerContentSize,
             content: .animation(layerContent))
         
         var newSceneManifest = sceneManifest
@@ -181,8 +187,34 @@ extension SceneEditorVC: SceneEditorContentVCDelegate {
     func onSelectLayer(
         _ vc: SceneEditorContentVC,
         layerID: String
-    ) { 
-        // TODO: Show layer editor
+    ) {
+        guard 
+            let projectManifest,
+            let sceneManifest
+        else { return }
+        
+        guard let layer = sceneManifest.layers.first(
+            where: { $0.id == layerID })
+        else { return }
+        
+        switch layer.content {
+        case .animation(let animationLayerContent):
+            
+            let projectViewportSize = projectManifest
+                .content.metadata.viewportSize
+            
+            do {
+                let vc = try AnimationEditorVC(
+                    projectID: projectID,
+                    layerID: layerID,
+                    projectViewportSize: projectViewportSize,
+                    layerContentSize: layer.contentSize,
+                    animationLayerContent: animationLayerContent)
+                
+                present(vc, animated: true)
+                
+            } catch { }
+        }
     }
     
 }

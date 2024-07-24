@@ -52,7 +52,7 @@ class EditorFrameEditorVC: UIViewController {
     
     private let projectID: String
     private let projectViewportSize: PixelSize
-    private let drawingSize: PixelSize
+    private let layerContentSize: PixelSize
     
     private var projectManifest: Project.Manifest?
     private var focusedFrameIndex = 0
@@ -67,21 +67,21 @@ class EditorFrameEditorVC: UIViewController {
     init(
         projectID: String,
         projectViewportSize: PixelSize,
-        drawingSize: PixelSize
+        layerContentSize: PixelSize
     ) throws {
         self.projectID = projectID
         self.projectViewportSize = projectViewportSize
-        self.drawingSize = drawingSize
+        self.layerContentSize = layerContentSize
         
         drawingEditorVC = try EditorFrameDrawingEditorVC(
-            drawingSize: drawingSize,
+            drawingSize: layerContentSize,
             canvasContentView: canvasVC.canvasContentView)
         
         assetLoader = EditorFrameAssetLoader(
             projectID: projectID)
         
         activeDrawingRenderer = EditorFrameActiveDrawingRenderer(
-            drawingSize: drawingSize)
+            drawingSize: layerContentSize)
         
         frameSceneRenderer = EditorFrameSceneRenderer(
             viewportSize: projectViewportSize)

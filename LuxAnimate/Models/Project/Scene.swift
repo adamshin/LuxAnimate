@@ -21,7 +21,7 @@ enum Scene {
         var id: String
         var name: String
         
-        var size: PixelSize
+        var contentSize: PixelSize
         var content: LayerContent
     }
     
@@ -59,7 +59,7 @@ enum Scene {
     struct FrameRenderManifest: Codable {
         
         struct Layer: Codable {
-            var size: PixelSize
+            var contentSize: PixelSize
             var content: LayerContent
         }
         

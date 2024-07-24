@@ -1,5 +1,5 @@
 //
-//  EditorTimelineVC.swift
+//  AnimationEditorTimelineVC.swift
 //
 
 import UIKit
@@ -7,49 +7,49 @@ import UIKit
 private let frameCount = 120
 private let framesPerSecond = 24
 
-protocol EditorTimelineVCDelegate: AnyObject {
+protocol AnimationEditorTimelineVCDelegate: AnyObject {
     
-    func onBeginFrameScroll(_ vc: EditorTimelineVC)
-    func onEndFrameScroll(_ vc: EditorTimelineVC)
+    func onBeginFrameScroll(_ vc: AnimationEditorTimelineVC)
+    func onEndFrameScroll(_ vc: AnimationEditorTimelineVC)
     
     func onChangeFocusedFrame(
-        _ vc: EditorTimelineVC,
+        _ vc: AnimationEditorTimelineVC,
         index: Int)
     
     func onSelectPlayPause(
-        _ vc: EditorTimelineVC)
+        _ vc: AnimationEditorTimelineVC)
     
     func onRequestCreateDrawing(
-        _ vc: EditorTimelineVC,
+        _ vc: AnimationEditorTimelineVC,
         frameIndex: Int)
     
     func onRequestDeleteDrawing(
-        _ vc: EditorTimelineVC,
+        _ vc: AnimationEditorTimelineVC,
         frameIndex: Int)
     
     func onRequestInsertSpacing(
-        _ vc: EditorTimelineVC,
+        _ vc: AnimationEditorTimelineVC,
         frameIndex: Int)
     
     func onRequestRemoveSpacing(
-        _ vc: EditorTimelineVC,
+        _ vc: AnimationEditorTimelineVC,
         frameIndex: Int)
     
     func onChangeContentAreaSize(
-        _ vc: EditorTimelineVC)
+        _ vc: AnimationEditorTimelineVC)
     
 }
 
-class EditorTimelineVC: UIViewController {
+class AnimationEditorTimelineVC: UIViewController {
     
-    weak var delegate: EditorTimelineVCDelegate?
+    weak var delegate: AnimationEditorTimelineVCDelegate?
     
     private let collapsibleContentVC = EditorCollapsibleContentVC()
     
     private let toolbarVC = TimelineToolbarVC()
     private let trackVC = TimelineTrackVC()
     
-    private var model: EditorModel = .empty
+    private var model: AnimationEditorTimelineModel = .empty
     private var focusedFrameIndex = 0
     
     // MARK: - Lifecycle
@@ -105,7 +105,7 @@ class EditorTimelineVC: UIViewController {
     
     // MARK: - Interface
     
-    func setModel(_ model: EditorModel) {
+    func setModel(_ model: AnimationEditorTimelineModel) {
         self.model = model
         
         toolbarVC.setFrameCount(model.frames.count)
@@ -131,7 +131,7 @@ class EditorTimelineVC: UIViewController {
 
 // MARK: - Delegates
 
-extension EditorTimelineVC: EditorCollapsibleContentVCDelegate {
+extension AnimationEditorTimelineVC: EditorCollapsibleContentVCDelegate {
     
     func onSetExpanded(
         _ vc: EditorCollapsibleContentVC,
@@ -148,7 +148,7 @@ extension EditorTimelineVC: EditorCollapsibleContentVCDelegate {
     
 }
 
-extension EditorTimelineVC: TimelineToolbarVCDelegate {
+extension AnimationEditorTimelineVC: TimelineToolbarVCDelegate {
     
     func onChangeFocusedFrame(_ vc: TimelineToolbarVC, index: Int) {
         focusedFrameIndex = index
@@ -167,7 +167,7 @@ extension EditorTimelineVC: TimelineToolbarVCDelegate {
     
 }
 
-extension EditorTimelineVC: TimelineTrackVCDelegate {
+extension AnimationEditorTimelineVC: TimelineTrackVCDelegate {
     
     func onBeginFrameScroll(_ vc: TimelineTrackVC) {
         delegate?.onBeginFrameScroll(self)
@@ -197,7 +197,7 @@ extension EditorTimelineVC: TimelineTrackVCDelegate {
     
 }
 
-extension EditorTimelineVC: EditorMenuViewDelegate {
+extension AnimationEditorTimelineVC: EditorMenuViewDelegate {
     
     func onPresent(_ v: EditorMenuView) { }
     
@@ -207,7 +207,7 @@ extension EditorTimelineVC: EditorMenuViewDelegate {
     
 }
 
-extension EditorTimelineVC: EditorTimelineFrameMenuViewDelegate {
+extension AnimationEditorTimelineVC: EditorTimelineFrameMenuViewDelegate {
     
     func onSelectCreateDrawing(
         _ v: EditorTimelineFrameMenuView,
