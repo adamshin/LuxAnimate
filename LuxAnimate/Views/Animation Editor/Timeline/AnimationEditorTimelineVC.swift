@@ -105,7 +105,16 @@ class AnimationEditorTimelineVC: UIViewController {
     
     // MARK: - Interface
     
-    func setModel(_ model: AnimationEditorTimelineModel) {
+    func update(
+        projectID: String,
+        sceneManifest: Scene.Manifest,
+        animationLayerContent: Scene.AnimationLayerContent
+    ) {
+        let model = AnimationEditorTimelineModel.generate(
+            projectID: projectID,
+            sceneManifest: sceneManifest,
+            animationLayerContent: animationLayerContent)
+        
         self.model = model
         
         toolbarVC.setFrameCount(model.frames.count)
@@ -116,11 +125,6 @@ class AnimationEditorTimelineVC: UIViewController {
         focusedFrameIndex = index
         toolbarVC.setFocusedFrameIndex(index)
         trackVC.setFocusedFrameIndex(index)
-    }
-    
-    func setPlaying(_ playing: Bool) {
-        toolbarVC.setPlaying(playing)
-        trackVC.setPlaying(playing)
     }
     
     var contentAreaView: UIView {

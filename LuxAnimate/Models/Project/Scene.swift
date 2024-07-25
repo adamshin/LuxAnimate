@@ -9,6 +9,8 @@ enum Scene {
     // MARK: - Scene
     
     struct Manifest: Codable {
+        var id: String
+        
         var frameCount: Int
         var backgroundColor: Color
         

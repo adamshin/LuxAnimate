@@ -6,14 +6,14 @@ import UIKit
 
 protocol AnimationEditorVCDelegate: AnyObject {
         
-    func onRequestUndo(_ vc: SceneEditorVC)
-    func onRequestRedo(_ vc: SceneEditorVC)
+    func onRequestUndo(_ vc: AnimationEditorVC)
+    func onRequestRedo(_ vc: AnimationEditorVC)
     
     func onRequestApplyEdit(
         _ vc: SceneEditorVC,
-        layerID: String,
-        newAnimationLayerContent: Scene.AnimationLayerContent,
-        newAssets: [ProjectEditor.Asset])
+        sceneID: String,
+        newSceneManifest: Scene.Manifest,
+        newSceneAssets: [ProjectEditor.Asset])
     
 }
 
@@ -21,33 +21,33 @@ class AnimationEditorVC: UIViewController {
     
     weak var delegate: AnimationEditorVCDelegate?
     
-    private let timelineVC = AnimationEditorTimelineVC()
+    private let timelineVC: AnimationEditorTimelineVC
     private let frameVC: EditorFrameVC
     
     private let projectID: String
+    private let sceneID: String
     private let layerID: String
+    private let initialFrameIndex: Int
     
-    private var animationLayerContent: Scene.AnimationLayerContent
+    private var projectManifest: Project.Manifest?
+    private var sceneManifest: Scene.Manifest?
     
     // MARK: - Init
     
     init(
         projectID: String,
+        sceneID: String,
         layerID: String,
-        projectViewportSize: PixelSize,
-        layerContentSize: PixelSize,
-        animationLayerContent: Scene.AnimationLayerContent
+        initialFrameIndex: Int
     ) throws {
         
         self.projectID = projectID
+        self.sceneID = sceneID
         self.layerID = layerID
+        self.initialFrameIndex = initialFrameIndex
         
-        self.animationLayerContent = animationLayerContent
-        
-        frameVC = try EditorFrameVC(
-            projectID: projectID,
-            projectViewportSize: projectViewportSize,
-            layerContentSize: layerContentSize)
+        timelineVC = AnimationEditorTimelineVC()
+        frameVC = try EditorFrameVC(projectID: projectID)
         
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
@@ -59,9 +59,7 @@ class AnimationEditorVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         setupUI()
-        setInitialData()
     }
     
     override var prefersStatusBarHidden: Bool { true }
@@ -69,44 +67,49 @@ class AnimationEditorVC: UIViewController {
     // MARK: - Setup
     
     private func setupUI() {
-        frameVC.delegate = self
         timelineVC.delegate = self
+        frameVC.delegate = self
         
         addChild(frameVC, to: view)
         addChild(timelineVC, to: view)
         
         frameVC.setBottomInsetView(
             timelineVC.contentAreaView)
+        
+        timelineVC.setFocusedFrameIndex(initialFrameIndex)
+        frameVC.setFocusedFrameIndex(initialFrameIndex)
     }
     
-    // MARK: - Data
+    // MARK: - Interface
     
-    private func setInitialData() {
-//        let projectManifest = editor.currentProjectManifest
-//        
-//        update(
-//            projectManifest: projectManifest,
-//            editContext: nil)
-//        
-//        timelineVC.setFocusedFrameIndex(0)
-//        frameVC.setFocusedFrameIndex(0)
-    }
-    
-    private func update(
+    func update(
         projectManifest: Project.Manifest,
-        editContext: Any?
+        sceneManifest: Scene.Manifest,
+        availableUndoCount: Int,
+        availableRedoCount: Int
     ) {
-//        model = modelGenerator.generate(
-//            from: projectManifest)
-//        
-//        focusedFrameIndex = clamp(
-//            focusedFrameIndex,
-//            min: 0,
-//            max: model.frames.count - 1)
-//        
-//        timelineVC.setModel(model)
-//        timelineVC.setFocusedFrameIndex(focusedFrameIndex)
-//        
+        guard 
+            let layer = sceneManifest.layers
+                .first(where: { $0.id == layerID }),
+            case .animation(let animationLayerContent)
+                = layer.content
+        else {
+            dismiss(animated: true)
+            return
+        }
+        
+        self.projectManifest = projectManifest
+        self.sceneManifest = sceneManifest
+        
+        timelineVC.update(
+            projectID: projectID,
+            sceneManifest: sceneManifest,
+            animationLayerContent: animationLayerContent)
+        
+        frameVC.update(
+            availableUndoCount: availableUndoCount,
+            availableRedoCount: availableRedoCount)
+//
 //        frameVC.setProjectManifest(
 //            projectManifest,
 //            editContext: editContext)
@@ -133,10 +136,7 @@ extension AnimationEditorVC: AnimationEditorTimelineVCDelegate {
         _ vc: AnimationEditorTimelineVC,
         index: Int
     ) {
-//        focusedFrameIndex = index
         frameVC.setFocusedFrameIndex(index)
-        
-//        playbackController.stopPlayback()
     }
     
     func onSelectPlayPause(
@@ -194,11 +194,11 @@ extension AnimationEditorVC: EditorFrameVCDelegate {
     }
     
     func onSelectUndo(_ vc: EditorFrameVC) {
-//        try? editor.applyUndo()
+        delegate?.onRequestUndo(self)
     }
     
     func onSelectRedo(_ vc: EditorFrameVC) {
-//        try? editor.applyRedo()
+        delegate?.onRequestRedo(self)
     }
     
     func onEditDrawing(
@@ -214,21 +214,3 @@ extension AnimationEditorVC: EditorFrameVCDelegate {
     }
     
 }
-
-// MARK: - Editor Delegate
-
-/*
-extension AnimationEditorVC: ProjectContentEditorDelegate {
-    
-    func onEditProject(
-        _ editor: ProjectContentEditor,
-        editContext: Any?
-    ) {
-        let projectManifest = editor.currentProjectManifest
-        update(
-            projectManifest: projectManifest,
-            editContext: editContext)
-    }
-    
-}
-*/

@@ -27,6 +27,7 @@ struct ProjectEditHelper {
         
         // Create scene manifest
         let sceneManifest = Scene.Manifest(
+            id: sceneID,
             frameCount: frameCount,
             backgroundColor: backgroundColor,
             layers: [],

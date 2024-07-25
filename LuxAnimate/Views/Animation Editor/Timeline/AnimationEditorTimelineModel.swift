@@ -11,7 +11,6 @@ struct AnimationEditorTimelineModel {
         var thumbnailURL: URL?
     }
     
-    var framesPerSecond: Int
     var frames: [Frame]
     
 }
@@ -19,27 +18,22 @@ struct AnimationEditorTimelineModel {
 extension AnimationEditorTimelineModel {
     
     static let empty = AnimationEditorTimelineModel(
-        framesPerSecond: 1,
         frames: [])
-    
     
     static func generate(
         projectID: String,
-        contentMetadata: Project.ContentMetadata,
         sceneManifest: Scene.Manifest,
         animationLayerContent: Scene.AnimationLayerContent
     ) -> AnimationEditorTimelineModel {
-
-        let framesPerSecond = contentMetadata.framesPerSecond
-
+        
         let emptyFrame = Frame(
             hasDrawing: false,
             thumbnailURL: nil)
-
+        
         var frames = Array(
             repeating: emptyFrame,
             count: sceneManifest.frameCount)
-
+        
         // Put drawings on frames
         let drawings = animationLayerContent.drawings
         for drawing in drawings {
@@ -63,7 +57,6 @@ extension AnimationEditorTimelineModel {
         }
         
         return AnimationEditorTimelineModel(
-            framesPerSecond: framesPerSecond,
             frames: frames)
     }
     

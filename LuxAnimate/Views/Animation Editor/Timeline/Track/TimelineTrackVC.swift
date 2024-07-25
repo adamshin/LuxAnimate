@@ -92,15 +92,19 @@ class TimelineTrackVC: UIViewController {
         
         collectionView.dataSource = self
         collectionView.delegate = self
+    }
+    
+    override func viewIsAppearing(_ animated: Bool) {
+        super.viewIsAppearing(animated)
         
-        focusFrame(at: 0, animated: false)
+        view.layoutIfNeeded()
+        focusFrame(at: focusedFrameIndex, animated: false)
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
         recalculateCollectionViewInsets()
-        recalculateFocusedFrame()
     }
     
     override func viewWillTransition(
@@ -178,9 +182,6 @@ class TimelineTrackVC: UIViewController {
         let clampedIndex = clamp(index,
             min: 0,
             max: model.frames.count - 1)
-        
-        guard focusedFrameIndex != clampedIndex
-        else { return }
         
         focusedFrameIndex = clampedIndex
         

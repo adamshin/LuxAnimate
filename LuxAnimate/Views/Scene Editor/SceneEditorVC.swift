@@ -9,6 +9,9 @@ private let newLayerContentSize = PixelSize(
 
 protocol SceneEditorVCDelegate: AnyObject {
     
+    func availableUndoCount(_ vc: SceneEditorVC) -> Int
+    func availableRedoCount(_ vc: SceneEditorVC) -> Int
+    
     func onRequestUndo(_ vc: SceneEditorVC)
     func onRequestRedo(_ vc: SceneEditorVC)
     
@@ -63,17 +66,69 @@ class SceneEditorVC: UIViewController {
     
     // MARK: - Logic
     
-    private func updateContentVCModels() {
+    private func handleModelUpdate() {
         guard
+            let delegate,
             let projectManifest,
             let sceneRef,
             let sceneManifest
         else { return }
         
+        let availableUndoCount = delegate.availableUndoCount(self)
+        let availableRedoCount = delegate.availableRedoCount(self)
+        
         contentVC.update(
             projectManifest: projectManifest,
             sceneRef: sceneRef,
-            sceneManifest: sceneManifest)
+            sceneManifest: sceneManifest,
+            availableUndoCount: availableUndoCount,
+            availableRedoCount: availableRedoCount)
+        
+        animationEditorVC?.update(
+            projectManifest: projectManifest,
+            sceneManifest: sceneManifest,
+            availableUndoCount: availableUndoCount,
+            availableRedoCount: availableRedoCount)
+    }
+    
+    // MARK: - Navigation
+    
+    private func showLayerEditor(layerID: String) {
+        guard
+            let delegate,
+            let projectManifest,
+            let sceneManifest
+        else { return }
+        
+        guard let layer = sceneManifest.layers
+            .first(where: { $0.id == layerID })
+        else { return }
+        
+        let availableUndoCount = delegate.availableUndoCount(self)
+        let availableRedoCount = delegate.availableRedoCount(self)
+        
+        switch layer.content {
+        case .animation:
+            do {
+                let vc = try AnimationEditorVC(
+                    projectID: projectID,
+                    sceneID: sceneID,
+                    layerID: layerID,
+                    initialFrameIndex: 0)
+                
+                vc.delegate = self
+                
+                vc.update(
+                    projectManifest: projectManifest,
+                    sceneManifest: sceneManifest,
+                    availableUndoCount: availableUndoCount,
+                    availableRedoCount: availableRedoCount)
+                
+                present(vc, animated: true)
+                animationEditorVC = vc
+                
+            } catch { }
+        }
     }
     
     // MARK: - Interface
@@ -81,46 +136,34 @@ class SceneEditorVC: UIViewController {
     func update(
         projectManifest: Project.Manifest
     ) {
-        do {
-            guard let sceneRef = projectManifest.content.sceneRefs
-                .first(where: { $0.id == sceneID })
-            else {
-                dismiss(animated: true)
-                return
-            }
+        guard let sceneRef = projectManifest
+            .content.sceneRefs
+            .first(where: { $0.id == sceneID })
+        else {
+            dismiss(animated: true)
+            return
+        }
+        
+        let sceneManifestURL = FileHelper.shared
+            .projectAssetURL(
+                projectID: projectID,
+                assetID: sceneRef.manifestAssetID)
             
-            let sceneManifestURL = FileHelper.shared
-                .projectAssetURL(
-                    projectID: projectID,
-                    assetID: sceneRef.manifestAssetID)
-            
-            let sceneManifestData = try Data(
-                contentsOf: sceneManifestURL)
-            
-            let sceneManifest = try JSONFileDecoder.shared.decode(
+        guard let sceneManifestData = try? Data(
+            contentsOf: sceneManifestURL)
+        else { return }
+        
+        guard let sceneManifest = try? JSONFileDecoder
+            .shared.decode(
                 Scene.Manifest.self,
                 from: sceneManifestData)
-            
-            self.projectManifest = projectManifest
-            self.sceneRef = sceneRef
-            self.sceneManifest = sceneManifest
-            
-            updateContentVCModels()
-            
-            // TODO: Update animationEditorVC!
-            
-        } catch { }
-    }
-    
-    func update(
-        undoCount: Int,
-        redoCount: Int
-    ) {
-        contentVC.update(
-            undoCount: undoCount,
-            redoCount: redoCount)
+        else { return }
         
-        // TODO: Update animationEditorVC!
+        self.projectManifest = projectManifest
+        self.sceneRef = sceneRef
+        self.sceneManifest = sceneManifest
+        
+        handleModelUpdate()
     }
     
 }
@@ -155,7 +198,8 @@ extension SceneEditorVC: SceneEditorContentVCDelegate {
             newSceneAssets: [])
         
         self.sceneManifest = newSceneManifest
-        updateContentVCModels()
+        
+        handleModelUpdate()
     }
     
     func onSelectRemoveLayer(_ vc: SceneEditorContentVC) {
@@ -173,7 +217,8 @@ extension SceneEditorVC: SceneEditorContentVCDelegate {
             newSceneAssets: [])
         
         self.sceneManifest = newSceneManifest
-        updateContentVCModels()
+        
+        handleModelUpdate()
     }
     
     func onSelectUndo(_ vc: SceneEditorContentVC) { 
@@ -188,33 +233,31 @@ extension SceneEditorVC: SceneEditorContentVCDelegate {
         _ vc: SceneEditorContentVC,
         layerID: String
     ) {
-        guard 
-            let projectManifest,
-            let sceneManifest
-        else { return }
-        
-        guard let layer = sceneManifest.layers.first(
-            where: { $0.id == layerID })
-        else { return }
-        
-        switch layer.content {
-        case .animation(let animationLayerContent):
-            
-            let projectViewportSize = projectManifest
-                .content.metadata.viewportSize
-            
-            do {
-                let vc = try AnimationEditorVC(
-                    projectID: projectID,
-                    layerID: layerID,
-                    projectViewportSize: projectViewportSize,
-                    layerContentSize: layer.contentSize,
-                    animationLayerContent: animationLayerContent)
-                
-                present(vc, animated: true)
-                
-            } catch { }
-        }
+        showLayerEditor(layerID: layerID)
+    }
+    
+}
+
+extension SceneEditorVC: AnimationEditorVCDelegate {
+    
+    func onRequestUndo(_ vc: AnimationEditorVC) {
+        delegate?.onRequestUndo(self)
+    }
+    func onRequestRedo(_ vc: AnimationEditorVC) {
+        delegate?.onRequestRedo(self)
+    }
+    
+    func onRequestApplyEdit(
+        _ vc: SceneEditorVC,
+        sceneID: String,
+        newSceneManifest: Scene.Manifest,
+        newSceneAssets: [ProjectEditor.Asset]
+    ) {
+        delegate?.onRequestApplyEdit(
+            self,
+            sceneID: sceneID,
+            newSceneManifest: newSceneManifest,
+            newSceneAssets: newSceneAssets)
     }
     
 }

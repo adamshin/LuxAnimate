@@ -27,8 +27,8 @@ class SceneEditorContentVC: UIViewController {
     private var sceneRef: Project.SceneRef?
     private var sceneManifest: Scene.Manifest?
     
-    private var undoCount = 0
-    private var redoCount = 0
+    private var availableUndoCount = 0
+    private var availableRedoCount = 0
     
     private lazy var backButton = UIBarButtonItem(
         title: "Back", style: .done,
@@ -92,22 +92,15 @@ class SceneEditorContentVC: UIViewController {
     func update(
         projectManifest: Project.Manifest,
         sceneRef: Project.SceneRef,
-        sceneManifest: Scene.Manifest
+        sceneManifest: Scene.Manifest,
+        availableUndoCount: Int,
+        availableRedoCount: Int
     ) {
         self.projectManifest = projectManifest
         self.sceneRef = sceneRef
         self.sceneManifest = sceneManifest
-        
-        updateButtons()
-        tableView.reloadData()
-    }
-    
-    func update(
-        undoCount: Int,
-        redoCount: Int
-    ) {
-        self.undoCount = undoCount
-        self.redoCount = redoCount
+        self.availableUndoCount = availableUndoCount
+        self.availableRedoCount = availableRedoCount
         
         updateButtons()
         tableView.reloadData()
@@ -119,8 +112,8 @@ class SceneEditorContentVC: UIViewController {
         removeLayerButton.isEnabled =
             sceneManifest.layers.count > 0
         
-        undoButton.isEnabled = undoCount > 0
-        redoButton.isEnabled = redoCount > 0
+        undoButton.isEnabled = availableUndoCount > 0
+        redoButton.isEnabled = availableRedoCount > 0
     }
     
 }

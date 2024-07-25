@@ -97,10 +97,6 @@ class ProjectEditorVC: UIViewController {
             sceneEditorVC?.update(
                 projectManifest: projectEditor.projectManifest)
             
-            sceneEditorVC?.update(
-                undoCount: projectEditor.availableUndoCount,
-                redoCount: projectEditor.availableRedoCount)
-            
         } catch { }
     }
     
@@ -112,10 +108,6 @@ class ProjectEditorVC: UIViewController {
             
             sceneEditorVC?.update(
                 projectManifest: projectEditor.projectManifest)
-            
-            sceneEditorVC?.update(
-                undoCount: projectEditor.availableUndoCount,
-                redoCount: projectEditor.availableRedoCount)
             
         } catch { }
     }
@@ -156,28 +148,26 @@ extension ProjectEditorVC: ProjectEditorContentVCDelegate {
         
         vc.delegate = self
         
-        sceneEditorVC = vc
-        present(vc, animated: true)
-        
         vc.update(
             projectManifest: projectEditor.projectManifest)
         
-        vc.update(
-            undoCount: projectEditor.availableUndoCount,
-            redoCount: projectEditor.availableRedoCount)
+        present(vc, animated: true)
+        sceneEditorVC = vc
     }
     
 }
 
 extension ProjectEditorVC: SceneEditorVCDelegate {
     
-    func onRequestUndo(_ vc: SceneEditorVC) {
-        undo()
+    func availableUndoCount(_ vc: SceneEditorVC) -> Int {
+        projectEditor.availableUndoCount
+    }
+    func availableRedoCount(_ vc: SceneEditorVC) -> Int {
+        projectEditor.availableRedoCount
     }
     
-    func onRequestRedo(_ vc: SceneEditorVC) {
-        redo()
-    }
+    func onRequestUndo(_ vc: SceneEditorVC) { undo() }
+    func onRequestRedo(_ vc: SceneEditorVC) { redo() }
     
     func onRequestApplyEdit(
         _ vc: SceneEditorVC,
@@ -194,10 +184,6 @@ extension ProjectEditorVC: SceneEditorVCDelegate {
                 newSceneAssets: newSceneAssets)
             
             updateUI()
-            
-            sceneEditorVC?.update(
-                undoCount: projectEditor.availableUndoCount,
-                redoCount: projectEditor.availableRedoCount)
             
         } catch { }
     }

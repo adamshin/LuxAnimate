@@ -11,6 +11,7 @@ class EditorFrameView: UIView {
     
     init() {
         super.init(frame: .zero)
+        backgroundColor = .editorBackground
         
         addSubview(frameEditorContainer)
         frameEditorContainer.pinEdges()

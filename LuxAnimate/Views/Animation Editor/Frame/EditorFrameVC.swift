@@ -25,7 +25,7 @@ class EditorFrameVC: UIViewController {
     
     private let bodyView = EditorFrameView()
     
-    private let frameEditorVC: EditorFrameEditorVC
+//    private let frameEditorVC: EditorFrameEditorVC
     private let toolbarVC = EditorFrameToolbarVC()
     private let sidebarVC = EditorFrameSidebarVC()
     
@@ -33,17 +33,11 @@ class EditorFrameVC: UIViewController {
     
     // MARK: - Init
     
-    init(
-        projectID: String,
-        projectViewportSize: PixelSize,
-        layerContentSize: PixelSize
-    ) throws {
+    init(projectID: String) throws {
         self.projectID = projectID
         
-        frameEditorVC = try EditorFrameEditorVC(
-            projectID: projectID,
-            projectViewportSize: projectViewportSize,
-            layerContentSize: layerContentSize)
+//        frameEditorVC = try EditorFrameEditorVC(
+//            projectID: projectID)
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -57,47 +51,56 @@ class EditorFrameVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        frameEditorVC.delegate = self
+//        frameEditorVC.delegate = self
         toolbarVC.delegate = self
         sidebarVC.delegate = self
         
-        addChild(frameEditorVC, to: bodyView.frameEditorContainer)
+//        addChild(frameEditorVC, to: bodyView.frameEditorContainer)
         addChild(toolbarVC, to: bodyView.toolbarContainer)
         addChild(sidebarVC, to: bodyView.canvasOverlayContainer)
         
-        frameEditorVC.setSafeAreaReferenceView(
-            bodyView.canvasOverlayContainer)
+//        frameEditorVC.setSafeAreaReferenceView(
+//            bodyView.canvasOverlayContainer)
     }
     
     // MARK: - Interface
+    
+    func update(
+        availableUndoCount: Int,
+        availableRedoCount: Int
+    ) {
+        toolbarVC.update(
+            availableUndoCount: availableUndoCount,
+            availableRedoCount: availableRedoCount)
+    }
     
     func setProjectManifest(
         _ projectManifest: Project.Manifest,
         editContext: Any?
     ) {
-        frameEditorVC.setProjectManifest(
-            projectManifest,
-            editContext: editContext)
+//        frameEditorVC.setProjectManifest(
+//            projectManifest,
+//            editContext: editContext)
     }
     
     func setFocusedFrameIndex(_ index: Int) {
-        frameEditorVC.setFocusedFrameIndex(index)
+//        frameEditorVC.setFocusedFrameIndex(index)
     }
     
     func setPlaying(_ playing: Bool) {
-        frameEditorVC.setPlaying(playing)
+//        frameEditorVC.setPlaying(playing)
     }
     
     func setOnionSkinOn(_ on: Bool) {
-        frameEditorVC.setOnionSkinOn(on)
+//        frameEditorVC.setOnionSkinOn(on)
     }
     
     func onBeginFrameScroll() {
-        frameEditorVC.onBeginFrameScroll()
+//        frameEditorVC.onBeginFrameScroll()
     }
     
     func onEndFrameScroll() {
-        frameEditorVC.onEndFrameScroll()
+//        frameEditorVC.onEndFrameScroll()
     }
     
     func setBottomInsetView(_ bottomInsetView: UIView) {
@@ -106,7 +109,7 @@ class EditorFrameVC: UIViewController {
     
     func handleChangeBottomInsetViewFrame() {
         view.layoutIfNeeded()
-        frameEditorVC.handleChangeSafeAreaReferenceViewFrame()
+//        frameEditorVC.handleChangeSafeAreaReferenceViewFrame()
     }
     
 }
@@ -156,10 +159,10 @@ extension EditorFrameVC: EditorFrameToolbarVCDelegate {
         delegate?.onSelectBack(self)
     }
     func onSelectBrushTool(_ vc: EditorFrameToolbarVC) {
-        frameEditorVC.selectBrushTool()
+//        frameEditorVC.selectBrushTool()
     }
     func onSelectEraseTool(_ vc: EditorFrameToolbarVC) {
-        frameEditorVC.selectEraseTool()
+//        frameEditorVC.selectEraseTool()
     }
     func onSelectUndo(_ vc: EditorFrameToolbarVC) {
         delegate?.onSelectUndo(self)
@@ -176,14 +179,14 @@ extension EditorFrameVC: EditorFrameSidebarVCDelegate {
         _ vc: EditorFrameSidebarVC,
         _ brushScale: Double
     ) {
-        frameEditorVC.setBrushScale(brushScale)
+//        frameEditorVC.setBrushScale(brushScale)
     }
     
     func onSetBrushSmoothing(
         _ vc: EditorFrameSidebarVC,
         _ brushSmoothing: Double
     ) {
-        frameEditorVC.setBrushSmoothing(brushSmoothing)
+//        frameEditorVC.setBrushSmoothing(brushSmoothing)
     }
     
 }

@@ -51,4 +51,12 @@ class EditorFrameToolbarVC: UIViewController {
         bodyView.selectBrushTool()
     }
     
+    func update(
+        availableUndoCount: Int,
+        availableRedoCount: Int
+    ) {
+        bodyView.undoButton.isEnabled = availableUndoCount > 0
+        bodyView.redoButton.isEnabled = availableRedoCount > 0
+    }
+    
 }

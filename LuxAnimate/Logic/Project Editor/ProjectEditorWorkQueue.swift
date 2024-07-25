@@ -8,7 +8,7 @@ class ProjectEditorWorkQueue {
     
     private let queue = DispatchQueue(
         label: "ProjectEditorWorkQueue.queue",
-        qos: .background)
+        qos: .userInitiated)
     
     func enqueueSync(
         task: @escaping () throws -> Void
