@@ -23,20 +23,19 @@ protocol EditorFrameEditorVCDelegate: AnyObject {
     func onEditDrawing(
         _ vc: EditorFrameEditorVC,
         drawingID: String,
-        drawingTexture: MTLTexture,
-        editContext: Any?)
+        drawingTexture: MTLTexture)
     
 }
 
-extension EditorFrameEditorVC {
-    
-    struct EditContext {
-        var origin: EditorFrameEditorVC
-        var focusedFrameIndex: Int
-        var activeDrawingID: String
-    }
-    
-}
+//extension EditorFrameEditorVC {
+//    
+//    struct EditContext {
+//        var origin: EditorFrameEditorVC
+//        var focusedFrameIndex: Int
+//        var activeDrawingID: String
+//    }
+//    
+//}
 
 class EditorFrameEditorVC: UIViewController {
     
@@ -184,14 +183,14 @@ class EditorFrameEditorVC: UIViewController {
     ) {
         self.projectManifest = projectManifest
         
-        if let scene,
-            let c = editContext as? EditContext,
-            c.origin == self,
-            c.focusedFrameIndex == focusedFrameIndex,
-            c.activeDrawingID == scene.activeDrawingID
-        {
-            return
-        }
+//        if let scene,
+//            let c = editContext as? EditContext,
+//            c.origin == self,
+//            c.focusedFrameIndex == focusedFrameIndex,
+//            c.activeDrawingID == scene.activeDrawingID
+//        {
+//            return
+//        }
         
         drawingEditorVC.endActiveEdit()
         updateScene()
@@ -290,15 +289,9 @@ extension EditorFrameEditorVC: EditorFrameDrawingEditorVCDelegate {
         guard let activeDrawingID = scene?.activeDrawingID
         else { return }
         
-        let editContext = EditContext(
-            origin: self,
-            focusedFrameIndex: focusedFrameIndex,
-            activeDrawingID: activeDrawingID)
-        
         delegate?.onEditDrawing(self,
             drawingID: activeDrawingID,
-            drawingTexture: drawingTexture,
-            editContext: editContext)
+            drawingTexture: drawingTexture)
     }
     
 }

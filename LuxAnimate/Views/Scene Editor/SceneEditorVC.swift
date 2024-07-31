@@ -66,7 +66,7 @@ class SceneEditorVC: UIViewController {
     
     // MARK: - Logic
     
-    private func handleModelUpdate() {
+    private func handleUpdateData(fromEditor: Bool) {
         guard
             let delegate,
             let projectManifest,
@@ -85,10 +85,14 @@ class SceneEditorVC: UIViewController {
             availableRedoCount: availableRedoCount)
         
         animationEditorVC?.update(
-            projectManifest: projectManifest,
-            sceneManifest: sceneManifest,
             availableUndoCount: availableUndoCount,
             availableRedoCount: availableRedoCount)
+        
+        if !fromEditor {
+            animationEditorVC?.update(
+                projectManifest: projectManifest,
+                sceneManifest: sceneManifest)
+        }
     }
     
     // MARK: - Navigation
@@ -120,7 +124,9 @@ class SceneEditorVC: UIViewController {
                 
                 vc.update(
                     projectManifest: projectManifest,
-                    sceneManifest: sceneManifest,
+                    sceneManifest: sceneManifest)
+                
+                vc.update(
                     availableUndoCount: availableUndoCount,
                     availableRedoCount: availableRedoCount)
                 
@@ -163,7 +169,7 @@ class SceneEditorVC: UIViewController {
         self.sceneRef = sceneRef
         self.sceneManifest = sceneManifest
         
-        handleModelUpdate()
+        handleUpdateData(fromEditor: false)
     }
     
 }
@@ -199,7 +205,7 @@ extension SceneEditorVC: SceneEditorContentVCDelegate {
         
         self.sceneManifest = newSceneManifest
         
-        handleModelUpdate()
+        handleUpdateData(fromEditor: false)
     }
     
     func onSelectRemoveLayer(_ vc: SceneEditorContentVC) {
@@ -218,7 +224,7 @@ extension SceneEditorVC: SceneEditorContentVCDelegate {
         
         self.sceneManifest = newSceneManifest
         
-        handleModelUpdate()
+        handleUpdateData(fromEditor: false)
     }
     
     func onSelectUndo(_ vc: SceneEditorContentVC) { 
@@ -248,16 +254,20 @@ extension SceneEditorVC: AnimationEditorVCDelegate {
     }
     
     func onRequestApplyEdit(
-        _ vc: SceneEditorVC,
+        _ vc: AnimationEditorVC,
         sceneID: String,
         newSceneManifest: Scene.Manifest,
         newSceneAssets: [ProjectEditor.Asset]
     ) {
+        self.sceneManifest = newSceneManifest
+        
         delegate?.onRequestApplyEdit(
             self,
             sceneID: sceneID,
             newSceneManifest: newSceneManifest,
             newSceneAssets: newSceneAssets)
+        
+        handleUpdateData(fromEditor: true)
     }
     
 }

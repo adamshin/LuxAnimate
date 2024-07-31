@@ -9,8 +9,8 @@ private let framesPerSecond = 24
 
 protocol AnimationEditorTimelineVCDelegate: AnyObject {
     
-    func onBeginFrameScroll(_ vc: AnimationEditorTimelineVC)
-    func onEndFrameScroll(_ vc: AnimationEditorTimelineVC)
+//    func onBeginFrameScroll(_ vc: AnimationEditorTimelineVC)
+//    func onEndFrameScroll(_ vc: AnimationEditorTimelineVC)
     
     func onChangeFocusedFrame(
         _ vc: AnimationEditorTimelineVC,
@@ -174,10 +174,10 @@ extension AnimationEditorTimelineVC: TimelineToolbarVCDelegate {
 extension AnimationEditorTimelineVC: TimelineTrackVCDelegate {
     
     func onBeginFrameScroll(_ vc: TimelineTrackVC) {
-        delegate?.onBeginFrameScroll(self)
+//        delegate?.onBeginFrameScroll(self)
     }
     func onEndFrameScroll(_ vc: TimelineTrackVC) {
-        delegate?.onEndFrameScroll(self)
+//        delegate?.onEndFrameScroll(self)
     }
     
     func onChangeFocusedFrame(_ vc: TimelineTrackVC, index: Int) {

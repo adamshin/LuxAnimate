@@ -9,8 +9,9 @@ protocol AnimationEditorVCDelegate: AnyObject {
     func onRequestUndo(_ vc: AnimationEditorVC)
     func onRequestRedo(_ vc: AnimationEditorVC)
     
+    // TODO: Allow specifying synchronous vs asynchronous edits!
     func onRequestApplyEdit(
-        _ vc: SceneEditorVC,
+        _ vc: AnimationEditorVC,
         sceneID: String,
         newSceneManifest: Scene.Manifest,
         newSceneAssets: [ProjectEditor.Asset])
@@ -29,8 +30,11 @@ class AnimationEditorVC: UIViewController {
     private let layerID: String
     private let initialFrameIndex: Int
     
+    private let editor: AnimationLayerEditor
+    
     private var projectManifest: Project.Manifest?
     private var sceneManifest: Scene.Manifest?
+    private var animationLayerContent: Scene.AnimationLayerContent?
     
     // MARK: - Init
     
@@ -49,8 +53,12 @@ class AnimationEditorVC: UIViewController {
         timelineVC = AnimationEditorTimelineVC()
         frameVC = try EditorFrameVC(projectID: projectID)
         
+        editor = AnimationLayerEditor(layerID: layerID)
+        
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
+        
+        editor.delegate = self
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -80,13 +88,15 @@ class AnimationEditorVC: UIViewController {
         frameVC.setFocusedFrameIndex(initialFrameIndex)
     }
     
+    // MARK: - Data
+    
+    private func shit() {}
+    
     // MARK: - Interface
     
     func update(
         projectManifest: Project.Manifest,
-        sceneManifest: Scene.Manifest,
-        availableUndoCount: Int,
-        availableRedoCount: Int
+        sceneManifest: Scene.Manifest
     ) {
         guard 
             let layer = sceneManifest.layers
@@ -100,22 +110,28 @@ class AnimationEditorVC: UIViewController {
         
         self.projectManifest = projectManifest
         self.sceneManifest = sceneManifest
+        self.animationLayerContent = animationLayerContent
+        
+        editor.update(animationLayerContent: animationLayerContent)
         
         timelineVC.update(
             projectID: projectID,
             sceneManifest: sceneManifest,
             animationLayerContent: animationLayerContent)
         
-        frameVC.update(
-            availableUndoCount: availableUndoCount,
-            availableRedoCount: availableRedoCount)
-//
 //        frameVC.setProjectManifest(
 //            projectManifest,
 //            editContext: editContext)
 //        frameVC.setFocusedFrameIndex(focusedFrameIndex)
-//        
-//        playbackController.setModel(model)
+    }
+    
+    func update(
+        availableUndoCount: Int,
+        availableRedoCount: Int
+    ) {
+        frameVC.update(
+            availableUndoCount: availableUndoCount,
+            availableRedoCount: availableRedoCount)
     }
     
 }
@@ -123,14 +139,6 @@ class AnimationEditorVC: UIViewController {
 // MARK: - View Controller Delegates
 
 extension AnimationEditorVC: AnimationEditorTimelineVCDelegate {
-    
-    func onBeginFrameScroll(_ vc: AnimationEditorTimelineVC) {
-        frameVC.onBeginFrameScroll()
-    }
-    
-    func onEndFrameScroll(_ vc: AnimationEditorTimelineVC) {
-        frameVC.onEndFrameScroll()
-    }
     
     func onChangeFocusedFrame(
         _ vc: AnimationEditorTimelineVC,
@@ -141,42 +149,34 @@ extension AnimationEditorVC: AnimationEditorTimelineVCDelegate {
     
     func onSelectPlayPause(
         _ vc: AnimationEditorTimelineVC
-    ) {
-//        if playbackController.isPlaying {
-//            playbackController.stopPlayback()
-//        } else {
-//            playbackController.startPlayback(
-//                frameIndex: focusedFrameIndex)
-//        }
-    }
+    ) { }
     
     func onRequestCreateDrawing(
         _ vc: AnimationEditorTimelineVC,
         frameIndex: Int
     ) {
-//        try? editor.createEmptyDrawing(
-//            frameIndex: frameIndex)
+        editor.createDrawing(frameIndex: frameIndex)
     }
     
     func onRequestDeleteDrawing(
         _ vc: AnimationEditorTimelineVC,
         frameIndex: Int
     ) {
-//        try? editor.deleteDrawing(at: frameIndex)
+//        editor.deleteDrawing(at: frameIndex)
     }
     
     func onRequestInsertSpacing(
         _ vc: AnimationEditorTimelineVC, 
         frameIndex: Int
     ) {
-//        try? editor.insertSpacing(at: frameIndex)
+//        editor.insertSpacing(at: frameIndex)
     }
     
     func onRequestRemoveSpacing(
         _ vc: AnimationEditorTimelineVC,
         frameIndex: Int
     ) {
-//        try? editor.removeSpacing(at: frameIndex)
+//        editor.removeSpacing(at: frameIndex)
     }
     
     func onChangeContentAreaSize(
@@ -204,13 +204,45 @@ extension AnimationEditorVC: EditorFrameVCDelegate {
     func onEditDrawing(
         _ vc: EditorFrameVC,
         drawingID: String,
-        drawingTexture: MTLTexture,
-        editContext: Any?
+        drawingTexture: MTLTexture
     ) {
-//        try? editor.editDrawing(
+//        editor.editDrawing(
 //            drawingID: drawingID,
-//            drawingTexture: drawingTexture,
-//            editContext: editContext)
+//            drawingTexture: drawingTexture)
+    }
+    
+}
+
+extension AnimationEditorVC: AnimationLayerEditorDelegate {
+    
+    func onRequestApplyEdit(
+        _ editor: AnimationLayerEditor,
+        edit: AnimationLayerEditor.Edit
+    ) {
+        guard let sceneManifest,
+            let layerIndex = sceneManifest.layers
+                .firstIndex(where: { $0.id == layerID })
+        else { return }
+        
+        var newSceneManifest = sceneManifest
+        newSceneManifest.layers[layerIndex].content
+            = .animation(edit.newAnimationLayerContent)
+        
+        self.sceneManifest = newSceneManifest
+        self.animationLayerContent = edit.newAnimationLayerContent
+        
+        timelineVC.update(
+            projectID: projectID,
+            sceneManifest: self.sceneManifest!,
+            animationLayerContent: self.animationLayerContent!)
+        
+        // TODO: Update frame vc
+        
+        delegate?.onRequestApplyEdit(
+            self,
+            sceneID: sceneID,
+            newSceneManifest: newSceneManifest,
+            newSceneAssets: edit.newAssets)
     }
     
 }

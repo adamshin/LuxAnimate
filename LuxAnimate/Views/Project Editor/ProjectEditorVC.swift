@@ -56,12 +56,8 @@ class ProjectEditorVC: UIViewController {
     // MARK: - Logic
     
     private func addScene() {
-        let projectManifest = projectEditor.projectManifest
-        
         do {
-            try ProjectEditHelper.createScene(
-                projectEditor: projectEditor,
-                projectManifest: projectManifest,
+            try projectEditor.createScene(
                 name: "Scene",
                 frameCount: 100,
                 backgroundColor: .white)
@@ -72,15 +68,12 @@ class ProjectEditorVC: UIViewController {
     }
     
     private func removeLastScene() {
-        let projectManifest = projectEditor.projectManifest
-        
-        guard let lastSceneRef = projectManifest.content.sceneRefs.last
+        guard let lastSceneRef = projectEditor
+            .projectManifest.content.sceneRefs.last
         else { return }
         
         do {
-            try ProjectEditHelper.deleteScene(
-                projectEditor: projectEditor,
-                projectManifest: projectManifest,
+            try projectEditor.deleteScene(
                 sceneID: lastSceneRef.id)
                 
             updateUI()
@@ -176,9 +169,7 @@ extension ProjectEditorVC: SceneEditorVCDelegate {
         newSceneAssets: [ProjectEditor.Asset]
     ) {
         do {
-            try ProjectEditHelper.applySceneEdit(
-                projectEditor: projectEditor,
-                projectManifest: projectEditor.projectManifest,
+            try projectEditor.applySceneEdit(
                 sceneID: sceneID,
                 newSceneManifest: newSceneManifest,
                 newSceneAssets: newSceneAssets)
