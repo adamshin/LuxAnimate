@@ -1,10 +1,10 @@
 //
-//  AnimationEditorTimelineModel.swift
+//  AnimationTimelineModel.swift
 //
 
 import Foundation
 
-struct AnimationEditorTimelineModel {
+struct AnimationTimelineModel {
     
     struct Frame {
         var hasDrawing: Bool
@@ -15,16 +15,16 @@ struct AnimationEditorTimelineModel {
     
 }
 
-extension AnimationEditorTimelineModel {
+extension AnimationTimelineModel {
     
-    static let empty = AnimationEditorTimelineModel(
+    static let empty = AnimationTimelineModel(
         frames: [])
     
     static func generate(
         projectID: String,
         sceneManifest: Scene.Manifest,
         animationLayerContent: Scene.AnimationLayerContent
-    ) -> AnimationEditorTimelineModel {
+    ) -> AnimationTimelineModel {
         
         let emptyFrame = Frame(
             hasDrawing: false,
@@ -49,14 +49,14 @@ extension AnimationEditorTimelineModel {
                 thumbnailURL = nil
             }
             
-            let frame = AnimationEditorTimelineModel.Frame(
+            let frame = AnimationTimelineModel.Frame(
                 hasDrawing: true,
                 thumbnailURL: thumbnailURL)
             
             frames[drawing.frameIndex] = frame
         }
         
-        return AnimationEditorTimelineModel(
+        return AnimationTimelineModel(
             frames: frames)
     }
     

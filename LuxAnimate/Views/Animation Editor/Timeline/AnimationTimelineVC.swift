@@ -7,7 +7,7 @@ import UIKit
 private let frameCount = 120
 private let framesPerSecond = 24
 
-protocol AnimationEditorTimelineVCDelegate: AnyObject {
+protocol AnimationTimelineVCDelegate: AnyObject {
     
 //    func onBeginFrameScroll(_ vc: AnimationEditorTimelineVC)
 //    func onEndFrameScroll(_ vc: AnimationEditorTimelineVC)
@@ -42,14 +42,14 @@ protocol AnimationEditorTimelineVCDelegate: AnyObject {
 
 class AnimationEditorTimelineVC: UIViewController {
     
-    weak var delegate: AnimationEditorTimelineVCDelegate?
+    weak var delegate: AnimationTimelineVCDelegate?
     
     private let collapsibleContentVC = EditorCollapsibleContentVC()
     
     private let toolbarVC = TimelineToolbarVC()
     private let trackVC = TimelineTrackVC()
     
-    private var model: AnimationEditorTimelineModel = .empty
+    private var model: AnimationTimelineModel = .empty
     private var focusedFrameIndex = 0
     
     // MARK: - Lifecycle
@@ -74,8 +74,6 @@ class AnimationEditorTimelineVC: UIViewController {
         addChild(collapsibleContentVC, to: view)
         addChild(toolbarVC, to: collapsibleContentVC.barView)
         addChild(trackVC, to: collapsibleContentVC.collapsibleContentView)
-        
-        collapsibleContentVC.setExpanded(true, animated: false)
     }
     
     // MARK: - Menu
@@ -110,7 +108,7 @@ class AnimationEditorTimelineVC: UIViewController {
         sceneManifest: Scene.Manifest,
         animationLayerContent: Scene.AnimationLayerContent
     ) {
-        let model = AnimationEditorTimelineModel.generate(
+        let model = AnimationTimelineModel.generate(
             projectID: projectID,
             sceneManifest: sceneManifest,
             animationLayerContent: animationLayerContent)
@@ -125,6 +123,11 @@ class AnimationEditorTimelineVC: UIViewController {
         focusedFrameIndex = index
         toolbarVC.setFocusedFrameIndex(index)
         trackVC.setFocusedFrameIndex(index)
+    }
+    
+    func setExpanded(_ expanded: Bool) {
+        collapsibleContentVC.setExpanded(
+            expanded, animated: false)
     }
     
     var contentAreaView: UIView {

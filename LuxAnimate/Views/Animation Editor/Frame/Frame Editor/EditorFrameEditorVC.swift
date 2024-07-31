@@ -27,16 +27,6 @@ protocol EditorFrameEditorVCDelegate: AnyObject {
     
 }
 
-//extension EditorFrameEditorVC {
-//    
-//    struct EditContext {
-//        var origin: EditorFrameEditorVC
-//        var focusedFrameIndex: Int
-//        var activeDrawingID: String
-//    }
-//    
-//}
-
 class EditorFrameEditorVC: UIViewController {
     
     weak var delegate: EditorFrameEditorVCDelegate?

@@ -23,7 +23,7 @@ class AnimationEditorVC: UIViewController {
     weak var delegate: AnimationEditorVCDelegate?
     
     private let timelineVC: AnimationEditorTimelineVC
-    private let frameVC: EditorFrameVC
+    private let frameVC: AnimationFrameVC
     
     private let projectID: String
     private let sceneID: String
@@ -51,7 +51,7 @@ class AnimationEditorVC: UIViewController {
         self.initialFrameIndex = initialFrameIndex
         
         timelineVC = AnimationEditorTimelineVC()
-        frameVC = try EditorFrameVC(projectID: projectID)
+        frameVC = try AnimationFrameVC(projectID: projectID)
         
         editor = AnimationLayerEditor(layerID: layerID)
         
@@ -86,6 +86,8 @@ class AnimationEditorVC: UIViewController {
         
         timelineVC.setFocusedFrameIndex(initialFrameIndex)
         frameVC.setFocusedFrameIndex(initialFrameIndex)
+        
+        timelineVC.setExpanded(true)
     }
     
     // MARK: - Data
@@ -138,7 +140,7 @@ class AnimationEditorVC: UIViewController {
 
 // MARK: - View Controller Delegates
 
-extension AnimationEditorVC: AnimationEditorTimelineVCDelegate {
+extension AnimationEditorVC: AnimationTimelineVCDelegate {
     
     func onChangeFocusedFrame(
         _ vc: AnimationEditorTimelineVC,
@@ -187,22 +189,22 @@ extension AnimationEditorVC: AnimationEditorTimelineVCDelegate {
     
 }
 
-extension AnimationEditorVC: EditorFrameVCDelegate {
+extension AnimationEditorVC: AnimationFrameVCDelegate {
     
-    func onSelectBack(_ vc: EditorFrameVC) {
+    func onSelectBack(_ vc: AnimationFrameVC) {
         dismiss(animated: true)
     }
     
-    func onSelectUndo(_ vc: EditorFrameVC) {
+    func onSelectUndo(_ vc: AnimationFrameVC) {
         delegate?.onRequestUndo(self)
     }
     
-    func onSelectRedo(_ vc: EditorFrameVC) {
+    func onSelectRedo(_ vc: AnimationFrameVC) {
         delegate?.onRequestRedo(self)
     }
     
     func onEditDrawing(
-        _ vc: EditorFrameVC,
+        _ vc: AnimationFrameVC,
         drawingID: String,
         drawingTexture: MTLTexture
     ) {

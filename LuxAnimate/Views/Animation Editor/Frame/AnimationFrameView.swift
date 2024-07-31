@@ -1,9 +1,10 @@
 //
-//  EditorFrameView.swift
+//  AnimationFrameView.swift
 //
+
 import UIKit
 
-class EditorFrameView: UIView {
+class AnimationFrameView: UIView {
     
     let frameEditorContainer = UIView()
     let toolbarContainer = UIView()

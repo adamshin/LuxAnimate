@@ -1,30 +1,30 @@
 //
-//  EditorFrameVC.swift
+//  AnimationFrameVC.swift
 //
 
 import UIKit
 import Metal
 
-protocol EditorFrameVCDelegate: AnyObject {
+protocol AnimationFrameVCDelegate: AnyObject {
     
-    func onSelectBack(_ vc: EditorFrameVC)
-    func onSelectUndo(_ vc: EditorFrameVC)
-    func onSelectRedo(_ vc: EditorFrameVC)
+    func onSelectBack(_ vc: AnimationFrameVC)
+    func onSelectUndo(_ vc: AnimationFrameVC)
+    func onSelectRedo(_ vc: AnimationFrameVC)
     
     func onEditDrawing(
-        _ vc: EditorFrameVC,
+        _ vc: AnimationFrameVC,
         drawingID: String,
         drawingTexture: MTLTexture)
     
 }
 
-class EditorFrameVC: UIViewController {
+class AnimationFrameVC: UIViewController {
     
-    weak var delegate: EditorFrameVCDelegate?
+    weak var delegate: AnimationFrameVCDelegate?
     
-    private let bodyView = EditorFrameView()
+    private let bodyView = AnimationFrameView()
     
-//    private let frameEditorVC: EditorFrameEditorVC
+    private let frameEditorVC: AnimationFrameEditorVC
     private let toolbarVC = EditorFrameToolbarVC()
     private let sidebarVC = EditorFrameSidebarVC()
     
@@ -35,8 +35,8 @@ class EditorFrameVC: UIViewController {
     init(projectID: String) throws {
         self.projectID = projectID
         
-//        frameEditorVC = try EditorFrameEditorVC(
-//            projectID: projectID)
+        frameEditorVC = AnimationFrameEditorVC(
+            projectID: projectID)
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -50,16 +50,16 @@ class EditorFrameVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-//        frameEditorVC.delegate = self
+        frameEditorVC.delegate = self
         toolbarVC.delegate = self
         sidebarVC.delegate = self
         
-//        addChild(frameEditorVC, to: bodyView.frameEditorContainer)
+        addChild(frameEditorVC, to: bodyView.frameEditorContainer)
         addChild(toolbarVC, to: bodyView.toolbarContainer)
         addChild(sidebarVC, to: bodyView.canvasOverlayContainer)
         
-//        frameEditorVC.setSafeAreaReferenceView(
-//            bodyView.canvasOverlayContainer)
+        frameEditorVC.setSafeAreaReferenceView(
+            bodyView.canvasOverlayContainer)
     }
     
     // MARK: - Interface
@@ -108,49 +108,26 @@ class EditorFrameVC: UIViewController {
     
     func handleChangeBottomInsetViewFrame() {
         view.layoutIfNeeded()
-//        frameEditorVC.handleChangeSafeAreaReferenceViewFrame()
+        frameEditorVC.handleChangeSafeAreaReferenceViewFrame()
     }
     
 }
 
 // MARK: - Delegates
 
-extension EditorFrameVC: EditorFrameEditorVCDelegate {
+extension AnimationFrameVC: AnimationFrameEditorVCDelegate {
     
-    func onSetBrushScale(
-        _ vc: EditorFrameEditorVC,
-        _ brushScale: Double
-    ) {
-        sidebarVC.brushScale = brushScale
-    }
-    
-    func onSetBrushSmoothing(
-        _ vc: EditorFrameEditorVC,
-        _ brushSmoothing: Double
-    ) {
-        sidebarVC.brushSmoothing = brushSmoothing
-    }
-    
-    func onSelectUndo(_ vc: EditorFrameEditorVC) {
+    func onSelectUndo(_ vc: AnimationFrameEditorVC) {
         delegate?.onSelectUndo(self)
     }
-    func onSelectRedo(_ vc: EditorFrameEditorVC) {
-        delegate?.onSelectRedo(self)
-    }
     
-    func onEditDrawing(
-        _ vc: EditorFrameEditorVC,
-        drawingID: String,
-        drawingTexture: MTLTexture
-    ) {
-        delegate?.onEditDrawing(self,
-            drawingID: drawingID,
-            drawingTexture: drawingTexture)
+    func onSelectRedo(_ vc: AnimationFrameEditorVC) {
+        delegate?.onSelectRedo(self)
     }
     
 }
 
-extension EditorFrameVC: EditorFrameToolbarVCDelegate {
+extension AnimationFrameVC: EditorFrameToolbarVCDelegate {
     
     func onSelectBack(_ vc: EditorFrameToolbarVC) {
         delegate?.onSelectBack(self)
@@ -170,7 +147,7 @@ extension EditorFrameVC: EditorFrameToolbarVCDelegate {
     
 }
 
-extension EditorFrameVC: EditorFrameSidebarVCDelegate {
+extension AnimationFrameVC: EditorFrameSidebarVCDelegate {
     
     func onSetBrushScale(
         _ vc: EditorFrameSidebarVC,

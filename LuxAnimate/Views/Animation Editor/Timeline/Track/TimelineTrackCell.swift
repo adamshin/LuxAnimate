@@ -104,7 +104,7 @@ class TimelineTrackCell: UICollectionViewCell {
     // MARK: - Interface
     
     func updateContent(
-        frame: AnimationEditorTimelineModel.Frame
+        frame: AnimationTimelineModel.Frame
     ) {
         if frame.hasDrawing {
             imageView.backgroundColor = canvasBackgroundColor
