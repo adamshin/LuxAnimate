@@ -155,28 +155,28 @@ extension AnimationEditorVC: AnimationEditorTimelineVCDelegate {
         _ vc: AnimationEditorTimelineVC,
         frameIndex: Int
     ) {
-        editor.createDrawing(frameIndex: frameIndex)
+        editor.createDrawing(at: frameIndex)
     }
     
     func onRequestDeleteDrawing(
         _ vc: AnimationEditorTimelineVC,
         frameIndex: Int
     ) {
-//        editor.deleteDrawing(at: frameIndex)
+        editor.deleteDrawing(at: frameIndex)
     }
     
     func onRequestInsertSpacing(
         _ vc: AnimationEditorTimelineVC, 
         frameIndex: Int
     ) {
-//        editor.insertSpacing(at: frameIndex)
+        editor.insertSpacing(at: frameIndex)
     }
     
     func onRequestRemoveSpacing(
         _ vc: AnimationEditorTimelineVC,
         frameIndex: Int
     ) {
-//        editor.removeSpacing(at: frameIndex)
+        editor.removeSpacing(at: frameIndex)
     }
     
     func onChangeContentAreaSize(
