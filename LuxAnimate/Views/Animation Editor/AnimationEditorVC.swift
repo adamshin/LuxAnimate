@@ -90,10 +90,6 @@ class AnimationEditorVC: UIViewController {
         timelineVC.setExpanded(true)
     }
     
-    // MARK: - Data
-    
-    private func shit() {}
-    
     // MARK: - Interface
     
     func update(
