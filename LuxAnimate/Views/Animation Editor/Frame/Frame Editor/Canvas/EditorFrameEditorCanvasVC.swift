@@ -5,8 +5,8 @@
 import UIKit
 import Metal
 
-private let minScaleLevel: Scalar = 0.1
-private let maxScaleLevel: Scalar = 30
+private let minScale: Scalar = 0.1
+private let maxScale: Scalar = 30
 private let scalePixelateThreshold: Scalar = 1.0
 
 protocol EditorFrameEditorCanvasVCDelegate: AnyObject {
@@ -28,7 +28,6 @@ class EditorFrameEditorCanvasVC: UIViewController {
     
     private let layerRenderer = MetalLayerTextureRenderer()
     
-    private var canvasSize = PixelSize(width: 0, height: 0)
     private var canvasTexture: MTLTexture?
     
     // MARK: - Lifecycle
@@ -40,7 +39,8 @@ class EditorFrameEditorCanvasVC: UIViewController {
         view.addSubview(canvasView)
         canvasView.pinEdges()
         canvasView.delegate = self
-        canvasView.singleFingerPanEnabled = false
+        canvasView.minScale = minScale
+        canvasView.maxScale = maxScale
         
         canvasView.canvasContentView.addSubview(metalView)
         metalView.pinEdges()
@@ -54,7 +54,7 @@ class EditorFrameEditorCanvasVC: UIViewController {
         undoGesture.addTarget(self, action: #selector(onUndoGesture))
         redoGesture.addTarget(self, action: #selector(onRedoGesture))
         
-        setCanvasSize(PixelSize(width: 100, height: 100))
+        setCanvasSize(PixelSize(width: 0, height: 0))
     }
     
     override func viewIsAppearing(_ animated: Bool) {
@@ -85,13 +85,14 @@ class EditorFrameEditorCanvasVC: UIViewController {
     // MARK: - Interface
     
     func setCanvasSize(_ canvasSize: PixelSize) {
-        self.canvasSize = canvasSize
-        
         metalView.setDrawableSize(CGSize(
             width: canvasSize.width,
             height: canvasSize.height))
         
-        canvasView.handleChangeCanvasSize()
+        canvasView.canvasSize = Size(
+            Double(canvasSize.width),
+            Double(canvasSize.height))
+        
         canvasView.fitCanvasToBounds(animated: false)
     }
     
@@ -122,20 +123,6 @@ class EditorFrameEditorCanvasVC: UIViewController {
 // MARK: - Delegates
 
 extension EditorFrameEditorCanvasVC: MovableCanvasViewDelegate {
-    
-    func canvasSize(_ v: MovableCanvasView) -> Size {
-        Size(
-            Scalar(canvasSize.width),
-            Scalar(canvasSize.height))
-    }
-    
-    func minScale(_ v: MovableCanvasView) -> Scalar {
-        minScaleLevel
-    }
-    
-    func maxScale(_ v: MovableCanvasView) -> Scalar {
-        maxScaleLevel
-    }
     
     func onUpdateCanvasTransform(
         _ v: MovableCanvasView,

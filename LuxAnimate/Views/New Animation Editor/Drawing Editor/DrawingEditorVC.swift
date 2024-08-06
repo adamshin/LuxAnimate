@@ -22,6 +22,8 @@ class DrawingEditorVC: UIViewController {
         
         canvasVC.delegate = self
         addChild(canvasVC, to: view)
+        
+        canvasVC.setCanvasSize(PixelSize(width: 1920, height: 1080))
     }
     
     // MARK: - Interface

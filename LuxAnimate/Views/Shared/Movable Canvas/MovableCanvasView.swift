@@ -13,11 +13,6 @@ private let rotationSnapThreshold: Scalar =
 
 protocol MovableCanvasViewDelegate: AnyObject {
     
-    func canvasSize(_ v: MovableCanvasView) -> Size
-    
-    func minScale(_ v: MovableCanvasView) -> Scalar
-    func maxScale(_ v: MovableCanvasView) -> Scalar
-    
     func onUpdateCanvasTransform(
         _ v: MovableCanvasView,
         _ transform: MovableCanvasTransform)
@@ -39,9 +34,19 @@ class MovableCanvasView: UIView {
     
     private var isCanvasFitToBounds = false
     
-    var singleFingerPanEnabled: Bool = true {
+    var canvasSize: Size = .zero {
         didSet {
-            panGesture.isEnabled = singleFingerPanEnabled
+            setNeedsLayout()
+            layoutIfNeeded()
+        }
+    }
+    
+    var minScale: Scalar = 1
+    var maxScale: Scalar = 1
+    
+    var isSingleFingerPanEnabled: Bool = true {
+        didSet {
+            panGesture.isEnabled = isSingleFingerPanEnabled
         }
     }
     
@@ -73,8 +78,6 @@ class MovableCanvasView: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        
-        let canvasSize = delegate?.canvasSize(self) ?? Size(1, 1)
         
         canvasContentView.bounds = CGRect(
             origin: .zero,
@@ -126,7 +129,7 @@ class MovableCanvasView: UIView {
     private func canvasTransformFittingToBounds()
     -> MovableCanvasTransform {
         
-        guard let canvasSize = delegate?.canvasSize(self)
+        guard canvasSize.width > 0, canvasSize.height > 0
         else { return MovableCanvasTransform() }
         
         let boundsReferenceView = safeAreaReferenceView ?? self
@@ -158,13 +161,6 @@ class MovableCanvasView: UIView {
     private func canvasTransformSnapping(
         _ transform: MovableCanvasTransform
     ) -> MovableCanvasTransform {
-        
-        guard let delegate
-        else { return MovableCanvasTransform() }
-        
-        let canvasSize = delegate.canvasSize(self)
-        let minScale = delegate.minScale(self)
-        let maxScale = delegate.maxScale(self)
         
         var snappedTransform = transform
         
@@ -218,9 +214,7 @@ class MovableCanvasView: UIView {
         translation: Vector,
         rotation: Scalar,
         scale: Scalar
-    ) {
-        let maxScale = delegate?.maxScale(self) ?? 1
-        
+    ) { 
         let anchor = Vector(
             anchorPosition.x - bounds.width / 2,
             anchorPosition.y - bounds.height / 2)
@@ -266,13 +260,6 @@ class MovableCanvasView: UIView {
     }
     
     // MARK: - Interface
-    
-    func handleChangeCanvasSize() {
-        isCanvasFitToBounds = false
-        
-        setNeedsLayout()
-        layoutIfNeeded()
-    }
     
     func fitCanvasToBounds(animated: Bool) {
         isCanvasFitToBounds = true

@@ -5,8 +5,8 @@
 import UIKit
 import Metal
 
-private let minScaleLevel: Scalar = 0.1
-private let maxScaleLevel: Scalar = 30
+private let minScale: Scalar = 0.1
+private let maxScale: Scalar = 30
 private let scalePixelateThreshold: Scalar = 1.0
 
 protocol DrawingEditorCanvasVCDelegate: AnyObject {
@@ -26,7 +26,6 @@ class DrawingEditorCanvasVC: UIViewController {
     
     private let layerRenderer = MetalLayerTextureRenderer()
     
-    private var canvasSize = PixelSize(width: 0, height: 0)
     private var canvasTexture: MTLTexture?
     
     // MARK: - Lifecycle
@@ -38,7 +37,9 @@ class DrawingEditorCanvasVC: UIViewController {
         view.addSubview(canvasView)
         canvasView.pinEdges()
         canvasView.delegate = self
-        canvasView.singleFingerPanEnabled = false
+        canvasView.minScale = minScale
+        canvasView.maxScale = maxScale
+        canvasView.isSingleFingerPanEnabled = false
         canvasView.canvasContentView.backgroundColor = .white
         
         canvasView.canvasContentView.addSubview(metalView)
@@ -53,7 +54,7 @@ class DrawingEditorCanvasVC: UIViewController {
         undoGesture.addTarget(self, action: #selector(onUndoGesture))
         redoGesture.addTarget(self, action: #selector(onRedoGesture))
         
-        setCanvasSize(PixelSize(width: 1280, height: 720))
+        setCanvasSize(PixelSize(width: 0, height: 0))
     }
     
     override func viewIsAppearing(_ animated: Bool) {
@@ -84,13 +85,13 @@ class DrawingEditorCanvasVC: UIViewController {
     // MARK: - Interface
     
     func setCanvasSize(_ canvasSize: PixelSize) {
-        self.canvasSize = canvasSize
+        canvasView.canvasSize = Size(
+            Double(canvasSize.width),
+            Double(canvasSize.height))
         
         metalView.setDrawableSize(CGSize(
             width: canvasSize.width,
             height: canvasSize.height))
-        
-        canvasView.handleChangeCanvasSize()
     }
     
     func setCanvasTexture(_ texture: MTLTexture) {
@@ -120,20 +121,6 @@ class DrawingEditorCanvasVC: UIViewController {
 // MARK: - Delegates
 
 extension DrawingEditorCanvasVC: MovableCanvasViewDelegate {
-    
-    func canvasSize(_ v: MovableCanvasView) -> Size {
-        Size(
-            Scalar(canvasSize.width),
-            Scalar(canvasSize.height))
-    }
-    
-    func minScale(_ v: MovableCanvasView) -> Scalar {
-        minScaleLevel
-    }
-    
-    func maxScale(_ v: MovableCanvasView) -> Scalar {
-        maxScaleLevel
-    }
     
     func onUpdateCanvasTransform(
         _ v: MovableCanvasView,
