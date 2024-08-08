@@ -27,8 +27,8 @@ struct MetalLayerTextureRenderer {
             texture: texture,
             sprites: [
                 SpriteRenderer.Sprite(
-                    size: Size(1, 1),
-                    position: Vector(0.5, 0.5))
+                    position: Vector(0.5, 0.5),
+                    size: Size(1, 1))
             ],
             blendMode: .replace,
             sampleMode: sampleMode)

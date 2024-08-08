@@ -90,10 +90,7 @@ class AnimationFrameEditorCanvasVC: UIViewController {
             width: canvasSize.width,
             height: canvasSize.height))
         
-        canvasView.canvasSize = Size(
-            Double(canvasSize.width),
-            Double(canvasSize.height))
-        
+        canvasView.canvasSize = canvasSize
         canvasView.fitCanvasToBounds(animated: false)
     }
     

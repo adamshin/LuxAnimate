@@ -114,33 +114,24 @@ class SceneEditorVC: UIViewController {
         
         switch layer.content {
         case .animation:
-            do {
-//                let vc = try AnimationEditorVC(
-//                    projectID: projectID,
-//                    sceneID: sceneID,
-//                    layerID: layerID,
-//                    initialFrameIndex: 0)
-                
-                let vc = try NewAnimationEditorVC(
-                    projectID: projectID,
-                    sceneID: sceneID,
-                    layerID: layerID,
-                    frameIndex: 0)
-                
-                vc.delegate = self
-                
-                vc.update(
-                    projectManifest: projectManifest,
-                    sceneManifest: sceneManifest)
-                
-                vc.update(
-                    availableUndoCount: availableUndoCount,
-                    availableRedoCount: availableRedoCount)
-                
-                present(vc, animated: true)
-                animationEditorVC = vc
-                
-            } catch { }
+            let vc = NewAnimationEditorVC(
+                projectID: projectID,
+                sceneID: sceneID,
+                activeLayerID: layerID,
+                activeFrameIndex: 0)
+            
+            vc.delegate = self
+            
+            vc.update(
+                projectManifest: projectManifest,
+                sceneManifest: sceneManifest)
+            
+            vc.update(
+                availableUndoCount: availableUndoCount,
+                availableRedoCount: availableRedoCount)
+            
+            present(vc, animated: true)
+            animationEditorVC = vc
         }
     }
     
@@ -292,7 +283,6 @@ extension SceneEditorVC: NewAnimationEditorVCDelegate {
     
     func onRequestApplyEdit(
         _ vc: NewAnimationEditorVC,
-        sceneID: String,
         newSceneManifest: Scene.Manifest,
         newSceneAssets: [ProjectEditor.Asset]
     ) {

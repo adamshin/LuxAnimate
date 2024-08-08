@@ -9,10 +9,9 @@ protocol NewAnimationEditorVCDelegate: AnyObject {
     func onRequestUndo(_ vc: NewAnimationEditorVC)
     func onRequestRedo(_ vc: NewAnimationEditorVC)
     
-    // TODO: Allow specifying synchronous vs asynchronous edits!
+    // TODO: Allow specifying synchronous vs asynchronous edits?
     func onRequestApplyEdit(
         _ vc: NewAnimationEditorVC,
-        sceneID: String,
         newSceneManifest: Scene.Manifest,
         newSceneAssets: [ProjectEditor.Asset])
     
@@ -24,26 +23,28 @@ class NewAnimationEditorVC: UIViewController {
     
     private let bodyView = NewAnimationEditorView()
     
-    private let drawingEditorVC = DrawingEditorVC()
+    private let canvasVC = NewAnimationEditorCanvasVC()
     private let toolbarVC = NewAnimationEditorToolbarVC()
     
     private let projectID: String
     private let sceneID: String
-    private let layerID: String
-    private let frameIndex: Int
+    private let activeLayerID: String
+    private let activeFrameIndex: Int
+    
+    private var frameEditor: AnimationFrameEditor?
     
     // MARK: - Initializer
     
     init(
         projectID: String,
         sceneID: String,
-        layerID: String,
-        frameIndex: Int
-    ) throws {
+        activeLayerID: String,
+        activeFrameIndex: Int
+    ) {
         self.projectID = projectID
         self.sceneID = sceneID
-        self.layerID = layerID
-        self.frameIndex = frameIndex
+        self.activeLayerID = activeLayerID
+        self.activeFrameIndex = activeFrameIndex
         
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
@@ -60,14 +61,18 @@ class NewAnimationEditorVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        drawingEditorVC.delegate = self
+        canvasVC.delegate = self
         toolbarVC.delegate = self
         
-        addChild(drawingEditorVC, to: bodyView.canvasContainer)
+        addChild(canvasVC, to: bodyView.canvasContainer)
         addChild(toolbarVC, to: bodyView.toolbarContainer)
         
-        drawingEditorVC.setSafeAreaReferenceView(
+        canvasVC.setSafeAreaReferenceView(
             bodyView.canvasOverlayContainer)
+        
+        // TODO: Determine this based on edit session
+        canvasVC.setCanvasSize(
+            PixelSize(width: 1920, height: 1080))
     }
     
     override var prefersStatusBarHidden: Bool { true }
@@ -78,7 +83,16 @@ class NewAnimationEditorVC: UIViewController {
         projectManifest: Project.Manifest,
         sceneManifest: Scene.Manifest
     ) {
-        // todo
+        frameEditor = AnimationFrameEditor(
+            projectID: projectID,
+            sceneID: sceneID,
+            activeLayerID: activeLayerID,
+            activeFrameIndex: activeFrameIndex,
+            onionSkinPrevCount: 0,
+            onionSkinNextCount: 0,
+            projectManifest: projectManifest,
+            sceneManifest: sceneManifest,
+            delegate: self)
     }
     
     func update(
@@ -94,12 +108,12 @@ class NewAnimationEditorVC: UIViewController {
 
 // MARK: - Delegates
 
-extension NewAnimationEditorVC: DrawingEditorVCDelegate {
+extension NewAnimationEditorVC: NewAnimationEditorCanvasVCDelegate {
     
-    func onSelectUndo(_ vc: DrawingEditorVC) {
+    func onSelectUndo(_ vc: NewAnimationEditorCanvasVC) {
         delegate?.onRequestUndo(self)
     }
-    func onSelectRedo(_ vc: DrawingEditorVC) {
+    func onSelectRedo(_ vc: NewAnimationEditorCanvasVC) {
         delegate?.onRequestRedo(self)
     }
     
@@ -123,6 +137,38 @@ extension NewAnimationEditorVC: NewAnimationEditorToolbarVCDelegate {
     }
     func onSelectRedo(_ vc: NewAnimationEditorToolbarVC) {
         delegate?.onRequestRedo(self)
+    }
+    
+}
+
+extension NewAnimationEditorVC: AnimationFrameEditorDelegate {
+    
+    func onBegin(
+        _ editor: AnimationFrameEditor,
+        viewportSize: PixelSize
+    ) {
+        canvasVC.setCanvasSize(viewportSize)
+    }
+    
+    func onFinishLoadingAssets(
+        _ editor: AnimationFrameEditor
+    ) {
+        // TODO
+    }
+    
+    func onUpdateViewportTexture(
+        _ session: AnimationFrameEditor,
+        viewportTexture: MTLTexture
+    ) {
+        canvasVC.setCanvasTexture(viewportTexture)
+    }
+    
+    func onRequestApplyEdit(
+        _ session: AnimationFrameEditor,
+        newSceneManifest: Scene.Manifest,
+        newSceneAssets: [ProjectEditor.Asset]
+    ) {
+        // TODO
     }
     
 }

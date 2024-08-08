@@ -1,5 +1,5 @@
 //
-//  DrawingEditorCanvasVC.swift
+//  NewAnimationEditorCanvasVC.swift
 //
 
 import UIKit
@@ -9,14 +9,14 @@ private let minScale: Scalar = 0.1
 private let maxScale: Scalar = 30
 private let scalePixelateThreshold: Scalar = 1.0
 
-protocol DrawingEditorCanvasVCDelegate: AnyObject {
-    func onSelectUndo(_ vc: DrawingEditorCanvasVC)
-    func onSelectRedo(_ vc: DrawingEditorCanvasVC)
+protocol NewAnimationEditorCanvasVCDelegate: AnyObject {
+    func onSelectUndo(_ vc: NewAnimationEditorCanvasVC)
+    func onSelectRedo(_ vc: NewAnimationEditorCanvasVC)
 }
 
-class DrawingEditorCanvasVC: UIViewController {
+class NewAnimationEditorCanvasVC: UIViewController {
     
-    weak var delegate: DrawingEditorCanvasVCDelegate?
+    weak var delegate: NewAnimationEditorCanvasVCDelegate?
     
     private let metalView = MetalView()
     private let canvasView = MovableCanvasView()
@@ -85,9 +85,7 @@ class DrawingEditorCanvasVC: UIViewController {
     // MARK: - Interface
     
     func setCanvasSize(_ canvasSize: PixelSize) {
-        canvasView.canvasSize = Size(
-            Double(canvasSize.width),
-            Double(canvasSize.height))
+        canvasView.canvasSize = canvasSize
         
         metalView.setDrawableSize(CGSize(
             width: canvasSize.width,
@@ -96,6 +94,11 @@ class DrawingEditorCanvasVC: UIViewController {
     
     func setCanvasTexture(_ texture: MTLTexture) {
         canvasTexture = texture
+        drawCanvas()
+    }
+    
+    func clearCanvasTexture() {
+        canvasTexture = nil
         drawCanvas()
     }
     
@@ -120,7 +123,7 @@ class DrawingEditorCanvasVC: UIViewController {
 
 // MARK: - Delegates
 
-extension DrawingEditorCanvasVC: MovableCanvasViewDelegate {
+extension NewAnimationEditorCanvasVC: MovableCanvasViewDelegate {
     
     func onUpdateCanvasTransform(
         _ v: MovableCanvasView,
@@ -137,7 +140,7 @@ extension DrawingEditorCanvasVC: MovableCanvasViewDelegate {
     
 }
 
-extension DrawingEditorCanvasVC: MetalViewDelegate {
+extension NewAnimationEditorCanvasVC: MetalViewDelegate {
     
     func draw(in layer: CAMetalLayer) {
         drawCanvas()

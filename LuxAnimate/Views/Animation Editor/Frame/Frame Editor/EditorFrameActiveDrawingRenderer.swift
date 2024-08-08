@@ -87,8 +87,8 @@ class EditorFrameActiveDrawingRenderer {
                 texture: texture,
                 sprites: [
                     SpriteRenderer.Sprite(
-                        size: Size(1, 1),
                         position: Vector(0.5, 0.5),
+                        size: Size(1, 1),
                         alpha: onionSkinPrevAlpha)
                 ],
                 colorMode: .stencil,
@@ -115,8 +115,8 @@ class EditorFrameActiveDrawingRenderer {
                 texture: texture,
                 sprites: [
                     SpriteRenderer.Sprite(
-                        size: Size(1, 1),
                         position: Vector(0.5, 0.5),
+                        size: Size(1, 1),
                         alpha: onionSkinNextAlpha)
                 ],
                 colorMode: .stencil,
@@ -136,8 +136,8 @@ class EditorFrameActiveDrawingRenderer {
                 texture: drawingTexture,
                 sprites: [
                     SpriteRenderer.Sprite(
-                        size: Size(1, 1),
-                        position: Vector(0.5, 0.5))
+                        position: Vector(0.5, 0.5),
+                        size: Size(1, 1))
                 ])
         }
         

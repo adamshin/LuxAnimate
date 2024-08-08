@@ -30,8 +30,8 @@ struct BrushEngineStampRenderer {
                 3 : 1
             
             return SpriteRenderer.Sprite(
-                size: Size(stamp.size, stamp.size),
                 position: offsetPosition,
+                size: Size(stamp.size, stamp.size),
                 rotation: stamp.rotation,
                 alpha: stamp.alpha,
                 paddingScale: paddingScale)

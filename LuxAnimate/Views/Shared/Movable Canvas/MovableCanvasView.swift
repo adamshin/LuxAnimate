@@ -34,7 +34,7 @@ class MovableCanvasView: UIView {
     
     private var isCanvasFitToBounds = false
     
-    var canvasSize: Size = .zero {
+    var canvasSize = PixelSize(width: 0, height: 0) {
         didSet {
             setNeedsLayout()
             layoutIfNeeded()
@@ -81,7 +81,10 @@ class MovableCanvasView: UIView {
         
         canvasContentView.bounds = CGRect(
             origin: .zero,
-            size: CGSize(canvasSize))
+            size: CGSize(
+                width: canvasSize.width,
+                height: canvasSize.height))
+        
         canvasContentView.center = bounds.center
         
         if isCanvasFitToBounds,
@@ -129,7 +132,10 @@ class MovableCanvasView: UIView {
     private func canvasTransformFittingToBounds()
     -> MovableCanvasTransform {
         
-        guard canvasSize.width > 0, canvasSize.height > 0
+        let canvasWidth = Double(canvasSize.width)
+        let canvasHeight = Double(canvasSize.height)
+        
+        guard canvasWidth > 0, canvasHeight > 0
         else { return MovableCanvasTransform() }
         
         let boundsReferenceView = safeAreaReferenceView ?? self
@@ -147,8 +153,8 @@ class MovableCanvasView: UIView {
         let availableHeight = boundsReferenceView.bounds.height 
             - fitToBoundsInset * 2
         
-        let xScaleToFit = availableWidth / canvasSize.width
-        let yScaleToFit = availableHeight / canvasSize.height
+        let xScaleToFit = availableWidth / canvasWidth
+        let yScaleToFit = availableHeight / canvasHeight
         
         let scale = min(xScaleToFit, yScaleToFit)
         
@@ -162,6 +168,9 @@ class MovableCanvasView: UIView {
         _ transform: MovableCanvasTransform
     ) -> MovableCanvasTransform {
         
+        let canvasWidth = Double(canvasSize.width)
+        let canvasHeight = Double(canvasSize.height)
+        
         var snappedTransform = transform
         
         snappedTransform.snapScale(
@@ -172,10 +181,10 @@ class MovableCanvasView: UIView {
             threshold: rotationSnapThreshold)
         
         snappedTransform.snapTranslationToKeepRectContainingOrigin(
-            x: -canvasSize.width / 2,
-            y: -canvasSize.height / 2,
-            width: canvasSize.width,
-            height: canvasSize.height)
+            x: -canvasWidth / 2,
+            y: -canvasHeight / 2,
+            width: canvasWidth,
+            height: canvasHeight)
         
         return snappedTransform
     }

@@ -8,12 +8,49 @@ import Metal
 struct SpriteRenderer {
     
     struct Sprite {
-        var size: Size
         var position: Vector
-        var rotation: Scalar = 0
-        var scale: Scalar = 1
-        var alpha: Double = 1
-        var paddingScale: Double = 1
+        var size: Size
+        var anchor: Vector
+        var transform: Matrix3
+        var alpha: Double
+        var paddingScale: Double
+        
+        init(
+            position: Vector,
+            size: Size,
+            anchor: Vector = .init(0.5, 0.5),
+            transform: Matrix3,
+            alpha: Double = 1,
+            paddingScale: Double = 1
+        ) {
+            self.position = position
+            self.size = size
+            self.anchor = anchor
+            self.transform = transform
+            self.alpha = alpha
+            self.paddingScale = paddingScale
+        }
+        
+        init(
+            position: Vector,
+            size: Size,
+            anchor: Vector = .init(0.5, 0.5),
+            rotation: Scalar = 0,
+            scale: Scalar = 1,
+            alpha: Double = 1,
+            paddingScale: Double = 1
+        ) {
+            self.position = position
+            self.size = size
+            self.anchor = anchor
+            self.alpha = alpha
+            self.paddingScale = paddingScale
+            
+            var t = Matrix3.identity
+            t = Matrix3(scale: .init(scale, scale)) * t
+            t = Matrix3(rotation: rotation) * t
+            transform = t
+        }
     }
     
     private let pipelineState: MTLRenderPipelineState
@@ -71,10 +108,9 @@ struct SpriteRenderer {
         
         for s in sprites {
             var t = Matrix3.identity
-            t = Matrix3(translation: .init(-0.5, -0.5)) * t
+            t = Matrix3(translation: -s.anchor) * t
             t = Matrix3(scale: .init(s.size.width, s.size.height)) * t
-            t = Matrix3(scale: .init(s.scale, s.scale)) * t
-            t = Matrix3(rotation: s.rotation) * t
+            t = s.transform * t
             t = Matrix3(translation: s.position) * t
             
             var quadPositions: [Vector] = [
