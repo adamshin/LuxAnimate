@@ -78,7 +78,7 @@ struct SpriteRenderer {
     }
     
     func drawSprites(
-        commandBuffer: any MTLCommandBuffer,
+        commandBuffer: MTLCommandBuffer,
         target: MTLTexture,
         viewportSize: Size,
         texture: MTLTexture,

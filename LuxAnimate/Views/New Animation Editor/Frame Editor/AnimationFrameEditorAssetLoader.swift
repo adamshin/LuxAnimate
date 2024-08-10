@@ -71,8 +71,6 @@ class AnimationFrameEditorAssetLoader {
         while let item = pendingLoadItems.first {
             pendingLoadItems.removeFirst()
             
-            let drawingID = item.drawingID
-            
             guard let fullAssetID = item.fullAssetID else {
                 continue
             }
