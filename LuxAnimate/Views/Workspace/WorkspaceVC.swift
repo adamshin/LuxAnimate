@@ -31,6 +31,7 @@ class WorkspaceVC: UIViewController {
             height: metalView.bounds.height * scale)
         
         metalView.setDrawableSize(drawableSize)
+        draw()
     }
     
     // MARK: - Rendering
@@ -42,11 +43,6 @@ class WorkspaceVC: UIViewController {
         
         let commandBuffer = MetalInterface.shared
             .commandQueue.makeCommandBuffer()!
-        
-        ClearColorRenderer.drawClearColor(
-            commandBuffer: commandBuffer,
-            target: drawable.texture,
-            color: .white)
         
         testRenderer.draw(
             commandBuffer: commandBuffer,

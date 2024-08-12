@@ -4,31 +4,18 @@
 
 import Metal
 
+private let rectSize = Size(1920, 1080)
+
 struct TestRenderer {
     
-    private let pipelineState: MTLRenderPipelineState
+    private let spriteRenderer: SpriteRenderer
     private let texture: MTLTexture
 
     init(
-        pixelFormat: MTLPixelFormat = AppConfig.pixelFormat
+        pixelFormat: MTLPixelFormat
     ) {
-        let library = MetalInterface.shared.device
-            .makeDefaultLibrary()!
-        
-        let vertexFunction = library.makeFunction(
-            name: "spriteVertexShader")
-        let fragmentFunction = library.makeFunction(
-            name: "spriteFragmentShader")
-        
-        let pipelineDescriptor = MTLRenderPipelineDescriptor()
-        pipelineDescriptor.vertexFunction = vertexFunction
-        pipelineDescriptor.fragmentFunction = fragmentFunction
-        
-        let attachment = pipelineDescriptor.colorAttachments[0]!
-        attachment.pixelFormat = pixelFormat
-        
-        pipelineState = try! MetalInterface.shared.device
-            .makeRenderPipelineState(descriptor: pipelineDescriptor)
+        spriteRenderer = SpriteRenderer(
+            pixelFormat: pixelFormat)
         
         texture = createDefaultTexture(
             color: MTLClearColor(red: 1, green: 0, blue: 0, alpha: 1))!
@@ -38,60 +25,33 @@ struct TestRenderer {
         commandBuffer: MTLCommandBuffer,
         target: MTLTexture
     ) {
-        let renderPassDescriptor = MTLRenderPassDescriptor()
+        // Clear color
+        ClearColorRenderer.drawClearColor(
+            commandBuffer: commandBuffer,
+            target: target,
+            color: .brushBlack)
         
-        let attachment = renderPassDescriptor.colorAttachments[0]!
-        attachment.texture = target
-        attachment.storeAction = .store
-        attachment.loadAction = .load
+        // Rectangle
+        let viewportSize = Size(
+            Double(target.width),
+            Double(target.height))
         
-        let renderEncoder = commandBuffer
-            .makeRenderCommandEncoder(
-                descriptor: renderPassDescriptor)!
+        let center = Vector(
+            viewportSize.width / 2,
+            viewportSize.height / 2)
         
-        renderEncoder.setRenderPipelineState(pipelineState)
-        
-        let vertices: [SpriteVertex] = [
-            SpriteVertex(position: .init(0, 1), texCoord: .zero, color: .red, alpha: 1),
-            SpriteVertex(position: .init(0.5, 0), texCoord: .zero, color: .green, alpha: 1),
-            SpriteVertex(position: .init(1, 1), texCoord: .zero, color: .blue, alpha: 1),
-        ]
-        
-        let vertexBuffer = MetalInterface.shared.device.makeBuffer(
-            bytes: vertices,
-            length: vertices.count * MemoryLayout<SpriteVertex>.stride)
-        
-        var vertexUniforms = SpriteVertexUniforms(
-            viewportSize: .init(1, 1))
-        
-        var fragmentUniforms = SpriteFragmentUniforms(
-            blendMode: BlendMode.normal.shaderValue,
-            sampleMode: SampleMode.linear.shaderValue,
-            colorMode: ColorMode.stencil.shaderValue)
-        
-        renderEncoder.setVertexBuffer(
-            vertexBuffer,
-            offset: 0,
-            index: Int(SpriteVertexBufferIndexVertices.rawValue))
-        
-        renderEncoder.setVertexBytes(
-            &vertexUniforms,
-            length: MemoryLayout<SpriteVertexUniforms>.stride,
-            index: Int(SpriteVertexBufferIndexUniforms.rawValue))
-        
-        renderEncoder.setFragmentBytes(
-            &fragmentUniforms,
-            length: MemoryLayout<SpriteFragmentUniforms>.stride,
-            index: Int(SpriteFragmentBufferIndexUniforms.rawValue))
-        
-        renderEncoder.setFragmentTexture(texture, index: 0)
-        
-        renderEncoder.drawPrimitives(
-            type: .triangle,
-            vertexStart: 0,
-            vertexCount: vertices.count)
-         
-        renderEncoder.endEncoding()
+        spriteRenderer.drawSprites(
+            commandBuffer: commandBuffer,
+            target: target,
+            viewportSize: viewportSize,
+            texture: texture,
+            sprites: [
+                .init(
+                    position: center,
+                    size: rectSize)
+            ],
+            colorMode: .stencil,
+            color: .white)
     }
     
 }
@@ -106,10 +66,7 @@ private func createDefaultTexture(color: MTLClearColor) -> MTLTexture? {
     
     guard let texture = MetalInterface.shared.device
         .makeTexture(descriptor: textureDescriptor)
-    else {
-        print("Failed to create texture")
-        return nil
-    }
+    else { return nil }
     
     let region = MTLRegionMake2D(0, 0, 1, 1)
     var c = simd_uchar4(
