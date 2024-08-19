@@ -3,7 +3,9 @@
 //
 
 import Metal
+import UIKit
 
+private let clearColor = Color(UIColor.editorBackground)
 private let rectSize = Size(1920, 1080)
 
 struct TestRenderer {
@@ -29,7 +31,7 @@ struct TestRenderer {
         ClearColorRenderer.drawClearColor(
             commandBuffer: commandBuffer,
             target: target,
-            color: .brushBlack)
+            color: clearColor)
         
         // Rectangle
         let viewportSize = Size(

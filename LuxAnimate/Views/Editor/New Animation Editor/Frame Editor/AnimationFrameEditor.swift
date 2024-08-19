@@ -7,10 +7,6 @@ import Metal
 
 protocol AnimationFrameEditorDelegate: AnyObject {
     
-    func onBegin(
-        _ editor: AnimationFrameEditor,
-        viewportSize: PixelSize)
-    
     func onFinishLoadingAssets(
         _ editor: AnimationFrameEditor)
     
@@ -36,9 +32,10 @@ class AnimationFrameEditor {
     
     private var sceneManifest: Scene.Manifest
     
-    private let frameScene: AnimationEditorFrameScene
+    private let frameScene: AnimationEditorScene
     private let assetLoader: AnimationFrameEditorAssetLoader
-    private let renderer: AnimationFrameEditorRenderer
+    
+    private let renderer = AnimationEditorSceneRenderer()
     
     // Drawing edit session
     
@@ -65,7 +62,7 @@ class AnimationFrameEditor {
         self.activeFrameIndex = activeFrameIndex
         self.sceneManifest = sceneManifest
         
-        frameScene = AnimationEditorFrameScene.generate(
+        frameScene = AnimationEditorScene.generate(
             projectManifest: projectManifest,
             sceneManifest: sceneManifest,
             activeLayerID: activeLayerID,
@@ -78,21 +75,15 @@ class AnimationFrameEditor {
         assetLoader = AnimationFrameEditorAssetLoader(
             projectID: projectID)
         
-        renderer = AnimationFrameEditorRenderer(
-            viewportSize: frameScene.viewportSize)
-        
-        delegate.onBegin(self,
-            viewportSize: frameScene.viewportSize)
-        
         assetLoader.delegate = self
         assetLoader.loadAssets(drawings: allDrawings)
         
         renderer.delegate = self
     }
     
-//    func drawViewport() -> MTLTexture {
-//        
-//    }
+    func drawViewport() -> MTLTexture {
+        // TODO: Draw
+    }
     
 }
 
@@ -106,10 +97,10 @@ extension AnimationFrameEditor: AnimationFrameEditorAssetLoaderDelegate {
     
 }
 
-extension AnimationFrameEditor: AnimationFrameEditorRendererDelegate {
+extension AnimationFrameEditor: AnimationEditorSceneRendererDelegate {
     
     func textureForDrawing(
-        _ r: AnimationFrameEditorRenderer,
+        _ r: AnimationEditorSceneRenderer,
         drawingID: String
     ) -> MTLTexture? {
         

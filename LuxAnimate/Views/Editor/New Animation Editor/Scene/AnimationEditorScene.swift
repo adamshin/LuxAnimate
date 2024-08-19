@@ -1,10 +1,10 @@
 //
-//  AnimationEditorFrameScene.swift
+//  AnimationEditorScene.swift
 //
 
 import Foundation
 
-struct AnimationEditorFrameScene {
+struct AnimationEditorScene {
     
     struct Layer {
         var transform: Matrix3
@@ -37,7 +37,7 @@ struct AnimationEditorFrameScene {
 
 // MARK: - Generation
 
-extension AnimationEditorFrameScene {
+extension AnimationEditorScene {
     
     static func generate(
         projectManifest: Project.Manifest,
@@ -46,7 +46,7 @@ extension AnimationEditorFrameScene {
         activeFrameIndex: Int,
         onionSkinPrevCount: Int,
         onionSkinNextCount: Int
-    ) -> AnimationEditorFrameScene {
+    ) -> AnimationEditorScene {
         
         var frameSceneLayers: [Layer] = []
         
@@ -75,7 +75,7 @@ extension AnimationEditorFrameScene {
             }
         }
         
-        return AnimationEditorFrameScene(
+        return AnimationEditorScene(
             viewportSize: projectManifest.content.metadata.viewportSize, 
             backgroundColor: sceneManifest.backgroundColor,
             layers: frameSceneLayers,
@@ -161,7 +161,7 @@ extension AnimationEditorFrameScene {
 
 // MARK: - Drawings
 
-extension AnimationEditorFrameScene {
+extension AnimationEditorScene {
     
     // At some point, this may have to adapt to handle
     // different asset types (video, etc?) Might not be

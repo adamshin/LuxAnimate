@@ -6,7 +6,7 @@ import UIKit
 
 class NewAnimationEditorView: UIView {
     
-    let canvasContainer = UIView()
+    let workspaceContainer = UIView()
     let toolbarContainer = UIView()
     let canvasOverlayContainer = PassthroughView()
     
@@ -14,8 +14,8 @@ class NewAnimationEditorView: UIView {
         super.init(frame: .zero)
         backgroundColor = .editorBackground
         
-        addSubview(canvasContainer)
-        canvasContainer.pinEdges()
+        addSubview(workspaceContainer)
+        workspaceContainer.pinEdges()
         
         addSubview(toolbarContainer)
         toolbarContainer.pinEdges([.horizontal, .top])

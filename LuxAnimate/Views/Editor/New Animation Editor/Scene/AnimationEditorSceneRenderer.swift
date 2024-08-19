@@ -1,42 +1,32 @@
 //
-//  AnimationFrameEditorRenderer.swift
+//  AnimationEditorSceneRenderer.swift
 //
 
 import Foundation
 import Metal
 
-protocol AnimationFrameEditorRendererDelegate: AnyObject {
+protocol AnimationEditorSceneRendererDelegate: AnyObject {
     
     func textureForDrawing(
-        _ r: AnimationFrameEditorRenderer,
+        _ r: AnimationEditorSceneRenderer,
         drawingID: String
     ) -> MTLTexture?
     
 }
 
-class AnimationFrameEditorRenderer {
+// TODO: Use content transform
+
+class AnimationEditorSceneRenderer {
     
-    weak var delegate: AnimationFrameEditorRendererDelegate?
+    weak var delegate: AnimationEditorSceneRendererDelegate?
     
     private let spriteRenderer = SpriteRenderer()
     
-    let renderTarget: MTLTexture
-    
-    init(
-        viewportSize: PixelSize
+    func draw(
+        renderTarget: MTLTexture,
+        contentTransform: Matrix3,
+        frameScene: AnimationEditorScene
     ) {
-        let texDesc = MTLTextureDescriptor()
-        texDesc.width = viewportSize.width
-        texDesc.height = viewportSize.height
-        texDesc.pixelFormat = AppConfig.pixelFormat
-        texDesc.storageMode = .private
-        texDesc.usage = [.renderTarget, .shaderRead]
-        
-        renderTarget = MetalInterface.shared.device
-            .makeTexture(descriptor: texDesc)!
-    }
-    
-    func draw(frameScene: AnimationEditorFrameScene) {
         let commandBuffer = MetalInterface.shared
             .commandQueue.makeCommandBuffer()!
         
@@ -49,13 +39,17 @@ class AnimationFrameEditorRenderer {
             switch layer.content {
             case .activeDrawing(let content):
                 drawActiveDrawingLayer(
+                    renderTarget: renderTarget,
                     commandBuffer: commandBuffer,
+                    contentTransform: contentTransform,
                     frameScene: frameScene,
                     layer: layer,
                     content: content)
             case .drawing(let content):
                 drawDrawingLayer(
+                    renderTarget: renderTarget,
                     commandBuffer: commandBuffer,
+                    contentTransform: contentTransform,
                     frameScene: frameScene,
                     layer: layer,
                     content: content)
@@ -66,10 +60,12 @@ class AnimationFrameEditorRenderer {
     }
     
     private func drawActiveDrawingLayer(
+        renderTarget: MTLTexture,
         commandBuffer: any MTLCommandBuffer,
-        frameScene: AnimationEditorFrameScene,
-        layer: AnimationEditorFrameScene.Layer,
-        content: AnimationEditorFrameScene.ActiveDrawingLayerContent
+        contentTransform: Matrix3,
+        frameScene: AnimationEditorScene,
+        layer: AnimationEditorScene.Layer,
+        content: AnimationEditorScene.ActiveDrawingLayerContent
     ) {
         let viewportSize = Size(
             Double(frameScene.viewportSize.width),
@@ -145,10 +141,12 @@ class AnimationFrameEditorRenderer {
     }
     
     private func drawDrawingLayer(
+        renderTarget: MTLTexture,
         commandBuffer: any MTLCommandBuffer,
-        frameScene: AnimationEditorFrameScene,
-        layer: AnimationEditorFrameScene.Layer,
-        content: AnimationEditorFrameScene.DrawingLayerContent
+        contentTransform: Matrix3,
+        frameScene: AnimationEditorScene,
+        layer: AnimationEditorScene.Layer,
+        content: AnimationEditorScene.DrawingLayerContent
     ) {
         guard let drawing = content.drawing,
             let texture = delegate?.textureForDrawing(self,

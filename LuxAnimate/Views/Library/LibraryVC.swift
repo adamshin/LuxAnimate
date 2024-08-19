@@ -60,15 +60,11 @@ extension LibraryVC: LibraryContentVCDelegate {
     }
     
     func onSelectProject(id: String) {
-//        do {
-//            let vc = try ProjectEditorVC(projectID: id)
-//            present(vc, animated: true)
-//            
-//        } catch { }
-        
-        let vc = WorkspaceVC()
-        vc.modalPresentationStyle = .fullScreen
-        present(vc, animated: true)
+        do {
+            let vc = try ProjectEditorVC(projectID: id)
+            present(vc, animated: true)
+            
+        } catch { }
     }
     
     func onSelectRenameProject(id: String, name: String) {

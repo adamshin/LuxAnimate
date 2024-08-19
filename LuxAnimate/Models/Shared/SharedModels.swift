@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import UIKit
 import Metal
 
 struct Color: Codable {
@@ -39,6 +40,23 @@ extension Color {
     
     init(_ r: UInt8, _ g: UInt8, _ b: UInt8, _ a: UInt8) {
         self.init(r: r, g: g, b: b, a: a)
+    }
+    
+    init(_ color: UIColor) {
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
+        
+        color.getRed(
+            &red, green: &green,
+            blue: &blue, alpha: &alpha)
+        
+        self.init(
+            UInt8(red * 255),
+            UInt8(green * 255),
+            UInt8(blue * 255),
+            UInt8(alpha * 255))
     }
     
     init(hex: String) {

@@ -23,7 +23,7 @@ class NewAnimationEditorVC: UIViewController {
     
     private let bodyView = NewAnimationEditorView()
     
-    private let canvasVC = NewAnimationEditorCanvasVC()
+    private let workspaceVC = EditorWorkspaceVC()
     private let toolbarVC = NewAnimationEditorToolbarVC()
     
     private let projectID: String
@@ -61,21 +61,23 @@ class NewAnimationEditorVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        canvasVC.delegate = self
+        workspaceVC.delegate = self
         toolbarVC.delegate = self
         
-        addChild(canvasVC, to: bodyView.canvasContainer)
+        addChild(workspaceVC, to: bodyView.workspaceContainer)
         addChild(toolbarVC, to: bodyView.toolbarContainer)
         
-        canvasVC.setSafeAreaReferenceView(
-            bodyView.canvasOverlayContainer)
-        
-        // TODO: Determine this based on edit session
-        canvasVC.setCanvasSize(
-            PixelSize(width: 1920, height: 1080))
+//        canvasVC.setSafeAreaReferenceView(
+//            bodyView.canvasOverlayContainer)
     }
     
     override var prefersStatusBarHidden: Bool { true }
+    
+    // MARK: - Rendering
+    
+    private func drawWorkspace() {
+//        frameEditor?.drawViewport()
+    }
     
     // MARK: - Interface
     
@@ -108,13 +110,10 @@ class NewAnimationEditorVC: UIViewController {
 
 // MARK: - Delegates
 
-extension NewAnimationEditorVC: NewAnimationEditorCanvasVCDelegate {
+extension NewAnimationEditorVC: EditorWorkspaceVCDelegate {
     
-    func onSelectUndo(_ vc: NewAnimationEditorCanvasVC) {
-        delegate?.onRequestUndo(self)
-    }
-    func onSelectRedo(_ vc: NewAnimationEditorCanvasVC) {
-        delegate?.onRequestRedo(self)
+    func onRequestDraw(_ vc: EditorWorkspaceVC) {
+        // TODO: Trigger render
     }
     
 }
@@ -125,12 +124,8 @@ extension NewAnimationEditorVC: NewAnimationEditorToolbarVCDelegate {
         dismiss(animated: true)
     }
     
-    func onSelectBrushTool(_ vc: NewAnimationEditorToolbarVC) {
-//        frameEditorVC.selectBrushTool()
-    }
-    func onSelectEraseTool(_ vc: NewAnimationEditorToolbarVC) {
-//        frameEditorVC.selectEraseTool()
-    }
+    func onSelectBrushTool(_ vc: NewAnimationEditorToolbarVC) { }
+    func onSelectEraseTool(_ vc: NewAnimationEditorToolbarVC) { }
     
     func onSelectUndo(_ vc: NewAnimationEditorToolbarVC) {
         delegate?.onRequestUndo(self)
@@ -143,24 +138,17 @@ extension NewAnimationEditorVC: NewAnimationEditorToolbarVCDelegate {
 
 extension NewAnimationEditorVC: AnimationFrameEditorDelegate {
     
-    func onBegin(
-        _ editor: AnimationFrameEditor,
-        viewportSize: PixelSize
-    ) {
-        canvasVC.setCanvasSize(viewportSize)
-    }
-    
     func onFinishLoadingAssets(
         _ editor: AnimationFrameEditor
     ) {
-        // TODO
+        drawWorkspace()
     }
     
     func onUpdateViewportTexture(
         _ session: AnimationFrameEditor,
         viewportTexture: MTLTexture
     ) {
-        canvasVC.setCanvasTexture(viewportTexture)
+//        canvasVC.setCanvasTexture(viewportTexture)
     }
     
     func onRequestApplyEdit(
