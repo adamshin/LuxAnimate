@@ -81,9 +81,9 @@ class AnimationFrameEditor {
         renderer.delegate = self
     }
     
-    func drawViewport() -> MTLTexture {
-        // TODO: Draw
-    }
+//    func drawViewport() -> MTLTexture {
+//        // TODO: Draw
+//    }
     
 }
 
