@@ -81,7 +81,7 @@ class EditorFrameEditorVC: UIViewController {
         activeDrawingRenderer.delegate = self
         frameSceneRenderer.delegate = self
         
-        displayLink.setCallback { [weak self] in
+        displayLink.setCallback { [weak self] _ in
             self?.onFrame()
         }
     }

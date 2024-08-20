@@ -1,14 +1,13 @@
 //
-//  TestRenderer.swift
+//  TestSceneRenderer.swift
 //
 
 import Metal
 import UIKit
 
 private let clearColor = Color(UIColor.editorBackground)
-private let rectSize = Size(1920, 1080)
 
-struct TestRenderer {
+struct TestSceneRenderer {
     
     private let spriteRenderer: SpriteRenderer
     private let texture: MTLTexture
@@ -24,8 +23,9 @@ struct TestRenderer {
     }
     
     func draw(
+        target: MTLTexture,
         commandBuffer: MTLCommandBuffer,
-        target: MTLTexture
+        scene: TestScene
     ) {
         // Clear color
         ClearColorRenderer.drawClearColor(
@@ -33,7 +33,25 @@ struct TestRenderer {
             target: target,
             color: clearColor)
         
-        // Rectangle
+        // Layers
+        for layer in scene.layers {
+            switch layer.content {
+            case .rect(let content):
+                drawRectLayer(
+                    target: target,
+                    commandBuffer: commandBuffer,
+                    layer: layer,
+                    content: content)
+            }
+        }
+    }
+    
+    private func drawRectLayer(
+        target: MTLTexture,
+        commandBuffer: MTLCommandBuffer,
+        layer: TestScene.Layer,
+        content: TestScene.RectLayerContent
+    ) {
         let viewportSize = Size(
             Double(target.width),
             Double(target.height))
@@ -50,12 +68,13 @@ struct TestRenderer {
             sprites: [
                 .init(
                     position: center,
-                    size: rectSize)
+                    size: layer.contentSize,
+                    transform: layer.transform,
+                    alpha: layer.alpha)
             ],
             colorMode: .stencil,
-            color: .white)
+            color: content.color)
     }
-    
 }
 
 private func createDefaultTexture(color: MTLClearColor) -> MTLTexture? {

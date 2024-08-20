@@ -7,9 +7,11 @@ import QuartzCore
 
 class WrappedDisplayLink {
     
+    typealias Callback = (CFTimeInterval) -> Void
+    
     private var displayLink: CADisplayLink?
     
-    fileprivate var callback: () -> Void = { }
+    fileprivate var callback: Callback = { _ in }
     
     init() {
         displayLink = CADisplayLink(
@@ -23,7 +25,7 @@ class WrappedDisplayLink {
         displayLink?.invalidate()
     }
     
-    func setCallback(_ callback: @escaping () -> Void) {
+    func setCallback(_ callback: @escaping Callback) {
         self.callback = callback
     }
     
@@ -37,8 +39,8 @@ private class WeakWrapper {
         self.wrapped = wrapped
     }
     
-    @objc func callback() {
-        wrapped?.callback()
+    @objc func callback(_ displayLink: CADisplayLink) {
+        wrapped?.callback(displayLink.timestamp)
     }
     
 }
