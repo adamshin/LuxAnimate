@@ -19,7 +19,8 @@ class TestWorkspaceVC: UIViewController {
     private let sceneRenderer = TestWorkspaceRenderer(
         pixelFormat: AppConfig.metalLayerPixelFormat)
     
-    private let displayLink = WrappedDisplayLink()
+    private lazy var displayLink = CAMetalDisplayLink(
+        metalLayer: metalView.metalLayer)
     
     private var scene: TestScene?
     private var workspaceTransform: Matrix3 = .identity
@@ -41,9 +42,11 @@ class TestWorkspaceVC: UIViewController {
         transformManager.setMinScale(minScale)
         transformManager.setMaxScale(maxScale)
         
-        displayLink.setCallback { [weak self] timestamp in
-            self?.onFrame(timestamp: timestamp)
-        }
+        displayLink.delegate = self
+        displayLink.preferredFrameLatency = 1
+        displayLink.add(to: .main, forMode: .common)
+        
+        scene = TestScene.generate(timestamp: 0)
     }
     
     override func viewDidLayoutSubviews() {
@@ -55,21 +58,10 @@ class TestWorkspaceVC: UIViewController {
                 metalView.bounds.height * metalView.contentScaleFactor))
     }
     
-    // MARK: - Frame
-    
-    private func onFrame(timestamp: Double) {
-        scene = TestScene.generate(timestamp: timestamp)
-        draw()
-    }
-    
     // MARK: - Render
     
-    private func draw() {
+    private func draw(drawable: CAMetalDrawable) {
         guard let scene else { return }
-        
-        guard let drawable = metalView
-            .metalLayer.nextDrawable()
-        else { return }
 
         let commandBuffer = MetalInterface.shared
             .commandQueue.makeCommandBuffer()!
@@ -87,6 +79,17 @@ class TestWorkspaceVC: UIViewController {
 }
 
 // MARK: - Delegates
+
+extension TestWorkspaceVC: CAMetalDisplayLinkDelegate {
+    
+    func metalDisplayLink(
+        _ link: CAMetalDisplayLink,
+        needsUpdate update: CAMetalDisplayLink.Update
+    ) {
+        draw(drawable: update.drawable)
+    }
+    
+}
 
 extension TestWorkspaceVC: TestWorkspaceMetalViewDelegate {
     
