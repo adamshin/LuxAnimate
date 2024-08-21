@@ -13,7 +13,7 @@ class AppVC: UIViewController {
         
 //        addChild(libraryVC, to: view)
         
-        let vc = TestVC()
+        let vc = TestWorkspaceVC()
         addChild(vc, to: view)
     }
     

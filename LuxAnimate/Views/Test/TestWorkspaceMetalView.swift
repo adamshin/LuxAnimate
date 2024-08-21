@@ -1,16 +1,16 @@
 //
-//  TestMetalView.swift
+//  TestWorkspaceMetalView.swift
 //
 
 import UIKit
 
-protocol TestMetalViewDelegate: AnyObject {
-    func onRequestDraw(_ view: TestMetalView)
+protocol TestWorkspaceMetalViewDelegate: AnyObject {
+    func onRequestDraw(_ view: TestWorkspaceMetalView)
 }
 
-class TestMetalView: UIView {
+class TestWorkspaceMetalView: UIView {
     
-    weak var delegate: TestMetalViewDelegate?
+    weak var delegate: TestWorkspaceMetalViewDelegate?
     
     override class var layerClass: AnyClass {
         CAMetalLayer.self
@@ -57,7 +57,7 @@ class TestMetalView: UIView {
 
 // MARK: - Delegates
 
-extension TestMetalView {
+extension TestWorkspaceMetalView {
     
     override func display(_ layer: CALayer) {
         delegate?.onRequestDraw(self)

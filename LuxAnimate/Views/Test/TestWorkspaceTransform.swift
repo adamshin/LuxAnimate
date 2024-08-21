@@ -1,18 +1,21 @@
 //
-//  MovableCanvasTransform.swift
+//  TestWorkspaceTransform.swift
 //
 
 import Foundation
 
-struct MovableCanvasTransform {
-    
-    var translation: Vector2 = .zero
-    var rotation: Scalar = 0
-    var scale: Scalar = 1
-    
+struct TestWorkspaceTransform {
+    var translation: Vector2
+    var rotation: Scalar
+    var scale: Scalar
 }
 
-extension MovableCanvasTransform {
+extension TestWorkspaceTransform {
+    
+    static let identity = TestWorkspaceTransform(
+        translation: .zero,
+        rotation: 0,
+        scale: 1)
     
     mutating func applyTranslation(
         _ dTranslation: Vector2
@@ -103,3 +106,4 @@ extension MovableCanvasTransform {
     }
     
 }
+

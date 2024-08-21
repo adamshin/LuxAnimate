@@ -1,5 +1,5 @@
 //
-//  TestSceneRenderer.swift
+//  TestWorkspaceRenderer.swift
 //
 
 import Metal
@@ -7,24 +7,22 @@ import UIKit
 
 private let clearColor = Color(UIColor.editorBackground)
 
-struct TestSceneRenderer {
+struct TestWorkspaceRenderer {
     
     private let spriteRenderer: SpriteRenderer
-    private let texture: MTLTexture
-
+    private let blankTexture: MTLTexture
+    
     init(
         pixelFormat: MTLPixelFormat
     ) {
-        spriteRenderer = SpriteRenderer(
-            pixelFormat: pixelFormat)
-        
-        texture = createDefaultTexture(
-            color: MTLClearColor(red: 1, green: 0, blue: 0, alpha: 1))!
+        spriteRenderer = SpriteRenderer(pixelFormat: pixelFormat)
+        blankTexture = createBlankTexture(color: .clear)!
     }
     
     func draw(
         target: MTLTexture,
         commandBuffer: MTLCommandBuffer,
+        workspaceTransform: Matrix3,
         scene: TestScene
     ) {
         // Clear color
@@ -40,6 +38,7 @@ struct TestSceneRenderer {
                 drawRectLayer(
                     target: target,
                     commandBuffer: commandBuffer,
+                    workspaceTransform: workspaceTransform,
                     layer: layer,
                     content: content)
             }
@@ -49,6 +48,7 @@ struct TestSceneRenderer {
     private func drawRectLayer(
         target: MTLTexture,
         commandBuffer: MTLCommandBuffer,
+        workspaceTransform: Matrix3,
         layer: TestScene.Layer,
         content: TestScene.RectLayerContent
     ) {
@@ -60,16 +60,18 @@ struct TestSceneRenderer {
             viewportSize.width / 2,
             viewportSize.height / 2)
         
+        let transform = workspaceTransform * layer.transform
+        
         spriteRenderer.drawSprites(
             commandBuffer: commandBuffer,
             target: target,
             viewportSize: viewportSize,
-            texture: texture,
+            texture: blankTexture,
             sprites: [
                 .init(
                     position: center,
                     size: layer.contentSize,
-                    transform: layer.transform,
+                    transform: transform,
                     alpha: layer.alpha)
             ],
             colorMode: .stencil,
@@ -77,7 +79,7 @@ struct TestSceneRenderer {
     }
 }
 
-private func createDefaultTexture(color: MTLClearColor) -> MTLTexture? {
+private func createBlankTexture(color: Color) -> MTLTexture? {
     let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(
         pixelFormat: .rgba8Unorm,
         width: 1,
@@ -90,11 +92,7 @@ private func createDefaultTexture(color: MTLClearColor) -> MTLTexture? {
     else { return nil }
     
     let region = MTLRegionMake2D(0, 0, 1, 1)
-    var c = simd_uchar4(
-        UInt8(color.red * 255),
-        UInt8(color.green * 255),
-        UInt8(color.blue * 255),
-        UInt8(color.alpha * 255))
+    var c = simd_uchar4(color.r, color.g, color.b, color.a)
     
     texture.replace(region: region, mipmapLevel: 0, withBytes: &c, bytesPerRow: 4)
     
