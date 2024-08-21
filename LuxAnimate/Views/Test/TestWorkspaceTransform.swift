@@ -105,18 +105,4 @@ extension TestWorkspaceTransform {
         return t3 * t2 * t1
     }
     
-    func sceneSpaceToViewportSpaceTransform(
-        viewportSize: Size
-    ) -> Matrix3 {
-        
-        let t1 = Matrix3(scale: Vector2(scale, scale))
-        let t2 = Matrix3(rotation: rotation)
-        let t3 = Matrix3(translation: translation)
-        let t4 = Matrix3(translation: Vector(
-            viewportSize.width / 2,
-            viewportSize.height / 2))
-        
-        return t4 * t3 * t2 * t1
-    }
-    
 }

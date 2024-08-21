@@ -4,7 +4,7 @@
 
 import UIKit
 
-private let canvasSize = PixelSize(1000, 1000)
+private let canvasSize = PixelSize(800, 800)
 
 private let minScale: Scalar = 0.1
 private let maxScale: Scalar = 30
@@ -28,7 +28,7 @@ class TestWorkspaceVC: UIViewController {
     private lazy var displayLink = CAMetalDisplayLink(
         metalLayer: metalView.metalLayer)
     
-    private var workspaceTransform: Matrix3 = .identity
+    private var workspaceTransform: TestWorkspaceTransform = .identity
     
     // MARK: - Init
     
@@ -148,12 +148,7 @@ extension TestWorkspaceVC: TestWorkspaceTransformManagerDelegate {
         _ m: TestWorkspaceTransformManager,
         transform: TestWorkspaceTransform
     ) {
-        let viewportSize = Size(
-            metalView.bounds.width,
-            metalView.bounds.height)
-        
-        workspaceTransform = transform.sceneSpaceToViewportSpaceTransform(
-            viewportSize: viewportSize)
+        workspaceTransform = transform
     }
     
 }
@@ -195,7 +190,7 @@ extension TestWorkspaceVC: TestWorkspaceOverlayVCDelegate {
         brushEngine.beginStroke(
             brush: brush,
             color: .brushBlack,
-            scale: 0.1,
+            scale: 0.05,
             smoothing: 0,
             quickTap: quickTap)
     }
@@ -204,8 +199,18 @@ extension TestWorkspaceVC: TestWorkspaceOverlayVCDelegate {
         _ vc: TestWorkspaceOverlayVC,
         stroke: BrushGestureRecognizer.Stroke
     ) {
+        let viewportSize = Size(
+            metalView.bounds.width,
+            metalView.bounds.height)
+        
+        let canvasSize = Size(
+            Double(canvasSize.width),
+            Double(canvasSize.height))
+        
         let inputStroke = TestBrushStrokeAdapter.convert(
             stroke: stroke,
+            viewportSize: viewportSize,
+            canvasSize: canvasSize,
             workspaceTransform: workspaceTransform)
         
         brushEngine.updateStroke(inputStroke: inputStroke)

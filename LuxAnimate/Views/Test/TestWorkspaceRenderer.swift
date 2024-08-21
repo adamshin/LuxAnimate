@@ -23,9 +23,18 @@ struct TestWorkspaceRenderer {
         target: MTLTexture,
         commandBuffer: MTLCommandBuffer,
         viewportSize: Size,
-        workspaceTransform: Matrix3,
+        workspaceTransform: TestWorkspaceTransform,
         scene: TestScene
     ) {
+        // Transform
+        let viewportTransform = Matrix3(translation: Vector(
+            viewportSize.width / 2,
+            viewportSize.height / 2))
+        
+        let contentTransform =
+            viewportTransform *
+            workspaceTransform.matrix()
+        
         // Clear color
         ClearColorRenderer.drawClearColor(
             commandBuffer: commandBuffer,
@@ -40,7 +49,7 @@ struct TestWorkspaceRenderer {
                     target: target,
                     commandBuffer: commandBuffer,
                     viewportSize: viewportSize,
-                    workspaceTransform: workspaceTransform,
+                    contentTransform: contentTransform,
                     layer: layer,
                     content: content)
                 
@@ -49,7 +58,7 @@ struct TestWorkspaceRenderer {
                     target: target,
                     commandBuffer: commandBuffer,
                     viewportSize: viewportSize,
-                    workspaceTransform: workspaceTransform,
+                    contentTransform: contentTransform,
                     layer: layer,
                     content: content)
             }
@@ -60,11 +69,11 @@ struct TestWorkspaceRenderer {
         target: MTLTexture,
         commandBuffer: MTLCommandBuffer,
         viewportSize: Size,
-        workspaceTransform: Matrix3,
+        contentTransform: Matrix3,
         layer: TestScene.Layer,
         content: TestScene.DrawingLayerContent
     ) {
-        let transform = workspaceTransform * layer.transform
+        let transform = contentTransform * layer.transform
         
         spriteRenderer.drawSprites(
             commandBuffer: commandBuffer,
@@ -84,11 +93,11 @@ struct TestWorkspaceRenderer {
         target: MTLTexture,
         commandBuffer: MTLCommandBuffer,
         viewportSize: Size,
-        workspaceTransform: Matrix3,
+        contentTransform: Matrix3,
         layer: TestScene.Layer,
         content: TestScene.RectLayerContent
     ) { 
-        let transform = workspaceTransform * layer.transform
+        let transform = contentTransform * layer.transform
         
         spriteRenderer.drawSprites(
             commandBuffer: commandBuffer,

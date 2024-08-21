@@ -8,15 +8,33 @@ struct TestBrushStrokeAdapter {
     
     static func convert(
         stroke: BrushGestureRecognizer.Stroke,
-        workspaceTransform: Matrix3
+        viewportSize: Size,
+        canvasSize: Size,
+        workspaceTransform: TestWorkspaceTransform
     ) -> BrushStrokeEngine.InputStroke {
         
+        // Transform
+        var strokeTransform = Matrix3.identity
+        
+        strokeTransform = Matrix3(translation: Vector(
+            -viewportSize.width / 2,
+            -viewportSize.height / 2))
+            * strokeTransform
+        
+        strokeTransform =
+            workspaceTransform.matrix().inverse()
+            * strokeTransform
+        
+        strokeTransform = Matrix3(translation: Vector(
+            canvasSize.width / 2,
+            canvasSize.height / 2))
+            * strokeTransform
+        
+        // Samples
         let samples = stroke.samples + stroke.predictedSamples
         
         let inputSamples = samples.map { sample in
-            let position =
-                workspaceTransform.inverse() *
-                Vector(sample.position)
+            let position = strokeTransform * Vector(sample.position)
             
             let normalizedForce: Double
             if sample.maximumPossibleForce < 0.001 {
@@ -45,6 +63,7 @@ struct TestBrushStrokeAdapter {
                 azimuth: azimuth,
                 isFinalized: isFinalized)
         }
+        
         return BrushStrokeEngine.InputStroke(
             samples: inputSamples,
             startTimestamp: stroke.startTimestamp,

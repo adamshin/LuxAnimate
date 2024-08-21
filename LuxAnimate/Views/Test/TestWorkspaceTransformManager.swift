@@ -27,7 +27,7 @@ class TestWorkspaceTransformManager {
     
     weak var delegate: TestWorkspaceTransformManagerDelegate?
     
-    private var baseTransform = TestWorkspaceTransform.identity
+    private var baseTransform: TestWorkspaceTransform = .identity
     private var activeGestureTransform: TestWorkspaceTransform?
     
     private var viewportSize: Size = .zero
