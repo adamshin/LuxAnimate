@@ -22,6 +22,7 @@ struct TestWorkspaceRenderer {
     func draw(
         target: MTLTexture,
         commandBuffer: MTLCommandBuffer,
+        viewportSize: Size,
         workspaceTransform: Matrix3,
         scene: TestScene
     ) {
@@ -38,6 +39,7 @@ struct TestWorkspaceRenderer {
                 drawRectLayer(
                     target: target,
                     commandBuffer: commandBuffer,
+                    viewportSize: viewportSize,
                     workspaceTransform: workspaceTransform,
                     layer: layer,
                     content: content)
@@ -48,14 +50,11 @@ struct TestWorkspaceRenderer {
     private func drawRectLayer(
         target: MTLTexture,
         commandBuffer: MTLCommandBuffer,
+        viewportSize: Size,
         workspaceTransform: Matrix3,
         layer: TestScene.Layer,
         content: TestScene.RectLayerContent
-    ) {
-        let viewportSize = Size(
-            Double(target.width),
-            Double(target.height))
-        
+    ) { 
         let center = Vector(
             viewportSize.width / 2,
             viewportSize.height / 2)

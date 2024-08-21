@@ -37,24 +37,6 @@ class EditorWorkspaceVC: UIViewController {
         delegate?.onRequestDraw(self)
     }
     
-    // MARK: - Rendering
-    
-//    private func draw() {
-//        guard let drawable = metalView
-//            .metalLayer.nextDrawable()
-//        else { return }
-//        
-//        let commandBuffer = MetalInterface.shared
-//            .commandQueue.makeCommandBuffer()!
-//        
-//        testRenderer.draw(
-//            commandBuffer: commandBuffer,
-//            target: drawable.texture)
-//        
-//        commandBuffer.present(drawable)
-//        commandBuffer.commit()
-//    }
-    
 }
 
 // MARK: - Delegates

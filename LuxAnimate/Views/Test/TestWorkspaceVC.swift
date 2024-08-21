@@ -16,7 +16,7 @@ class TestWorkspaceVC: UIViewController {
     
     private let transformManager = TestWorkspaceTransformManager()
     
-    private let sceneRenderer = TestWorkspaceRenderer(
+    private let workspaceRenderer = TestWorkspaceRenderer(
         pixelFormat: AppConfig.metalLayerPixelFormat)
     
     private lazy var displayLink = CAMetalDisplayLink(
@@ -54,24 +54,29 @@ class TestWorkspaceVC: UIViewController {
         
         transformManager.setViewportSize(
             Size(
-                metalView.bounds.width * metalView.contentScaleFactor,
-                metalView.bounds.height * metalView.contentScaleFactor))
+                metalView.bounds.width,
+                metalView.bounds.height))
     }
     
     // MARK: - Render
     
     private func draw(drawable: CAMetalDrawable) {
         guard let scene else { return }
-
+        
         let commandBuffer = MetalInterface.shared
             .commandQueue.makeCommandBuffer()!
-
-        sceneRenderer.draw(
+        
+        let viewportSize = Size(
+            metalView.bounds.width,
+            metalView.bounds.height)
+        
+        workspaceRenderer.draw(
             target: drawable.texture,
             commandBuffer: commandBuffer,
+            viewportSize: viewportSize,
             workspaceTransform: workspaceTransform,
             scene: scene)
-
+        
         commandBuffer.present(drawable)
         commandBuffer.commit()
     }
@@ -113,8 +118,8 @@ extension TestWorkspaceVC: TestWorkspaceOverlayVCDelegate {
         scale: Scalar
     ) {
         transformManager.handleUpdateTransformGesture(
-            anchorPosition: anchorPosition * metalView.contentScaleFactor,
-            translation: translation * metalView.contentScaleFactor,
+            anchorPosition: anchorPosition,
+            translation: translation,
             rotation: rotation,
             scale: scale)
     }
