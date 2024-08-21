@@ -165,13 +165,13 @@ extension TestWorkspaceVC: TestWorkspaceOverlayVCDelegate {
     
     func onUpdateWorkspaceTransformGesture(
         _ vc: TestWorkspaceOverlayVC,
-        anchorPosition: Vector,
+        initialAnchorPosition: Vector,
         translation: Vector,
         rotation: Scalar,
         scale: Scalar
     ) {
         workspaceTransformManager.handleUpdateTransformGesture(
-            anchorPosition: anchorPosition,
+            initialAnchorPosition: initialAnchorPosition,
             translation: translation,
             rotation: rotation,
             scale: scale)
@@ -179,9 +179,11 @@ extension TestWorkspaceVC: TestWorkspaceOverlayVCDelegate {
     
     func onEndWorkspaceTransformGesture(
         _ vc: TestWorkspaceOverlayVC,
+        finalAnchorPosition: Vector,
         pinchFlickIn: Bool
     ) {
         workspaceTransformManager.handleEndTransformGesture(
+            finalAnchorPosition: finalAnchorPosition,
             pinchFlickIn: pinchFlickIn)
     }
     

@@ -201,7 +201,7 @@ class MovableCanvasView: UIView {
                 panGesture.translation(in: self))
             
             updateMultiGesture(
-                anchorPosition: .zero,
+                initialAnchorPosition: .zero,
                 translation: translation,
                 rotation: 0,
                 scale: 1)
@@ -219,14 +219,14 @@ class MovableCanvasView: UIView {
     }
     
     private func updateMultiGesture(
-        anchorPosition: Vector,
+        initialAnchorPosition: Vector,
         translation: Vector,
         rotation: Scalar,
         scale: Scalar
     ) { 
         let anchor = Vector(
-            anchorPosition.x - bounds.width / 2,
-            anchorPosition.y - bounds.height / 2)
+            initialAnchorPosition.x - bounds.width / 2,
+            initialAnchorPosition.y - bounds.height / 2)
         
         var newTransform = baseCanvasTransform
         
@@ -302,19 +302,22 @@ extension MovableCanvasView: CanvasMultiGestureRecognizerGestureDelegate {
     }
     
     func onUpdateGesture(
-        anchorPosition: Vector,
+        initialAnchorPosition: Vector,
         translation: Vector,
         rotation: Scalar,
         scale: Scalar
     ) {
         updateMultiGesture(
-            anchorPosition: anchorPosition,
+            initialAnchorPosition: initialAnchorPosition,
             translation: translation,
             rotation: rotation,
             scale: scale)
     }
     
-    func onEndGesture(pinchFlickIn: Bool) {
+    func onEndGesture(
+        finalAnchorPosition: Vector,
+        pinchFlickIn: Bool
+    ) {
         endMultiGesture(pinchFlickIn: pinchFlickIn)
     }
     

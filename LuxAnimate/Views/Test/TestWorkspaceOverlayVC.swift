@@ -11,13 +11,14 @@ protocol TestWorkspaceOverlayVCDelegate: AnyObject {
     
     func onUpdateWorkspaceTransformGesture(
         _ vc: TestWorkspaceOverlayVC,
-        anchorPosition: Vector,
+        initialAnchorPosition: Vector,
         translation: Vector,
         rotation: Scalar,
         scale: Scalar)
     
     func onEndWorkspaceTransformGesture(
         _ vc: TestWorkspaceOverlayVC,
+        finalAnchorPosition: Vector,
         pinchFlickIn: Bool)
     
     func onBeginBrushStroke(
@@ -76,7 +77,7 @@ class TestWorkspaceOverlayVC: UIViewController {
             
             delegate?.onUpdateWorkspaceTransformGesture(
                 self,
-                anchorPosition: .zero,
+                initialAnchorPosition: .zero,
                 translation: translation,
                 rotation: 0,
                 scale: 1)
@@ -84,6 +85,7 @@ class TestWorkspaceOverlayVC: UIViewController {
         default:
             delegate?.onEndWorkspaceTransformGesture(
                 self,
+                finalAnchorPosition: .zero,
                 pinchFlickIn: false)
         }
     }
@@ -113,22 +115,26 @@ extension TestWorkspaceOverlayVC: CanvasMultiGestureRecognizerGestureDelegate {
     }
     
     func onUpdateGesture(
-        anchorPosition: Vector,
+        initialAnchorPosition: Vector,
         translation: Vector,
         rotation: Scalar,
         scale: Scalar
     ) {
         delegate?.onUpdateWorkspaceTransformGesture(
             self,
-            anchorPosition: anchorPosition,
+            initialAnchorPosition: initialAnchorPosition,
             translation: translation,
             rotation: rotation,
             scale: scale)
     }
     
-    func onEndGesture(pinchFlickIn: Bool) {
+    func onEndGesture(
+        finalAnchorPosition: Vector,
+        pinchFlickIn: Bool
+    ) {
         delegate?.onEndWorkspaceTransformGesture(
             self,
+            finalAnchorPosition: finalAnchorPosition,
             pinchFlickIn: pinchFlickIn)
     }
     

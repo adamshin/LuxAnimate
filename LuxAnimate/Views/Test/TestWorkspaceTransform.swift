@@ -74,14 +74,17 @@ extension TestWorkspaceTransform {
         applyTranslation(-closestRectPointInViewSpace)
     }
     
-    mutating func snapRotation(threshold: Scalar) {
+    mutating func snapRotation(
+        threshold: Scalar,
+        anchor: Vector
+    ) {
         let snapAngles: [Scalar] = (0...4)
             .map { Scalar($0) / 4 * .twoPi }
         
         for snapAngle in snapAngles {
             let distance = snapAngle - rotation
             if abs(distance) < threshold {
-                applyRotation(distance, anchor: .zero)
+                applyRotation(distance, anchor: anchor)
                 break
             }
         }
@@ -89,12 +92,13 @@ extension TestWorkspaceTransform {
     
     mutating func snapScale(
         minScale: Scalar,
-        maxScale: Scalar
+        maxScale: Scalar,
+        anchor: Vector
     ) {
         applyScale(1,
             minScale: minScale,
             maxScale: maxScale,
-            anchor: .zero)
+            anchor: anchor)
     }
     
     func matrix() -> Matrix3 {

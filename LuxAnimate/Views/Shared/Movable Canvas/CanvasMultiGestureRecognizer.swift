@@ -12,12 +12,14 @@ protocol CanvasMultiGestureRecognizerGestureDelegate: AnyObject {
     func onBeginGesture()
     
     func onUpdateGesture(
-        anchorPosition: Vector,
+        initialAnchorPosition: Vector,
         translation: Vector,
         rotation: Scalar,
         scale: Scalar)
     
-    func onEndGesture(pinchFlickIn: Bool)
+    func onEndGesture(
+        finalAnchorPosition: Vector,
+        pinchFlickIn: Bool)
     
 }
 
@@ -99,20 +101,25 @@ extension CanvasMultiGestureRecognizer: CanvasMultiGestureRecognizerInternalStat
     }
     
     func onUpdateGesture(
-        anchorPosition: Vector,
+        initialAnchorPosition: Vector,
         translation: Vector,
         rotation: Scalar,
         scale: Scalar
     ) {
         gestureDelegate?.onUpdateGesture(
-            anchorPosition: anchorPosition,
+            initialAnchorPosition: initialAnchorPosition,
             translation: translation,
             rotation: rotation,
             scale: scale)
     }
     
-    func onEndGesture(pinchFlickIn: Bool) {
-        gestureDelegate?.onEndGesture(pinchFlickIn: pinchFlickIn)
+    func onEndGesture(
+        finalAnchorPosition: Vector,
+        pinchFlickIn: Bool
+    ) {
+        gestureDelegate?.onEndGesture(
+            finalAnchorPosition: finalAnchorPosition,
+            pinchFlickIn: pinchFlickIn)
     }
     
 }

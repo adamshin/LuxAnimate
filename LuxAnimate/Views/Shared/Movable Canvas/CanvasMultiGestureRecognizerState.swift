@@ -25,12 +25,14 @@ protocol CanvasMultiGestureRecognizerInternalStateDelegate: AnyObject {
     func onBeginGesture()
     
     func onUpdateGesture(
-        anchorPosition: Vector,
+        initialAnchorPosition: Vector,
         translation: Vector,
         rotation: Scalar,
         scale: Scalar)
     
-    func onEndGesture(pinchFlickIn: Bool)
+    func onEndGesture(
+        finalAnchorPosition: Vector,
+        pinchFlickIn: Bool)
     
 }
 
@@ -135,6 +137,8 @@ class CanvasMultiGestureRecognizerActiveState: CanvasMultiGestureRecognizerInter
     private let touch1InitialPos: Vector
     private let touch2InitialPos: Vector
     
+    private var lastCenterPos: Vector
+    
     private var translationState: TranslationState?
     private var rotationState: RotationState?
     private var scaleState: ScaleState?
@@ -147,6 +151,8 @@ class CanvasMultiGestureRecognizerActiveState: CanvasMultiGestureRecognizerInter
         
         touch1InitialPos = Vector(touch1.location(in: delegate?.view))
         touch2InitialPos = Vector(touch2.location(in: delegate?.view))
+        
+        lastCenterPos = (touch1InitialPos + touch2InitialPos) / 2
     }
     
     func touchesMoved(touches: Set<UITouch>, event: UIEvent) {
@@ -263,9 +269,11 @@ class CanvasMultiGestureRecognizerActiveState: CanvasMultiGestureRecognizerInter
         }
         
         // Finalize
+        lastCenterPos = currentCenterPos
+        
         if hasGestureBegun {
             delegate?.onUpdateGesture(
-                anchorPosition: initialCenterPos,
+                initialAnchorPosition: initialCenterPos,
                 translation: translation,
                 rotation: rotation,
                 scale: scale)
@@ -288,7 +296,10 @@ class CanvasMultiGestureRecognizerActiveState: CanvasMultiGestureRecognizerInter
             pinchFlickIn = false
         }
         
-        delegate?.onEndGesture(pinchFlickIn: pinchFlickIn)
+        delegate?.onEndGesture(
+            finalAnchorPosition: lastCenterPos,
+            pinchFlickIn: pinchFlickIn)
+        
         delegate?.setGestureRecognizerState(.ended)
     }
     

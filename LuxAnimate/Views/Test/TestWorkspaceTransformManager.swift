@@ -10,7 +10,7 @@ private let rotationSnapThreshold: Scalar =
     //8 * .radiansPerDegree
     20 * .radiansPerDegree
 
-private let animationDuration: TimeInterval = 0.5
+private let animationDuration: TimeInterval = 0.2
 
 protocol TestWorkspaceTransformManagerDelegate: AnyObject {
     
@@ -96,18 +96,21 @@ class TestWorkspaceTransformManager {
             scale: scale)
     }
     
-    private func transformSnapped(
-        _ transform: TestWorkspaceTransform
+    private func snapTransform(
+        transform: TestWorkspaceTransform,
+        anchor: Vector
     ) -> TestWorkspaceTransform {
         
         var snappedTransform = transform
         
         snappedTransform.snapScale(
             minScale: minScale,
-            maxScale: maxScale)
+            maxScale: maxScale,
+            anchor: anchor)
         
         snappedTransform.snapRotation(
-            threshold: rotationSnapThreshold)
+            threshold: rotationSnapThreshold,
+            anchor: anchor)
         
 //        snappedTransform.snapTranslationToKeepRectContainingOrigin(
 //            x: -contentSize.width / 2,
@@ -258,7 +261,7 @@ class TestWorkspaceTransformManager {
     }
     
     func handleUpdateTransformGesture(
-        anchorPosition: Vector,
+        initialAnchorPosition: Vector,
         translation: Vector,
         rotation: Scalar,
         scale: Scalar
@@ -267,8 +270,8 @@ class TestWorkspaceTransformManager {
         else { return }
         
         let anchor = Vector(
-            anchorPosition.x - viewportSize.width / 2,
-            anchorPosition.y - viewportSize.height / 2)
+            initialAnchorPosition.x - viewportSize.width / 2,
+            initialAnchorPosition.y - viewportSize.height / 2)
         
         var newTransform = baseTransform
         
@@ -286,16 +289,24 @@ class TestWorkspaceTransformManager {
     }
     
     func handleEndTransformGesture(
+        finalAnchorPosition: Vector,
         pinchFlickIn: Bool
     ) {
         guard let activeGestureTransform else { return }
         
+        let anchor = Vector(
+            finalAnchorPosition.x - viewportSize.width / 2,
+            finalAnchorPosition.y - viewportSize.height / 2)
+        
         let endTransform: TestWorkspaceTransform
+        
         if pinchFlickIn {
             isContentFitToViewport = true
             endTransform = transformFittingContentToViewport()
         } else {
-            endTransform = transformSnapped(activeGestureTransform)
+            endTransform = snapTransform(
+                transform: activeGestureTransform,
+                anchor: anchor)
         }
         
         animateTransform(
