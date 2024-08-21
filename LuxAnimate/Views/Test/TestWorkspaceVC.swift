@@ -4,41 +4,10 @@
 
 import UIKit
 
-private func generateTestScene(
-    timestamp: Double
-) -> TestScene {
-    
-    TestScene(
-        layers: [
-            TestScene.Layer(
-                transform: .identity,
-                contentSize: Size(1000, 1000),
-                alpha: 1,
-                content: .rect(
-                    .init(color: .white))),
-            
-            TestScene.Layer(
-                transform: Matrix3(translation: Vector(-400, -200)),
-                contentSize: Size(100, 500),
-                alpha: 1,
-                content: .rect(
-                    .init(color: .brushGreen))),
-            
-            TestScene.Layer(
-                transform: .identity,
-                contentSize: Size(300, 300),
-                alpha: 0.8,
-                content: .rect(
-                    .init(color: .brushRed))),
-            
-            TestScene.Layer(
-                transform: Matrix3(translation: Vector(100, 100)),
-                contentSize: Size(300, 300),
-                alpha: 1,
-                content: .rect(
-                    .init(color: .brushBlue))),
-        ])
-}
+private let contentSize = Size(1000, 1000)
+
+private let minScale: Scalar = 0.1
+private let maxScale: Scalar = 30
 
 class TestWorkspaceVC: UIViewController {
     
@@ -64,21 +33,32 @@ class TestWorkspaceVC: UIViewController {
         metalView.pinEdges()
         metalView.delegate = self
         
-//        addChild(overlayVC, to: view)
-//        overlayVC.delegate = self
-//        
-//        transformManager.delegate = self
+        addChild(overlayVC, to: view)
+        overlayVC.delegate = self
+        
+        transformManager.delegate = self
+        transformManager.setContentSize(contentSize)
+        transformManager.setMinScale(minScale)
+        transformManager.setMaxScale(maxScale)
         
         displayLink.setCallback { [weak self] timestamp in
             self?.onFrame(timestamp: timestamp)
         }
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        transformManager.setViewportSize(
+            Size(
+                metalView.bounds.width * metalView.contentScaleFactor,
+                metalView.bounds.height * metalView.contentScaleFactor))
+    }
+    
     // MARK: - Frame
     
     private func onFrame(timestamp: Double) {
-        scene = generateTestScene(timestamp: timestamp)
-        
+        scene = TestScene.generate(timestamp: timestamp)
         draw()
     }
     
@@ -97,7 +77,7 @@ class TestWorkspaceVC: UIViewController {
         sceneRenderer.draw(
             target: drawable.texture,
             commandBuffer: commandBuffer,
-            workspaceTransform: .identity,//workspaceTransform,
+            workspaceTransform: workspaceTransform,
             scene: scene)
 
         commandBuffer.present(drawable)
@@ -130,8 +110,8 @@ extension TestWorkspaceVC: TestWorkspaceOverlayVCDelegate {
         scale: Scalar
     ) {
         transformManager.handleUpdateTransformGesture(
-            anchorPosition: anchorPosition,
-            translation: translation,
+            anchorPosition: anchorPosition * metalView.contentScaleFactor,
+            translation: translation * metalView.contentScaleFactor,
             rotation: rotation,
             scale: scale)
     }
@@ -152,7 +132,7 @@ extension TestWorkspaceVC: TestWorkspaceTransformManagerDelegate {
         _ m: TestWorkspaceTransformManager,
         transform: TestWorkspaceTransform
     ) {
-//        workspaceTransform = transform.matrix()
+        workspaceTransform = transform.matrix()
     }
     
 }

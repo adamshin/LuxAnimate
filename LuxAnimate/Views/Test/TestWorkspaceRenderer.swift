@@ -16,7 +16,7 @@ struct TestWorkspaceRenderer {
         pixelFormat: MTLPixelFormat
     ) {
         spriteRenderer = SpriteRenderer(pixelFormat: pixelFormat)
-        blankTexture = createBlankTexture(color: .clear)!
+        blankTexture = createBlankTexture(color: .white)!
     }
     
     func draw(

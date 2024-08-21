@@ -86,11 +86,11 @@ class TestWorkspaceTransformManager {
         snappedTransform.snapRotation(
             threshold: rotationSnapThreshold)
         
-        snappedTransform.snapTranslationToKeepRectContainingOrigin(
-            x: -contentSize.width / 2,
-            y: -contentSize.height / 2,
-            width: contentSize.width,
-            height: contentSize.height)
+//        snappedTransform.snapTranslationToKeepRectContainingOrigin(
+//            x: -contentSize.width / 2,
+//            y: -contentSize.height / 2,
+//            width: contentSize.width,
+//            height: contentSize.height)
         
         return snappedTransform
     }
