@@ -28,8 +28,6 @@ class TestWorkspaceVC: UIViewController {
     private lazy var displayLink = CAMetalDisplayLink(
         metalLayer: metalView.metalLayer)
     
-    private var workspaceTransform: TestWorkspaceTransform = .identity
-    
     // MARK: - Init
     
     init() {
@@ -104,12 +102,15 @@ class TestWorkspaceVC: UIViewController {
             ),
         ])
         
-        let commandBuffer = MetalInterface.shared
-            .commandQueue.makeCommandBuffer()!
+        let workspaceTransform =
+            workspaceTransformManager.transform()
         
         let viewportSize = Size(
             metalView.bounds.width,
             metalView.bounds.height)
+        
+        let commandBuffer = MetalInterface.shared
+            .commandQueue.makeCommandBuffer()!
         
         workspaceRenderer.draw(
             target: drawable.texture,
@@ -132,7 +133,9 @@ extension TestWorkspaceVC: CAMetalDisplayLinkDelegate {
         _ link: CAMetalDisplayLink,
         needsUpdate update: CAMetalDisplayLink.Update
     ) {
+        workspaceTransformManager.onFrame()
         brushEngine.onFrame()
+        
         draw(drawable: update.drawable)
     }
     
@@ -147,11 +150,8 @@ extension TestWorkspaceVC: TestWorkspaceMetalViewDelegate {
 extension TestWorkspaceVC: TestWorkspaceTransformManagerDelegate {
     
     func onUpdateTransform(
-        _ m: TestWorkspaceTransformManager,
-        transform: TestWorkspaceTransform
-    ) {
-        workspaceTransform = transform
-    }
+        _ m: TestWorkspaceTransformManager
+    ) { }
     
 }
 
@@ -209,6 +209,9 @@ extension TestWorkspaceVC: TestWorkspaceOverlayVCDelegate {
             Double(canvasSize.width),
             Double(canvasSize.height))
         
+        let workspaceTransform =
+            workspaceTransformManager.transform()
+        
         let inputStroke = TestBrushStrokeAdapter.convert(
             stroke: stroke,
             viewportSize: viewportSize,
@@ -236,15 +239,11 @@ extension TestWorkspaceVC: BrushEngineDelegate {
     
     func onUpdateActiveCanvasTexture(
         _ e: BrushEngine
-    ) {
-        // nothing yet
-    }
+    ) { }
     
     func onFinalizeStroke(
         _ e: BrushEngine,
         canvasTexture: MTLTexture
-    ) {
-        // nothing yet
-    }
+    ) { }
     
 }

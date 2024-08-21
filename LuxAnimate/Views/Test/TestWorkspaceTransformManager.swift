@@ -7,12 +7,16 @@ import Foundation
 private let contentFitInset: CGFloat = 0
 
 private let rotationSnapThreshold: Scalar =
-    8 * .radiansPerDegree
+    //8 * .radiansPerDegree
+    20 * .radiansPerDegree
+
+private let animationDuration: TimeInterval = 0.5
 
 protocol TestWorkspaceTransformManagerDelegate: AnyObject {
+    
     func onUpdateTransform(
-        _ m: TestWorkspaceTransformManager,
-        transform: TestWorkspaceTransform)
+        _ m: TestWorkspaceTransformManager)
+    
 }
 
 class TestWorkspaceTransformManager {
@@ -25,10 +29,20 @@ class TestWorkspaceTransformManager {
             left: 0, right: 0)
     }
     
+    struct Animation {
+        var startTransform: TestWorkspaceTransform
+        var endTransform: TestWorkspaceTransform
+        
+        var startTime: TimeInterval
+        var endTime: TimeInterval
+    }
+    
     weak var delegate: TestWorkspaceTransformManagerDelegate?
     
     private var baseTransform: TestWorkspaceTransform = .identity
     private var activeGestureTransform: TestWorkspaceTransform?
+    
+    private var activeAnimation: Animation?
     
     private var viewportSize: Size = .zero
     private var viewportSafeAreaInsets: SafeAreaInsets = .zero
@@ -43,6 +57,9 @@ class TestWorkspaceTransformManager {
     // MARK: - Transform
     
     private func handleUpdateWorkspaceParams() {
+        activeGestureTransform = nil
+        activeAnimation = nil
+        
         if isContentFitToViewport {
             fitContentToViewport()
         }
@@ -79,7 +96,7 @@ class TestWorkspaceTransformManager {
             scale: scale)
     }
     
-    private func transformSnapping(
+    private func transformSnapped(
         _ transform: TestWorkspaceTransform
     ) -> TestWorkspaceTransform {
         
@@ -101,7 +118,107 @@ class TestWorkspaceTransformManager {
         return snappedTransform
     }
     
+    // MARK: - Animation
+    
+    private func animateTransform(
+        startTransform: TestWorkspaceTransform,
+        endTransform: TestWorkspaceTransform,
+        duration: TimeInterval
+    ) {
+        let now = Date().timeIntervalSince1970
+        
+        activeAnimation = Animation(
+            startTransform: startTransform,
+            endTransform: endTransform,
+            startTime: now,
+            endTime: now + duration)
+        
+        self.activeGestureTransform = nil
+        baseTransform = endTransform
+        
+        delegate?.onUpdateTransform(self)
+    }
+    
+    private func updateActiveAnimationTransform() {
+        guard let animation = activeAnimation else { return }
+        
+        let time = Date().timeIntervalSince1970
+        
+        if time > animation.endTime {
+            baseTransform = animation.endTransform
+            activeAnimation = nil
+            delegate?.onUpdateTransform(self)
+            
+        } else {
+            let transform = Self.transformForAnimation(
+                animation: animation,
+                time: time)
+            
+            baseTransform = transform
+            delegate?.onUpdateTransform(self)
+        }
+    }
+    
+    private static func transformForAnimation(
+        animation: Animation,
+        time: TimeInterval
+    ) -> TestWorkspaceTransform {
+        
+        let v: Double = map(time,
+            in: (animation.startTime, animation.endTime),
+            to: (0, 1))
+        
+        let c1 = 1 - v
+        let c2 = v
+        
+        let translation =
+            (c1 * animation.startTransform.translation) +
+            (c2 * animation.endTransform.translation)
+        
+        let rotation = Self.interpolateRotation(
+            start: animation.startTransform.rotation,
+            end: animation.endTransform.rotation,
+            t: v)
+        
+        let scale =
+            (c1 * animation.startTransform.scale) +
+            (c2 * animation.endTransform.scale)
+        
+        return TestWorkspaceTransform(
+            translation: translation,
+            rotation: rotation,
+            scale: scale)
+    }
+    
+    private static func interpolateRotation(
+        start: Double, end: Double, t: Double
+    ) -> Double {
+        let start = start.truncatingRemainder(dividingBy: .twoPi)
+        let end = end.truncatingRemainder(dividingBy: .twoPi)
+        
+        var diff = end - start
+        if diff > .pi {
+            diff -= .twoPi
+        } else if diff < -.pi {
+            diff += .twoPi
+        }
+        
+        return (start + diff * t).truncatingRemainder(dividingBy: .twoPi)
+    }
+    
     // MARK: - Interface
+    
+    func onFrame() {
+        updateActiveAnimationTransform()
+    }
+    
+    func transform() -> TestWorkspaceTransform {
+        if let activeGestureTransform {
+            return activeGestureTransform
+        } else {
+            return baseTransform
+        }
+    }
     
     func setViewportSize(_ viewportSize: Size) {
         self.viewportSize = viewportSize
@@ -130,13 +247,13 @@ class TestWorkspaceTransformManager {
         isContentFitToViewport = true
         
         baseTransform = transformFittingContentToViewport()
-        delegate?.onUpdateTransform(
-            self,
-            transform: baseTransform)
+        delegate?.onUpdateTransform(self)
     }
     
     func handleBeginTransformGesture() {
         isContentFitToViewport = false
+        
+        activeAnimation = nil
         activeGestureTransform = baseTransform
     }
     
@@ -146,6 +263,9 @@ class TestWorkspaceTransformManager {
         rotation: Scalar,
         scale: Scalar
     ) {
+        guard activeGestureTransform != nil
+        else { return }
+        
         let anchor = Vector(
             anchorPosition.x - viewportSize.width / 2,
             anchorPosition.y - viewportSize.height / 2)
@@ -162,9 +282,7 @@ class TestWorkspaceTransformManager {
         newTransform.applyTranslation(translation)
         
         self.activeGestureTransform = newTransform
-        
-        delegate?.onUpdateTransform(self,
-            transform: newTransform)
+        delegate?.onUpdateTransform(self)
     }
     
     func handleEndTransformGesture(
@@ -172,23 +290,18 @@ class TestWorkspaceTransformManager {
     ) {
         guard let activeGestureTransform else { return }
         
+        let endTransform: TestWorkspaceTransform
         if pinchFlickIn {
             isContentFitToViewport = true
-            
-            self.activeGestureTransform = nil
-            baseTransform = transformFittingContentToViewport()
-            
-            delegate?.onUpdateTransform(self,
-                transform: baseTransform)
-            
+            endTransform = transformFittingContentToViewport()
         } else {
-            self.activeGestureTransform = nil
-            baseTransform = transformSnapping(
-                activeGestureTransform)
-            
-            delegate?.onUpdateTransform(self,
-                transform: baseTransform)
+            endTransform = transformSnapped(activeGestureTransform)
         }
+        
+        animateTransform(
+            startTransform: activeGestureTransform,
+            endTransform: endTransform,
+            duration: animationDuration)
     }
     
 }
