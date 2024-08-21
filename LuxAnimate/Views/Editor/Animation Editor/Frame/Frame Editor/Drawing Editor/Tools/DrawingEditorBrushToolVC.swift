@@ -146,8 +146,8 @@ extension DrawingEditorBrushToolVC: BrushGestureRecognizerGestureDelegate {
             brush: brush,
             color: brushColor,
             scale: brushScale,
-            quickTap: quickTap,
-            smoothing: brushSmoothing)
+            smoothing: brushSmoothing,
+            quickTap: quickTap)
     }
     
     func onUpdateBrushStroke(

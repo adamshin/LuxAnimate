@@ -93,6 +93,10 @@ extension Color {
 
 extension PixelSize {
     
+    init(_ width: Int, _ height: Int) {
+        self.init(width: width, height: height)
+    }
+    
     init(
         filling containerSize: PixelSize,
         aspectRatio: Double

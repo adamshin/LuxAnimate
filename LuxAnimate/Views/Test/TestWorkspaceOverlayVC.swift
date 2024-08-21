@@ -20,6 +20,20 @@ protocol TestWorkspaceOverlayVCDelegate: AnyObject {
         _ vc: TestWorkspaceOverlayVC,
         pinchFlickIn: Bool)
     
+    func onBeginBrushStroke(
+        _ vc: TestWorkspaceOverlayVC,
+        quickTap: Bool)
+    
+    func onUpdateBrushStroke(
+        _ vc: TestWorkspaceOverlayVC,
+        stroke: BrushGestureRecognizer.Stroke)
+    
+    func onEndBrushStroke(
+        _ vc: TestWorkspaceOverlayVC)
+    
+    func onCancelBrushStroke(
+        _ vc: TestWorkspaceOverlayVC)
+    
 }
 
 class TestWorkspaceOverlayVC: UIViewController {
@@ -28,6 +42,8 @@ class TestWorkspaceOverlayVC: UIViewController {
     
     private let multiGesture = CanvasMultiGestureRecognizer()
     private let panGesture = UIPanGestureRecognizer()
+    
+    private let brushGesture = BrushGestureRecognizer()
     
     // MARK: - Lifecycle
     
@@ -41,6 +57,10 @@ class TestWorkspaceOverlayVC: UIViewController {
         panGesture.maximumNumberOfTouches = 1
         panGesture.delegate = self
         panGesture.addTarget(self, action: #selector(onPan))
+        panGesture.isEnabled = false
+        
+        view.addGestureRecognizer(brushGesture)
+        brushGesture.gestureDelegate = self
     }
     
     // MARK: - Pan Gesture
@@ -72,6 +92,20 @@ class TestWorkspaceOverlayVC: UIViewController {
 
 // MARK: - Delegates
 
+extension TestWorkspaceOverlayVC: UIGestureRecognizerDelegate {
+    
+    func gestureRecognizer(
+        _ gestureRecognizer: UIGestureRecognizer,
+        shouldReceive touch: UITouch
+    ) -> Bool {
+        if gestureRecognizer == panGesture {
+            return touch.type == .direct
+        }
+        return true
+    }
+    
+}
+
 extension TestWorkspaceOverlayVC: CanvasMultiGestureRecognizerGestureDelegate {
     
     func onBeginGesture() {
@@ -100,16 +134,28 @@ extension TestWorkspaceOverlayVC: CanvasMultiGestureRecognizerGestureDelegate {
     
 }
 
-extension TestWorkspaceOverlayVC: UIGestureRecognizerDelegate {
+extension TestWorkspaceOverlayVC: BrushGestureRecognizerGestureDelegate {
     
-    func gestureRecognizer(
-        _ gestureRecognizer: UIGestureRecognizer,
-        shouldReceive touch: UITouch
-    ) -> Bool {
-//        if gestureRecognizer == panGesture {
-//            return touch.type == .direct
-//        }
-        return true
+    func onBeginBrushStroke(quickTap: Bool) {
+        delegate?.onBeginBrushStroke(
+            self,
+            quickTap: quickTap)
+    }
+    
+    func onUpdateBrushStroke(
+        _ stroke: BrushGestureRecognizer.Stroke
+    ) {
+        delegate?.onUpdateBrushStroke(
+            self,
+            stroke: stroke)
+    }
+    
+    func onEndBrushStroke() {
+        delegate?.onEndBrushStroke(self)
+    }
+    
+    func onCancelBrushStroke() {
+        delegate?.onCancelBrushStroke(self)
     }
     
 }

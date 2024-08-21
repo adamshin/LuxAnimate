@@ -4,7 +4,7 @@
 
 import UIKit
 
-private let contentSize = Size(1000, 1000)
+private let canvasSize = PixelSize(1000, 1000)
 
 private let minScale: Scalar = 0.1
 private let maxScale: Scalar = 30
@@ -14,7 +14,13 @@ class TestWorkspaceVC: UIViewController {
     private let metalView = TestWorkspaceMetalView()
     private let overlayVC = TestWorkspaceOverlayVC()
     
-    private let transformManager = TestWorkspaceTransformManager()
+    private let brush: Brush
+    
+    private let brushEngine = BrushEngine(
+        canvasSize: canvasSize,
+        brushMode: .paint)
+    
+    private let workspaceTransformManager = TestWorkspaceTransformManager()
     
     private let workspaceRenderer = TestWorkspaceRenderer(
         pixelFormat: AppConfig.metalLayerPixelFormat)
@@ -22,37 +28,49 @@ class TestWorkspaceVC: UIViewController {
     private lazy var displayLink = CAMetalDisplayLink(
         metalLayer: metalView.metalLayer)
     
-    private var scene: TestScene?
     private var workspaceTransform: Matrix3 = .identity
+    
+    // MARK: - Init
+    
+    init() {
+        brush = try! Brush(
+            configuration: AppConfig.roundBrushConfig)
+        
+        super.init(nibName: nil, bundle: nil)
+        
+        brushEngine.delegate = self
+        
+        workspaceTransformManager.delegate = self
+        workspaceTransformManager.setMinScale(minScale)
+        workspaceTransformManager.setMaxScale(maxScale)
+        workspaceTransformManager.setContentSize(Size(
+            Double(canvasSize.width),
+            Double(canvasSize.height)))
+        
+        displayLink.delegate = self
+        displayLink.preferredFrameLatency = 1
+        displayLink.add(to: .main, forMode: .common)
+    }
+    
+    required init?(coder: NSCoder) { fatalError() }
     
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        metalView.delegate = self
         view.addSubview(metalView)
         metalView.pinEdges()
-        metalView.delegate = self
         
-        addChild(overlayVC, to: view)
         overlayVC.delegate = self
-        
-        transformManager.delegate = self
-        transformManager.setContentSize(contentSize)
-        transformManager.setMinScale(minScale)
-        transformManager.setMaxScale(maxScale)
-        
-        displayLink.delegate = self
-        displayLink.preferredFrameLatency = 1
-        displayLink.add(to: .main, forMode: .common)
-        
-        scene = TestScene.generate(timestamp: 0)
+        addChild(overlayVC, to: view)
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        transformManager.setViewportSize(
+        workspaceTransformManager.setViewportSize(
             Size(
                 metalView.bounds.width,
                 metalView.bounds.height))
@@ -61,7 +79,28 @@ class TestWorkspaceVC: UIViewController {
     // MARK: - Render
     
     private func draw(drawable: CAMetalDrawable) {
-        guard let scene else { return }
+        let layerSize = Size(
+            Double(canvasSize.width),
+            Double(canvasSize.height))
+        
+        let scene = TestScene(layers: [
+            TestScene.Layer(
+                transform: .identity,
+                contentSize: layerSize,
+                alpha: 1,
+                content: .rect(.init(
+                    color: .white
+                ))
+            ),
+            TestScene.Layer(
+                transform: .identity,
+                contentSize: layerSize,
+                alpha: 1,
+                content: .drawing(.init(
+                    texture: brushEngine.activeCanvasTexture
+                ))
+            ),
+        ])
         
         let commandBuffer = MetalInterface.shared
             .commandQueue.makeCommandBuffer()!
@@ -91,6 +130,7 @@ extension TestWorkspaceVC: CAMetalDisplayLinkDelegate {
         _ link: CAMetalDisplayLink,
         needsUpdate update: CAMetalDisplayLink.Update
     ) {
+        brushEngine.onFrame()
         draw(drawable: update.drawable)
     }
     
@@ -102,12 +142,28 @@ extension TestWorkspaceVC: TestWorkspaceMetalViewDelegate {
     
 }
 
+extension TestWorkspaceVC: TestWorkspaceTransformManagerDelegate {
+    
+    func onUpdateTransform(
+        _ m: TestWorkspaceTransformManager,
+        transform: TestWorkspaceTransform
+    ) {
+        let viewportSize = Size(
+            metalView.bounds.width,
+            metalView.bounds.height)
+        
+        workspaceTransform = transform.sceneSpaceToViewportSpaceTransform(
+            viewportSize: viewportSize)
+    }
+    
+}
+
 extension TestWorkspaceVC: TestWorkspaceOverlayVCDelegate {
     
     func onBeginWorkspaceTransformGesture(
         _ vc: TestWorkspaceOverlayVC
     ) {
-        transformManager.handleBeginTransformGesture()
+        workspaceTransformManager.handleBeginTransformGesture()
     }
     
     func onUpdateWorkspaceTransformGesture(
@@ -117,7 +173,7 @@ extension TestWorkspaceVC: TestWorkspaceOverlayVCDelegate {
         rotation: Scalar,
         scale: Scalar
     ) {
-        transformManager.handleUpdateTransformGesture(
+        workspaceTransformManager.handleUpdateTransformGesture(
             anchorPosition: anchorPosition,
             translation: translation,
             rotation: rotation,
@@ -128,19 +184,60 @@ extension TestWorkspaceVC: TestWorkspaceOverlayVCDelegate {
         _ vc: TestWorkspaceOverlayVC,
         pinchFlickIn: Bool
     ) {
-        transformManager.handleEndTransformGesture(
+        workspaceTransformManager.handleEndTransformGesture(
             pinchFlickIn: pinchFlickIn)
+    }
+    
+    func onBeginBrushStroke(
+        _ vc: TestWorkspaceOverlayVC,
+        quickTap: Bool
+    ) {
+        brushEngine.beginStroke(
+            brush: brush,
+            color: .brushBlack,
+            scale: 0.1,
+            smoothing: 0,
+            quickTap: quickTap)
+    }
+    
+    func onUpdateBrushStroke(
+        _ vc: TestWorkspaceOverlayVC,
+        stroke: BrushGestureRecognizer.Stroke
+    ) {
+        let inputStroke = TestBrushStrokeAdapter.convert(
+            stroke: stroke,
+            workspaceTransform: workspaceTransform)
+        
+        brushEngine.updateStroke(inputStroke: inputStroke)
+    }
+    
+    func onEndBrushStroke(
+        _ vc: TestWorkspaceOverlayVC
+    ) {
+        brushEngine.endStroke()
+    }
+    
+    func onCancelBrushStroke(
+        _ vc: TestWorkspaceOverlayVC
+    ) {
+        brushEngine.cancelStroke()
     }
     
 }
 
-extension TestWorkspaceVC: TestWorkspaceTransformManagerDelegate {
+extension TestWorkspaceVC: BrushEngineDelegate {
     
-    func onUpdateTransform(
-        _ m: TestWorkspaceTransformManager,
-        transform: TestWorkspaceTransform
+    func onUpdateActiveCanvasTexture(
+        _ e: BrushEngine
     ) {
-        workspaceTransform = transform.matrix()
+        // nothing yet
+    }
+    
+    func onFinalizeStroke(
+        _ e: BrushEngine,
+        canvasTexture: MTLTexture
+    ) {
+        // nothing yet
     }
     
 }

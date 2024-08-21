@@ -35,6 +35,15 @@ struct TestWorkspaceRenderer {
         // Layers
         for layer in scene.layers {
             switch layer.content {
+            case .drawing(let content):
+                drawDrawingLayer(
+                    target: target,
+                    commandBuffer: commandBuffer,
+                    viewportSize: viewportSize,
+                    workspaceTransform: workspaceTransform,
+                    layer: layer,
+                    content: content)
+                
             case .rect(let content):
                 drawRectLayer(
                     target: target,
@@ -47,6 +56,30 @@ struct TestWorkspaceRenderer {
         }
     }
     
+    private func drawDrawingLayer(
+        target: MTLTexture,
+        commandBuffer: MTLCommandBuffer,
+        viewportSize: Size,
+        workspaceTransform: Matrix3,
+        layer: TestScene.Layer,
+        content: TestScene.DrawingLayerContent
+    ) {
+        let transform = workspaceTransform * layer.transform
+        
+        spriteRenderer.drawSprites(
+            commandBuffer: commandBuffer,
+            target: target,
+            viewportSize: viewportSize,
+            texture: content.texture,
+            sprites: [
+                .init(
+                    position: .zero,
+                    size: layer.contentSize,
+                    transform: transform,
+                    alpha: layer.alpha)
+            ])
+    }
+    
     private func drawRectLayer(
         target: MTLTexture,
         commandBuffer: MTLCommandBuffer,
@@ -55,10 +88,6 @@ struct TestWorkspaceRenderer {
         layer: TestScene.Layer,
         content: TestScene.RectLayerContent
     ) { 
-        let center = Vector(
-            viewportSize.width / 2,
-            viewportSize.height / 2)
-        
         let transform = workspaceTransform * layer.transform
         
         spriteRenderer.drawSprites(
@@ -68,7 +97,7 @@ struct TestWorkspaceRenderer {
             texture: blankTexture,
             sprites: [
                 .init(
-                    position: center,
+                    position: .zero,
                     size: layer.contentSize,
                     transform: transform,
                     alpha: layer.alpha)
@@ -76,6 +105,7 @@ struct TestWorkspaceRenderer {
             colorMode: .stencil,
             color: content.color)
     }
+    
 }
 
 private func createBlankTexture(color: Color) -> MTLTexture? {

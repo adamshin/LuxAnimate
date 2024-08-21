@@ -59,8 +59,8 @@ class BrushStrokeEngine {
         brush: Brush,
         color: Color,
         scale: Double,
-        quickTap: Bool,
-        smoothing: Double
+        smoothing: Double,
+        quickTap: Bool
     ) {
         self.brush = brush
         self.color = color

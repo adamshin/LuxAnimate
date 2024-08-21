@@ -80,15 +80,15 @@ class BrushEngine {
         brush: Brush,
         color: Color,
         scale: Double,
-        quickTap: Bool,
-        smoothing: Double
+        smoothing: Double,
+        quickTap: Bool
     ) {
         strokeEngine = BrushStrokeEngine(
             brush: brush,
             color: color,
             scale: scale,
-            quickTap: quickTap,
-            smoothing: smoothing)
+            smoothing: smoothing,
+            quickTap: quickTap)
     }
     
     func updateStroke(
