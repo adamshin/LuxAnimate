@@ -106,9 +106,9 @@ extension TestWorkspaceOverlayVC: UIGestureRecognizerDelegate {
         _ gestureRecognizer: UIGestureRecognizer,
         shouldReceive touch: UITouch
     ) -> Bool {
-        if gestureRecognizer == panGesture {
-            return touch.type == .direct
-        }
+//        if gestureRecognizer == panGesture {
+//            return touch.type == .direct
+//        }
         return true
     }
     

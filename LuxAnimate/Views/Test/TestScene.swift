@@ -41,14 +41,14 @@ extension TestScene {
                         .init(color: .white))),
                 
                 TestScene.Layer(
-                    transform: Matrix3(translation: Vector(-400, -200)),
-                    contentSize: Size(100, 500),
+                    transform: Matrix3(translation: Vector(-200, -400)),
+                    contentSize: Size(500, 100),
                     alpha: 1,
                     content: .rect(
                         .init(color: .brushGreen))),
                 
                 TestScene.Layer(
-                    transform: Matrix3(rotation: timestamp),
+                    transform: .identity,//Matrix3(rotation: timestamp),
                     contentSize: Size(300, 300),
                     alpha: 0.8,
                     content: .rect(
