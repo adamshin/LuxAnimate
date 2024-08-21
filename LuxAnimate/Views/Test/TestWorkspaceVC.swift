@@ -4,7 +4,7 @@
 
 import UIKit
 
-private let canvasSize = PixelSize(800, 800)
+private let canvasSize = PixelSize(1920, 1080)
 
 private let minScale: Scalar = 0.1
 private let maxScale: Scalar = 30
@@ -46,6 +46,8 @@ class TestWorkspaceVC: UIViewController {
         workspaceTransformManager.setContentSize(Size(
             Double(canvasSize.width),
             Double(canvasSize.height)))
+        
+        workspaceTransformManager.fitContentToViewport()
         
         displayLink.delegate = self
         displayLink.preferredFrameLatency = 1
@@ -190,7 +192,7 @@ extension TestWorkspaceVC: TestWorkspaceOverlayVCDelegate {
         brushEngine.beginStroke(
             brush: brush,
             color: .brushBlack,
-            scale: 0.05,
+            scale: 0.1,
             smoothing: 0,
             quickTap: quickTap)
     }

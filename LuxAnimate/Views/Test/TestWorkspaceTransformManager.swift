@@ -42,6 +42,12 @@ class TestWorkspaceTransformManager {
     
     // MARK: - Transform
     
+    private func handleUpdateWorkspaceParams() {
+        if isContentFitToViewport {
+            fitContentToViewport()
+        }
+    }
+    
     private func transformFittingContentToViewport()
     -> TestWorkspaceTransform {
         
@@ -99,14 +105,17 @@ class TestWorkspaceTransformManager {
     
     func setViewportSize(_ viewportSize: Size) {
         self.viewportSize = viewportSize
+        handleUpdateWorkspaceParams()
     }
     
     func setViewportSafeAreaInsets(_ viewportSafeAreaInsets: SafeAreaInsets) {
         self.viewportSafeAreaInsets = viewportSafeAreaInsets
+        handleUpdateWorkspaceParams()
     }
     
     func setContentSize(_ contentSize: Size) {
         self.contentSize = contentSize
+        handleUpdateWorkspaceParams()
     }
     
     func setMinScale(_ minScale: Double) {
@@ -115,6 +124,15 @@ class TestWorkspaceTransformManager {
     
     func setMaxScale(_ maxScale: Double) {
         self.maxScale = maxScale
+    }
+    
+    func fitContentToViewport() {
+        isContentFitToViewport = true
+        
+        baseTransform = transformFittingContentToViewport()
+        delegate?.onUpdateTransform(
+            self,
+            transform: baseTransform)
     }
     
     func handleBeginTransformGesture() {
