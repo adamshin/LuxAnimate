@@ -7,10 +7,10 @@ import Foundation
 private let contentFitInset: CGFloat = 0
 
 private let rotationSnapThreshold: Scalar =
-    //8 * .radiansPerDegree
-    20 * .radiansPerDegree
+    8 * .radiansPerDegree
 
-private let animationDuration: TimeInterval = 0.2
+private let shortSnapDuration: TimeInterval = 1.0
+private let longSnapDuration: TimeInterval = 1.2
 
 protocol TestWorkspaceTransformManagerDelegate: AnyObject {
     
@@ -34,7 +34,7 @@ class TestWorkspaceTransformManager {
         var endTransform: TestWorkspaceTransform
         
         var startTime: TimeInterval
-        var endTime: TimeInterval
+        var duration: TimeInterval
     }
     
     weak var delegate: TestWorkspaceTransformManagerDelegate?
@@ -134,7 +134,7 @@ class TestWorkspaceTransformManager {
             startTransform: startTransform,
             endTransform: endTransform,
             startTime: now,
-            endTime: now + duration)
+            duration: duration)
         
         self.activeGestureTransform = nil
         baseTransform = endTransform
@@ -146,8 +146,9 @@ class TestWorkspaceTransformManager {
         guard let animation = activeAnimation else { return }
         
         let time = Date().timeIntervalSince1970
+        let endTime = animation.startTime + animation.duration
         
-        if time > animation.endTime {
+        if time > endTime {
             baseTransform = animation.endTransform
             activeAnimation = nil
             delegate?.onUpdateTransform(self)
@@ -167,9 +168,16 @@ class TestWorkspaceTransformManager {
         time: TimeInterval
     ) -> TestWorkspaceTransform {
         
-        let v: Double = map(time,
-            in: (animation.startTime, animation.endTime),
+        let startTime = animation.startTime
+        let endTime = startTime + animation.duration
+        
+        let t: Double = map(time,
+            in: (startTime, endTime),
             to: (0, 1))
+        
+        let v = springInterpolate(
+            t: t,
+            duration: animation.duration)
         
         let c1 = 1 - v
         let c2 = v
@@ -298,21 +306,41 @@ class TestWorkspaceTransformManager {
             finalAnchorPosition.x - viewportSize.width / 2,
             finalAnchorPosition.y - viewportSize.height / 2)
         
-        let endTransform: TestWorkspaceTransform
-        
         if pinchFlickIn {
             isContentFitToViewport = true
-            endTransform = transformFittingContentToViewport()
+            
+            let endTransform = transformFittingContentToViewport()
+            
+            animateTransform(
+                startTransform: activeGestureTransform,
+                endTransform: endTransform,
+                duration: longSnapDuration)
+            
         } else {
-            endTransform = snapTransform(
+            let endTransform = snapTransform(
                 transform: activeGestureTransform,
                 anchor: anchor)
+            
+            animateTransform(
+                startTransform: activeGestureTransform,
+                endTransform: endTransform,
+                duration: shortSnapDuration)
         }
-        
-        animateTransform(
-            startTransform: activeGestureTransform,
-            endTransform: endTransform,
-            duration: animationDuration)
     }
     
+}
+
+// MARK: - Spring
+
+private func springInterpolate(
+    t: Double,
+    duration: Double
+) -> Double {
+    
+    let a: Double = 1
+    let b: Double = 20 / duration
+    let g: Double = b
+    
+    let y = (a + b*t) * exp(-g * t)
+    return 1 - y
 }
