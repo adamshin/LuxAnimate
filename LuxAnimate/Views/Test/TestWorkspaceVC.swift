@@ -76,6 +76,17 @@ class TestWorkspaceVC: UIViewController {
                 metalView.bounds.height))
     }
     
+    // MARK: - Brush Engine
+    
+    private func clearCanvas() {
+        let texture = try! TextureCreator
+            .createEmptyTexture(
+                size: canvasSize,
+                mipMapped: false)
+        
+        brushEngine.setCanvasTexture(texture)
+    }
+    
     // MARK: - Render
     
     private func draw(drawable: CAMetalDrawable) {
@@ -185,6 +196,14 @@ extension TestWorkspaceVC: TestWorkspaceOverlayVCDelegate {
         workspaceTransformManager.handleEndTransformGesture(
             finalAnchorPosition: finalAnchorPosition,
             pinchFlickIn: pinchFlickIn)
+    }
+    
+    func onSelectUndo(_ vc: TestWorkspaceOverlayVC) {
+        clearCanvas()
+    }
+    
+    func onSelectRedo(_ vc: TestWorkspaceOverlayVC) { 
+        clearCanvas()
     }
     
     func onBeginBrushStroke(

@@ -10,7 +10,7 @@ private let rotationSnapThreshold: Scalar =
     8 * .radiansPerDegree
 
 private let shortSnapDuration: TimeInterval = 1.0
-private let longSnapDuration: TimeInterval = 1.2
+private let longSnapDuration: TimeInterval = 1.1
 
 protocol TestWorkspaceTransformManagerDelegate: AnyObject {
     

@@ -21,6 +21,9 @@ protocol TestWorkspaceOverlayVCDelegate: AnyObject {
         finalAnchorPosition: Vector,
         pinchFlickIn: Bool)
     
+    func onSelectUndo(_ vc: TestWorkspaceOverlayVC)
+    func onSelectRedo(_ vc: TestWorkspaceOverlayVC)
+    
     func onBeginBrushStroke(
         _ vc: TestWorkspaceOverlayVC,
         quickTap: Bool)
@@ -44,6 +47,9 @@ class TestWorkspaceOverlayVC: UIViewController {
     private let multiGesture = CanvasMultiGestureRecognizer()
     private let panGesture = UIPanGestureRecognizer()
     
+    private let undoGesture = MultiFingerTapGestureRecognizer(touchCount: 2)
+    private let redoGesture = MultiFingerTapGestureRecognizer(touchCount: 3)
+    
     private let brushGesture = BrushGestureRecognizer()
     
     // MARK: - Lifecycle
@@ -60,11 +66,25 @@ class TestWorkspaceOverlayVC: UIViewController {
         panGesture.addTarget(self, action: #selector(onPan))
         panGesture.isEnabled = false
         
+        view.addGestureRecognizer(undoGesture)
+        view.addGestureRecognizer(redoGesture)
+        undoGesture.addTarget(self, action: #selector(onUndoGesture))
+        redoGesture.addTarget(self, action: #selector(onRedoGesture))
+        
+        
         view.addGestureRecognizer(brushGesture)
         brushGesture.gestureDelegate = self
     }
     
-    // MARK: - Pan Gesture
+    // MARK: - Gesture Handlers
+    
+    @objc private func onUndoGesture() {
+        delegate?.onSelectUndo(self)
+    }
+    
+    @objc private func onRedoGesture() {
+        delegate?.onSelectRedo(self)
+    }
     
     @objc private func onPan() {
         switch panGesture.state {
