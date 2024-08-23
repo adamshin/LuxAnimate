@@ -4,10 +4,18 @@
 
 import UIKit
 
-private let canvasSize = PixelSize(1920, 1080)
+private let sceneContentSize = PixelSize(1920, 1080)
+private let layerContentSize = PixelSize(800, 800)
 
-private let minScale: Scalar = 0.1
-private let maxScale: Scalar = 30
+private let layerTransform = 
+    Matrix3(translation: Vector(-200, 50)) *
+    Matrix3(rotation: -.pi/20) *
+    Matrix3(shearHorizontal: .pi/10) *
+    Matrix3(scale: Vector(1.2, 1))
+
+private let minZoomScale: Scalar = 0.1
+private let maxZoomScale: Scalar = 30
+private let scalePixelateThreshold: Scalar = 1.0
 
 class TestWorkspaceVC: UIViewController {
     
@@ -17,7 +25,7 @@ class TestWorkspaceVC: UIViewController {
     private let brush: Brush
     
     private let brushEngine = BrushEngine(
-        canvasSize: canvasSize,
+        canvasSize: layerContentSize,
         brushMode: .paint)
     
     private let workspaceTransformManager = TestWorkspaceTransformManager()
@@ -39,11 +47,11 @@ class TestWorkspaceVC: UIViewController {
         brushEngine.delegate = self
         
         workspaceTransformManager.delegate = self
-        workspaceTransformManager.setMinScale(minScale)
-        workspaceTransformManager.setMaxScale(maxScale)
+        workspaceTransformManager.setMinScale(minZoomScale)
+        workspaceTransformManager.setMaxScale(maxZoomScale)
         workspaceTransformManager.setContentSize(Size(
-            Double(canvasSize.width),
-            Double(canvasSize.height)))
+            Double(sceneContentSize.width),
+            Double(sceneContentSize.height)))
         
         workspaceTransformManager.fitContentToViewport()
         
@@ -81,7 +89,7 @@ class TestWorkspaceVC: UIViewController {
     private func clearCanvas() {
         let texture = try! TextureCreator
             .createEmptyTexture(
-                size: canvasSize,
+                size: layerContentSize,
                 mipMapped: false)
         
         brushEngine.setCanvasTexture(texture)
@@ -90,13 +98,25 @@ class TestWorkspaceVC: UIViewController {
     // MARK: - Render
     
     private func draw(drawable: CAMetalDrawable) {
+        let sceneSize = Size(
+            Double(sceneContentSize.width),
+            Double(sceneContentSize.height))
+        
         let layerSize = Size(
-            Double(canvasSize.width),
-            Double(canvasSize.height))
+            Double(layerContentSize.width),
+            Double(layerContentSize.height))
         
         let scene = TestScene(layers: [
             TestScene.Layer(
                 transform: .identity,
+                contentSize: sceneSize,
+                alpha: 1,
+                content: .rect(.init(
+                    color: .brushBlue
+                ))
+            ),
+            TestScene.Layer(
+                transform: layerTransform,
                 contentSize: layerSize,
                 alpha: 1,
                 content: .rect(.init(
@@ -104,7 +124,7 @@ class TestWorkspaceVC: UIViewController {
                 ))
             ),
             TestScene.Layer(
-                transform: .identity,
+                transform: layerTransform,
                 contentSize: layerSize,
                 alpha: 1,
                 content: .drawing(.init(
@@ -115,6 +135,10 @@ class TestWorkspaceVC: UIViewController {
         
         let workspaceTransform =
             workspaceTransformManager.transform()
+        
+        let pixelate = 
+            workspaceTransform.scale >
+            scalePixelateThreshold
         
         let viewportSize = Size(
             metalView.bounds.width,
@@ -128,7 +152,8 @@ class TestWorkspaceVC: UIViewController {
             commandBuffer: commandBuffer,
             viewportSize: viewportSize,
             workspaceTransform: workspaceTransform,
-            scene: scene)
+            scene: scene, 
+            pixelate: pixelate)
         
         commandBuffer.present(drawable)
         commandBuffer.commit()
@@ -222,22 +247,23 @@ extension TestWorkspaceVC: TestWorkspaceOverlayVCDelegate {
         _ vc: TestWorkspaceOverlayVC,
         stroke: BrushGestureRecognizer.Stroke
     ) {
-        let viewportSize = Size(
-            metalView.bounds.width,
-            metalView.bounds.height)
-        
-        let canvasSize = Size(
-            Double(canvasSize.width),
-            Double(canvasSize.height))
-        
         let workspaceTransform =
             workspaceTransformManager.transform()
         
+        let workspaceViewSize = Size(
+            metalView.bounds.width,
+            metalView.bounds.height)
+        
+        let layerContentSize = Size(
+            Double(layerContentSize.width),
+            Double(layerContentSize.height))
+        
         let inputStroke = TestBrushStrokeAdapter.convert(
             stroke: stroke,
-            viewportSize: viewportSize,
-            canvasSize: canvasSize,
-            workspaceTransform: workspaceTransform)
+            workspaceViewSize: workspaceViewSize,
+            workspaceTransform: workspaceTransform,
+            layerContentSize: layerContentSize,
+            layerTransform: layerTransform)
         
         brushEngine.updateStroke(inputStroke: inputStroke)
     }

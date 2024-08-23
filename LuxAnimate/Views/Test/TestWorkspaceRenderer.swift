@@ -24,7 +24,8 @@ struct TestWorkspaceRenderer {
         commandBuffer: MTLCommandBuffer,
         viewportSize: Size,
         workspaceTransform: TestWorkspaceTransform,
-        scene: TestScene
+        scene: TestScene,
+        pixelate: Bool
     ) {
         // Transform
         let viewportTransform = Matrix3(translation: Vector(
@@ -51,7 +52,8 @@ struct TestWorkspaceRenderer {
                     viewportSize: viewportSize,
                     contentTransform: contentTransform,
                     layer: layer,
-                    content: content)
+                    content: content,
+                    pixelate: pixelate)
                 
             case .rect(let content):
                 drawRectLayer(
@@ -71,9 +73,13 @@ struct TestWorkspaceRenderer {
         viewportSize: Size,
         contentTransform: Matrix3,
         layer: TestScene.Layer,
-        content: TestScene.DrawingLayerContent
+        content: TestScene.DrawingLayerContent,
+        pixelate: Bool
     ) {
         let transform = contentTransform * layer.transform
+        
+        let sampleMode: SampleMode = pixelate ?
+            .nearest : .linear
         
         spriteRenderer.drawSprites(
             commandBuffer: commandBuffer,
@@ -86,7 +92,8 @@ struct TestWorkspaceRenderer {
                     size: layer.contentSize,
                     transform: transform,
                     alpha: layer.alpha)
-            ])
+            ],
+            sampleMode: sampleMode)
     }
     
     private func drawRectLayer(
