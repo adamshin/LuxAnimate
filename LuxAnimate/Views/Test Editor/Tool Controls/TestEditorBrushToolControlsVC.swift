@@ -34,6 +34,31 @@ class TestEditorBrushToolControlsVC: UIViewController {
         
         stack.addArrangedSubview(scaleSlider)
         stack.addArrangedSubview(smoothingSlider)
+        
+        scaleSlider.delegate = self
+        smoothingSlider.delegate = self
+        
+        scaleSlider.value = TestEditorToolSettingsStore.brushToolScale
+        smoothingSlider.value = TestEditorToolSettingsStore.brushToolSmoothing
+    }
+    
+}
+
+extension TestEditorBrushToolControlsVC: EditorSidebarSliderContainerDelegate {
+    
+    func onChangeValue(_ v: EditorSidebarSliderContainer) {
+        switch v {
+        case scaleSlider:
+            let v = scaleSlider.value
+            TestEditorToolSettingsStore.brushToolScale = v
+            
+        case smoothingSlider:
+            let v = smoothingSlider.value
+            TestEditorToolSettingsStore.brushToolSmoothing = v
+            
+        default: 
+            break
+        }
     }
     
 }
