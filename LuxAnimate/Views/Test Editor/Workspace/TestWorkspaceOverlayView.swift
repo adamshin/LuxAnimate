@@ -38,6 +38,8 @@ class TestWorkspaceOverlayView: UIView {
     
     private let brushGesture = BrushGestureRecognizer()
     
+    private var toolGestureRecognizers: [UIGestureRecognizer] = []
+    
     // MARK: - Init
     
     init() {
@@ -92,6 +94,20 @@ class TestWorkspaceOverlayView: UIView {
                 finalAnchorPosition: .zero,
                 pinchFlickIn: false)
         }
+    }
+    
+    // MARK: - Interface
+    
+    func addToolGestureRecognizer(_ g: UIGestureRecognizer) {
+        addGestureRecognizer(g)
+        toolGestureRecognizers.append(g)
+    }
+    
+    func removeAllToolGestureRecognizers() {
+        for g in toolGestureRecognizers {
+            removeGestureRecognizer(g)
+        }
+        toolGestureRecognizers = []
     }
     
 }

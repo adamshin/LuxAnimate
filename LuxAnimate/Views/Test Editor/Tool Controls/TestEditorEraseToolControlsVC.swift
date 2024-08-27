@@ -10,12 +10,12 @@ private let smoothingGamma: Double = 1.5
 class TestEditorEraseToolControlsVC: UIViewController {
     
     private let scaleSlider = EditorSidebarSliderContainer(
-        title: "Erase Size",
+        title: "Size",
         gamma: scaleGamma,
         valueDisplayMode: .percent(minValue: 1))
     
     private let smoothingSlider = EditorSidebarSliderContainer(
-        title: "Erase Smoothing",
+        title: "Smoothing",
         gamma: smoothingGamma,
         valueDisplayMode: .percent(minValue: 0))
     

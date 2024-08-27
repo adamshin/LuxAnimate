@@ -43,6 +43,7 @@ class EditorSidebarSliderContainer: UIView {
         
         slider.delegate = self
         
+        popupView.updateValue(0)
         popupView.setVisible(false, animated: false)
     }
     
@@ -118,15 +119,21 @@ private class PopupView: UIView {
     required init?(coder: NSCoder) { fatalError() }
     
     func setVisible(_ visible: Bool, animated: Bool) {
-        UIView.animate(springDuration: 0.2) {
+        let update = {
             if visible {
-                alpha = 1
-                transform = .identity
+                self.alpha = 1
+                self.transform = .identity
             } else {
-                alpha = 0
-                transform = CGAffineTransform(
+                self.alpha = 0
+                self.transform = CGAffineTransform(
                     scaleX: 0.9, y: 0.9)
             }
+        }
+        
+        if animated {
+            UIView.animate(withDuration: 0.2) { update() }
+        } else {
+            update()
         }
     }
     

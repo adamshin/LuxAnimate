@@ -81,6 +81,14 @@ class TestEditorWorkspaceVC: UIViewController {
             .setContentSize(contentSize)
     }
     
+    func addToolGestureRecognizer(_ g: UIGestureRecognizer) {
+        overlayView.addToolGestureRecognizer(g)
+    }
+    
+    func removeAllToolGestureRecognizers() {
+        overlayView.removeAllToolGestureRecognizers()
+    }
+    
     // MARK: - Brush Engine
     
 //    private func clearCanvas() {

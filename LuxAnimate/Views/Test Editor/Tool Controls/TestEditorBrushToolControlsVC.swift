@@ -10,12 +10,12 @@ private let smoothingGamma: Double = 1.5
 class TestEditorBrushToolControlsVC: UIViewController {
     
     private let scaleSlider = EditorSidebarSliderContainer(
-        title: "Brush Size",
+        title: "Size",
         gamma: scaleGamma,
         valueDisplayMode: .percent(minValue: 1))
     
     private let smoothingSlider = EditorSidebarSliderContainer(
-        title: "Brush Smoothing",
+        title: "Smoothing",
         gamma: smoothingGamma,
         valueDisplayMode: .percent(minValue: 0))
     

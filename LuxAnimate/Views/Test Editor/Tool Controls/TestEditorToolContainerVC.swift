@@ -4,14 +4,10 @@
 
 import UIKit
 
-class TestEditorToolControlsVC: UIViewController {
+class TestEditorToolControlsVC: ContainerViewController {
     
     override func loadView() {
         view = PassthroughView()
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
     }
     
 }

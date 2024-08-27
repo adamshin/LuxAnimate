@@ -55,9 +55,11 @@ class TestEditorVC: UIViewController {
     
     private let bodyView = TestEditorView()
     
-    private let workspaceVC = TestEditorWorkspaceVC()
     private let toolbarVC = TestEditorToolbarVC()
     private let toolControlsVC = TestEditorToolControlsVC()
+    private let workspaceVC = TestEditorWorkspaceVC()
+    
+    private var toolState: TestEditorToolState?
     
     private var frameEditor: TestFrameEditor?
     
@@ -85,9 +87,9 @@ class TestEditorVC: UIViewController {
         workspaceVC.delegate = self
         toolbarVC.delegate = self
         
-        addChild(workspaceVC, to: bodyView.workspaceContainer)
         addChild(toolbarVC, to: bodyView.toolbarContainer)
         addChild(toolControlsVC, to: bodyView.toolControlsContainer)
+        addChild(workspaceVC, to: bodyView.workspaceContainer)
         
         updateSceneContentSize()
         selectBrushTool()
@@ -106,26 +108,49 @@ class TestEditorVC: UIViewController {
     
     // MARK: - Tools
     
-    // Should this go inside some kind of state helper object?
+    private func enterToolState(
+        _ newToolState: TestEditorToolState
+    ) {
+        toolState?.endState(
+            workspaceVC: workspaceVC,
+            toolControlsVC: toolControlsVC)
+        
+        toolState = newToolState
+        
+        newToolState.beginState(
+            workspaceVC: workspaceVC,
+            toolControlsVC: toolControlsVC)
+    }
     
     private func selectBrushTool() {
-        // Show brush tool UI in tool controls
-        // Set up brush gesture recognizer
-        // Set drawing editor to brush tool mode
-        // Connect events(?)
+        enterToolState(TestEditorBrushToolState())
     }
     
     private func selectEraseTool() {
-        // Show erase tool UI in tool controls
-        // Set up erase gesture recognizer
-        // Set drawing editor to erase tool mode
-        // Connect events(?)
+        enterToolState(TestEditorEraseToolState())
     }
     
     // MARK: - Editing
     
     private func clearCanvas() {
         frameEditor?.clearCanvas()
+    }
+    
+    // MARK: - Frame
+    
+    private func onFrame(
+        drawable: CAMetalDrawable,
+        viewportSize: Size,
+        workspaceTransform: TestWorkspaceTransform
+    ) {
+        // TODO: Do rendering here?
+        // Maybe the frame editor should simply return a
+        // scene object, which we draw.
+        
+        frameEditor?.onFrame(
+            drawable: drawable,
+            viewportSize: viewportSize,
+            workspaceTransform: workspaceTransform)
     }
     
 }
@@ -140,7 +165,7 @@ extension TestEditorVC: TestEditorWorkspaceVCDelegate {
         viewportSize: Size,
         workspaceTransform: TestWorkspaceTransform
     ) {
-        frameEditor?.onFrame(
+        onFrame(
             drawable: drawable,
             viewportSize: viewportSize,
             workspaceTransform: workspaceTransform)

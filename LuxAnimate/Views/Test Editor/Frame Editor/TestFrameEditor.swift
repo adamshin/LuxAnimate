@@ -30,34 +30,6 @@ class TestFrameEditor {
     private let workspaceRenderer = TestEditorWorkspaceRenderer(
         pixelFormat: AppConfig.metalLayerPixelFormat)
     
-    // MARK: - Interface
-    
-    func getSceneContentSize() -> PixelSize {
-        return sceneContentSize
-    }
-    
-    func clearCanvas() {
-//        let texture = try! TextureCreator
-//            .createEmptyTexture(
-//                size: layerContentSize,
-//                mipMapped: false)
-//
-//        brushEngine.setCanvasTexture(texture)
-    }
-    
-    func onFrame(
-        drawable: CAMetalDrawable,
-        viewportSize: Size,
-        workspaceTransform: TestWorkspaceTransform
-    ) {
-        // TODO: Update active tool
-        
-        drawWorkspace(
-            drawable: drawable,
-            viewportSize: viewportSize,
-            workspaceTransform: workspaceTransform)
-    }
-    
     // MARK: - Render
     
     private func drawWorkspace(
@@ -112,6 +84,49 @@ class TestFrameEditor {
         
         commandBuffer.present(drawable)
         commandBuffer.commit()
+    }
+    
+    // MARK: - Interface
+    
+    func getSceneContentSize() -> PixelSize {
+        return sceneContentSize
+    }
+    
+    func clearCanvas() {
+//        let texture = try! TextureCreator
+//            .createEmptyTexture(
+//                size: layerContentSize,
+//                mipMapped: false)
+//
+//        brushEngine.setCanvasTexture(texture)
+    }
+    
+    func handleUpdateEditorToolState(
+        editorToolState: TestEditorToolState
+    ) {
+        switch editorToolState {
+        case let s as TestEditorBrushToolState:
+            print("foo") // TODO: Enter brush state
+            
+        case let s as TestEditorEraseToolState:
+            print("foo") // TODO: Enter erase state
+            
+        default:
+            break
+        }
+    }
+    
+    func onFrame(
+        drawable: CAMetalDrawable,
+        viewportSize: Size,
+        workspaceTransform: TestWorkspaceTransform
+    ) {
+        // TODO: Update tool state
+        
+        drawWorkspace(
+            drawable: drawable,
+            viewportSize: viewportSize,
+            workspaceTransform: workspaceTransform)
     }
     
 }
