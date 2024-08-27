@@ -1,48 +1,34 @@
 //
-//  TestWorkspaceOverlayVC.swift
+//  TestWorkspaceOverlayView.swift
 //
 
 import UIKit
 
-protocol TestWorkspaceOverlayVCDelegate: AnyObject {
+protocol TestWorkspaceOverlayViewDelegate: AnyObject {
     
     func onBeginWorkspaceTransformGesture(
-        _ vc: TestWorkspaceOverlayVC)
+        _ v: TestWorkspaceOverlayView)
     
     func onUpdateWorkspaceTransformGesture(
-        _ vc: TestWorkspaceOverlayVC,
+        _ v: TestWorkspaceOverlayView,
         initialAnchorPosition: Vector,
         translation: Vector,
         rotation: Scalar,
         scale: Scalar)
     
     func onEndWorkspaceTransformGesture(
-        _ vc: TestWorkspaceOverlayVC,
+        _ v: TestWorkspaceOverlayView,
         finalAnchorPosition: Vector,
         pinchFlickIn: Bool)
     
-    func onSelectUndo(_ vc: TestWorkspaceOverlayVC)
-    func onSelectRedo(_ vc: TestWorkspaceOverlayVC)
-    
-    func onBeginBrushStroke(
-        _ vc: TestWorkspaceOverlayVC,
-        quickTap: Bool)
-    
-    func onUpdateBrushStroke(
-        _ vc: TestWorkspaceOverlayVC,
-        stroke: BrushGestureRecognizer.Stroke)
-    
-    func onEndBrushStroke(
-        _ vc: TestWorkspaceOverlayVC)
-    
-    func onCancelBrushStroke(
-        _ vc: TestWorkspaceOverlayVC)
+    func onSelectUndo(_ v: TestWorkspaceOverlayView)
+    func onSelectRedo(_ v: TestWorkspaceOverlayView)
     
 }
 
-class TestWorkspaceOverlayVC: UIViewController {
+class TestWorkspaceOverlayView: UIView {
     
-    weak var delegate: TestWorkspaceOverlayVCDelegate?
+    weak var delegate: TestWorkspaceOverlayViewDelegate?
     
     private let multiGesture = CanvasMultiGestureRecognizer()
     private let panGesture = UIPanGestureRecognizer()
@@ -52,29 +38,27 @@ class TestWorkspaceOverlayVC: UIViewController {
     
     private let brushGesture = BrushGestureRecognizer()
     
-    // MARK: - Lifecycle
+    // MARK: - Init
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    init() {
+        super.init(frame: .zero)
         
-        view.addGestureRecognizer(multiGesture)
+        addGestureRecognizer(multiGesture)
         multiGesture.gestureDelegate = self
         
-        view.addGestureRecognizer(panGesture)
+        addGestureRecognizer(panGesture)
         panGesture.maximumNumberOfTouches = 1
         panGesture.delegate = self
         panGesture.addTarget(self, action: #selector(onPan))
         panGesture.isEnabled = false
         
-        view.addGestureRecognizer(undoGesture)
-        view.addGestureRecognizer(redoGesture)
+        addGestureRecognizer(undoGesture)
+        addGestureRecognizer(redoGesture)
         undoGesture.addTarget(self, action: #selector(onUndoGesture))
         redoGesture.addTarget(self, action: #selector(onRedoGesture))
-        
-        
-        view.addGestureRecognizer(brushGesture)
-        brushGesture.gestureDelegate = self
     }
+    
+    required init?(coder: NSCoder) { fatalError() }
     
     // MARK: - Gesture Handlers
     
@@ -93,7 +77,7 @@ class TestWorkspaceOverlayVC: UIViewController {
             
         case .changed:
             let translation = Vector(
-                panGesture.translation(in: view))
+                panGesture.translation(in: self))
             
             delegate?.onUpdateWorkspaceTransformGesture(
                 self,
@@ -114,7 +98,7 @@ class TestWorkspaceOverlayVC: UIViewController {
 
 // MARK: - Delegates
 
-extension TestWorkspaceOverlayVC: UIGestureRecognizerDelegate {
+extension TestWorkspaceOverlayView: UIGestureRecognizerDelegate {
     
     func gestureRecognizer(
         _ gestureRecognizer: UIGestureRecognizer,
@@ -128,7 +112,7 @@ extension TestWorkspaceOverlayVC: UIGestureRecognizerDelegate {
     
 }
 
-extension TestWorkspaceOverlayVC: CanvasMultiGestureRecognizerGestureDelegate {
+extension TestWorkspaceOverlayView: CanvasMultiGestureRecognizerGestureDelegate {
     
     func onBeginGesture() {
         delegate?.onBeginWorkspaceTransformGesture(self)
@@ -156,32 +140,6 @@ extension TestWorkspaceOverlayVC: CanvasMultiGestureRecognizerGestureDelegate {
             self,
             finalAnchorPosition: finalAnchorPosition,
             pinchFlickIn: pinchFlickIn)
-    }
-    
-}
-
-extension TestWorkspaceOverlayVC: BrushGestureRecognizerGestureDelegate {
-    
-    func onBeginBrushStroke(quickTap: Bool) {
-        delegate?.onBeginBrushStroke(
-            self,
-            quickTap: quickTap)
-    }
-    
-    func onUpdateBrushStroke(
-        _ stroke: BrushGestureRecognizer.Stroke
-    ) {
-        delegate?.onUpdateBrushStroke(
-            self,
-            stroke: stroke)
-    }
-    
-    func onEndBrushStroke() {
-        delegate?.onEndBrushStroke(self)
-    }
-    
-    func onCancelBrushStroke() {
-        delegate?.onCancelBrushStroke(self)
     }
     
 }

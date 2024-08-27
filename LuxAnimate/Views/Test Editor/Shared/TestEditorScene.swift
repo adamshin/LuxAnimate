@@ -1,11 +1,11 @@
 //
-//  TestScene.swift
+//  TestEditorScene.swift
 //
 
 import Foundation
 import Metal
 
-struct TestScene {
+struct TestEditorScene {
     
     struct Layer {
         var transform: Matrix3

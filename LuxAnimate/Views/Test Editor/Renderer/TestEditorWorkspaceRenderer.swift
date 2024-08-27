@@ -1,13 +1,14 @@
 //
-//  TestWorkspaceRenderer.swift
+//  TestEditorWorkspaceRenderer.swift
 //
 
 import Metal
 import UIKit
 
-private let clearColor = Color(UIColor.editorBackground)
+private let backgroundColor = Color(UIColor.editorBackground)
+private let scalePixelateThreshold: Scalar = 1.0
 
-struct TestWorkspaceRenderer {
+struct TestEditorWorkspaceRenderer {
     
     private let spriteRenderer: SpriteRenderer
     private let blankTexture: MTLTexture
@@ -24,8 +25,7 @@ struct TestWorkspaceRenderer {
         commandBuffer: MTLCommandBuffer,
         viewportSize: Size,
         workspaceTransform: TestWorkspaceTransform,
-        scene: TestScene,
-        pixelate: Bool
+        scene: TestEditorScene
     ) {
         // Transform
         let viewportTransform = Matrix3(translation: Vector(
@@ -36,11 +36,16 @@ struct TestWorkspaceRenderer {
             viewportTransform *
             workspaceTransform.matrix()
         
-        // Clear color
+        // Pixelation
+        let pixelate =
+            workspaceTransform.scale >
+            scalePixelateThreshold
+        
+        // Background color
         ClearColorRenderer.drawClearColor(
             commandBuffer: commandBuffer,
             target: target,
-            color: clearColor)
+            color: backgroundColor)
         
         // Layers
         for layer in scene.layers {
@@ -72,8 +77,8 @@ struct TestWorkspaceRenderer {
         commandBuffer: MTLCommandBuffer,
         viewportSize: Size,
         contentTransform: Matrix3,
-        layer: TestScene.Layer,
-        content: TestScene.DrawingLayerContent,
+        layer: TestEditorScene.Layer,
+        content: TestEditorScene.DrawingLayerContent,
         pixelate: Bool
     ) {
         let transform = contentTransform * layer.transform
@@ -101,8 +106,8 @@ struct TestWorkspaceRenderer {
         commandBuffer: MTLCommandBuffer,
         viewportSize: Size,
         contentTransform: Matrix3,
-        layer: TestScene.Layer,
-        content: TestScene.RectLayerContent
+        layer: TestEditorScene.Layer,
+        content: TestEditorScene.RectLayerContent
     ) { 
         let transform = contentTransform * layer.transform
         
