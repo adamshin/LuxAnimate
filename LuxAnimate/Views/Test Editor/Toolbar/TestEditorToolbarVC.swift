@@ -6,10 +6,11 @@ import UIKit
 
 protocol TestEditorToolbarVCDelegate: AnyObject {
     func onSelectBack(_ vc: TestEditorToolbarVC)
-    func onSelectBrushTool(_ vc: TestEditorToolbarVC)
-    func onSelectEraseTool(_ vc: TestEditorToolbarVC)
     func onSelectUndo(_ vc: TestEditorToolbarVC)
     func onSelectRedo(_ vc: TestEditorToolbarVC)
+    
+    func onSelectPaintTool(_ vc: TestEditorToolbarVC)
+    func onSelectEraseTool(_ vc: TestEditorToolbarVC)
 }
 
 class TestEditorToolbarVC: UIViewController {
@@ -29,16 +30,6 @@ class TestEditorToolbarVC: UIViewController {
             guard let self else { return }
             self.delegate?.onSelectBack(self)
         }
-        bodyView.brushButton.addHandler { [weak self] in
-            guard let self else { return }
-            self.bodyView.selectBrushTool()
-            self.delegate?.onSelectBrushTool(self)
-        }
-        bodyView.eraseButton.addHandler { [weak self] in
-            guard let self else { return }
-            self.bodyView.selectEraseTool()
-            self.delegate?.onSelectEraseTool(self)
-        }
         bodyView.undoButton.addHandler { [weak self] in
             guard let self else { return }
             self.delegate?.onSelectUndo(self)
@@ -48,7 +39,18 @@ class TestEditorToolbarVC: UIViewController {
             self.delegate?.onSelectRedo(self)
         }
         
-        bodyView.selectBrushTool()
+        bodyView.paintButton.addHandler { [weak self] in
+            guard let self else { return }
+            self.bodyView.selectPaintTool()
+            self.delegate?.onSelectPaintTool(self)
+        }
+        bodyView.eraseButton.addHandler { [weak self] in
+            guard let self else { return }
+            self.bodyView.selectEraseTool()
+            self.delegate?.onSelectEraseTool(self)
+        }
+        
+        bodyView.selectPaintTool()
     }
     
     func update(

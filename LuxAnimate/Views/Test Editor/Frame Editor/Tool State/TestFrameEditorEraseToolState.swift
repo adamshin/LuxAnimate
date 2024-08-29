@@ -46,7 +46,7 @@ class TestFrameEditorEraseToolState: TestFrameEditorToolState {
         
         brushEngine = BrushEngine(
             canvasSize: drawingCanvasSize,
-            brushMode: .paint)
+            brushMode: .erase)
         
         if let drawingCanvasTexture {
             brushEngine.setCanvasTexture(drawingCanvasTexture)
@@ -88,7 +88,7 @@ extension TestFrameEditorEraseToolState: TestEditorEraseToolStateDelegate {
         
         brushEngine.beginStroke(
             brush: brush,
-            color: .brushGreen,
+            color: .black,
             scale: editorToolState.scale,
             smoothing: editorToolState.smoothing,
             quickTap: quickTap)

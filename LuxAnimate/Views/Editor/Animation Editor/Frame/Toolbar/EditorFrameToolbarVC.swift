@@ -29,9 +29,9 @@ class EditorFrameToolbarVC: UIViewController {
             guard let self else { return }
             self.delegate?.onSelectBack(self)
         }
-        bodyView.brushButton.addHandler { [weak self] in
+        bodyView.paintButton.addHandler { [weak self] in
             guard let self else { return }
-            self.bodyView.selectBrushTool()
+            self.bodyView.selectPaintTool()
             self.delegate?.onSelectBrushTool(self)
         }
         bodyView.eraseButton.addHandler { [weak self] in
@@ -48,7 +48,7 @@ class EditorFrameToolbarVC: UIViewController {
             self.delegate?.onSelectRedo(self)
         }
         
-        bodyView.selectBrushTool()
+        bodyView.selectPaintTool()
     }
     
     func update(

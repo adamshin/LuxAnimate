@@ -30,13 +30,9 @@ import Metal
 // already-loaded assets from the previous session.
 
 private let sceneSize = PixelSize(1920, 1080)
-private let drawingSize = PixelSize(800, 800)
+private let drawingSize = PixelSize(1000, 1000)
 
-private let drawingTransform =
-    Matrix3(translation: Vector(200, 50)) *
-    Matrix3(rotation: -.pi/20) *
-    Matrix3(shearHorizontal: .pi/10) *
-    Matrix3(scale: Vector(1.2, 1))
+private let drawingTransform: Matrix3 = .identity
 
 protocol TestFrameEditorDelegate: AnyObject {
     
@@ -68,13 +64,16 @@ class TestFrameEditor {
     // TODO: This needs to take scene/frame/layer data.
     // We'll load assets, generate an editor scene.
     
-    init(editorToolState: TestEditorToolState) {
+    init(
+        editorToolState: TestEditorToolState,
+        drawingCanvasTexture: MTLTexture?
+    ) {
         switch editorToolState {
-        case let state as TestEditorBrushToolState:
-            let toolState = TestFrameEditorBrushToolState(
+        case let state as TestEditorPaintToolState:
+            let toolState = TestFrameEditorPaintToolState(
                 editorToolState: state,
                 drawingCanvasSize: drawingSize,
-                drawingCanvasTexture: nil)
+                drawingCanvasTexture: drawingCanvasTexture)
             
             self.toolState = toolState
             toolState.delegate = self
@@ -83,7 +82,7 @@ class TestFrameEditor {
             let toolState = TestFrameEditorEraseToolState(
                 editorToolState: state,
                 drawingCanvasSize: drawingSize,
-                drawingCanvasTexture: nil)
+                drawingCanvasTexture: drawingCanvasTexture)
             
             self.toolState = toolState
             toolState.delegate = self
@@ -144,6 +143,10 @@ class TestFrameEditor {
         return sceneSize
     }
     
+    func drawingCanvasTexture() -> MTLTexture? {
+        toolState?.drawingCanvasTexture()
+    }
+    
     func clearCanvas() {
         toolState?.clearCanvas()
     }
@@ -159,22 +162,22 @@ class TestFrameEditor {
 
 // MARK: - Delegates
 
-extension TestFrameEditor: TestFrameEditorBrushToolStateDelegate {
+extension TestFrameEditor: TestFrameEditorPaintToolStateDelegate {
     
     func workspaceViewSize(
-        _ s: TestFrameEditorBrushToolState
+        _ s: TestFrameEditorPaintToolState
     ) -> Size {
         delegate?.workspaceViewSize(self) ?? .zero
     }
     
     func workspaceTransform(
-        _ s: TestFrameEditorBrushToolState
+        _ s: TestFrameEditorPaintToolState
     ) -> TestWorkspaceTransform {
         delegate?.workspaceTransform(self) ?? .identity
     }
     
     func layerContentSize(
-        _ s: TestFrameEditorBrushToolState
+        _ s: TestFrameEditorPaintToolState
     ) -> Size {
         Size(
             Double(drawingSize.width),
@@ -182,7 +185,7 @@ extension TestFrameEditor: TestFrameEditorBrushToolStateDelegate {
     }
     
     func layerTransform(
-        _ s: TestFrameEditorBrushToolState
+        _ s: TestFrameEditorPaintToolState
     ) -> Matrix3 {
         drawingTransform
     }

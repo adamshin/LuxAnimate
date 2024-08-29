@@ -44,27 +44,6 @@ class EditorFrameToolbarView: UIView {
         return button
     }()
     
-    let brushButton = {
-        let button = UIButton(type: .system)
-        let image = UIImage(
-            systemName: "paintbrush.pointed.fill",
-            withConfiguration: iconConfig)
-        button.setImage(image, for: .normal)
-        button.tintColor = .editorLabel
-        button.pinWidth(to: buttonWidth)
-        return button
-    }()
-    let eraseButton = {
-        let button = UIButton(type: .system)
-        let image = UIImage(
-            systemName: "eraser.fill",
-            withConfiguration: iconConfig)
-        button.setImage(image, for: .normal)
-        button.tintColor = .editorLabel
-        button.pinWidth(to: buttonWidth)
-        return button
-    }()
-    
     let undoButton = {
         let button = UIButton(type: .system)
         let image = UIImage(
@@ -79,6 +58,27 @@ class EditorFrameToolbarView: UIView {
         let button = UIButton(type: .system)
         let image = UIImage(
             systemName: "arrow.uturn.forward",
+            withConfiguration: iconConfig)
+        button.setImage(image, for: .normal)
+        button.tintColor = .editorLabel
+        button.pinWidth(to: buttonWidth)
+        return button
+    }()
+    
+    let paintButton = {
+        let button = UIButton(type: .system)
+        let image = UIImage(
+            systemName: "paintbrush.pointed.fill",
+            withConfiguration: iconConfig)
+        button.setImage(image, for: .normal)
+        button.tintColor = .editorLabel
+        button.pinWidth(to: buttonWidth)
+        return button
+    }()
+    let eraseButton = {
+        let button = UIButton(type: .system)
+        let image = UIImage(
+            systemName: "eraser.fill",
             withConfiguration: iconConfig)
         button.setImage(image, for: .normal)
         button.tintColor = .editorLabel
@@ -133,7 +133,7 @@ class EditorFrameToolbarView: UIView {
         line.pinCenter(.vertical)
         line.pinEdges(.leading)
         
-        leftStack.addArrangedSubview(brushButton)
+        leftStack.addArrangedSubview(paintButton)
         leftStack.addArrangedSubview(eraseButton)
         
         rightStack.addArrangedSubview(undoButton)
@@ -142,12 +142,12 @@ class EditorFrameToolbarView: UIView {
     
     required init?(coder: NSCoder) { fatalError() }
     
-    func selectBrushTool() {
-        brushButton.tintColor = .tint
+    func selectPaintTool() {
+        paintButton.tintColor = .tint
         eraseButton.tintColor = .editorLabel
     }
     func selectEraseTool() {
-        brushButton.tintColor = .editorLabel
+        paintButton.tintColor = .editorLabel
         eraseButton.tintColor = .tint
     }
     

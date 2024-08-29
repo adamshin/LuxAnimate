@@ -1,30 +1,30 @@
 //
-//  TestEditorBrushToolState.swift
+//  TestEditorPaintToolState.swift
 //
 
 import UIKit
 
-protocol TestEditorBrushToolStateDelegate: AnyObject {
+protocol TestEditorPaintToolStateDelegate: AnyObject {
     
     func onBeginBrushStroke(
-        _ s: TestEditorBrushToolState,
+        _ s: TestEditorPaintToolState,
         quickTap: Bool)
 
     func onUpdateBrushStroke(
-        _ s: TestEditorBrushToolState,
+        _ s: TestEditorPaintToolState,
         stroke: BrushGestureRecognizer.Stroke)
 
     func onEndBrushStroke(
-        _ s: TestEditorBrushToolState)
+        _ s: TestEditorPaintToolState)
 
     func onCancelBrushStroke(
-        _ s: TestEditorBrushToolState)
+        _ s: TestEditorPaintToolState)
     
 }
 
-class TestEditorBrushToolState: TestEditorToolState {
+class TestEditorPaintToolState: TestEditorToolState {
     
-    weak var delegate: TestEditorBrushToolStateDelegate?
+    weak var delegate: TestEditorPaintToolStateDelegate?
     
     private let brushGestureRecognizer = BrushGestureRecognizer()
     private let controlsVC = TestEditorBrushToolControlsVC()
@@ -73,7 +73,7 @@ class TestEditorBrushToolState: TestEditorToolState {
 
 // MARK: - Delegates
 
-extension TestEditorBrushToolState: TestEditorBrushToolControlsVCDelegate {
+extension TestEditorPaintToolState: TestEditorBrushToolControlsVCDelegate {
     
     func onChangeScale(_ vc: TestEditorBrushToolControlsVC) {
         scale = controlsVC.scale
@@ -87,7 +87,7 @@ extension TestEditorBrushToolState: TestEditorBrushToolControlsVCDelegate {
     
 }
 
-extension TestEditorBrushToolState: BrushGestureRecognizerGestureDelegate {
+extension TestEditorPaintToolState: BrushGestureRecognizerGestureDelegate {
     
     func onBeginBrushStroke(quickTap: Bool) {
         delegate?.onBeginBrushStroke(self, quickTap: quickTap)

@@ -90,7 +90,7 @@ class TestEditorVC: UIViewController {
         addChild(toolControlsVC, to: bodyView.toolControlsContainer)
         addChild(workspaceVC, to: bodyView.workspaceContainer)
         
-        enterToolState(TestEditorBrushToolState())
+        enterToolState(TestEditorPaintToolState())
         reloadFrameEditor()
         
         updateWorkspaceContentSize()
@@ -102,13 +102,18 @@ class TestEditorVC: UIViewController {
         // TODO: Reuse already-loaded assets from the
         // previous frame editor!
         
-        // If it's for the same drawing, reuse the
-        // drawing canvas?
+        let drawingCanvasTexture: MTLTexture?
+        if let frameEditor {
+            drawingCanvasTexture = frameEditor.drawingCanvasTexture()
+        } else {
+            drawingCanvasTexture = nil
+        }
         
         guard let toolState else { return }
         
         let frameEditor = TestFrameEditor(
-            editorToolState: toolState)
+            editorToolState: toolState,
+            drawingCanvasTexture: drawingCanvasTexture)
         
         frameEditor.delegate = self
         
@@ -219,18 +224,18 @@ extension TestEditorVC: TestEditorToolbarVCDelegate {
     
     func onSelectBack(_ vc: TestEditorToolbarVC) { }
     
-    func onSelectBrushTool(_ vc: TestEditorToolbarVC) {
-        enterToolState(TestEditorBrushToolState())
-    }
-    func onSelectEraseTool(_ vc: TestEditorToolbarVC) {
-        enterToolState(TestEditorEraseToolState())
-    }
-    
     func onSelectUndo(_ vc: TestEditorToolbarVC) {
         clearCanvas()
     }
     func onSelectRedo(_ vc: TestEditorToolbarVC) { 
         clearCanvas()
+    }
+    
+    func onSelectPaintTool(_ vc: TestEditorToolbarVC) {
+        enterToolState(TestEditorPaintToolState())
+    }
+    func onSelectEraseTool(_ vc: TestEditorToolbarVC) {
+        enterToolState(TestEditorEraseToolState())
     }
     
 }

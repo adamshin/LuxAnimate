@@ -1,43 +1,43 @@
 //
-//  TestFrameEditorBrushToolState.swift
+//  TestFrameEditorPaintToolState.swift
 //
 
 import UIKit
 import Metal
 
-protocol TestFrameEditorBrushToolStateDelegate: AnyObject {
+protocol TestFrameEditorPaintToolStateDelegate: AnyObject {
     
     func workspaceViewSize(
-        _ s: TestFrameEditorBrushToolState
+        _ s: TestFrameEditorPaintToolState
     ) -> Size
     
     func workspaceTransform(
-        _ s: TestFrameEditorBrushToolState
+        _ s: TestFrameEditorPaintToolState
     ) -> TestWorkspaceTransform
     
     func layerContentSize(
-        _ s: TestFrameEditorBrushToolState
+        _ s: TestFrameEditorPaintToolState
     ) -> Size
     
     func layerTransform(
-        _ s: TestFrameEditorBrushToolState
+        _ s: TestFrameEditorPaintToolState
     ) -> Matrix3
     
     // TODO: Methods for reporting project edits
     
 }
 
-class TestFrameEditorBrushToolState: TestFrameEditorToolState {
+class TestFrameEditorPaintToolState: TestFrameEditorToolState {
     
-    weak var delegate: TestFrameEditorBrushToolStateDelegate?
+    weak var delegate: TestFrameEditorPaintToolStateDelegate?
     
-    private let editorToolState: TestEditorBrushToolState
+    private let editorToolState: TestEditorPaintToolState
     private let drawingCanvasSize: PixelSize
     
     private let brushEngine: BrushEngine
     
     init(
-        editorToolState: TestEditorBrushToolState,
+        editorToolState: TestEditorPaintToolState,
         drawingCanvasSize: PixelSize,
         drawingCanvasTexture: MTLTexture?
     ) {
@@ -77,10 +77,10 @@ class TestFrameEditorBrushToolState: TestFrameEditorToolState {
 
 // MARK: - Delegates
 
-extension TestFrameEditorBrushToolState: TestEditorBrushToolStateDelegate {
+extension TestFrameEditorPaintToolState: TestEditorPaintToolStateDelegate {
     
     func onBeginBrushStroke(
-        _ s: TestEditorBrushToolState,
+        _ s: TestEditorPaintToolState,
         quickTap: Bool
     ) {
         guard let brush = editorToolState.brush
@@ -95,7 +95,7 @@ extension TestFrameEditorBrushToolState: TestEditorBrushToolStateDelegate {
     }
     
     func onUpdateBrushStroke(
-        _ s: TestEditorBrushToolState,
+        _ s: TestEditorPaintToolState,
         stroke: BrushGestureRecognizer.Stroke
     ) {
         guard let delegate else { return }
@@ -116,20 +116,20 @@ extension TestFrameEditorBrushToolState: TestEditorBrushToolStateDelegate {
     }
 
     func onEndBrushStroke(
-        _ s: TestEditorBrushToolState
+        _ s: TestEditorPaintToolState
     ) {
         brushEngine.endStroke()
     }
 
     func onCancelBrushStroke(
-        _ s: TestEditorBrushToolState
+        _ s: TestEditorPaintToolState
     ) {
         brushEngine.cancelStroke()
     }
     
 }
 
-extension TestFrameEditorBrushToolState: BrushEngineDelegate {
+extension TestFrameEditorPaintToolState: BrushEngineDelegate {
     
     func onUpdateActiveCanvasTexture(
         _ e: BrushEngine

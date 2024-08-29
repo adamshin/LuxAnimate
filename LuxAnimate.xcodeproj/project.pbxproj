@@ -89,11 +89,11 @@
 		6632595F2BB6E94E00460F70 /* libjxl.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6632595E2BB6E94E00460F70 /* libjxl.xcframework */; };
 		663D40D42C35EA9C004B8591 /* ProjectEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663D40D32C35EA9C004B8591 /* ProjectEditor.swift */; };
 		664120532C7A727E00CF98B8 /* TestEditorBrushToolControlsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664120522C7A727E00CF98B8 /* TestEditorBrushToolControlsVC.swift */; };
-		664175B52C7E557300205FEC /* TestEditorBrushToolState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664175B42C7E557300205FEC /* TestEditorBrushToolState.swift */; };
+		664175B52C7E557300205FEC /* TestEditorPaintToolState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664175B42C7E557300205FEC /* TestEditorPaintToolState.swift */; };
 		664175B72C7E558500205FEC /* TestEditorEraseToolState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664175B62C7E558500205FEC /* TestEditorEraseToolState.swift */; };
 		664175B92C7E798900205FEC /* TestEditorToolSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664175B82C7E798900205FEC /* TestEditorToolSettingsStore.swift */; };
 		664175BC2C7E820F00205FEC /* TestFrameEditorToolState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664175BB2C7E820F00205FEC /* TestFrameEditorToolState.swift */; };
-		664175BE2C7E824700205FEC /* TestFrameEditorBrushToolState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664175BD2C7E824700205FEC /* TestFrameEditorBrushToolState.swift */; };
+		664175BE2C7E824700205FEC /* TestFrameEditorPaintToolState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664175BD2C7E824700205FEC /* TestFrameEditorPaintToolState.swift */; };
 		6643CAF52BE31CC00094B998 /* ChromeBlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6643CAF42BE31CC00094B998 /* ChromeBlurView.swift */; };
 		6643CAF72BE3431A0094B998 /* EditorMenuDismissGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6643CAF62BE3431A0094B998 /* EditorMenuDismissGestureRecognizer.swift */; };
 		6643CAFD2BE38AD40094B998 /* EditorSidebarCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6643CAFC2BE38AD40094B998 /* EditorSidebarCardView.swift */; };
@@ -263,11 +263,11 @@
 		6632595E2BB6E94E00460F70 /* libjxl.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libjxl.xcframework; sourceTree = "<group>"; };
 		663D40D32C35EA9C004B8591 /* ProjectEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectEditor.swift; sourceTree = "<group>"; };
 		664120522C7A727E00CF98B8 /* TestEditorBrushToolControlsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestEditorBrushToolControlsVC.swift; sourceTree = "<group>"; };
-		664175B42C7E557300205FEC /* TestEditorBrushToolState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestEditorBrushToolState.swift; sourceTree = "<group>"; };
+		664175B42C7E557300205FEC /* TestEditorPaintToolState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestEditorPaintToolState.swift; sourceTree = "<group>"; };
 		664175B62C7E558500205FEC /* TestEditorEraseToolState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestEditorEraseToolState.swift; sourceTree = "<group>"; };
 		664175B82C7E798900205FEC /* TestEditorToolSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestEditorToolSettingsStore.swift; sourceTree = "<group>"; };
 		664175BB2C7E820F00205FEC /* TestFrameEditorToolState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFrameEditorToolState.swift; sourceTree = "<group>"; };
-		664175BD2C7E824700205FEC /* TestFrameEditorBrushToolState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFrameEditorBrushToolState.swift; sourceTree = "<group>"; };
+		664175BD2C7E824700205FEC /* TestFrameEditorPaintToolState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFrameEditorPaintToolState.swift; sourceTree = "<group>"; };
 		6643CAF42BE31CC00094B998 /* ChromeBlurView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromeBlurView.swift; sourceTree = "<group>"; };
 		6643CAF62BE3431A0094B998 /* EditorMenuDismissGestureRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorMenuDismissGestureRecognizer.swift; sourceTree = "<group>"; };
 		6643CAFC2BE38AD40094B998 /* EditorSidebarCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorSidebarCardView.swift; sourceTree = "<group>"; };
@@ -755,7 +755,7 @@
 			isa = PBXGroup;
 			children = (
 				668A14D82C7D7BCD00D73D36 /* TestEditorToolState.swift */,
-				664175B42C7E557300205FEC /* TestEditorBrushToolState.swift */,
+				664175B42C7E557300205FEC /* TestEditorPaintToolState.swift */,
 				664175B62C7E558500205FEC /* TestEditorEraseToolState.swift */,
 			);
 			path = "Tool State";
@@ -765,7 +765,7 @@
 			isa = PBXGroup;
 			children = (
 				664175BB2C7E820F00205FEC /* TestFrameEditorToolState.swift */,
-				664175BD2C7E824700205FEC /* TestFrameEditorBrushToolState.swift */,
+				664175BD2C7E824700205FEC /* TestFrameEditorPaintToolState.swift */,
 				6678A9BD2C8131E700838EA3 /* TestFrameEditorEraseToolState.swift */,
 			);
 			path = "Tool State";
@@ -1308,7 +1308,7 @@
 				662232712BE1B79300C8813F /* EditorSidebarSlider.swift in Sources */,
 				664C28232C755402002166D6 /* TestWorkspaceOverlayView.swift in Sources */,
 				664C28252C757E95002166D6 /* TestWorkspaceTransformManager.swift in Sources */,
-				664175B52C7E557300205FEC /* TestEditorBrushToolState.swift in Sources */,
+				664175B52C7E557300205FEC /* TestEditorPaintToolState.swift in Sources */,
 				66099BA42BDB193800243D9F /* EditorFrameToolbarView.swift in Sources */,
 				66211EAC2BF2D6BD005490C4 /* AnimationFrameView.swift in Sources */,
 				66211E962BEF590F005490C4 /* TimelineToolbarFrameWidgetControlVC.swift in Sources */,
@@ -1391,7 +1391,7 @@
 				6622326B2BE07FB000C8813F /* TimelineTrackCell.swift in Sources */,
 				6622326C2BE07FB000C8813F /* TimelineTrackVC.swift in Sources */,
 				66211EB82BF54F63005490C4 /* EditorFrameEditorScene.swift in Sources */,
-				664175BE2C7E824700205FEC /* TestFrameEditorBrushToolState.swift in Sources */,
+				664175BE2C7E824700205FEC /* TestFrameEditorPaintToolState.swift in Sources */,
 				66A653042C209DFB0060A216 /* XXHash.swift in Sources */,
 				66E312B62C3A0001006BE399 /* ProjectEditorContentVC.swift in Sources */,
 				66D0843F2BA3840C00EB8556 /* SceneDelegate.swift in Sources */,
