@@ -59,6 +59,9 @@ class TestEditorVC: UIViewController {
     private let toolControlsVC = TestEditorToolControlsVC()
     private let workspaceVC = TestEditorWorkspaceVC()
     
+    private let workspaceRenderer = TestEditorWorkspaceRenderer(
+        pixelFormat: AppConfig.metalLayerPixelFormat)
+    
     private var toolState: TestEditorToolState?
     
     private var frameEditor: TestFrameEditor?
@@ -67,10 +70,6 @@ class TestEditorVC: UIViewController {
     
     init() {
         super.init(nibName: nil, bundle: nil)
-        
-        let frameEditor = TestFrameEditor()
-        frameEditor.delegate = self
-        self.frameEditor = frameEditor
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -91,22 +90,41 @@ class TestEditorVC: UIViewController {
         addChild(toolControlsVC, to: bodyView.toolControlsContainer)
         addChild(workspaceVC, to: bodyView.workspaceContainer)
         
-        updateSceneContentSize()
-        selectBrushTool()
+        enterToolState(TestEditorBrushToolState())
+        reloadFrameEditor()
+        
+        updateWorkspaceContentSize()
     }
     
-    // MARK: - Content
+    // MARK: - Logic
     
-    private func updateSceneContentSize() {
-        let size = frameEditor?.getSceneContentSize()
-            ?? PixelSize(0, 0)
+    private func reloadFrameEditor() {
+        // TODO: Reuse already-loaded assets from the
+        // previous frame editor!
+        
+        // If it's for the same drawing, reuse the
+        // drawing canvas?
+        
+        guard let toolState else { return }
+        
+        let frameEditor = TestFrameEditor(
+            editorToolState: toolState)
+        
+        frameEditor.delegate = self
+        
+        self.frameEditor = frameEditor
+    }
+    
+    private func updateWorkspaceContentSize() {
+        guard let size = frameEditor?.sceneContentSize()
+        else { return }
         
         workspaceVC.setContentSize(Size(
             Double(size.width),
             Double(size.height)))
     }
     
-    // MARK: - Tools
+    // MARK: - Tool State
     
     private func enterToolState(
         _ newToolState: TestEditorToolState
@@ -120,14 +138,8 @@ class TestEditorVC: UIViewController {
         newToolState.beginState(
             workspaceVC: workspaceVC,
             toolControlsVC: toolControlsVC)
-    }
-    
-    private func selectBrushTool() {
-        enterToolState(TestEditorBrushToolState())
-    }
-    
-    private func selectEraseTool() {
-        enterToolState(TestEditorEraseToolState())
+        
+        reloadFrameEditor()
     }
     
     // MARK: - Editing
@@ -143,14 +155,37 @@ class TestEditorVC: UIViewController {
         viewportSize: Size,
         workspaceTransform: TestWorkspaceTransform
     ) {
-        // TODO: Do rendering here?
-        // Maybe the frame editor should simply return a
-        // scene object, which we draw.
+        let scene = frameEditor?.onFrame()
         
-        frameEditor?.onFrame(
-            drawable: drawable,
+        if let scene {
+            draw(
+                drawable: drawable,
+                viewportSize: viewportSize,
+                workspaceTransform: workspaceTransform,
+                scene: scene)
+        }
+    }
+    
+    // MARK: - Render
+    
+    private func draw(
+        drawable: CAMetalDrawable,
+        viewportSize: Size,
+        workspaceTransform: TestWorkspaceTransform,
+        scene: TestEditorScene
+    ) {
+        let commandBuffer = MetalInterface.shared
+            .commandQueue.makeCommandBuffer()!
+        
+        workspaceRenderer.draw(
+            target: drawable.texture,
+            commandBuffer: commandBuffer,
             viewportSize: viewportSize,
-            workspaceTransform: workspaceTransform)
+            workspaceTransform: workspaceTransform,
+            scene: scene)
+        
+        commandBuffer.present(drawable)
+        commandBuffer.commit()
     }
     
 }
@@ -185,10 +220,10 @@ extension TestEditorVC: TestEditorToolbarVCDelegate {
     func onSelectBack(_ vc: TestEditorToolbarVC) { }
     
     func onSelectBrushTool(_ vc: TestEditorToolbarVC) {
-        selectBrushTool()
+        enterToolState(TestEditorBrushToolState())
     }
     func onSelectEraseTool(_ vc: TestEditorToolbarVC) {
-        selectEraseTool()
+        enterToolState(TestEditorEraseToolState())
     }
     
     func onSelectUndo(_ vc: TestEditorToolbarVC) {
@@ -202,8 +237,20 @@ extension TestEditorVC: TestEditorToolbarVCDelegate {
 
 extension TestEditorVC: TestFrameEditorDelegate {
     
+    func workspaceViewSize(
+        _ e: TestFrameEditor
+    ) -> Size {
+        Size(workspaceVC.view.bounds.size)
+    }
+    
+    func workspaceTransform(
+        _ e: TestFrameEditor
+    ) -> TestWorkspaceTransform {
+        workspaceVC.workspaceTransform()
+    }
+    
     func onChangeSceneContentSize(_ e: TestFrameEditor) {
-        updateSceneContentSize()
+        updateWorkspaceContentSize()
     }
     
 }

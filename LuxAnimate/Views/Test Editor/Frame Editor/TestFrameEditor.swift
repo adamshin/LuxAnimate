@@ -5,10 +5,34 @@
 import UIKit
 import Metal
 
-private let sceneContentSize = PixelSize(1920, 1080)
-private let layerContentSize = PixelSize(800, 800)
+// Thought: Should the frame editor be recreated whenever
+// we change frames, layers, or tools? The frame editor
+// would then represent an editing session that pertains
+// to a single drawing, and a single tool.
 
-private let layerTransform =
+// This may simplify some things. I'll have to think about
+// where to reuse code, since all tools will share certain
+// logic. They all have to generate the frame scene, load
+// assets, render etc. This should probably live in the
+// frame editor, not the individual tool.
+
+// I like the idea of making a clean break whenever we
+// switch tools or drawings. Maybe when switching tools, we
+// should also reload the active drawing from disk. This
+// would help ensure everything stays in sync.
+
+// A benefit here is that we don't have to update the
+// existing frame editor when the selected tool changes.
+// We just create a fresh new frame editor. I think this
+// simplifies the logic.
+
+// When starting a new editor session, we should reuse
+// already-loaded assets from the previous session.
+
+private let sceneSize = PixelSize(1920, 1080)
+private let drawingSize = PixelSize(800, 800)
+
+private let drawingTransform =
     Matrix3(translation: Vector(200, 50)) *
     Matrix3(rotation: -.pi/20) *
     Matrix3(shearHorizontal: .pi/10) *
@@ -16,8 +40,18 @@ private let layerTransform =
 
 protocol TestFrameEditorDelegate: AnyObject {
     
+    func workspaceViewSize(
+        _ e: TestFrameEditor
+    ) -> Size
+    
+    func workspaceTransform(
+        _ e: TestFrameEditor
+    ) -> TestWorkspaceTransform
+    
     func onChangeSceneContentSize(
         _ e: TestFrameEditor)
+    
+    // TODO: Methods for reporting project edits
     
 }
 
@@ -27,25 +61,52 @@ class TestFrameEditor {
     
     // TODO: Logic for loading a single frame and editing content
     
-    private let workspaceRenderer = TestEditorWorkspaceRenderer(
-        pixelFormat: AppConfig.metalLayerPixelFormat)
+    private let toolState: TestFrameEditorToolState?
     
-    // MARK: - Render
+    // MARK: - Init
     
-    private func drawWorkspace(
-        drawable: CAMetalDrawable,
-        viewportSize: Size,
-        workspaceTransform: TestWorkspaceTransform
-    ) {
+    // TODO: This needs to take scene/frame/layer data.
+    // We'll load assets, generate an editor scene.
+    
+    init(editorToolState: TestEditorToolState) {
+        switch editorToolState {
+        case let state as TestEditorBrushToolState:
+            let toolState = TestFrameEditorBrushToolState(
+                editorToolState: state,
+                drawingCanvasSize: drawingSize,
+                drawingCanvasTexture: nil)
+            
+            self.toolState = toolState
+            toolState.delegate = self
+            
+        case let state as TestEditorEraseToolState:
+            let toolState = TestFrameEditorEraseToolState(
+                editorToolState: state,
+                drawingCanvasSize: drawingSize,
+                drawingCanvasTexture: nil)
+            
+            self.toolState = toolState
+            toolState.delegate = self
+            
+        default:
+            toolState = nil
+        }
+    }
+    
+    // MARK: - Logic
+    
+    private func createEditorScene() -> TestEditorScene {
         let sceneSize = Size(
-            Double(sceneContentSize.width),
-            Double(sceneContentSize.height))
+            Double(sceneSize.width),
+            Double(sceneSize.height))
         
         let layerSize = Size(
-            Double(layerContentSize.width),
-            Double(layerContentSize.height))
+            Double(drawingSize.width),
+            Double(drawingSize.height))
         
-        let scene = TestEditorScene(layers: [
+        let drawingTexture = toolState?.drawingCanvasTexture()
+        
+        var scene = TestEditorScene(layers: [
             TestEditorScene.Layer(
                 transform: .identity,
                 contentSize: sceneSize,
@@ -55,78 +116,105 @@ class TestFrameEditor {
                 ))
             ),
             TestEditorScene.Layer(
-                transform: layerTransform,
+                transform: drawingTransform,
                 contentSize: layerSize,
                 alpha: 1,
                 content: .rect(.init(
                     color: .white
                 ))
             ),
-//            TestEditorScene.Layer(
-//                transform: layerTransform,
-//                contentSize: layerSize,
-//                alpha: 1,
-//                content: .drawing(.init(
-//                    texture: brushEngine.activeCanvasTexture
-//                ))
-//            ),
         ])
-        
-        let commandBuffer = MetalInterface.shared
-            .commandQueue.makeCommandBuffer()!
-        
-        workspaceRenderer.draw(
-            target: drawable.texture,
-            commandBuffer: commandBuffer,
-            viewportSize: viewportSize,
-            workspaceTransform: workspaceTransform,
-            scene: scene)
-        
-        commandBuffer.present(drawable)
-        commandBuffer.commit()
+        if let drawingTexture {
+            let layer = TestEditorScene.Layer(
+                transform: drawingTransform,
+                contentSize: layerSize,
+                alpha: 1,
+                content: .drawing(.init(
+                    texture: drawingTexture
+                ))
+            )
+            scene.layers.append(layer)
+        }
+        return scene
     }
     
     // MARK: - Interface
     
-    func getSceneContentSize() -> PixelSize {
-        return sceneContentSize
+    func sceneContentSize() -> PixelSize {
+        return sceneSize
     }
     
     func clearCanvas() {
-//        let texture = try! TextureCreator
-//            .createEmptyTexture(
-//                size: layerContentSize,
-//                mipMapped: false)
-//
-//        brushEngine.setCanvasTexture(texture)
+        toolState?.clearCanvas()
     }
     
-    func handleUpdateEditorToolState(
-        editorToolState: TestEditorToolState
-    ) {
-        switch editorToolState {
-        case let s as TestEditorBrushToolState:
-            print("foo") // TODO: Enter brush state
-            
-        case let s as TestEditorEraseToolState:
-            print("foo") // TODO: Enter erase state
-            
-        default:
-            break
-        }
-    }
-    
-    func onFrame(
-        drawable: CAMetalDrawable,
-        viewportSize: Size,
-        workspaceTransform: TestWorkspaceTransform
-    ) {
-        // TODO: Update tool state
+    func onFrame() -> TestEditorScene? {
+        toolState?.onFrame()
         
-        drawWorkspace(
-            drawable: drawable,
-            viewportSize: viewportSize,
-            workspaceTransform: workspaceTransform)
+        let scene = createEditorScene()
+        return scene
+    }
+    
+}
+
+// MARK: - Delegates
+
+extension TestFrameEditor: TestFrameEditorBrushToolStateDelegate {
+    
+    func workspaceViewSize(
+        _ s: TestFrameEditorBrushToolState
+    ) -> Size {
+        delegate?.workspaceViewSize(self) ?? .zero
+    }
+    
+    func workspaceTransform(
+        _ s: TestFrameEditorBrushToolState
+    ) -> TestWorkspaceTransform {
+        delegate?.workspaceTransform(self) ?? .identity
+    }
+    
+    func layerContentSize(
+        _ s: TestFrameEditorBrushToolState
+    ) -> Size {
+        Size(
+            Double(drawingSize.width),
+            Double(drawingSize.height))
+    }
+    
+    func layerTransform(
+        _ s: TestFrameEditorBrushToolState
+    ) -> Matrix3 {
+        drawingTransform
+    }
+    
+}
+
+extension TestFrameEditor: TestFrameEditorEraseToolStateDelegate {
+    
+    func workspaceViewSize(
+        _ s: TestFrameEditorEraseToolState
+    ) -> Size {
+        delegate?.workspaceViewSize(self) ?? .zero
+    }
+    
+    func workspaceTransform(
+        _ s: TestFrameEditorEraseToolState
+    ) -> TestWorkspaceTransform {
+        delegate?.workspaceTransform(self) ?? .identity
+    }
+    
+    func layerContentSize(
+        _ s: TestFrameEditorEraseToolState
+    ) -> Size {
+        Size(
+            Double(drawingSize.width),
+            Double(drawingSize.height))
+    }
+    
+    func layerTransform(
+        _ s: TestFrameEditorEraseToolState
+    ) -> Matrix3 {
+        drawingTransform
     }
     
 }

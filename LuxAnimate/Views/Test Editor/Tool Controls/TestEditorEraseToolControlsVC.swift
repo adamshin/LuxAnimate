@@ -7,7 +7,14 @@ import UIKit
 private let scaleGamma: Double = 2.0
 private let smoothingGamma: Double = 1.5
 
+protocol TestEditorEraseToolControlsVCDelegate: AnyObject {
+    func onChangeScale(_ vc: TestEditorEraseToolControlsVC)
+    func onChangeSmoothing(_ vc: TestEditorEraseToolControlsVC)
+}
+
 class TestEditorEraseToolControlsVC: UIViewController {
+    
+    weak var delegate: TestEditorEraseToolControlsVCDelegate?
     
     private let scaleSlider = EditorSidebarSliderContainer(
         title: "Size",
@@ -37,9 +44,16 @@ class TestEditorEraseToolControlsVC: UIViewController {
         
         scaleSlider.delegate = self
         smoothingSlider.delegate = self
-        
-        scaleSlider.value = TestEditorToolSettingsStore.eraseToolScale
-        smoothingSlider.value = TestEditorToolSettingsStore.eraseToolSmoothing
+    }
+    
+    var scale: Double {
+        get { scaleSlider.value }
+        set { scaleSlider.value = newValue }
+    }
+    
+    var smoothing: Double {
+        get { smoothingSlider.value }
+        set { smoothingSlider.value = newValue }
     }
     
 }
@@ -49,13 +63,9 @@ extension TestEditorEraseToolControlsVC: EditorSidebarSliderContainerDelegate {
     func onChangeValue(_ v: EditorSidebarSliderContainer) {
         switch v {
         case scaleSlider:
-            let v = scaleSlider.value
-            TestEditorToolSettingsStore.eraseToolScale = v
-            
+            delegate?.onChangeScale(self)
         case smoothingSlider:
-            let v = smoothingSlider.value
-            TestEditorToolSettingsStore.eraseToolSmoothing = v
-            
+            delegate?.onChangeSmoothing(self)
         default:
             break
         }
