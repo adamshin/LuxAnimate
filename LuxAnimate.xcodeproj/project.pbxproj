@@ -612,6 +612,7 @@
 				6631079B2C62CC910028C89C /* Frame Editor */,
 				663107B52C6C17CE0028C89C /* Scene */,
 				663107962C615AD80028C89C /* Canvas */,
+				663107AB2C67EC9A0028C89C /* Workspace */,
 				663107912C614E7D0028C89C /* Toolbar */,
 				663107A22C62F15C0028C89C /* Drawing Editor */,
 				6631078D2C61451C0028C89C /* NewAnimationEditorVC.swift */,
@@ -669,7 +670,6 @@
 				669E20C62C40A61D008546E1 /* Scene Editor */,
 				66D0848D2BA56E7800EB8556 /* Animation Editor */,
 				6631078C2C61450D0028C89C /* New Animation Editor */,
-				663107AB2C67EC9A0028C89C /* Workspace */,
 			);
 			path = Editor;
 			sourceTree = "<group>";
