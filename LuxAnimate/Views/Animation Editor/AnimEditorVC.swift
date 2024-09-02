@@ -27,7 +27,7 @@ class AnimEditorVC: UIViewController {
     private let toolControlsVC = AnimEditorToolControlsVC()
     private let workspaceVC = AnimEditorWorkspaceVC()
     
-//    private let assetLoader: AnimEditorAssetLoader
+    private let assetLoader: AnimEditorAssetLoader
     
     private let workspaceRenderer = AnimEditorWorkspaceRenderer(
         pixelFormat: AppConfig.metalLayerPixelFormat)
@@ -35,7 +35,11 @@ class AnimEditorVC: UIViewController {
     private let projectID: String
     private let sceneID: String
     
-    // TODO: Make these changeable
+    private var projectManifest: Project.Manifest?
+    private var sceneManifest: Scene.Manifest?
+    
+    // TODO: Make these changeable.
+    // Changing these values should reload the frame editor.
     private let activeLayerID: String
     private let activeFrameIndex: Int
     
@@ -56,6 +60,9 @@ class AnimEditorVC: UIViewController {
         self.sceneID = sceneID
         self.activeLayerID = activeLayerID
         self.activeFrameIndex = activeFrameIndex
+        
+        assetLoader = AnimEditorAssetLoader(
+            projectID: projectID)
         
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
@@ -90,28 +97,28 @@ class AnimEditorVC: UIViewController {
     // MARK: - Logic
     
     private func reloadFrameEditor() {
+        guard 
+            let projectManifest,
+            let sceneManifest,
+            let toolState
+        else { return }
+        
         // TODO: Reuse already-loaded assets from the
-        // previous frame editor!
+        // previous frame editor, including the active
+        // drawing texture(?)
         
-        // Should we manually extract the drawing canvas
-        // texture here? Maybe the frame editor should
-        // store updated textures in the asset loader.
-        
-        let drawingCanvasTexture: MTLTexture?
-        if let frameEditor {
-            drawingCanvasTexture = frameEditor.drawingCanvasTexture()
-        } else {
-            drawingCanvasTexture = nil
-        }
-        
-        guard let toolState else { return }
+        // Need to figure out how to do this
         
         let frameEditor = AnimFrameEditor(
+            projectID: projectID,
+            sceneID: sceneID,
+            activeLayerID: activeLayerID,
+            activeFrameIndex: activeFrameIndex,
             editorToolState: toolState,
-            drawingCanvasTexture: drawingCanvasTexture)
+            projectManifest: projectManifest,
+            sceneManifest: sceneManifest)
         
         frameEditor.delegate = self
-        
         self.frameEditor = frameEditor
     }
     
@@ -188,16 +195,10 @@ class AnimEditorVC: UIViewController {
         projectManifest: Project.Manifest,
         sceneManifest: Scene.Manifest
     ) {
-//        frameEditor = AnimationFrameEditor(
-//            projectID: projectID,
-//            sceneID: sceneID,
-//            activeLayerID: activeLayerID,
-//            activeFrameIndex: activeFrameIndex,
-//            onionSkinPrevCount: 0,
-//            onionSkinNextCount: 0,
-//            projectManifest: projectManifest,
-//            sceneManifest: sceneManifest,
-//            delegate: self)
+        self.projectManifest = projectManifest
+        self.sceneManifest = sceneManifest
+        
+        reloadFrameEditor()
     }
     
     func update(

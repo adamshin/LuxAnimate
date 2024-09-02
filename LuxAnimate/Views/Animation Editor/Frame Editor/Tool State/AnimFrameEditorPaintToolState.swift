@@ -3,70 +3,90 @@
 //
 
 import UIKit
-import Metal
 
-protocol AnimFrameEditorPaintToolStateDelegate: AnyObject {
-    
-    func workspaceViewSize(
-        _ s: AnimFrameEditorPaintToolState
-    ) -> Size
-    
-    func workspaceTransform(
-        _ s: AnimFrameEditorPaintToolState
-    ) -> AnimWorkspaceTransform
-    
-    func layerContentSize(
-        _ s: AnimFrameEditorPaintToolState
-    ) -> Size
-    
-    func layerTransform(
-        _ s: AnimFrameEditorPaintToolState
-    ) -> Matrix3
-    
-    // TODO: Methods for reporting project edits
-    
-}
+private let brushColor: Color = .brushBlack
 
 class AnimFrameEditorPaintToolState: AnimFrameEditorToolState {
     
-    weak var delegate: AnimFrameEditorPaintToolStateDelegate?
+    weak var delegate: AnimFrameEditorToolStateDelegate?
     
     private let editorToolState: AnimEditorPaintToolState
-    private let drawingCanvasSize: PixelSize
-    
-    private let brushEngine: BrushEngine
+    private let internalState: AnimFrameEditorBrushToolInternalState
     
     init(
         editorToolState: AnimEditorPaintToolState,
-        drawingCanvasSize: PixelSize,
-        drawingCanvasTexture: MTLTexture?
+        drawingCanvasSize: PixelSize
     ) {
         self.editorToolState = editorToolState
-        self.drawingCanvasSize = drawingCanvasSize
         
-        brushEngine = BrushEngine(
+        internalState = AnimFrameEditorBrushToolInternalState(
             canvasSize: drawingCanvasSize,
             brushMode: .paint)
         
-        if let drawingCanvasTexture {
-            brushEngine.setCanvasTexture(drawingCanvasTexture)
-        }
-        
         editorToolState.delegate = self
-        brushEngine.delegate = self
+        internalState.delegate = self
     }
     
     func onFrame() {
-        brushEngine.onFrame()
-    }
-    
-    func drawingCanvasTexture() -> any MTLTexture {
-        brushEngine.activeCanvasTexture
+        internalState.onFrame()
     }
     
 }
 
 // MARK: - Delegates
+
+extension AnimFrameEditorPaintToolState:
+    AnimFrameEditorBrushToolInternalStateDelegate
+{
+    func brush(
+        _ s: AnimFrameEditorBrushToolInternalState
+    ) -> Brush? {
+        editorToolState.brush
+    }
+    
+    func color(
+        _ s: AnimFrameEditorBrushToolInternalState
+    ) -> Color {
+        brushColor
+    }
+    
+    func scale(
+        _ s: AnimFrameEditorBrushToolInternalState
+    ) -> Double {
+        editorToolState.scale
+    }
+    
+    func smoothing(
+        _ s: AnimFrameEditorBrushToolInternalState
+    ) -> Double {
+        editorToolState.smoothing
+    }
+    
+    func workspaceViewSize(
+        _ s: AnimFrameEditorBrushToolInternalState
+    ) -> Size {
+        delegate?.workspaceViewSize(self) ?? .zero
+    }
+    
+    func workspaceTransform(
+        _ s: AnimFrameEditorBrushToolInternalState
+    ) -> AnimWorkspaceTransform {
+        delegate?.workspaceTransform(self) ?? .identity
+    }
+    
+    func layerContentSize(
+        _ s: AnimFrameEditorBrushToolInternalState
+    ) -> Size {
+        delegate?.layerContentSize(self) ?? .zero
+    }
+    
+    func layerTransform(
+        _ s: AnimFrameEditorBrushToolInternalState
+    ) -> Matrix3 {
+        delegate?.layerTransform(self) ?? .identity
+    }
+    
+}
 
 extension AnimFrameEditorPaintToolState: AnimEditorPaintToolStateDelegate {
     
@@ -74,61 +94,26 @@ extension AnimFrameEditorPaintToolState: AnimEditorPaintToolStateDelegate {
         _ s: AnimEditorPaintToolState,
         quickTap: Bool
     ) {
-        guard let brush = editorToolState.brush
-        else { return }
-        
-        brushEngine.beginStroke(
-            brush: brush,
-            color: .brushBlack,
-            scale: editorToolState.scale,
-            smoothing: editorToolState.smoothing,
-            quickTap: quickTap)
+        internalState.beginBrushStroke(quickTap: quickTap)
     }
     
     func onUpdateBrushStroke(
         _ s: AnimEditorPaintToolState,
         stroke: BrushGestureRecognizer.Stroke
     ) {
-        guard let delegate else { return }
-        
-        let workspaceViewSize = delegate.workspaceViewSize(self)
-        let workspaceTransform = delegate.workspaceTransform(self)
-        let layerContentSize = delegate.layerContentSize(self)
-        let layerTransform = delegate.layerTransform(self)
-        
-        let inputStroke = AnimEditorBrushStrokeAdapter.convert(
-            stroke: stroke,
-            workspaceViewSize: workspaceViewSize,
-            workspaceTransform: workspaceTransform,
-            layerContentSize: layerContentSize,
-            layerTransform: layerTransform)
-        
-        brushEngine.updateStroke(inputStroke: inputStroke)
+        internalState.updateBrushStroke(stroke: stroke)
     }
 
     func onEndBrushStroke(
         _ s: AnimEditorPaintToolState
     ) {
-        brushEngine.endStroke()
+        internalState.endBrushStroke()
     }
 
     func onCancelBrushStroke(
         _ s: AnimEditorPaintToolState
     ) {
-        brushEngine.cancelStroke()
+        internalState.cancelBrushStroke()
     }
-    
-}
-
-extension AnimFrameEditorPaintToolState: BrushEngineDelegate {
-    
-    func onUpdateActiveCanvasTexture(
-        _ e: BrushEngine
-    ) { }
-
-    func onFinalizeStroke(
-        _ e: BrushEngine,
-        canvasTexture: MTLTexture
-    ) { }
     
 }

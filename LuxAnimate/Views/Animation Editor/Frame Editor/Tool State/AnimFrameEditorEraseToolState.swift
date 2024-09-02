@@ -3,70 +3,88 @@
 //
 
 import UIKit
-import Metal
-
-protocol AnimFrameEditorEraseToolStateDelegate: AnyObject {
-    
-    func workspaceViewSize(
-        _ s: AnimFrameEditorEraseToolState
-    ) -> Size
-    
-    func workspaceTransform(
-        _ s: AnimFrameEditorEraseToolState
-    ) -> AnimWorkspaceTransform
-    
-    func layerContentSize(
-        _ s: AnimFrameEditorEraseToolState
-    ) -> Size
-    
-    func layerTransform(
-        _ s: AnimFrameEditorEraseToolState
-    ) -> Matrix3
-    
-    // TODO: Methods for reporting project edits
-    
-}
 
 class AnimFrameEditorEraseToolState: AnimFrameEditorToolState {
     
-    weak var delegate: AnimFrameEditorEraseToolStateDelegate?
+    weak var delegate: AnimFrameEditorToolStateDelegate?
     
     private let editorToolState: AnimEditorEraseToolState
-    private let drawingCanvasSize: PixelSize
-    
-    private let brushEngine: BrushEngine
+    private let internalState: AnimFrameEditorBrushToolInternalState
     
     init(
         editorToolState: AnimEditorEraseToolState,
-        drawingCanvasSize: PixelSize,
-        drawingCanvasTexture: MTLTexture?
+        drawingCanvasSize: PixelSize
     ) {
         self.editorToolState = editorToolState
-        self.drawingCanvasSize = drawingCanvasSize
         
-        brushEngine = BrushEngine(
+        internalState = AnimFrameEditorBrushToolInternalState(
             canvasSize: drawingCanvasSize,
             brushMode: .erase)
         
-        if let drawingCanvasTexture {
-            brushEngine.setCanvasTexture(drawingCanvasTexture)
-        }
-        
         editorToolState.delegate = self
-        brushEngine.delegate = self
+        internalState.delegate = self
     }
     
     func onFrame() {
-        brushEngine.onFrame()
-    }
-    
-    func drawingCanvasTexture() -> any MTLTexture {
-        brushEngine.activeCanvasTexture
+        internalState.onFrame()
     }
     
 }
 
 // MARK: - Delegates
+
+extension AnimFrameEditorEraseToolState:
+    AnimFrameEditorBrushToolInternalStateDelegate
+{
+    func brush(
+        _ s: AnimFrameEditorBrushToolInternalState
+    ) -> Brush? {
+        editorToolState.brush
+    }
+    
+    func color(
+        _ s: AnimFrameEditorBrushToolInternalState
+    ) -> Color {
+        .black
+    }
+    
+    func scale(
+        _ s: AnimFrameEditorBrushToolInternalState
+    ) -> Double {
+        editorToolState.scale
+    }
+    
+    func smoothing(
+        _ s: AnimFrameEditorBrushToolInternalState
+    ) -> Double {
+        editorToolState.smoothing
+    }
+    
+    func workspaceViewSize(
+        _ s: AnimFrameEditorBrushToolInternalState
+    ) -> Size {
+        delegate?.workspaceViewSize(self) ?? .zero
+    }
+    
+    func workspaceTransform(
+        _ s: AnimFrameEditorBrushToolInternalState
+    ) -> AnimWorkspaceTransform {
+        delegate?.workspaceTransform(self) ?? .identity
+    }
+    
+    func layerContentSize(
+        _ s: AnimFrameEditorBrushToolInternalState
+    ) -> Size {
+        delegate?.layerContentSize(self) ?? .zero
+    }
+    
+    func layerTransform(
+        _ s: AnimFrameEditorBrushToolInternalState
+    ) -> Matrix3 {
+        delegate?.layerTransform(self) ?? .identity
+    }
+    
+}
 
 extension AnimFrameEditorEraseToolState: AnimEditorEraseToolStateDelegate {
     
@@ -74,62 +92,26 @@ extension AnimFrameEditorEraseToolState: AnimEditorEraseToolStateDelegate {
         _ s: AnimEditorEraseToolState,
         quickTap: Bool
     ) {
-        guard let brush = editorToolState.brush
-        else { return }
-        
-        brushEngine.beginStroke(
-            brush: brush,
-            color: .black,
-            scale: editorToolState.scale,
-            smoothing: editorToolState.smoothing,
-            quickTap: quickTap)
+        internalState.beginBrushStroke(quickTap: quickTap)
     }
     
     func onUpdateBrushStroke(
         _ s: AnimEditorEraseToolState,
         stroke: BrushGestureRecognizer.Stroke
     ) {
-        guard let delegate else { return }
-        
-        let workspaceViewSize = delegate.workspaceViewSize(self)
-        let workspaceTransform = delegate.workspaceTransform(self)
-        let layerContentSize = delegate.layerContentSize(self)
-        let layerTransform = delegate.layerTransform(self)
-        
-        let inputStroke = AnimEditorBrushStrokeAdapter.convert(
-            stroke: stroke,
-            workspaceViewSize: workspaceViewSize,
-            workspaceTransform: workspaceTransform,
-            layerContentSize: layerContentSize,
-            layerTransform: layerTransform)
-        
-        brushEngine.updateStroke(inputStroke: inputStroke)
+        internalState.updateBrushStroke(stroke: stroke)
     }
 
     func onEndBrushStroke(
         _ s: AnimEditorEraseToolState
     ) {
-        brushEngine.endStroke()
+        internalState.endBrushStroke()
     }
 
     func onCancelBrushStroke(
         _ s: AnimEditorEraseToolState
     ) {
-        brushEngine.cancelStroke()
+        internalState.cancelBrushStroke()
     }
     
 }
-
-extension AnimFrameEditorEraseToolState: BrushEngineDelegate {
-    
-    func onUpdateActiveCanvasTexture(
-        _ e: BrushEngine
-    ) { }
-
-    func onFinalizeStroke(
-        _ e: BrushEngine,
-        canvasTexture: MTLTexture
-    ) { }
-    
-}
-
