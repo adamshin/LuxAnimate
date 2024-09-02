@@ -33,6 +33,9 @@ class TestFrameEditor {
     
     // TODO: Logic for loading a single frame and editing content
     
+    // TODO: Create editor scene from project data, load assets,
+    // update tool state once assets are loaded
+    
     private let toolState: TestFrameEditorToolState?
     
     // MARK: - Init
