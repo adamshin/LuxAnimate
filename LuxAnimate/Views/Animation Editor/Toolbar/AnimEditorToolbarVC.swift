@@ -17,7 +17,7 @@ class AnimEditorToolbarVC: UIViewController {
     
     weak var delegate: AnimEditorToolbarVCDelegate?
     
-    let bodyView = EditorFrameToolbarView()
+    let bodyView = AnimEditorToolbarView()
     
     override func loadView() {
         view = bodyView

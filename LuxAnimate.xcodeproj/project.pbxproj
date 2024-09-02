@@ -41,6 +41,7 @@
 		661981E32C5AEDD300215573 /* AnimationFrameEditorVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 661981E22C5AEDD300215573 /* AnimationFrameEditorVC.swift */; };
 		661981E52C5AF06900215573 /* AnimationFrameEditorCanvasVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 661981E42C5AF06900215573 /* AnimationFrameEditorCanvasVC.swift */; };
 		6619CB622C791E9700458B79 /* AnimEditorVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6619CB612C791E9700458B79 /* AnimEditorVC.swift */; };
+		661A245B2C865F740031FE82 /* AnimEditorToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 661A245A2C865F740031FE82 /* AnimEditorToolbarView.swift */; };
 		66211E8B2BEDDEB0005490C4 /* LayoutInvalidatingFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66211E8A2BEDDEB0005490C4 /* LayoutInvalidatingFlowLayout.swift */; };
 		66211E8D2BEDE491005490C4 /* LibraryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66211E8C2BEDE491005490C4 /* LibraryCell.swift */; };
 		66211E8F2BEEC8B8005490C4 /* TimelineToolbarFrameWidgetVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66211E8E2BEEC8B8005490C4 /* TimelineToolbarFrameWidgetVC.swift */; };
@@ -214,6 +215,7 @@
 		661981E22C5AEDD300215573 /* AnimationFrameEditorVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationFrameEditorVC.swift; sourceTree = "<group>"; };
 		661981E42C5AF06900215573 /* AnimationFrameEditorCanvasVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationFrameEditorCanvasVC.swift; sourceTree = "<group>"; };
 		6619CB612C791E9700458B79 /* AnimEditorVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorVC.swift; sourceTree = "<group>"; };
+		661A245A2C865F740031FE82 /* AnimEditorToolbarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorToolbarView.swift; sourceTree = "<group>"; };
 		66211E8A2BEDDEB0005490C4 /* LayoutInvalidatingFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutInvalidatingFlowLayout.swift; sourceTree = "<group>"; };
 		66211E8C2BEDE491005490C4 /* LibraryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryCell.swift; sourceTree = "<group>"; };
 		66211E8E2BEEC8B8005490C4 /* TimelineToolbarFrameWidgetVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineToolbarFrameWidgetVC.swift; sourceTree = "<group>"; };
@@ -909,6 +911,7 @@
 			isa = PBXGroup;
 			children = (
 				66E3E4352C7ADE7C0086D388 /* AnimEditorToolbarVC.swift */,
+				661A245A2C865F740031FE82 /* AnimEditorToolbarView.swift */,
 			);
 			path = Toolbar;
 			sourceTree = "<group>";
@@ -1280,6 +1283,7 @@
 				660ABA432BFE8FA100B5C668 /* DrawingEditorBrushToolVC.swift in Sources */,
 				66211E8F2BEEC8B8005490C4 /* TimelineToolbarFrameWidgetVC.swift in Sources */,
 				664175B92C7E798900205FEC /* AnimEditorToolSettingsStore.swift in Sources */,
+				661A245B2C865F740031FE82 /* AnimEditorToolbarView.swift in Sources */,
 				66BC01692C35FA1200D2E2AD /* ProjectEditorWorkQueue.swift in Sources */,
 				66D0846C2BA3CEC300EB8556 /* Layout.swift in Sources */,
 				6662D8A32BBE1A3700B4C1D4 /* Geometry.swift in Sources */,

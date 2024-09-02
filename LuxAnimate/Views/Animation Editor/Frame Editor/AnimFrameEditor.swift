@@ -126,10 +126,6 @@ class AnimFrameEditor {
         toolState?.drawingCanvasTexture()
     }
     
-    func clearCanvas() {
-        toolState?.clearCanvas()
-    }
-    
     func onFrame() -> AnimEditorScene? {
         toolState?.onFrame()
         

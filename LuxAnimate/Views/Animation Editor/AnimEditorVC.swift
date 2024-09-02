@@ -4,6 +4,21 @@
 
 import UIKit
 
+protocol AnimEditorVCDelegate: AnyObject {
+    
+    func onRequestUndo(_ vc: AnimEditorVC)
+    func onRequestRedo(_ vc: AnimEditorVC)
+    
+    // TODO: Allow specifying synchronous vs asynchronous edits?
+    // Should the async edit method take a completion handler?
+    
+    func onRequestApplyEdit(
+        _ vc: AnimEditorVC,
+        newSceneManifest: Scene.Manifest,
+        newSceneAssets: [ProjectEditor.Asset])
+    
+}
+
 class AnimEditorVC: UIViewController {
     
     private let bodyView = AnimEditorView()
@@ -17,14 +32,33 @@ class AnimEditorVC: UIViewController {
     private let workspaceRenderer = AnimEditorWorkspaceRenderer(
         pixelFormat: AppConfig.metalLayerPixelFormat)
     
-    private var toolState: AnimEditorToolState?
+    private let projectID: String
+    private let sceneID: String
     
+    // TODO: Make these changeable
+    private let activeLayerID: String
+    private let activeFrameIndex: Int
+    
+    private var toolState: AnimEditorToolState?
     private var frameEditor: AnimFrameEditor?
+    
+    weak var delegate: AnimEditorVCDelegate?
     
     // MARK: - Init
     
-    init() {
+    init(
+        projectID: String,
+        sceneID: String,
+        activeLayerID: String,
+        activeFrameIndex: Int
+    ) {
+        self.projectID = projectID
+        self.sceneID = sceneID
+        self.activeLayerID = activeLayerID
+        self.activeFrameIndex = activeFrameIndex
+        
         super.init(nibName: nil, bundle: nil)
+        modalPresentationStyle = .fullScreen
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -51,11 +85,17 @@ class AnimEditorVC: UIViewController {
         updateWorkspaceContentSize()
     }
     
+    override var prefersStatusBarHidden: Bool { true }
+    
     // MARK: - Logic
     
     private func reloadFrameEditor() {
         // TODO: Reuse already-loaded assets from the
         // previous frame editor!
+        
+        // Should we manually extract the drawing canvas
+        // texture here? Maybe the frame editor should
+        // store updated textures in the asset loader.
         
         let drawingCanvasTexture: MTLTexture?
         if let frameEditor {
@@ -102,12 +142,6 @@ class AnimEditorVC: UIViewController {
         reloadFrameEditor()
     }
     
-    // MARK: - Editing
-    
-    private func clearCanvas() {
-        frameEditor?.clearCanvas()
-    }
-    
     // MARK: - Frame
     
     private func onFrame(
@@ -148,9 +182,58 @@ class AnimEditorVC: UIViewController {
         commandBuffer.commit()
     }
     
+    // MARK: - Interface
+    
+    func update(
+        projectManifest: Project.Manifest,
+        sceneManifest: Scene.Manifest
+    ) {
+//        frameEditor = AnimationFrameEditor(
+//            projectID: projectID,
+//            sceneID: sceneID,
+//            activeLayerID: activeLayerID,
+//            activeFrameIndex: activeFrameIndex,
+//            onionSkinPrevCount: 0,
+//            onionSkinNextCount: 0,
+//            projectManifest: projectManifest,
+//            sceneManifest: sceneManifest,
+//            delegate: self)
+    }
+    
+    func update(
+        availableUndoCount: Int,
+        availableRedoCount: Int
+    ) {
+        toolbarVC.update(
+            availableUndoCount: availableUndoCount,
+            availableRedoCount: availableRedoCount)
+    }
+    
 }
 
 // MARK: - Delegates
+
+extension AnimEditorVC: AnimEditorToolbarVCDelegate {
+    
+    func onSelectBack(_ vc: AnimEditorToolbarVC) {
+        dismiss(animated: true)
+    }
+    
+    func onSelectUndo(_ vc: AnimEditorToolbarVC) {
+        delegate?.onRequestUndo(self)
+    }
+    func onSelectRedo(_ vc: AnimEditorToolbarVC) {
+        delegate?.onRequestRedo(self)
+    }
+    
+    func onSelectPaintTool(_ vc: AnimEditorToolbarVC) {
+        enterToolState(AnimEditorPaintToolState())
+    }
+    func onSelectEraseTool(_ vc: AnimEditorToolbarVC) {
+        enterToolState(AnimEditorEraseToolState())
+    }
+    
+}
 
 extension AnimEditorVC: AnimEditorWorkspaceVCDelegate {
     
@@ -167,30 +250,10 @@ extension AnimEditorVC: AnimEditorWorkspaceVCDelegate {
     }
     
     func onSelectUndo(_ vc: AnimEditorWorkspaceVC) {
-        clearCanvas()
+        delegate?.onRequestUndo(self)
     }
     func onSelectRedo(_ vc: AnimEditorWorkspaceVC) {
-        clearCanvas()
-    }
-    
-}
-
-extension AnimEditorVC: AnimEditorToolbarVCDelegate {
-    
-    func onSelectBack(_ vc: AnimEditorToolbarVC) { }
-    
-    func onSelectUndo(_ vc: AnimEditorToolbarVC) {
-        clearCanvas()
-    }
-    func onSelectRedo(_ vc: AnimEditorToolbarVC) { 
-        clearCanvas()
-    }
-    
-    func onSelectPaintTool(_ vc: AnimEditorToolbarVC) {
-        enterToolState(AnimEditorPaintToolState())
-    }
-    func onSelectEraseTool(_ vc: AnimEditorToolbarVC) {
-        enterToolState(AnimEditorEraseToolState())
+        delegate?.onRequestRedo(self)
     }
     
 }

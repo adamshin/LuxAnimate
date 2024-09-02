@@ -36,8 +36,7 @@ class SceneEditorVC: UIViewController {
     private var sceneRef: Project.SceneRef?
     private var sceneManifest: Scene.Manifest?
     
-//    private weak var animationEditorVC: AnimationEditorVC?
-    private weak var animationEditorVC: NewAnimationEditorVC?
+    private weak var animEditorVC: AnimEditorVC?
     
     // MARK: - Init
     
@@ -85,12 +84,12 @@ class SceneEditorVC: UIViewController {
             availableUndoCount: availableUndoCount,
             availableRedoCount: availableRedoCount)
         
-        animationEditorVC?.update(
+        animEditorVC?.update(
             availableUndoCount: availableUndoCount,
             availableRedoCount: availableRedoCount)
         
         if !fromEditor {
-            animationEditorVC?.update(
+            animEditorVC?.update(
                 projectManifest: projectManifest,
                 sceneManifest: sceneManifest)
         }
@@ -114,7 +113,7 @@ class SceneEditorVC: UIViewController {
         
         switch layer.content {
         case .animation:
-            let vc = NewAnimationEditorVC(
+            let vc = AnimEditorVC(
                 projectID: projectID,
                 sceneID: sceneID,
                 activeLayerID: layerID,
@@ -131,7 +130,7 @@ class SceneEditorVC: UIViewController {
                 availableRedoCount: availableRedoCount)
             
             present(vc, animated: true)
-            animationEditorVC = vc
+            animEditorVC = vc
         }
     }
     
@@ -242,47 +241,17 @@ extension SceneEditorVC: SceneEditorContentVCDelegate {
     
 }
 
-/*
-extension SceneEditorVC: AnimationEditorVCDelegate {
+extension SceneEditorVC: AnimEditorVCDelegate {
     
-    func onRequestUndo(_ vc: AnimationEditorVC) {
+    func onRequestUndo(_ vc: AnimEditorVC) {
         delegate?.onRequestUndo(self)
     }
-    func onRequestRedo(_ vc: AnimationEditorVC) {
+    func onRequestRedo(_ vc: AnimEditorVC) {
         delegate?.onRequestRedo(self)
     }
     
     func onRequestApplyEdit(
-        _ vc: AnimationEditorVC,
-        sceneID: String,
-        newSceneManifest: Scene.Manifest,
-        newSceneAssets: [ProjectEditor.Asset]
-    ) {
-        self.sceneManifest = newSceneManifest
-        
-        delegate?.onRequestApplyEdit(
-            self,
-            sceneID: sceneID,
-            newSceneManifest: newSceneManifest,
-            newSceneAssets: newSceneAssets)
-        
-        handleUpdateData(fromEditor: true)
-    }
-    
-}
-*/
-
-extension SceneEditorVC: NewAnimationEditorVCDelegate {
-    
-    func onRequestUndo(_ vc: NewAnimationEditorVC) {
-        delegate?.onRequestUndo(self)
-    }
-    func onRequestRedo(_ vc: NewAnimationEditorVC) {
-        delegate?.onRequestRedo(self)
-    }
-    
-    func onRequestApplyEdit(
-        _ vc: NewAnimationEditorVC,
+        _ vc: AnimEditorVC,
         newSceneManifest: Scene.Manifest,
         newSceneAssets: [ProjectEditor.Asset]
     ) {

@@ -60,15 +60,6 @@ class AnimFrameEditorEraseToolState: AnimFrameEditorToolState {
         brushEngine.onFrame()
     }
     
-    func clearCanvas() {
-        let texture = try! TextureCreator
-            .createEmptyTexture(
-                size: drawingCanvasSize,
-                mipMapped: false)
-        
-        brushEngine.setCanvasTexture(texture)
-    }
-    
     func drawingCanvasTexture() -> any MTLTexture {
         brushEngine.activeCanvasTexture
     }
