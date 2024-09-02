@@ -12,6 +12,8 @@ class TestEditorVC: UIViewController {
     private let toolControlsVC = TestEditorToolControlsVC()
     private let workspaceVC = TestEditorWorkspaceVC()
     
+//    private let assetLoader: TestEditorAssetLoader
+    
     private let workspaceRenderer = TestEditorWorkspaceRenderer(
         pixelFormat: AppConfig.metalLayerPixelFormat)
     

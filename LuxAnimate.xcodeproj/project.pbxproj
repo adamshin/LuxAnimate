@@ -131,6 +131,7 @@
 		66789ACE2C3332A90020EACE /* ProjectAnimationEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66789ACD2C3332A90020EACE /* ProjectAnimationEditor.swift */; };
 		66789AD42C3340070020EACE /* SceneRenderManifestGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66789AD32C3340070020EACE /* SceneRenderManifestGenerator.swift */; };
 		6678A9BE2C8131E700838EA3 /* TestFrameEditorEraseToolState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6678A9BD2C8131E700838EA3 /* TestFrameEditorEraseToolState.swift */; };
+		6678A9C12C83991700838EA3 /* TestEditorAssetLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6678A9C02C83991700838EA3 /* TestEditorAssetLoader.swift */; };
 		667BF74B2BA655CB003E3430 /* FileHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667BF74A2BA655CB003E3430 /* FileHelper.swift */; };
 		668A14CC2C7D1E2000D73D36 /* TestEditorEraseToolControlsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668A14CB2C7D1E2000D73D36 /* TestEditorEraseToolControlsVC.swift */; };
 		668A14D72C7D3EBE00D73D36 /* TestFrameEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668A14D62C7D3EBE00D73D36 /* TestFrameEditor.swift */; };
@@ -307,6 +308,7 @@
 		66789ACD2C3332A90020EACE /* ProjectAnimationEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectAnimationEditor.swift; sourceTree = "<group>"; };
 		66789AD32C3340070020EACE /* SceneRenderManifestGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneRenderManifestGenerator.swift; sourceTree = "<group>"; };
 		6678A9BD2C8131E700838EA3 /* TestFrameEditorEraseToolState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFrameEditorEraseToolState.swift; sourceTree = "<group>"; };
+		6678A9C02C83991700838EA3 /* TestEditorAssetLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestEditorAssetLoader.swift; sourceTree = "<group>"; };
 		667BF74A2BA655CB003E3430 /* FileHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileHelper.swift; sourceTree = "<group>"; };
 		668A14CB2C7D1E2000D73D36 /* TestEditorEraseToolControlsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestEditorEraseToolControlsVC.swift; sourceTree = "<group>"; };
 		668A14D62C7D3EBE00D73D36 /* TestFrameEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFrameEditor.swift; sourceTree = "<group>"; };
@@ -870,6 +872,14 @@
 			path = "Project Creator";
 			sourceTree = "<group>";
 		};
+		6678A9BF2C8398ED00838EA3 /* Asset Loader */ = {
+			isa = PBXGroup;
+			children = (
+				6678A9C02C83991700838EA3 /* TestEditorAssetLoader.swift */,
+			);
+			path = "Asset Loader";
+			sourceTree = "<group>";
+		};
 		667BF7492BA655B6003E3430 /* File Helper */ = {
 			isa = PBXGroup;
 			children = (
@@ -886,6 +896,7 @@
 				668A14D22C7D3D9800D73D36 /* Workspace */,
 				668A14D02C7D3D2C00D73D36 /* Toolbar */,
 				668A14D12C7D3D8A00D73D36 /* Tool Controls */,
+				6678A9BF2C8398ED00838EA3 /* Asset Loader */,
 				668A14D32C7D3E2D00D73D36 /* Renderer */,
 				668A14D42C7D3E3800D73D36 /* Shared */,
 				6619CB612C791E9700458B79 /* TestEditorVC.swift */,
@@ -1395,6 +1406,7 @@
 				66A653042C209DFB0060A216 /* XXHash.swift in Sources */,
 				66E312B62C3A0001006BE399 /* ProjectEditorContentVC.swift in Sources */,
 				66D0843F2BA3840C00EB8556 /* SceneDelegate.swift in Sources */,
+				6678A9C12C83991700838EA3 /* TestEditorAssetLoader.swift in Sources */,
 				660ABA3E2BF9BAF600B5C668 /* PerlinNoiseGenerator.swift in Sources */,
 				6631079F2C62D30A0028C89C /* AnimationDrawingEditor.swift in Sources */,
 				66E3E4382C7ADEC90086D388 /* TestEditorView.swift in Sources */,
