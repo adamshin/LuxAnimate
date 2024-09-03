@@ -1,16 +1,16 @@
 //
-//  AnimWorkspaceMetalView.swift
+//  EditorWorkspaceMetalView.swift
 //
 
 import UIKit
 
-protocol AnimWorkspaceMetalViewDelegate: AnyObject {
-    func onRequestDraw(_ view: AnimWorkspaceMetalView)
+protocol EditorWorkspaceMetalViewDelegate: AnyObject {
+    func onRequestDraw(_ view: EditorWorkspaceMetalView)
 }
 
-class AnimWorkspaceMetalView: UIView {
+class EditorWorkspaceMetalView: UIView {
     
-    weak var delegate: AnimWorkspaceMetalViewDelegate?
+    weak var delegate: EditorWorkspaceMetalViewDelegate?
     
     override class var layerClass: AnyClass {
         CAMetalLayer.self
@@ -57,7 +57,7 @@ class AnimWorkspaceMetalView: UIView {
 
 // MARK: - Delegates
 
-extension AnimWorkspaceMetalView {
+extension EditorWorkspaceMetalView {
     
     override func display(_ layer: CALayer) {
         delegate?.onRequestDraw(self)

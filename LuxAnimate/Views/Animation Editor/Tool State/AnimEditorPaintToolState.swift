@@ -52,7 +52,7 @@ class AnimEditorPaintToolState: AnimEditorToolState {
     }
     
     func beginState(
-        workspaceVC: AnimEditorWorkspaceVC,
+        workspaceVC: EditorWorkspaceVC,
         toolControlsVC: AnimEditorToolControlsVC
     ) {
         workspaceVC.addToolGestureRecognizer(
@@ -62,7 +62,7 @@ class AnimEditorPaintToolState: AnimEditorToolState {
     }
     
     func endState(
-        workspaceVC: AnimEditorWorkspaceVC,
+        workspaceVC: EditorWorkspaceVC,
         toolControlsVC: AnimEditorToolControlsVC
     ) {
         workspaceVC.removeAllToolGestureRecognizers()

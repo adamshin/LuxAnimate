@@ -7,11 +7,11 @@ import UIKit
 protocol AnimEditorToolState: AnyObject {
     
     func beginState(
-        workspaceVC: AnimEditorWorkspaceVC,
+        workspaceVC: EditorWorkspaceVC,
         toolControlsVC: AnimEditorToolControlsVC)
     
     func endState(
-        workspaceVC: AnimEditorWorkspaceVC,
+        workspaceVC: EditorWorkspaceVC,
         toolControlsVC: AnimEditorToolControlsVC)
     
 }

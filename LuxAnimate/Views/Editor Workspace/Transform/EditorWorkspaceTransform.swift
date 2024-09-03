@@ -1,18 +1,18 @@
 //
-//  AnimWorkspaceTransform.swift
+//  EditorWorkspaceTransform.swift
 //
 
 import Foundation
 
-struct AnimWorkspaceTransform {
+struct EditorWorkspaceTransform {
     var translation: Vector2
     var rotation: Scalar
     var scale: Scalar
 }
 
-extension AnimWorkspaceTransform {
+extension EditorWorkspaceTransform {
     
-    static let identity = AnimWorkspaceTransform(
+    static let identity = EditorWorkspaceTransform(
         translation: .zero,
         rotation: 0,
         scale: 1)

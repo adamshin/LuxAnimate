@@ -1,34 +1,34 @@
 //
-//  AnimWorkspaceOverlayView.swift
+//  EditorWorkspaceOverlayView.swift
 //
 
 import UIKit
 
-protocol AnimWorkspaceOverlayViewDelegate: AnyObject {
+protocol EditorWorkspaceOverlayViewDelegate: AnyObject {
     
     func onBeginWorkspaceTransformGesture(
-        _ v: AnimWorkspaceOverlayView)
+        _ v: EditorWorkspaceOverlayView)
     
     func onUpdateWorkspaceTransformGesture(
-        _ v: AnimWorkspaceOverlayView,
+        _ v: EditorWorkspaceOverlayView,
         initialAnchorPosition: Vector,
         translation: Vector,
         rotation: Scalar,
         scale: Scalar)
     
     func onEndWorkspaceTransformGesture(
-        _ v: AnimWorkspaceOverlayView,
+        _ v: EditorWorkspaceOverlayView,
         finalAnchorPosition: Vector,
         pinchFlickIn: Bool)
     
-    func onSelectUndo(_ v: AnimWorkspaceOverlayView)
-    func onSelectRedo(_ v: AnimWorkspaceOverlayView)
+    func onSelectUndo(_ v: EditorWorkspaceOverlayView)
+    func onSelectRedo(_ v: EditorWorkspaceOverlayView)
     
 }
 
-class AnimWorkspaceOverlayView: UIView {
+class EditorWorkspaceOverlayView: UIView {
     
-    weak var delegate: AnimWorkspaceOverlayViewDelegate?
+    weak var delegate: EditorWorkspaceOverlayViewDelegate?
     
     private let multiGesture = CanvasMultiGestureRecognizer()
     private let panGesture = UIPanGestureRecognizer()
@@ -114,7 +114,7 @@ class AnimWorkspaceOverlayView: UIView {
 
 // MARK: - Delegates
 
-extension AnimWorkspaceOverlayView: UIGestureRecognizerDelegate {
+extension EditorWorkspaceOverlayView: UIGestureRecognizerDelegate {
     
     func gestureRecognizer(
         _ gestureRecognizer: UIGestureRecognizer,
@@ -128,7 +128,7 @@ extension AnimWorkspaceOverlayView: UIGestureRecognizerDelegate {
     
 }
 
-extension AnimWorkspaceOverlayView: CanvasMultiGestureRecognizerGestureDelegate {
+extension EditorWorkspaceOverlayView: CanvasMultiGestureRecognizerGestureDelegate {
     
     func onBeginGesture() {
         delegate?.onBeginWorkspaceTransformGesture(self)

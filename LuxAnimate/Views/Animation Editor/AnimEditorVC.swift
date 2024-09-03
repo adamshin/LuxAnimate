@@ -25,11 +25,11 @@ class AnimEditorVC: UIViewController {
     
     private let toolbarVC = AnimEditorToolbarVC()
     private let toolControlsVC = AnimEditorToolControlsVC()
-    private let workspaceVC = AnimEditorWorkspaceVC()
+    private let workspaceVC = EditorWorkspaceVC()
     
     private let assetLoader: AnimEditorAssetLoader
     
-    private let workspaceRenderer = AnimEditorWorkspaceRenderer(
+    private let workspaceRenderer = EditorWorkspaceRenderer(
         pixelFormat: AppConfig.metalLayerPixelFormat)
     
     private let projectID: String
@@ -66,6 +66,8 @@ class AnimEditorVC: UIViewController {
         
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
+        
+        assetLoader.delegate = self
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -154,16 +156,16 @@ class AnimEditorVC: UIViewController {
     private func onFrame(
         drawable: CAMetalDrawable,
         viewportSize: Size,
-        workspaceTransform: AnimWorkspaceTransform
+        workspaceTransform: EditorWorkspaceTransform
     ) {
-        let scene = frameEditor?.onFrame()
+        let sceneGraph = frameEditor?.onFrame()
         
-        if let scene {
+        if let sceneGraph {
             draw(
                 drawable: drawable,
                 viewportSize: viewportSize,
                 workspaceTransform: workspaceTransform,
-                scene: scene)
+                sceneGraph: sceneGraph)
         }
     }
     
@@ -172,8 +174,8 @@ class AnimEditorVC: UIViewController {
     private func draw(
         drawable: CAMetalDrawable,
         viewportSize: Size,
-        workspaceTransform: AnimWorkspaceTransform,
-        scene: AnimEditorScene
+        workspaceTransform: EditorWorkspaceTransform,
+        sceneGraph: EditorWorkspaceSceneGraph
     ) {
         let commandBuffer = MetalInterface.shared
             .commandQueue.makeCommandBuffer()!
@@ -183,7 +185,7 @@ class AnimEditorVC: UIViewController {
             commandBuffer: commandBuffer,
             viewportSize: viewportSize,
             workspaceTransform: workspaceTransform,
-            scene: scene)
+            sceneGraph: sceneGraph)
         
         commandBuffer.present(drawable)
         commandBuffer.commit()
@@ -236,13 +238,13 @@ extension AnimEditorVC: AnimEditorToolbarVCDelegate {
     
 }
 
-extension AnimEditorVC: AnimEditorWorkspaceVCDelegate {
+extension AnimEditorVC: EditorWorkspaceVCDelegate {
     
     func onFrame(
-        _ vc: AnimEditorWorkspaceVC,
+        _ vc: EditorWorkspaceVC,
         drawable: CAMetalDrawable,
         viewportSize: Size,
-        workspaceTransform: AnimWorkspaceTransform
+        workspaceTransform: EditorWorkspaceTransform
     ) {
         onFrame(
             drawable: drawable,
@@ -250,12 +252,22 @@ extension AnimEditorVC: AnimEditorWorkspaceVCDelegate {
             workspaceTransform: workspaceTransform)
     }
     
-    func onSelectUndo(_ vc: AnimEditorWorkspaceVC) {
+    func onSelectUndo(_ vc: EditorWorkspaceVC) {
         delegate?.onRequestUndo(self)
     }
-    func onSelectRedo(_ vc: AnimEditorWorkspaceVC) {
+    func onSelectRedo(_ vc: EditorWorkspaceVC) {
         delegate?.onRequestRedo(self)
     }
+    
+}
+
+extension AnimEditorVC: AnimEditorAssetLoaderDelegate {
+    
+    func onLoadAsset(_ loader: AnimEditorAssetLoader) {
+        frameEditor?.onLoadAsset()
+    }
+    
+    func onError(_ loader: AnimEditorAssetLoader) { }
     
 }
 
@@ -269,7 +281,7 @@ extension AnimEditorVC: AnimFrameEditorDelegate {
     
     func workspaceTransform(
         _ e: AnimFrameEditor
-    ) -> AnimWorkspaceTransform {
+    ) -> EditorWorkspaceTransform {
         workspaceVC.workspaceTransform()
     }
     

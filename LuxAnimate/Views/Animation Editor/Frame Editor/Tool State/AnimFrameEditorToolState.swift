@@ -12,7 +12,7 @@ protocol AnimFrameEditorToolStateDelegate: AnyObject {
     
     func workspaceTransform(
         _ s: AnimFrameEditorToolState
-    ) -> AnimWorkspaceTransform
+    ) -> EditorWorkspaceTransform
     
     func layerContentSize(
         _ s: AnimFrameEditorToolState

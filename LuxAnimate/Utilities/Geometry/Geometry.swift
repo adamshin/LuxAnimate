@@ -20,7 +20,7 @@ extension Scalar {
 
 typealias Size = Size2
 
-struct Size2 {
+struct Size2: Codable {
     var width, height: Scalar
 }
 
@@ -38,7 +38,7 @@ extension Size2 {
 
 typealias Vector = Vector2
 
-struct Vector2 {
+struct Vector2: Codable {
     var x, y: Scalar
 }
 
@@ -128,7 +128,7 @@ extension Vector2 {
 
 // MARK: - Matrix
 
-struct Matrix3 {
+struct Matrix3: Codable {
     var m11, m12, m13: Scalar
     var m21, m22, m23: Scalar
     var m31, m32, m33: Scalar

@@ -1,5 +1,5 @@
 //
-//  AnimWorkspaceTransformManager.swift
+//  EditorWorkspaceTransformManager.swift
 //
 
 import Foundation
@@ -12,14 +12,14 @@ private let rotationSnapThreshold: Scalar =
 private let shortSnapDuration: TimeInterval = 1.0
 private let longSnapDuration: TimeInterval = 1.1
 
-protocol AnimWorkspaceTransformManagerDelegate: AnyObject {
+protocol EditorWorkspaceTransformManagerDelegate: AnyObject {
     
     func onUpdateTransform(
-        _ m: AnimWorkspaceTransformManager)
+        _ m: EditorWorkspaceTransformManager)
     
 }
 
-class AnimWorkspaceTransformManager {
+class EditorWorkspaceTransformManager {
     
     struct SafeAreaInsets {
         var top, bottom, left, right: Double
@@ -30,17 +30,17 @@ class AnimWorkspaceTransformManager {
     }
     
     struct Animation {
-        var startTransform: AnimWorkspaceTransform
-        var endTransform: AnimWorkspaceTransform
+        var startTransform: EditorWorkspaceTransform
+        var endTransform: EditorWorkspaceTransform
         
         var startTime: TimeInterval
         var duration: TimeInterval
     }
     
-    weak var delegate: AnimWorkspaceTransformManagerDelegate?
+    weak var delegate: EditorWorkspaceTransformManagerDelegate?
     
-    private var baseTransform: AnimWorkspaceTransform = .identity
-    private var activeGestureTransform: AnimWorkspaceTransform?
+    private var baseTransform: EditorWorkspaceTransform = .identity
+    private var activeGestureTransform: EditorWorkspaceTransform?
     
     private var activeAnimation: Animation?
     
@@ -66,7 +66,7 @@ class AnimWorkspaceTransformManager {
     }
     
     private func transformFittingContentToViewport()
-    -> AnimWorkspaceTransform {
+    -> EditorWorkspaceTransform {
         
         guard contentSize.width > 0, contentSize.height > 0
         else { return .identity }
@@ -90,16 +90,16 @@ class AnimWorkspaceTransformManager {
         
         let scale = min(xScaleToFit, yScaleToFit)
         
-        return AnimWorkspaceTransform(
+        return EditorWorkspaceTransform(
             translation: viewportSafeAreaCenterOffset,
             rotation: 0,
             scale: scale)
     }
     
     private func snapTransform(
-        transform: AnimWorkspaceTransform,
+        transform: EditorWorkspaceTransform,
         anchor: Vector
-    ) -> AnimWorkspaceTransform {
+    ) -> EditorWorkspaceTransform {
         
         var snappedTransform = transform
         
@@ -124,8 +124,8 @@ class AnimWorkspaceTransformManager {
     // MARK: - Animation
     
     private func animateTransform(
-        startTransform: AnimWorkspaceTransform,
-        endTransform: AnimWorkspaceTransform,
+        startTransform: EditorWorkspaceTransform,
+        endTransform: EditorWorkspaceTransform,
         duration: TimeInterval
     ) {
         let now = Date().timeIntervalSince1970
@@ -166,7 +166,7 @@ class AnimWorkspaceTransformManager {
     private static func transformForAnimation(
         animation: Animation,
         time: TimeInterval
-    ) -> AnimWorkspaceTransform {
+    ) -> EditorWorkspaceTransform {
         
         let startTime = animation.startTime
         let endTime = startTime + animation.duration
@@ -195,7 +195,7 @@ class AnimWorkspaceTransformManager {
             (c1 * animation.startTransform.scale) +
             (c2 * animation.endTransform.scale)
         
-        return AnimWorkspaceTransform(
+        return EditorWorkspaceTransform(
             translation: translation,
             rotation: rotation,
             scale: scale)
@@ -223,7 +223,7 @@ class AnimWorkspaceTransformManager {
         updateActiveAnimationTransform()
     }
     
-    func transform() -> AnimWorkspaceTransform {
+    func transform() -> EditorWorkspaceTransform {
         if let activeGestureTransform {
             return activeGestureTransform
         } else {

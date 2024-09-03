@@ -68,7 +68,7 @@ extension AnimFrameEditorEraseToolState:
     
     func workspaceTransform(
         _ s: AnimFrameEditorBrushToolInternalState
-    ) -> AnimWorkspaceTransform {
+    ) -> EditorWorkspaceTransform {
         delegate?.workspaceTransform(self) ?? .identity
     }
     

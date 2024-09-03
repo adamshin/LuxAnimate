@@ -29,7 +29,7 @@ protocol AnimFrameEditorBrushToolInternalStateDelegate: AnyObject {
     
     func workspaceTransform(
         _ s: AnimFrameEditorBrushToolInternalState
-    ) -> AnimWorkspaceTransform
+    ) -> EditorWorkspaceTransform
     
     func layerContentSize(
         _ s: AnimFrameEditorBrushToolInternalState

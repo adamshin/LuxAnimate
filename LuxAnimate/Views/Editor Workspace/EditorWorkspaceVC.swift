@@ -1,5 +1,5 @@
 //
-//  AnimEditorWorkspaceVC.swift
+//  EditorWorkspaceVC.swift
 //
 
 import UIKit
@@ -8,27 +8,27 @@ import Metal
 private let minZoomScale: Scalar = 0.1
 private let maxZoomScale: Scalar = 30
 
-protocol AnimEditorWorkspaceVCDelegate: AnyObject {
+protocol EditorWorkspaceVCDelegate: AnyObject {
     
     func onFrame(
-        _ vc: AnimEditorWorkspaceVC,
+        _ vc: EditorWorkspaceVC,
         drawable: CAMetalDrawable,
         viewportSize: Size,
-        workspaceTransform: AnimWorkspaceTransform)
+        workspaceTransform: EditorWorkspaceTransform)
     
-    func onSelectUndo(_ vc: AnimEditorWorkspaceVC)
-    func onSelectRedo(_ vc: AnimEditorWorkspaceVC)
+    func onSelectUndo(_ vc: EditorWorkspaceVC)
+    func onSelectRedo(_ vc: EditorWorkspaceVC)
     
 }
 
-class AnimEditorWorkspaceVC: UIViewController {
+class EditorWorkspaceVC: UIViewController {
     
-    weak var delegate: AnimEditorWorkspaceVCDelegate?
+    weak var delegate: EditorWorkspaceVCDelegate?
     
-    private let metalView = AnimWorkspaceMetalView()
-    private let overlayView = AnimWorkspaceOverlayView()
+    private let metalView = EditorWorkspaceMetalView()
+    private let overlayView = EditorWorkspaceOverlayView()
     
-    private let workspaceTransformManager = AnimWorkspaceTransformManager()
+    private let workspaceTransformManager = EditorWorkspaceTransformManager()
     
     private lazy var displayLink = CAMetalDisplayLink(
         metalLayer: metalView.metalLayer)
@@ -89,7 +89,7 @@ class AnimEditorWorkspaceVC: UIViewController {
         overlayView.removeAllToolGestureRecognizers()
     }
     
-    func workspaceTransform() -> AnimWorkspaceTransform {
+    func workspaceTransform() -> EditorWorkspaceTransform {
         workspaceTransformManager.transform()
     }
     
@@ -97,7 +97,7 @@ class AnimEditorWorkspaceVC: UIViewController {
 
 // MARK: - Delegates
 
-extension AnimEditorWorkspaceVC: CAMetalDisplayLinkDelegate {
+extension EditorWorkspaceVC: CAMetalDisplayLinkDelegate {
     
     func metalDisplayLink(
         _ link: CAMetalDisplayLink,
@@ -120,34 +120,34 @@ extension AnimEditorWorkspaceVC: CAMetalDisplayLinkDelegate {
     
 }
 
-extension AnimEditorWorkspaceVC: AnimWorkspaceTransformManagerDelegate {
+extension EditorWorkspaceVC: EditorWorkspaceTransformManagerDelegate {
     
     func onUpdateTransform(
-        _ m: AnimWorkspaceTransformManager
+        _ m: EditorWorkspaceTransformManager
     ) { 
         // TODO: Report to delegate that we need draw?
     }
     
 }
 
-extension AnimEditorWorkspaceVC: AnimWorkspaceMetalViewDelegate {
+extension EditorWorkspaceVC: EditorWorkspaceMetalViewDelegate {
     
-    func onRequestDraw(_ view: AnimWorkspaceMetalView) {
+    func onRequestDraw(_ view: EditorWorkspaceMetalView) {
         // TODO: Report to delegate that we need draw?
     }
     
 }
 
-extension AnimEditorWorkspaceVC: AnimWorkspaceOverlayViewDelegate {
+extension EditorWorkspaceVC: EditorWorkspaceOverlayViewDelegate {
     
     func onBeginWorkspaceTransformGesture(
-        _ v: AnimWorkspaceOverlayView
+        _ v: EditorWorkspaceOverlayView
     ) {
         workspaceTransformManager.handleBeginTransformGesture()
     }
     
     func onUpdateWorkspaceTransformGesture(
-        _ v: AnimWorkspaceOverlayView,
+        _ v: EditorWorkspaceOverlayView,
         initialAnchorPosition: Vector,
         translation: Vector,
         rotation: Scalar,
@@ -161,7 +161,7 @@ extension AnimEditorWorkspaceVC: AnimWorkspaceOverlayViewDelegate {
     }
     
     func onEndWorkspaceTransformGesture(
-        _ v: AnimWorkspaceOverlayView,
+        _ v: EditorWorkspaceOverlayView,
         finalAnchorPosition: Vector,
         pinchFlickIn: Bool
     ) {
@@ -170,11 +170,11 @@ extension AnimEditorWorkspaceVC: AnimWorkspaceOverlayViewDelegate {
             pinchFlickIn: pinchFlickIn)
     }
     
-    func onSelectUndo(_ v: AnimWorkspaceOverlayView) {
+    func onSelectUndo(_ v: EditorWorkspaceOverlayView) {
         delegate?.onSelectUndo(self)
     }
     
-    func onSelectRedo(_ v: AnimWorkspaceOverlayView) {
+    func onSelectRedo(_ v: EditorWorkspaceOverlayView) {
         delegate?.onSelectRedo(self)
     }
     

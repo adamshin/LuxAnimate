@@ -23,7 +23,7 @@ class AnimEditorAssetLoader {
         label: "AnimEditorAssetLoader.loadQueue",
         qos: .background)
     
-    private var assetIDsToLoad: Set<String> = []
+    private var assetIDs: Set<String> = []
     private var loadedAssets: [String: MTLTexture] = [:]
     
     // MARK: - Init
@@ -34,11 +34,11 @@ class AnimEditorAssetLoader {
     
     // MARK: - Interface
     
-    func update(assetIDsToLoad: Set<String>) {
-        self.assetIDsToLoad = assetIDsToLoad
+    func update(assetIDs: Set<String>) {
+        self.assetIDs = assetIDs
         
         loadedAssets = loadedAssets.filter { assetID, _ in
-            assetIDsToLoad.contains(assetID)
+            assetIDs.contains(assetID)
         }
         
         loadNextAsset()
@@ -51,7 +51,7 @@ class AnimEditorAssetLoader {
     // MARK: - Loading
     
     private func loadNextAsset() {
-        let assetID = assetIDsToLoad.first {
+        let assetID = assetIDs.first {
             !loadedAssets.keys.contains($0)
         }
         guard let assetID else { return }
@@ -61,7 +61,7 @@ class AnimEditorAssetLoader {
                 let texture = try self.loadAsset(
                     assetID: assetID,
                     shouldContinue: {
-                        self.assetIDsToLoad.contains(assetID)
+                        self.assetIDs.contains(assetID)
                     })
                 
                 self.loadedAssets[assetID] = texture
@@ -100,7 +100,7 @@ class AnimEditorAssetLoader {
             let output = try JXLDecoder.decode(
                 data: encodedData,
                 progress: {
-                    self.assetIDsToLoad.contains(assetID)
+                    self.assetIDs.contains(assetID)
                 })
             
             let texture = try TextureCreator.createTexture(
@@ -111,7 +111,7 @@ class AnimEditorAssetLoader {
                 mipMapped: false,
                 usage: .shaderRead)
             
-            guard self.assetIDsToLoad.contains(assetID)
+            guard self.assetIDs.contains(assetID)
             else { throw CancelLoadError() }
             
             return texture

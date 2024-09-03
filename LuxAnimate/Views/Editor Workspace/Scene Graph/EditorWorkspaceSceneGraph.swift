@@ -1,16 +1,17 @@
 //
-//  AnimEditorScene.swift
+//  EditorWorkspaceSceneGraph.swift
 //
 
 import Foundation
 import Metal
 
-struct AnimEditorScene {
+struct EditorWorkspaceSceneGraph {
     
     struct Layer {
-        var transform: Matrix3
         var contentSize: Size
+        var transform: Matrix3
         var alpha: Double
+        
         var content: LayerContent
     }
     
@@ -28,5 +29,7 @@ struct AnimEditorScene {
     }
     
     var layers: [Layer]
+    
+    // TODO: Overlay content, drawn in screen space?
     
 }

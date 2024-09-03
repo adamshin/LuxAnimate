@@ -18,7 +18,7 @@ protocol AnimFrameEditorDelegate: AnyObject {
     
     func workspaceTransform(
         _ e: AnimFrameEditor
-    ) -> AnimWorkspaceTransform
+    ) -> EditorWorkspaceTransform
     
     func onChangeSceneContentSize(
         _ e: AnimFrameEditor)
@@ -28,11 +28,6 @@ protocol AnimFrameEditorDelegate: AnyObject {
 }
 
 class AnimFrameEditor {
-    
-    // TODO: Logic for loading a single frame and editing content
-    
-    // TODO: Create editor scene from project data, load assets,
-    // update tool state once assets are loaded
     
     private let projectID: String
     private let sceneID: String
@@ -47,9 +42,6 @@ class AnimFrameEditor {
     weak var delegate: AnimFrameEditorDelegate?
     
     // MARK: - Init
-    
-    // TODO: This needs to take scene/frame/layer data.
-    // We'll load assets, generate an editor scene.
     
     init(
         projectID: String,
@@ -70,77 +62,29 @@ class AnimFrameEditor {
         
         switch editorToolState {
         case let state as AnimEditorPaintToolState:
-            let toolState = AnimFrameEditorPaintToolState(
+            toolState = AnimFrameEditorPaintToolState(
                 editorToolState: state,
                 drawingCanvasSize: drawingSize)
-            
-            self.toolState = toolState
-            toolState.delegate = self
             
         case let state as AnimEditorEraseToolState:
-            let toolState = AnimFrameEditorEraseToolState(
+            toolState = AnimFrameEditorEraseToolState(
                 editorToolState: state,
                 drawingCanvasSize: drawingSize)
-            
-            self.toolState = toolState
-            toolState.delegate = self
             
         default:
             toolState = nil
         }
+        toolState?.delegate = self
         
         // TODO: Figure out how to update the tool state
         // when the active drawing asset is loaded. The
         // tool should start out inactive, then become
         // active once assets are loaded.
         
-        // TODO: Begin loading assets!
+        // TODO: Generate frame scene, begin loading assets!
     }
     
     // MARK: - Logic
-    
-    private func createEditorScene() -> AnimEditorScene {
-        let sceneSize = Size(
-            Double(sceneSize.width),
-            Double(sceneSize.height))
-        
-        let layerSize = Size(
-            Double(drawingSize.width),
-            Double(drawingSize.height))
-        
-//        let drawingTexture = toolState?.drawingCanvasTexture()
-        
-        let scene = AnimEditorScene(layers: [
-            AnimEditorScene.Layer(
-                transform: .identity,
-                contentSize: sceneSize,
-                alpha: 1,
-                content: .rect(.init(
-                    color: .brushBlue
-                ))
-            ),
-            AnimEditorScene.Layer(
-                transform: drawingTransform,
-                contentSize: layerSize,
-                alpha: 1,
-                content: .rect(.init(
-                    color: .white
-                ))
-            ),
-        ])
-//        if let drawingTexture {
-//            let layer = AnimEditorScene.Layer(
-//                transform: drawingTransform,
-//                contentSize: layerSize,
-//                alpha: 1,
-//                content: .drawing(.init(
-//                    texture: drawingTexture
-//                ))
-//            )
-//            scene.layers.append(layer)
-//        }
-        return scene
-    }
     
     // MARK: - Interface
     
@@ -148,11 +92,18 @@ class AnimFrameEditor {
         return sceneSize
     }
     
-    func onFrame() -> AnimEditorScene? {
+    func onFrame() -> EditorWorkspaceSceneGraph? {
         toolState?.onFrame()
         
-        let scene = createEditorScene()
-        return scene
+//        let scene = createEditorScene()
+//        return scene
+        return nil
+    }
+    
+    func onLoadAsset() {
+        // TODO: If all assets are loaded, update the tool
+        // state texture. Begin responding to events. Start
+        // rendering scene.
     }
     
 }
@@ -169,7 +120,7 @@ extension AnimFrameEditor: AnimFrameEditorToolStateDelegate {
     
     func workspaceTransform(
         _ s: AnimFrameEditorToolState
-    ) -> AnimWorkspaceTransform {
+    ) -> EditorWorkspaceTransform {
         delegate?.workspaceTransform(self) ?? .identity
     }
     

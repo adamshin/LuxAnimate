@@ -1,5 +1,5 @@
 //
-//  AnimEditorWorkspaceRenderer.swift
+//  EditorWorkspaceRenderer.swift
 //
 
 import Metal
@@ -8,7 +8,7 @@ import UIKit
 private let backgroundColor = Color(UIColor.editorBackground)
 private let scalePixelateThreshold: Scalar = 1.0
 
-struct AnimEditorWorkspaceRenderer {
+struct EditorWorkspaceRenderer {
     
     private let spriteRenderer: SpriteRenderer
     private let blankTexture: MTLTexture
@@ -24,8 +24,8 @@ struct AnimEditorWorkspaceRenderer {
         target: MTLTexture,
         commandBuffer: MTLCommandBuffer,
         viewportSize: Size,
-        workspaceTransform: AnimWorkspaceTransform,
-        scene: AnimEditorScene
+        workspaceTransform: EditorWorkspaceTransform,
+        sceneGraph: EditorWorkspaceSceneGraph
     ) {
         // Transform
         let viewportTransform = Matrix3(translation: Vector(
@@ -48,7 +48,7 @@ struct AnimEditorWorkspaceRenderer {
             color: backgroundColor)
         
         // Layers
-        for layer in scene.layers {
+        for layer in sceneGraph.layers {
             switch layer.content {
             case .drawing(let content):
                 drawDrawingLayer(
@@ -77,8 +77,8 @@ struct AnimEditorWorkspaceRenderer {
         commandBuffer: MTLCommandBuffer,
         viewportSize: Size,
         contentTransform: Matrix3,
-        layer: AnimEditorScene.Layer,
-        content: AnimEditorScene.DrawingLayerContent,
+        layer: EditorWorkspaceSceneGraph.Layer,
+        content: EditorWorkspaceSceneGraph.DrawingLayerContent,
         pixelate: Bool
     ) {
         let transform = contentTransform * layer.transform
@@ -106,8 +106,8 @@ struct AnimEditorWorkspaceRenderer {
         commandBuffer: MTLCommandBuffer,
         viewportSize: Size,
         contentTransform: Matrix3,
-        layer: AnimEditorScene.Layer,
-        content: AnimEditorScene.RectLayerContent
+        layer: EditorWorkspaceSceneGraph.Layer,
+        content: EditorWorkspaceSceneGraph.RectLayerContent
     ) { 
         let transform = contentTransform * layer.transform
         

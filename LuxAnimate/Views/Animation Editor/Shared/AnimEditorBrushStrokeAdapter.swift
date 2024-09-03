@@ -9,7 +9,7 @@ struct AnimEditorBrushStrokeAdapter {
     static func convert(
         stroke: BrushGestureRecognizer.Stroke,
         workspaceViewSize: Size,
-        workspaceTransform: AnimWorkspaceTransform,
+        workspaceTransform: EditorWorkspaceTransform,
         layerContentSize: Size,
         layerTransform: Matrix3
     ) -> BrushStrokeEngine.InputStroke {
@@ -61,7 +61,7 @@ struct AnimEditorBrushStrokeAdapter {
     
     private static func workspaceViewToLayerSpaceTransform(
         workspaceViewSize: Size,
-        workspaceTransform: AnimWorkspaceTransform,
+        workspaceTransform: EditorWorkspaceTransform,
         layerContentSize: Size,
         layerTransform: Matrix3
     ) -> Matrix3 {
