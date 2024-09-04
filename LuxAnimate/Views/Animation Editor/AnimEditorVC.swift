@@ -128,9 +128,7 @@ class AnimEditorVC: UIViewController {
         guard let size = frameEditor?.sceneContentSize()
         else { return }
         
-        workspaceVC.setContentSize(Size(
-            Double(size.width),
-            Double(size.height)))
+        workspaceVC.setContentSize(Size(size))
     }
     
     // MARK: - Tool State

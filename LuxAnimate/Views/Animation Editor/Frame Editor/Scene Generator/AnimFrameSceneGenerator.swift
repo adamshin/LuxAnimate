@@ -15,10 +15,21 @@ import Foundation
 // current selection mask, if one exists. It could do this
 // separately from frame generation.
 
+// Another wrinkle here is onion skins. These could be
+// generated as part of the scene object. Or maybe it would
+// be cleaner for the frame editor to add them.
+
+// At the end of this process, we'll have a frame scene
+// graph, plus a master list of assets to load. These
+// assets will come from the scene graph, plus additional
+// things added by the frame editor (selection mask, onion
+// skins). This list is what we pass to the asset loader.
+
 // Once we generate the frame scene, we need to adapt it
 // into an editor workspace scene. The frame editor will
 // need to work with the tool state to do this. We'll
 // replace the active drawing with the tool render buffer.
+// We'll add onion skin layers at this point, if necessary.
 // We also may add overlays, layer borders, etc.
 
 // Having separate objects to represent the frame scene and

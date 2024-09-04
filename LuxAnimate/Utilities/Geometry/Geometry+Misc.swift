@@ -1,5 +1,5 @@
 //
-//  Geometry+UIKit.swift
+//  Geometry+Misc.swift
 //
 
 import Foundation
@@ -36,6 +36,12 @@ extension Size2 {
     
     init(_ s: CGSize) {
         self.init(width: s.width, height: s.height)
+    }
+    
+    init(_ s: PixelSize) {
+        self.init(
+            width: Double(s.width),
+            height: Double(s.height))
     }
     
 }

@@ -23,8 +23,11 @@ enum Scene {
         var id: String
         var name: String
         
-        var contentSize: PixelSize
         var content: LayerContent
+        var contentSize: PixelSize
+        
+        var transform: Matrix3
+        var alpha: Double
     }
     
     enum LayerContent: Codable {

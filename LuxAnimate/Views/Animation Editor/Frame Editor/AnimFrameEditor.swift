@@ -127,9 +127,7 @@ extension AnimFrameEditor: AnimFrameEditorToolStateDelegate {
     func layerContentSize(
         _ s: AnimFrameEditorToolState
     ) -> Size {
-        Size(
-            Double(drawingSize.width),
-            Double(drawingSize.height))
+        Size(drawingSize)
     }
     
     func layerTransform(

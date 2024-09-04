@@ -8,11 +8,10 @@ import Metal
 struct EditorWorkspaceSceneGraph {
     
     struct Layer {
+        var content: LayerContent
         var contentSize: Size
         var transform: Matrix3
         var alpha: Double
-        
-        var content: LayerContent
     }
     
     enum LayerContent {

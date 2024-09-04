@@ -188,8 +188,10 @@ extension SceneEditorVC: SceneEditorContentVCDelegate {
         let layer = Scene.Layer(
             id: IDGenerator.id(),
             name: "Animation Layer",
+            content: .animation(layerContent),
             contentSize: newLayerContentSize,
-            content: .animation(layerContent))
+            transform: .identity,
+            alpha: 1)
         
         var newSceneManifest = sceneManifest
         newSceneManifest.layers.append(layer)
