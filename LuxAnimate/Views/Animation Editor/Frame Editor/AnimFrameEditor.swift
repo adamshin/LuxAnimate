@@ -158,13 +158,14 @@ extension AnimFrameEditor: AnimFrameEditorStateDelegate {
         // For now, just save it in the asset loader.
         // This will be enough for testing.
         
-        guard let assetID = drawing.assetIDs?.full
+        guard let assetID = drawing.assetIDs?.full,
+            let texture = try? TextureCopier.copy(drawingTexture)
         else { return }
         
         delegate?.storeAssetLoaderTexture(
             self,
             assetID: assetID,
-            texture: drawingTexture)
+            texture: texture)
     }
     
 }
