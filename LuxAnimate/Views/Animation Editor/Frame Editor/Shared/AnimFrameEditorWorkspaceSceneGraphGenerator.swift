@@ -25,6 +25,15 @@ class AnimFrameEditorWorkspaceSceneGraphGenerator {
         
         var outputLayers: [EditorWorkspaceSceneGraph.Layer] = []
         
+        let backgroundLayer = EditorWorkspaceSceneGraph.Layer(
+            content: .rect(.init(
+                color: frameSceneGraph.backgroundColor)),
+            contentSize: frameSceneGraph.contentSize,
+            transform: .identity,
+            alpha: 1)
+        
+        outputLayers.append(backgroundLayer)
+        
         for layer in frameSceneGraph.layers {
             let layerOutputLayers = outputLayersForLayer(
                 layer: layer,

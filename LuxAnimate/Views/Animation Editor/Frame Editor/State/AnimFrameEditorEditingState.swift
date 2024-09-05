@@ -27,8 +27,11 @@ class AnimFrameEditorEditingState: AnimFrameEditorState {
     
     private let toolState: AnimFrameEditorToolState?
     
-    private let workspaceSceneGraphGenerator = AnimFrameEditorWorkspaceSceneGraphGenerator()
-    private var workspaceSceneGraph: EditorWorkspaceSceneGraph?
+    private let workspaceSceneGraphGenerator 
+        = AnimFrameEditorWorkspaceSceneGraphGenerator()
+    
+    private var workspaceSceneGraph:
+        EditorWorkspaceSceneGraph?
     
     weak var delegate: AnimFrameEditorStateDelegate?
     
@@ -110,22 +113,45 @@ class AnimFrameEditorEditingState: AnimFrameEditorState {
     func beginState() {
         delegate?.setEditInteractionEnabled(
             self, enabled: true)
+        
+        if let activeDrawing = activeDrawingManifest.activeDrawing,
+            let assetIDs = activeDrawing.assetIDs
+        {
+            let activeDrawingTexture = delegate?.assetLoaderAssetTexture(
+                self,
+                assetID: assetIDs.full)
+            
+            if let activeDrawingTexture {
+                toolState?.setDrawingCanvasTexture(activeDrawingTexture)
+            }
+        }
     }
+    
+    func onLoadAsset() { }
+    
+    func onFinishLoadingAssets() { }
     
     func onFrame() -> EditorWorkspaceSceneGraph? {
         toolState?.onFrame()
         
+        // TODO: Maybe we shouldn't regenerate the entire
+        // workspace scene graph each frame. That's a lot
+        // of work. All we're changing is the active
+        // drawing texture. Technically, I don't think we
+        // even need to regenerate it because the textures
+        // in the workspace scene graph point to the render
+        // buffer in the tools.
         updateWorkspaceSceneGraph()
+        
         return workspaceSceneGraph
     }
-    
-    func onLoadAsset() { }
     
 }
 
 // MARK: - Delegates
 
-extension AnimFrameEditorEditingState: AnimFrameEditorToolStateDelegate {
+extension AnimFrameEditorEditingState: 
+    AnimFrameEditorToolStateDelegate {
     
     func workspaceViewSize(
         _ s: AnimFrameEditorToolState
@@ -155,24 +181,26 @@ extension AnimFrameEditorEditingState: AnimFrameEditorToolStateDelegate {
         _ s: AnimFrameEditorToolState,
         canvasTexture: MTLTexture
     ) {
-        guard let drawing = activeDrawingManifest
-            .activeDrawing
+        guard let activeDrawing =
+            activeDrawingManifest.activeDrawing
         else { return }
         
         delegate?.applyDrawingEdit(
             self,
-            drawing: drawing,
+            drawingID: activeDrawing.id,
             drawingTexture: canvasTexture)
     }
     
 }
 
-extension AnimFrameEditorEditingState: AnimFrameEditorWorkspaceSceneGraphGeneratorDelegate {
+extension AnimFrameEditorEditingState: 
+    AnimFrameEditorWorkspaceSceneGraphGeneratorDelegate {
     
     func assetTexture(
         _ g: AnimFrameEditorWorkspaceSceneGraphGenerator,
         assetID: String
     ) -> MTLTexture? {
+        
         delegate?.assetLoaderAssetTexture(
             self, assetID: assetID)
     }

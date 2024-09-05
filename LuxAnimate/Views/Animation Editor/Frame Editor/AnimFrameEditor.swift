@@ -33,6 +33,12 @@ protocol AnimFrameEditorDelegate: AnyObject {
     
     // TODO: Methods for reporting project edits
     
+    // For testing
+    func editDrawing(
+        _ e: AnimFrameEditor,
+        drawingID: String,
+        fullAssetID: String)
+    
 }
 
 class AnimFrameEditor {
@@ -41,9 +47,17 @@ class AnimFrameEditor {
     
     weak var delegate: AnimFrameEditorDelegate?
     
-    // MARK: - Init
+    // MARK: - State
     
-    init(
+    private func enterState(_ newState: AnimFrameEditorState) {
+        state = newState
+        newState.delegate = self
+        newState.beginState()
+    }
+    
+    // MARK: - Interface
+    
+    func begin(
         projectID: String,
         sceneID: String,
         activeLayerID: String,
@@ -69,22 +83,16 @@ class AnimFrameEditor {
         } catch { }
     }
     
-    // MARK: - State
-    
-    private func enterState(_ newState: AnimFrameEditorState) {
-        state = newState
-        newState.delegate = self
-        newState.beginState()
-    }
-    
-    // MARK: - Interface
-    
     func onFrame() -> EditorWorkspaceSceneGraph? {
         state?.onFrame()
     }
     
     func onLoadAsset() {
         state?.onLoadAsset()
+    }
+    
+    func onFinishLoadingAssets() {
+        state?.onFinishLoadingAssets()
     }
     
 }
@@ -151,21 +159,27 @@ extension AnimFrameEditor: AnimFrameEditorStateDelegate {
     
     func applyDrawingEdit(
         _ e: AnimFrameEditorState,
-        drawing: Scene.Drawing,
+        drawingID: String,
         drawingTexture: MTLTexture
     ) {
         // TODO: Save edit to disk.
         // For now, just save it in the asset loader.
         // This will be enough for testing.
         
-        guard let assetID = drawing.assetIDs?.full,
-            let texture = try? TextureCopier.copy(drawingTexture)
+        guard let texture = try? TextureCopier.copy(drawingTexture)
         else { return }
+        
+        let assetID = IDGenerator.id()
         
         delegate?.storeAssetLoaderTexture(
             self,
             assetID: assetID,
             texture: texture)
+        
+        delegate?.editDrawing(
+            self,
+            drawingID: drawingID,
+            fullAssetID: assetID)
     }
     
 }

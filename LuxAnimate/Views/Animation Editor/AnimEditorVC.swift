@@ -107,7 +107,11 @@ class AnimEditorVC: UIViewController {
             let toolState
         else { return }
         
-        let frameEditor = AnimFrameEditor(
+        let frameEditor = AnimFrameEditor()
+        frameEditor.delegate = self
+        self.frameEditor = frameEditor
+        
+        frameEditor.begin(
             projectID: projectID,
             sceneID: sceneID,
             activeLayerID: activeLayerID,
@@ -116,9 +120,6 @@ class AnimEditorVC: UIViewController {
             projectManifest: projectManifest,
             sceneManifest: sceneManifest,
             editorToolState: toolState)
-        
-        frameEditor.delegate = self
-        self.frameEditor = frameEditor
     }
     
     // MARK: - Tool State
@@ -254,11 +255,15 @@ extension AnimEditorVC: EditorWorkspaceVCDelegate {
 
 extension AnimEditorVC: AnimEditorAssetLoaderDelegate {
     
-    func onLoadAsset(_ loader: AnimEditorAssetLoader) {
+    func onLoadAsset(_ l: AnimEditorAssetLoader) {
         frameEditor?.onLoadAsset()
     }
     
-    func onError(_ loader: AnimEditorAssetLoader) { }
+    func onFinishLoadingAssets(_ l: AnimEditorAssetLoader) {
+        frameEditor?.onFinishLoadingAssets()
+    }
+    
+    func onError(_ l: AnimEditorAssetLoader) { }
     
 }
 
@@ -305,6 +310,41 @@ extension AnimEditorVC: AnimFrameEditorDelegate {
         enabled: Bool
     ) {
         toolState?.setEditInteractionEnabled(enabled)
+    }
+    
+    // For testing
+    func editDrawing(
+        _ e: AnimFrameEditor,
+        drawingID: String,
+        fullAssetID: String
+    ) {
+        guard let sceneManifest else { return }
+        
+        self.sceneManifest?.layers = sceneManifest.layers.map { layer in
+            if case .animation(let content) = layer.content {
+                let newDrawings = content.drawings.map { drawing in
+                    if drawing.id == drawingID {
+                        var newDrawing = drawing
+                        newDrawing.assetIDs = Scene.DrawingAssetIDGroup(
+                            full: fullAssetID, 
+                            medium: "",
+                            small: "")
+                        return newDrawing
+                    } else {
+                        return drawing
+                    }
+                }
+                var newContent = content
+                newContent.drawings = newDrawings
+                
+                var newLayer = layer
+                newLayer.content = .animation(newContent)
+                return newLayer
+                
+            } else {
+                return layer
+            }
+        }
     }
     
 }

@@ -35,6 +35,10 @@ class AnimFrameEditorPaintToolState: AnimFrameEditorToolState {
         internalState.activeCanvasTexture
     }
     
+    func setDrawingCanvasTexture(_ texture: MTLTexture) {
+        internalState.setCanvasTexture(texture)
+    }
+    
 }
 
 // MARK: - Delegates

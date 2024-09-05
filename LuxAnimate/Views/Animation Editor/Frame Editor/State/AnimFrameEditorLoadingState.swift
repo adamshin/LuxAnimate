@@ -50,7 +50,7 @@ class AnimFrameEditorLoadingState: AnimFrameEditorState {
     ) throws {
         
         guard let layer = sceneManifest.layers.first(
-            where: { $0.id == sceneID })
+            where: { $0.id == activeLayerID })
         else {
             throw Error.invalidLayerID
         }
@@ -119,25 +119,30 @@ class AnimFrameEditorLoadingState: AnimFrameEditorState {
             self, enabled: false)
         
         let assetIDsToLoad = assetManifest.allAssetIDs()
-        
-        delegate?.setAssetLoaderAssetIDs(
-            self, assetIDs: assetIDsToLoad)
+        if assetIDsToLoad.isEmpty {
+            enterEditingState()
+        } else {
+            delegate?.setAssetLoaderAssetIDs(
+                self, assetIDs: assetIDsToLoad)
+        }
     }
     
-    func onFrame() -> EditorWorkspaceSceneGraph? { nil }
+    func onLoadAsset() { }
     
-    func onLoadAsset() {
+    func onFinishLoadingAssets() {
         let assetIDsToLoad = assetManifest.allAssetIDs()
         
-        let allAssetsLoaded = !assetIDsToLoad.contains {
+        let areAllAssetsLoaded = !assetIDsToLoad.contains {
             delegate?.assetLoaderAssetTexture(
                 self, assetID: $0) == nil
         }
         
-        if allAssetsLoaded, !hasLoadedAllAssets {
+        if areAllAssetsLoaded, !hasLoadedAllAssets {
             hasLoadedAllAssets = true
             enterEditingState()
         }
     }
+    
+    func onFrame() -> EditorWorkspaceSceneGraph? { nil }
     
 }

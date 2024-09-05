@@ -73,6 +73,10 @@ class AnimFrameEditorBrushToolInternalState {
         brushEngine.activeCanvasTexture
     }
     
+    func setCanvasTexture(_ texture: MTLTexture) {
+        brushEngine.setCanvasTexture(texture)
+    }
+    
     func beginBrushStroke(quickTap: Bool) {
         guard let delegate,
             let brush = delegate.brush(self)

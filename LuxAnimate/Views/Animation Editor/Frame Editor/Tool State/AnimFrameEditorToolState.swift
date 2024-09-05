@@ -37,5 +37,6 @@ protocol AnimFrameEditorToolState: AnyObject {
     func onFrame()
     
     func drawingCanvasTexture() -> MTLTexture
+    func setDrawingCanvasTexture(_ texture: MTLTexture)
     
 }

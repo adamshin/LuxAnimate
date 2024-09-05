@@ -35,11 +35,9 @@ protocol AnimFrameEditorStateDelegate: AnyObject {
         _ e: AnimFrameEditorState,
         enabled: Bool)
     
-    // I'm passing the whole drawing here for testing.
-    // In the future, we should just pass the ID.
     func applyDrawingEdit(
         _ e: AnimFrameEditorState,
-        drawing: Scene.Drawing,
+        drawingID: String,
         drawingTexture: MTLTexture)
     
 }
@@ -50,7 +48,9 @@ protocol AnimFrameEditorState: AnyObject {
     
     func beginState()
     
-    func onFrame() -> EditorWorkspaceSceneGraph?
     func onLoadAsset()
+    func onFinishLoadingAssets()
+    
+    func onFrame() -> EditorWorkspaceSceneGraph?
     
 }

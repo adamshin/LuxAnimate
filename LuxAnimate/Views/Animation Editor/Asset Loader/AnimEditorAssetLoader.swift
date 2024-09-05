@@ -6,8 +6,10 @@ import Metal
 
 protocol AnimEditorAssetLoaderDelegate: AnyObject {
     
-    func onLoadAsset(_ loader: AnimEditorAssetLoader)
-    func onError(_ loader: AnimEditorAssetLoader)
+    func onLoadAsset(_ l: AnimEditorAssetLoader)
+    func onFinishLoadingAssets(_ l: AnimEditorAssetLoader)
+    
+    func onError(_ l: AnimEditorAssetLoader)
     
 }
 
@@ -62,7 +64,10 @@ class AnimEditorAssetLoader {
         let assetID = assetIDs.first {
             !loadedAssets.keys.contains($0)
         }
-        guard let assetID else { return }
+        guard let assetID else {
+            delegate?.onFinishLoadingAssets(self)
+            return
+        }
         
         loadQueue.async {
             do {

@@ -916,7 +916,7 @@
 			children = (
 				66BC14C52C89084C00749C7A /* State */,
 				664175BA2C7E820500205FEC /* Tool State */,
-				66BC14D02C89254500749C7A /* Shared */,
+				66A59E942C899BC300CF553E /* Shared */,
 				668A14D62C7D3EBE00D73D36 /* AnimFrameEditor.swift */,
 			);
 			path = "Frame Editor";
@@ -938,6 +938,15 @@
 				66099BA32BDB193800243D9F /* EditorFrameToolbarView.swift */,
 			);
 			path = Toolbar;
+			sourceTree = "<group>";
+		};
+		66A59E942C899BC300CF553E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				66BC14CA2C89105700749C7A /* AnimFrameEditorHelper.swift */,
+				66BC14CE2C8924E300749C7A /* AnimFrameEditorWorkspaceSceneGraphGenerator.swift */,
+			);
+			path = Shared;
 			sourceTree = "<group>";
 		};
 		66A653012C2099330060A216 /* XXHash */ = {
@@ -977,15 +986,6 @@
 				66BC14C82C89086D00749C7A /* AnimFrameEditorEditingState.swift */,
 			);
 			path = State;
-			sourceTree = "<group>";
-		};
-		66BC14D02C89254500749C7A /* Shared */ = {
-			isa = PBXGroup;
-			children = (
-				66BC14CA2C89105700749C7A /* AnimFrameEditorHelper.swift */,
-				66BC14CE2C8924E300749C7A /* AnimFrameEditorWorkspaceSceneGraphGenerator.swift */,
-			);
-			path = Shared;
 			sourceTree = "<group>";
 		};
 		66D084302BA3840B00EB8556 = {

@@ -182,8 +182,13 @@ extension SceneEditorVC: SceneEditorContentVCDelegate {
     func onSelectAddLayer(_ vc: SceneEditorContentVC) { 
         guard let sceneManifest else { return }
         
+        let drawing = Scene.Drawing(
+            id: IDGenerator.id(),
+            frameIndex: 0,
+            assetIDs: nil)
+        
         let layerContent = Scene.AnimationLayerContent(
-            drawings: [])
+            drawings: [drawing])
         
         let layer = Scene.Layer(
             id: IDGenerator.id(),
