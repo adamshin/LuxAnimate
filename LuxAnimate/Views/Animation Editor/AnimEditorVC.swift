@@ -324,15 +324,13 @@ extension AnimEditorVC: EditorWorkspaceVCDelegate {
 
 extension AnimEditorVC: AnimEditorAssetLoaderDelegate {
     
-    func onLoadAsset(_ l: AnimEditorAssetLoader) {
-        frameEditor?.onLoadAsset()
+    func onUpdate(_ l: AnimEditorAssetLoader) {
+        frameEditor?.onAssetLoaderUpdate()
     }
     
-    func onFinishLoadingAssets(_ l: AnimEditorAssetLoader) {
-        frameEditor?.onFinishLoadingAssets()
+    func onFinish(_ l: AnimEditorAssetLoader) {
+        frameEditor?.onAssetLoaderFinish()
     }
-    
-    func onError(_ l: AnimEditorAssetLoader) { }
     
 }
 
@@ -361,7 +359,8 @@ extension AnimEditorVC: AnimFrameEditorDelegate {
         _ e: AnimFrameEditor,
         assetID: String
     ) -> MTLTexture? {
-        assetLoader.assetTexture(assetID: assetID)
+        let asset = assetLoader.loadedAsset(assetID: assetID)
+        return asset?.texture
     }
     
     func storeAssetLoaderTexture(

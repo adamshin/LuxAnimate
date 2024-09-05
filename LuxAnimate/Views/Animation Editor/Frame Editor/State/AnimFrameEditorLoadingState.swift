@@ -122,9 +122,9 @@ class AnimFrameEditorLoadingState: AnimFrameEditorState {
             self, assetIDs: assetIDsToLoad)
     }
     
-    func onLoadAsset() { }
+    func onAssetLoaderUpdate() { }
     
-    func onFinishLoadingAssets() {
+    func onAssetLoaderFinish() {
         enterEditingState()
     }
     

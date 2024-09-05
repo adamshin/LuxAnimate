@@ -48,8 +48,8 @@ protocol AnimFrameEditorState: AnyObject {
     
     func beginState()
     
-    func onLoadAsset()
-    func onFinishLoadingAssets()
+    func onAssetLoaderUpdate()
+    func onAssetLoaderFinish()
     
     func onFrame() -> EditorWorkspaceSceneGraph?
     

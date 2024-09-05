@@ -87,12 +87,12 @@ class AnimFrameEditor {
         state?.onFrame()
     }
     
-    func onLoadAsset() {
-        state?.onLoadAsset()
+    func onAssetLoaderUpdate() {
+        state?.onAssetLoaderUpdate()
     }
     
-    func onFinishLoadingAssets() {
-        state?.onFinishLoadingAssets()
+    func onAssetLoaderFinish() {
+        state?.onAssetLoaderFinish()
     }
     
 }

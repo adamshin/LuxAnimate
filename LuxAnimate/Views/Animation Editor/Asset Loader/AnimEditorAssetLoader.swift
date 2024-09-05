@@ -6,18 +6,23 @@ import Metal
 
 protocol AnimEditorAssetLoaderDelegate: AnyObject {
     
-    func onLoadAsset(_ l: AnimEditorAssetLoader)
-    func onFinishLoadingAssets(_ l: AnimEditorAssetLoader)
-    
-    func onError(_ l: AnimEditorAssetLoader)
+    func onUpdate(_ l: AnimEditorAssetLoader)
+    func onFinish(_ l: AnimEditorAssetLoader)
     
 }
 
 class AnimEditorAssetLoader {
     
-    private enum LoadedAsset {
+    enum LoadedAsset {
         case loaded(MTLTexture)
         case error
+        
+        var texture: MTLTexture? {
+            switch self {
+            case .loaded(let texture): texture
+            case .error: nil
+            }
+        }
     }
     
     private struct CancelLoadError: Error { }
@@ -51,14 +56,8 @@ class AnimEditorAssetLoader {
         loadNextAsset()
     }
     
-    func assetTexture(assetID: String) -> MTLTexture? {
-        guard let loadedAsset = loadedAssets[assetID]
-        else { return nil }
-        
-        return switch loadedAsset {
-        case .loaded(let texture): texture
-        case .error: nil
-        }
+    func loadedAsset(assetID: String) -> LoadedAsset? {
+        loadedAssets[assetID]
     }
     
     func storeAssetTexture(
@@ -76,7 +75,8 @@ class AnimEditorAssetLoader {
             !loadedAssets.keys.contains($0)
         }
         guard let assetID else {
-            delegate?.onFinishLoadingAssets(self)
+            delegate?.onUpdate(self)
+            delegate?.onFinish(self)
             return
         }
         
@@ -89,12 +89,12 @@ class AnimEditorAssetLoader {
                     })
                 
                 self.loadedAssets[assetID] = .loaded(texture)
-                self.delegate?.onLoadAsset(self)
+                self.delegate?.onUpdate(self)
                 
             } catch {
                 if !(error is CancelLoadError) {
                     self.loadedAssets[assetID] = .error
-                    self.delegate?.onError(self)
+                    self.delegate?.onUpdate(self)
                 }
             }
             

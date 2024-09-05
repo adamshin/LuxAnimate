@@ -127,9 +127,9 @@ class AnimFrameEditorEditingState: AnimFrameEditorState {
         }
     }
     
-    func onLoadAsset() { }
+    func onAssetLoaderUpdate() { }
     
-    func onFinishLoadingAssets() { }
+    func onAssetLoaderFinish() { }
     
     func onFrame() -> EditorWorkspaceSceneGraph? {
         toolState?.onFrame()
