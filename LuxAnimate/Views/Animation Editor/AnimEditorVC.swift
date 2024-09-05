@@ -4,11 +4,6 @@
 
 import UIKit
 
-private let defaultOnionSkinConfig = 
-    AnimEditorOnionSkinConfig(
-        prevCount: 0,
-        nextCount: 0)
-
 protocol AnimEditorVCDelegate: AnyObject {
     
     func onRequestUndo(_ vc: AnimEditorVC)
@@ -67,7 +62,7 @@ class AnimEditorVC: UIViewController {
         self.activeLayerID = activeLayerID
         self.activeFrameIndex = activeFrameIndex
         
-        onionSkinConfig = defaultOnionSkinConfig
+        onionSkinConfig = AppConfig.onionSkinConfig
         
         assetLoader = AnimEditorAssetLoader(
             projectID: projectID)

@@ -101,7 +101,8 @@ class AnimFrameEditorEditingState: AnimFrameEditorState {
             .generate(
                 frameSceneGraph: frameSceneGraph,
                 activeDrawingManifest: activeDrawingManifest,
-                activeDrawingTexture: activeDrawingTexture)
+                activeDrawingTexture: activeDrawingTexture,
+                onionSkinConfig: onionSkinConfig)
     }
     
     // MARK: - Interface

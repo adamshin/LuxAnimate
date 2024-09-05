@@ -4,12 +4,6 @@
 
 import Metal
 
-private let onionSkinPrevColor = Color(hex: "FF4444")
-private let onionSkinNextColor = Color(hex: "22DD55")
-
-private let onionSkinAlpha: Double = 0.6
-private let onionSkinAlphaFalloff: Double = 0.2
-
 protocol AnimFrameEditorWorkspaceSceneGraphGeneratorDelegate: AnyObject {
     
     func assetTexture(
@@ -25,7 +19,8 @@ class AnimFrameEditorWorkspaceSceneGraphGenerator {
     func generate(
         frameSceneGraph: FrameSceneGraph,
         activeDrawingManifest: AnimFrameEditorHelper.ActiveDrawingManifest,
-        activeDrawingTexture: MTLTexture?
+        activeDrawingTexture: MTLTexture?,
+        onionSkinConfig: AnimEditorOnionSkinConfig
     ) -> EditorWorkspaceSceneGraph {
         
         var outputLayers: [EditorWorkspaceSceneGraph.Layer] = []
@@ -34,7 +29,8 @@ class AnimFrameEditorWorkspaceSceneGraphGenerator {
             let layerOutputLayers = outputLayersForLayer(
                 layer: layer,
                 activeDrawingManifest: activeDrawingManifest,
-                activeDrawingTexture: activeDrawingTexture)
+                activeDrawingTexture: activeDrawingTexture,
+                onionSkinConfig: onionSkinConfig)
             
             outputLayers.append(contentsOf: layerOutputLayers)
         }
@@ -47,7 +43,8 @@ class AnimFrameEditorWorkspaceSceneGraphGenerator {
     private func outputLayersForLayer(
         layer: FrameSceneGraph.Layer,
         activeDrawingManifest: AnimFrameEditorHelper.ActiveDrawingManifest,
-        activeDrawingTexture: MTLTexture?
+        activeDrawingTexture: MTLTexture?,
+        onionSkinConfig: AnimEditorOnionSkinConfig
     ) -> [EditorWorkspaceSceneGraph.Layer] {
         
         switch layer.content {
@@ -56,7 +53,8 @@ class AnimFrameEditorWorkspaceSceneGraphGenerator {
                 layer: layer,
                 drawingLayerContent: drawingLayerContent,
                 activeDrawingManifest: activeDrawingManifest,
-                activeDrawingTexture: activeDrawingTexture)
+                activeDrawingTexture: activeDrawingTexture,
+                onionSkinConfig: onionSkinConfig)
         }
     }
     
@@ -64,7 +62,8 @@ class AnimFrameEditorWorkspaceSceneGraphGenerator {
         layer: FrameSceneGraph.Layer,
         drawingLayerContent: FrameSceneGraph.DrawingLayerContent,
         activeDrawingManifest: AnimFrameEditorHelper.ActiveDrawingManifest,
-        activeDrawingTexture: MTLTexture?
+        activeDrawingTexture: MTLTexture?,
+        onionSkinConfig: AnimEditorOnionSkinConfig
     ) -> [EditorWorkspaceSceneGraph.Layer] {
         
         if drawingLayerContent.drawing.id == activeDrawingManifest.activeDrawing?.id {
@@ -72,7 +71,8 @@ class AnimFrameEditorWorkspaceSceneGraphGenerator {
                 layer: layer,
                 drawingLayerContent: drawingLayerContent,
                 activeDrawingManifest: activeDrawingManifest,
-                activeDrawingTexture: activeDrawingTexture)
+                activeDrawingTexture: activeDrawingTexture,
+                onionSkinConfig: onionSkinConfig)
             
         } else {
             return outputLayersForInactiveDrawingLayer(
@@ -85,7 +85,8 @@ class AnimFrameEditorWorkspaceSceneGraphGenerator {
         layer: FrameSceneGraph.Layer,
         drawingLayerContent: FrameSceneGraph.DrawingLayerContent,
         activeDrawingManifest: AnimFrameEditorHelper.ActiveDrawingManifest,
-        activeDrawingTexture: MTLTexture?
+        activeDrawingTexture: MTLTexture?,
+        onionSkinConfig: AnimEditorOnionSkinConfig
     ) -> [EditorWorkspaceSceneGraph.Layer] {
         
         var outputLayers: [EditorWorkspaceSceneGraph.Layer] = []
@@ -96,6 +97,7 @@ class AnimFrameEditorWorkspaceSceneGraphGenerator {
             outputLayers.append(outputLayerForDrawingLayer(
                 layer: layer,
                 drawing: drawing,
+                onionSkinConfig: onionSkinConfig,
                 onionSkinOffset: -index - 1))
         }
         
@@ -105,6 +107,7 @@ class AnimFrameEditorWorkspaceSceneGraphGenerator {
             outputLayers.append(outputLayerForDrawingLayer(
                 layer: layer,
                 drawing: drawing,
+                onionSkinConfig: onionSkinConfig,
                 onionSkinOffset: index + 1))
         }
         
@@ -132,6 +135,7 @@ class AnimFrameEditorWorkspaceSceneGraphGenerator {
         layer: FrameSceneGraph.Layer,
         drawing: Scene.Drawing,
         replacementTexture: MTLTexture? = nil,
+        onionSkinConfig: AnimEditorOnionSkinConfig? = nil,
         onionSkinOffset: Int = 0
     ) -> EditorWorkspaceSceneGraph.Layer {
         
@@ -145,22 +149,30 @@ class AnimFrameEditorWorkspaceSceneGraphGenerator {
             }
         }
         
-        let colorMode: ColorMode = if onionSkinOffset == 0 {
-            .none
-        } else {
-            .stencil
-        }
+        let colorMode: ColorMode
+        let color: Color
         
-        let color: Color = if onionSkinOffset == 0 {
-            .clear
-        } else if onionSkinOffset > 0 {
-            onionSkinNextColor.withAlpha(
-                onionSkinAlpha - 
-                onionSkinAlphaFalloff * Double(abs(onionSkinOffset)))
+        if let onionSkinConfig {
+            if onionSkinOffset == 0 {
+                colorMode = .none
+            } else {
+                colorMode = .stencil
+            }
+            if onionSkinOffset == 0 {
+                color = .clear
+            } else if onionSkinOffset > 0 {
+                color = onionSkinConfig.nextColor.withAlpha(
+                    onionSkinConfig.alpha -
+                    onionSkinConfig.alphaFalloff * Double(abs(onionSkinOffset)))
+            } else {
+                color = onionSkinConfig.prevColor.withAlpha(
+                    onionSkinConfig.alpha -
+                    onionSkinConfig.alphaFalloff * Double(abs(onionSkinOffset)))
+            }
+            
         } else {
-            onionSkinPrevColor.withAlpha(
-                onionSkinAlpha -
-                onionSkinAlphaFalloff * Double(abs(onionSkinOffset)))
+            colorMode = .none
+            color = .clear
         }
         
         let imageLayerContent = EditorWorkspaceSceneGraph
