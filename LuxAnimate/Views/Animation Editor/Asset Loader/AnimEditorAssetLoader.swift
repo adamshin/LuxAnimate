@@ -44,8 +44,16 @@ class AnimEditorAssetLoader {
         loadNextAsset()
     }
     
-    func assetTexture(id: String) -> MTLTexture? {
-        loadedAssets[id]
+    func assetTexture(assetID: String) -> MTLTexture? {
+        loadedAssets[assetID]
+    }
+    
+    func storeAssetTexture(
+        assetID: String,
+        texture: MTLTexture
+    ) {
+        assetIDs.insert(assetID)
+        loadedAssets[assetID] = texture
     }
     
     // MARK: - Loading

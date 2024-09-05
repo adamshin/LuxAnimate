@@ -2,13 +2,7 @@
 //  AnimFrameEditor.swift
 //
 
-import UIKit
 import Metal
-
-private let sceneSize = PixelSize(1920, 1080)
-private let drawingSize = PixelSize(1000, 1000)
-
-private let drawingTransform: Matrix3 = .identity
 
 protocol AnimFrameEditorDelegate: AnyObject {
     
@@ -20,8 +14,22 @@ protocol AnimFrameEditorDelegate: AnyObject {
         _ e: AnimFrameEditor
     ) -> EditorWorkspaceTransform
     
-    func onChangeSceneContentSize(
-        _ e: AnimFrameEditor)
+    func setAssetLoaderAssetIDs(
+        _ e: AnimFrameEditor,
+        assetIDs: Set<String>)
+    
+    func assetLoaderAssetTexture(
+        _ e: AnimFrameEditor,
+        assetID: String) -> MTLTexture?
+    
+    func storeAssetLoaderTexture(
+        _ e: AnimFrameEditor,
+        assetID: String,
+        texture: MTLTexture)
+    
+    func setEditInteractionEnabled(
+        _ e: AnimFrameEditor,
+        enabled: Bool)
     
     // TODO: Methods for reporting project edits
     
@@ -29,15 +37,7 @@ protocol AnimFrameEditorDelegate: AnyObject {
 
 class AnimFrameEditor {
     
-    private let projectID: String
-    private let sceneID: String
-    private let activeLayerID: String
-    private let activeFrameIndex: Int
-    
-    private let toolState: AnimFrameEditorToolState?
-    
-    private var projectManifest: Project.Manifest
-    private var sceneManifest: Scene.Manifest
+    private var state: AnimFrameEditorState?
     
     weak var delegate: AnimFrameEditorDelegate?
     
@@ -48,92 +48,105 @@ class AnimFrameEditor {
         sceneID: String,
         activeLayerID: String,
         activeFrameIndex: Int,
-        editorToolState: AnimEditorToolState,
+        onionSkinConfig: AnimEditorOnionSkinConfig,
         projectManifest: Project.Manifest,
-        sceneManifest: Scene.Manifest
+        sceneManifest: Scene.Manifest,
+        editorToolState: AnimEditorToolState
     ) {
-        self.projectID = projectID
-        self.sceneID = sceneID
-        self.activeLayerID = activeLayerID
-        self.activeFrameIndex = activeFrameIndex
-        
-        self.projectManifest = projectManifest
-        self.sceneManifest = sceneManifest
-        
-        switch editorToolState {
-        case let state as AnimEditorPaintToolState:
-            toolState = AnimFrameEditorPaintToolState(
-                editorToolState: state,
-                drawingCanvasSize: drawingSize)
+        do {
+            let state = try AnimFrameEditorLoadingState(
+                projectID: projectID,
+                sceneID: sceneID,
+                activeLayerID: activeLayerID,
+                activeFrameIndex: activeFrameIndex,
+                onionSkinConfig: onionSkinConfig,
+                projectManifest: projectManifest,
+                sceneManifest: sceneManifest,
+                editorToolState: editorToolState)
             
-        case let state as AnimEditorEraseToolState:
-            toolState = AnimFrameEditorEraseToolState(
-                editorToolState: state,
-                drawingCanvasSize: drawingSize)
+            enterState(state)
             
-        default:
-            toolState = nil
-        }
-        toolState?.delegate = self
-        
-        // TODO: Figure out how to update the tool state
-        // when the active drawing asset is loaded. The
-        // tool should start out inactive, then become
-        // active once assets are loaded.
-        
-        // TODO: Generate frame scene, begin loading assets!
+        } catch { }
     }
     
-    // MARK: - Logic
+    // MARK: - State
+    
+    private func enterState(_ newState: AnimFrameEditorState) {
+        state = newState
+        newState.delegate = self
+        newState.beginState()
+    }
     
     // MARK: - Interface
     
-    func sceneContentSize() -> PixelSize {
-        return sceneSize
-    }
-    
     func onFrame() -> EditorWorkspaceSceneGraph? {
-        toolState?.onFrame()
-        
-//        let scene = createEditorScene()
-//        return scene
-        return nil
+        state?.onFrame()
     }
     
     func onLoadAsset() {
-        // TODO: If all assets are loaded, update the tool
-        // state texture. Begin responding to events. Start
-        // rendering scene.
+        state?.onLoadAsset()
     }
     
 }
 
 // MARK: - Delegates
 
-extension AnimFrameEditor: AnimFrameEditorToolStateDelegate {
+extension AnimFrameEditor: AnimFrameEditorStateDelegate {
+    
+    func changeState(
+        _ e: AnimFrameEditorState,
+        newState: AnimFrameEditorState
+    ) {
+        enterState(newState)
+    }
+    
+    func setAssetLoaderAssetIDs(
+        _ s: AnimFrameEditorState,
+        assetIDs: Set<String>
+    ) {
+        delegate?.setAssetLoaderAssetIDs(
+            self, 
+            assetIDs: assetIDs)
+    }
+    
+    func assetLoaderAssetTexture(
+        _ e: AnimFrameEditorState,
+        assetID: String
+    ) -> MTLTexture? {
+        delegate?.assetLoaderAssetTexture(
+            self, 
+            assetID: assetID)
+    }
+    
+    func storeAssetLoaderTexture(
+        _ e: AnimFrameEditorState,
+        assetID: String,
+        texture: MTLTexture
+    ) {
+        delegate?.storeAssetLoaderTexture(
+            self, 
+            assetID: assetID,
+            texture: texture)
+    }
     
     func workspaceViewSize(
-        _ s: AnimFrameEditorToolState
+        _ e: AnimFrameEditorState
     ) -> Size {
         delegate?.workspaceViewSize(self) ?? .zero
     }
     
     func workspaceTransform(
-        _ s: AnimFrameEditorToolState
+        _ e: AnimFrameEditorState
     ) -> EditorWorkspaceTransform {
         delegate?.workspaceTransform(self) ?? .identity
     }
     
-    func layerContentSize(
-        _ s: AnimFrameEditorToolState
-    ) -> Size {
-        Size(drawingSize)
-    }
-    
-    func layerTransform(
-        _ s: AnimFrameEditorToolState
-    ) -> Matrix3 {
-        drawingTransform
+    func setEditInteractionEnabled(
+        _ e: any AnimFrameEditorState,
+        enabled: Bool
+    ) {
+        delegate?.setEditInteractionEnabled(
+            self, enabled: enabled)
     }
     
 }

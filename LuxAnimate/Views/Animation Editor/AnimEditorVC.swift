@@ -4,6 +4,11 @@
 
 import UIKit
 
+private let defaultOnionSkinConfig = 
+    AnimEditorOnionSkinConfig(
+        prevCount: 0,
+        nextCount: 0)
+
 protocol AnimEditorVCDelegate: AnyObject {
     
     func onRequestUndo(_ vc: AnimEditorVC)
@@ -42,6 +47,7 @@ class AnimEditorVC: UIViewController {
     // Changing these values should reload the frame editor.
     private let activeLayerID: String
     private let activeFrameIndex: Int
+    private let onionSkinConfig: AnimEditorOnionSkinConfig
     
     private var toolState: AnimEditorToolState?
     private var frameEditor: AnimFrameEditor?
@@ -60,6 +66,8 @@ class AnimEditorVC: UIViewController {
         self.sceneID = sceneID
         self.activeLayerID = activeLayerID
         self.activeFrameIndex = activeFrameIndex
+        
+        onionSkinConfig = defaultOnionSkinConfig
         
         assetLoader = AnimEditorAssetLoader(
             projectID: projectID)
@@ -89,9 +97,8 @@ class AnimEditorVC: UIViewController {
         addChild(workspaceVC, to: bodyView.workspaceContainer)
         
         enterToolState(AnimEditorPaintToolState())
-        reloadFrameEditor()
         
-        updateWorkspaceContentSize()
+        reloadFrameEditor()
     }
     
     override var prefersStatusBarHidden: Bool { true }
@@ -105,30 +112,18 @@ class AnimEditorVC: UIViewController {
             let toolState
         else { return }
         
-        // TODO: Reuse already-loaded assets from the
-        // previous frame editor, including the active
-        // drawing texture(?)
-        
-        // Need to figure out how to do this
-        
         let frameEditor = AnimFrameEditor(
             projectID: projectID,
             sceneID: sceneID,
             activeLayerID: activeLayerID,
             activeFrameIndex: activeFrameIndex,
-            editorToolState: toolState,
+            onionSkinConfig: onionSkinConfig,
             projectManifest: projectManifest,
-            sceneManifest: sceneManifest)
+            sceneManifest: sceneManifest,
+            editorToolState: toolState)
         
         frameEditor.delegate = self
         self.frameEditor = frameEditor
-    }
-    
-    private func updateWorkspaceContentSize() {
-        guard let size = frameEditor?.sceneContentSize()
-        else { return }
-        
-        workspaceVC.setContentSize(Size(size))
     }
     
     // MARK: - Tool State
@@ -159,6 +154,9 @@ class AnimEditorVC: UIViewController {
         let sceneGraph = frameEditor?.onFrame()
         
         if let sceneGraph {
+            // Maybe only set this if it changes?
+            workspaceVC.setContentSize(sceneGraph.contentSize)
+            
             draw(
                 drawable: drawable,
                 viewportSize: viewportSize,
@@ -283,8 +281,35 @@ extension AnimEditorVC: AnimFrameEditorDelegate {
         workspaceVC.workspaceTransform()
     }
     
-    func onChangeSceneContentSize(_ e: AnimFrameEditor) {
-        updateWorkspaceContentSize()
+    func setAssetLoaderAssetIDs(
+        _ e: AnimFrameEditor,
+        assetIDs: Set<String>
+    ) {
+        assetLoader.update(assetIDs: assetIDs)
+    }
+    
+    func assetLoaderAssetTexture(
+        _ e: AnimFrameEditor,
+        assetID: String
+    ) -> MTLTexture? {
+        assetLoader.assetTexture(assetID: assetID)
+    }
+    
+    func storeAssetLoaderTexture(
+        _ e: AnimFrameEditor,
+        assetID: String,
+        texture: MTLTexture
+    ) {
+        assetLoader.storeAssetTexture(
+            assetID: assetID,
+            texture: texture)
+    }
+    
+    func setEditInteractionEnabled(
+        _ e: AnimFrameEditor,
+        enabled: Bool
+    ) {
+        toolState?.setEditInteractionEnabled(enabled)
     }
     
 }

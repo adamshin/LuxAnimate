@@ -15,18 +15,21 @@ struct EditorWorkspaceSceneGraph {
     }
     
     enum LayerContent {
-        case drawing(DrawingLayerContent)
+        case image(ImageLayerContent)
         case rect(RectLayerContent)
     }
     
-    struct DrawingLayerContent {
-        var texture: MTLTexture
+    struct ImageLayerContent {
+        var texture: MTLTexture?
+        var colorMode: ColorMode
+        var color: Color
     }
     
     struct RectLayerContent {
         var color: Color
     }
     
+    var contentSize: Size
     var layers: [Layer]
     
     // TODO: Overlay content, drawn in screen space?

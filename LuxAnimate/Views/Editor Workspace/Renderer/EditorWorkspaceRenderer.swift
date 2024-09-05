@@ -50,8 +50,8 @@ struct EditorWorkspaceRenderer {
         // Layers
         for layer in sceneGraph.layers {
             switch layer.content {
-            case .drawing(let content):
-                drawDrawingLayer(
+            case .image(let content):
+                drawImageLayer(
                     target: target,
                     commandBuffer: commandBuffer,
                     viewportSize: viewportSize,
@@ -72,15 +72,17 @@ struct EditorWorkspaceRenderer {
         }
     }
     
-    private func drawDrawingLayer(
+    private func drawImageLayer(
         target: MTLTexture,
         commandBuffer: MTLCommandBuffer,
         viewportSize: Size,
         contentTransform: Matrix3,
         layer: EditorWorkspaceSceneGraph.Layer,
-        content: EditorWorkspaceSceneGraph.DrawingLayerContent,
+        content: EditorWorkspaceSceneGraph.ImageLayerContent,
         pixelate: Bool
     ) {
+        guard let texture = content.texture else { return }
+        
         let transform = contentTransform * layer.transform
         
         let sampleMode: SampleMode = pixelate ?
@@ -90,7 +92,7 @@ struct EditorWorkspaceRenderer {
             commandBuffer: commandBuffer,
             target: target,
             viewportSize: viewportSize,
-            texture: content.texture,
+            texture: texture,
             sprites: [
                 .init(
                     position: .zero,
@@ -98,7 +100,9 @@ struct EditorWorkspaceRenderer {
                     transform: transform,
                     alpha: layer.alpha)
             ],
-            sampleMode: sampleMode)
+            sampleMode: sampleMode,
+            colorMode: content.colorMode,
+            color: content.color)
     }
     
     private func drawRectLayer(

@@ -1,0 +1,49 @@
+//
+//  AnimFrameEditorState.swift
+//
+
+import Metal
+
+protocol AnimFrameEditorStateDelegate: AnyObject {
+    
+    func changeState(
+        _ e: AnimFrameEditorState,
+        newState: AnimFrameEditorState)
+    
+    func setAssetLoaderAssetIDs(
+        _ s: AnimFrameEditorState,
+        assetIDs: Set<String>)
+    
+    func assetLoaderAssetTexture(
+        _ e: AnimFrameEditorState,
+        assetID: String) -> MTLTexture?
+    
+    func storeAssetLoaderTexture(
+        _ e: AnimFrameEditorState,
+        assetID: String,
+        texture: MTLTexture)
+    
+    func workspaceViewSize(
+        _ e: AnimFrameEditorState
+    ) -> Size
+    
+    func workspaceTransform(
+        _ e: AnimFrameEditorState
+    ) -> EditorWorkspaceTransform
+    
+    func setEditInteractionEnabled(
+        _ e: AnimFrameEditorState,
+        enabled: Bool)
+    
+}
+
+protocol AnimFrameEditorState: AnyObject {
+    
+    var delegate: AnimFrameEditorStateDelegate? { get set }
+    
+    func beginState()
+    
+    func onFrame() -> EditorWorkspaceSceneGraph?
+    func onLoadAsset()
+    
+}

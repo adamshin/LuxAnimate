@@ -57,9 +57,6 @@ class EditorWorkspaceTransformManager {
     // MARK: - Transform
     
     private func handleUpdateWorkspaceParams() {
-        activeGestureTransform = nil
-        activeAnimation = nil
-        
         if isContentFitToViewport {
             fitContentToViewport()
         }

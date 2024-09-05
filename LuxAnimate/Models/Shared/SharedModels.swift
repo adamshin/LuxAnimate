@@ -93,6 +93,8 @@ extension Color {
 
 extension PixelSize {
     
+    static let zero = PixelSize(0, 0)
+    
     init(_ width: Int, _ height: Int) {
         self.init(width: width, height: height)
     }

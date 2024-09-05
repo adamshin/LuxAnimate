@@ -14,4 +14,6 @@ protocol AnimEditorToolState: AnyObject {
         workspaceVC: EditorWorkspaceVC,
         toolControlsVC: AnimEditorToolControlsVC)
     
+    func setEditInteractionEnabled(_ enabled: Bool)
+    
 }

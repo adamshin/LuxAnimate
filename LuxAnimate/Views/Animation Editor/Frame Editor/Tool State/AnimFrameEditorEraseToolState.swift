@@ -29,6 +29,10 @@ class AnimFrameEditorEraseToolState: AnimFrameEditorToolState {
         internalState.onFrame()
     }
     
+    func drawingCanvasTexture() -> MTLTexture {
+        internalState.drawingCanvasTexture()
+    }
+    
 }
 
 // MARK: - Delegates
