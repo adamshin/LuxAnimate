@@ -182,20 +182,24 @@ extension SceneEditorVC: SceneEditorContentVCDelegate {
     func onSelectAddLayer(_ vc: SceneEditorContentVC) { 
         guard let sceneManifest else { return }
         
-        let drawing = Scene.Drawing(
-            id: IDGenerator.id(),
-            frameIndex: 0,
-            assetIDs: nil)
+        let drawings = (0 ..< 10).map { index in
+            Scene.Drawing(
+                id: IDGenerator.id(),
+                frameIndex: index,
+                assetIDs: nil)
+        }
         
-        let layerContent = Scene.AnimationLayerContent(
-            drawings: [drawing])
+        let animationLayerContent = Scene.AnimationLayerContent(
+            drawings: drawings)
+        
+        let transform = Matrix3.identity
         
         let layer = Scene.Layer(
             id: IDGenerator.id(),
             name: "Animation Layer",
-            content: .animation(layerContent),
+            content: .animation(animationLayerContent),
             contentSize: newLayerContentSize,
-            transform: .identity,
+            transform: transform,
             alpha: 1)
         
         var newSceneManifest = sceneManifest
