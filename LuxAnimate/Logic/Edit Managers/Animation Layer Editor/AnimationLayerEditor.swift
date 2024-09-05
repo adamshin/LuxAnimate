@@ -17,7 +17,7 @@ extension AnimationLayerEditor {
     struct Edit {
         var layerID: String
         var newAnimationLayerContent: Scene.AnimationLayerContent
-        var newAssets: [ProjectEditor.Asset]
+        var newAssets: [ProjectEditManager.NewAsset]
     }
     
 }

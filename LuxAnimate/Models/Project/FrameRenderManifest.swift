@@ -1,34 +1,18 @@
 //
-//  RenderPreviewFrameSceneGraph.swift
+//  FrameRenderManifest.swift
 //
 
 import Foundation
 
-struct RenderPreviewFrameSceneGraph: Codable {
-    
-    struct Layer: Codable {
-        var size: PixelSize
-        var content: LayerContent
-    }
-    
-    enum LayerContent: Codable {
-        case drawing(DrawingLayerContent)
-    }
-    
-    struct DrawingLayerContent: Codable {
-        var assetID: String
-    }
-    
-    var viewportSize: PixelSize
-    var backgroundColor: Color
-    
-    var layers: [Layer]
+struct FrameRenderManifest: Codable {
+        
+    var frameSceneGraph: FrameSceneGraph
     
 }
 
 // MARK: - Fingerprint
 
-extension RenderPreviewFrameSceneGraph {
+extension FrameRenderManifest {
     
     static let jsonEncoder = {
         let e = JSONEncoder()

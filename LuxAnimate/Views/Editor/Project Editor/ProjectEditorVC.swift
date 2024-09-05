@@ -10,7 +10,7 @@ class ProjectEditorVC: UIViewController {
     
     private let projectID: String
     
-    private let projectEditor: ProjectEditor
+    private let projectEditor: ProjectEditManager
     
     private weak var sceneEditorVC: SceneEditorVC?
     
@@ -19,7 +19,7 @@ class ProjectEditorVC: UIViewController {
     init(projectID: String) throws {
         self.projectID = projectID
         
-        projectEditor = try ProjectEditor(
+        projectEditor = try ProjectEditManager(
             projectID: projectID)
         
         super.init(nibName: nil, bundle: nil)
@@ -166,7 +166,7 @@ extension ProjectEditorVC: SceneEditorVCDelegate {
         _ vc: SceneEditorVC,
         sceneID: String,
         newSceneManifest: Scene.Manifest,
-        newSceneAssets: [ProjectEditor.Asset]
+        newSceneAssets: [ProjectEditManager.NewAsset]
     ) {
         do {
             try projectEditor.applySceneEdit(

@@ -1,13 +1,13 @@
 //
-//  ProjectEditorWorkQueue.swift
+//  ProjectEditManagerWorkQueue.swift
 //
 
 import Foundation
 
-class ProjectEditorWorkQueue {
+class ProjectEditManagerWorkQueue {
     
     private let queue = DispatchQueue(
-        label: "ProjectEditorWorkQueue.queue",
+        label: "ProjectEditManagerWorkQueue.queue",
         qos: .userInitiated)
     
     func enqueueSync(

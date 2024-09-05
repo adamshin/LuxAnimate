@@ -1,14 +1,14 @@
 //
-//  ProjectEditor.swift
+//  ProjectEditManager.swift
 //
 
 import Foundation
 
 private let editHistoryLimit = 20
 
-extension ProjectEditor {
+extension ProjectEditManager {
     
-    struct Asset {
+    struct NewAsset {
         var id: String
         var data: Data
     }
@@ -19,7 +19,7 @@ extension ProjectEditor {
     
 }
 
-class ProjectEditor {
+class ProjectEditManager {
     
     private let projectID: String
     
@@ -28,7 +28,7 @@ class ProjectEditor {
     private(set) var availableUndoCount: Int = 0
     private(set) var availableRedoCount: Int = 0
     
-    private let workQueue = ProjectEditorWorkQueue()
+    private let workQueue = ProjectEditManagerWorkQueue()
     private let fileManager = FileManager.default
     
     // MARK: - Init
@@ -240,7 +240,7 @@ class ProjectEditor {
     }
     
     private func writeAssetToProject(
-        _ asset: Asset
+        _ asset: NewAsset
     ) throws {
         let url = assetURLInProject(assetID: asset.id)
         try asset.data.write(to: url)
@@ -290,18 +290,66 @@ class ProjectEditor {
         return assetIDs
     }
     
-    // MARK: - Undo/Redo
+    // MARK: - Internal Logic
     
-    func applyUndo() throws {
-        try workQueue.enqueueSync {
-            try self.consumeHistoryEntryInternal(undo: true)
+    private func applyEditInternal(
+        newProjectManifest: Project.Manifest,
+        newAssets: [NewAsset]
+    ) throws {
+        
+        // Setup
+        let oldProjectManifest = self.projectManifest
+        
+        let projectManifestURL = FileHelper.shared
+            .projectManifestURL(for: projectID)
+        
+        // Clear redo history
+        try removeAllEditHistoryEntries(
+            in: redoHistoryDirectoryURL())
+        
+        // Create new undo history entry
+        let entryURL = try pushNewEditHistoryEntry(
+            in: undoHistoryDirectoryURL())
+        
+        // Copy old project manifest to history entry
+        let historyEntryProjectManifestURL =
+            entryURL.appending(
+                path: FileHelper.projectManifestFileName)
+        
+        try fileManager.copyItem(
+            at: projectManifestURL,
+            to: historyEntryProjectManifestURL)
+        
+        // Write new assets to project directory
+        let oldAssetIDs = Self.allAssetIDs(in: oldProjectManifest)
+        let newAssetIDs = Self.allAssetIDs(in: newProjectManifest)
+        
+        for asset in newAssets {
+            guard newAssetIDs.contains(asset.id)
+            else { continue }
+            
+            try writeAssetToProject(asset)
         }
-    }
-    
-    func applyRedo() throws {
-        try workQueue.enqueueSync {
-            try self.consumeHistoryEntryInternal(undo: false)
+        
+        // Write new project manifest
+        let newProjectManifestData = try
+            JSONFileEncoder.shared.encode(newProjectManifest)
+        
+        try newProjectManifestData.write(to: projectManifestURL)
+        
+        // Find assets referenced in the old manifest but not the
+        // new one. Move these to the new history entry
+        let diffAssetIDs = oldAssetIDs.subtracting(newAssetIDs)
+        
+        for diffAssetID in diffAssetIDs {
+            try moveAssetInProjectToEditHistoryEntry(
+                assetID: diffAssetID,
+                entryURL: entryURL)
         }
+        
+        // Update state
+        self.projectManifest = newProjectManifest
+        updateAvailableUndoRedoCount()
     }
     
     private func consumeHistoryEntryInternal(undo: Bool) throws {
@@ -393,13 +441,12 @@ class ProjectEditor {
         updateAvailableUndoRedoCount()
     }
     
-    // MARK: - Project Edit
+    // MARK: - Interface
     
     func applyEdit(
         newProjectManifest: Project.Manifest,
-        newAssets: [Asset]
+        newAssets: [NewAsset]
     ) throws {
-        
         try workQueue.enqueueSync {
             try self.applyEditInternal(
                 newProjectManifest: newProjectManifest,
@@ -407,207 +454,18 @@ class ProjectEditor {
         }
     }
     
-    private func applyEditInternal(
-        newProjectManifest: Project.Manifest,
-        newAssets: [Asset]
-    ) throws {
-        
-        // Setup
-        let oldProjectManifest = self.projectManifest
-        
-        let projectManifestURL = FileHelper.shared
-            .projectManifestURL(for: projectID)
-        
-        // Clear redo history
-        try removeAllEditHistoryEntries(
-            in: redoHistoryDirectoryURL())
-        
-        // Create new undo history entry
-        let entryURL = try pushNewEditHistoryEntry(
-            in: undoHistoryDirectoryURL())
-        
-        // Copy old project manifest to history entry
-        let historyEntryProjectManifestURL =
-            entryURL.appending(
-                path: FileHelper.projectManifestFileName)
-        
-        try fileManager.copyItem(
-            at: projectManifestURL,
-            to: historyEntryProjectManifestURL)
-        
-        // Write new assets to project directory
-        let oldAssetIDs = Self.allAssetIDs(in: oldProjectManifest)
-        let newAssetIDs = Self.allAssetIDs(in: newProjectManifest)
-        
-        for asset in newAssets {
-            guard newAssetIDs.contains(asset.id)
-            else { continue }
-            
-            try writeAssetToProject(asset)
+    func applyUndo() throws {
+        try workQueue.enqueueSync {
+            try self.consumeHistoryEntryInternal(
+                undo: true)
         }
-        
-        // Write new project manifest
-        let newProjectManifestData = try
-            JSONFileEncoder.shared.encode(newProjectManifest)
-        
-        try newProjectManifestData.write(to: projectManifestURL)
-        
-        // Find assets referenced in the old manifest but not the
-        // new one. Move these to the new history entry
-        let diffAssetIDs = oldAssetIDs.subtracting(newAssetIDs)
-        
-        for diffAssetID in diffAssetIDs {
-            try moveAssetInProjectToEditHistoryEntry(
-                assetID: diffAssetID,
-                entryURL: entryURL)
-        }
-        
-        // Update state
-        self.projectManifest = newProjectManifest
-        updateAvailableUndoRedoCount()
     }
     
-    // MARK: - Scene Edit
-    
-    func createScene(
-        name: String,
-        frameCount: Int,
-        backgroundColor: Color
-    ) throws {
-        
-        let contentMetadata = projectManifest.content.metadata
-        
-        // Generate scene ID
-        let sceneID = IDGenerator.id()
-        
-        // Create scene manifest
-        let sceneManifest = Scene.Manifest(
-            id: sceneID,
-            frameCount: frameCount,
-            backgroundColor: backgroundColor,
-            layers: [],
-            assetIDs: [])
-        
-        // Generate scene render manifest
-        let sceneRenderManifest = SceneRenderManifestGenerator
-            .generate(
-                contentMetadata: contentMetadata,
-                sceneManifest: sceneManifest)
-        
-        // Encode data
-        let sceneManifestData = try JSONFileEncoder.shared
-            .encode(sceneManifest)
-        let sceneRenderManifestData = try JSONFileEncoder.shared
-            .encode(sceneRenderManifest)
-        
-        // Generate asset IDs
-        let sceneManifestAssetID = IDGenerator.id()
-        let sceneRenderManifestAssetID = IDGenerator.id()
-        
-        // Create scene ref
-        let newSceneRef = Project.SceneRef(
-            id: sceneID,
-            name: name,
-            manifestAssetID: sceneManifestAssetID,
-            renderManifestAssetID: sceneRenderManifestAssetID,
-            sceneAssetIDs: sceneManifest.assetIDs)
-        
-        // Update project manifest
-        var newProjectManifest = projectManifest
-        newProjectManifest.content.sceneRefs.append(newSceneRef)
-        
-        // Create asset list
-        var newProjectAssets: [ProjectEditor.Asset] = []
-        
-        newProjectAssets.append(ProjectEditor.Asset(
-            id: sceneManifestAssetID,
-            data: sceneManifestData))
-        
-        newProjectAssets.append(ProjectEditor.Asset(
-            id: sceneRenderManifestAssetID,
-            data: sceneRenderManifestData))
-        
-        // Apply edit
-        try applyEdit(
-            newProjectManifest: newProjectManifest,
-            newAssets: newProjectAssets)
-    }
-    
-    func deleteScene(
-        sceneID: String
-    ) throws {
-        
-        guard let sceneIndex = projectManifest.content.sceneRefs
-            .firstIndex(where: { $0.id == sceneID })
-        else {
-            throw EditError.sceneNotFound
+    func applyRedo() throws {
+        try workQueue.enqueueSync {
+            try self.consumeHistoryEntryInternal(
+                undo: false)
         }
-        
-        var newProjectManifest = projectManifest
-        newProjectManifest.content.sceneRefs.remove(at: sceneIndex)
-        
-        try applyEdit(
-            newProjectManifest: newProjectManifest,
-            newAssets: [])
-    }
-    
-    func applySceneEdit(
-        sceneID: String,
-        newSceneManifest: Scene.Manifest,
-        newSceneAssets: [ProjectEditor.Asset]
-    ) throws {
-        
-        guard let sceneIndex = projectManifest.content.sceneRefs
-            .firstIndex(where: { $0.id == sceneID })
-        else {
-            throw EditError.sceneNotFound
-        }
-        
-        let sceneRef = projectManifest.content.sceneRefs[sceneIndex]
-        let contentMetadata = projectManifest.content.metadata
-        
-        // Generate scene render manifest
-        let sceneRenderManifest = SceneRenderManifestGenerator
-            .generate(
-                contentMetadata: contentMetadata,
-                sceneManifest: newSceneManifest)
-        
-        // Encode data
-        let sceneManifestData = try JSONFileEncoder.shared
-            .encode(newSceneManifest)
-        let sceneRenderManifestData = try JSONFileEncoder.shared
-            .encode(sceneRenderManifest)
-        
-        // Generate asset IDs
-        let sceneManifestAssetID = IDGenerator.id()
-        let sceneRenderManifestAssetID = IDGenerator.id()
-        
-        // Update scene ref
-        var newSceneRef = sceneRef
-        
-        newSceneRef.manifestAssetID = sceneManifestAssetID
-        newSceneRef.renderManifestAssetID = sceneRenderManifestAssetID
-        newSceneRef.sceneAssetIDs = newSceneManifest.assetIDs
-        
-        // Update project manifest
-        var newProjectManifest = projectManifest
-        newProjectManifest.content.sceneRefs[sceneIndex] = newSceneRef
-        
-        // Create asset list
-        var newProjectAssets = newSceneAssets
-        
-        newProjectAssets.append(ProjectEditor.Asset(
-            id: sceneManifestAssetID,
-            data: sceneManifestData))
-        
-        newProjectAssets.append(ProjectEditor.Asset(
-            id: sceneRenderManifestAssetID,
-            data: sceneRenderManifestData))
-        
-        // Apply edit
-        try applyEdit(
-            newProjectManifest: newProjectManifest,
-            newAssets: newProjectAssets)
     }
     
 }

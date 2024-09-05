@@ -14,7 +14,7 @@ protocol AnimationEditorVCDelegate: AnyObject {
         _ vc: AnimationEditorVC,
         sceneID: String,
         newSceneManifest: Scene.Manifest,
-        newSceneAssets: [ProjectEditor.Asset])
+        newSceneAssets: [ProjectEditManager.NewAsset])
     
 }
 

@@ -12,35 +12,56 @@ struct FrameSceneGraphGenerator {
         frameIndex: Int
     ) -> FrameSceneGraph {
         
-        let metadata = projectManifest.content.metadata
+        let sceneGraphs = generate(
+            projectManifest: projectManifest,
+            sceneManifest: sceneManifest,
+            frameIndexes: [frameIndex])
         
-        let contentSize = Size(metadata.viewportSize)
-        
-        var sceneGraph = FrameSceneGraph(
-            contentSize: contentSize,
-            backgroundColor: sceneManifest.backgroundColor,
-            layers: [])
-        
-        let layerProviders = sceneManifest.layers.map {
-            Self.createLayerProvider(layer: $0)
-        }
-        
-        for layerProvider in layerProviders {
-            if let layer = layerProvider.layer(at: frameIndex) {
-                sceneGraph.layers.append(layer)
-            }
-        }
-        
-        return sceneGraph
+        return sceneGraphs.first!
     }
     
-    private static func createLayerProvider(
+    static func generate(
+        projectManifest: Project.Manifest,
+        sceneManifest: Scene.Manifest,
+        frameIndexes: [Int]
+    ) -> [FrameSceneGraph] {
+        
+        let metadata = projectManifest.content.metadata
+        let contentSize = Size(metadata.viewportSize)
+        
+        let sceneGraphLayerProviders = sceneManifest.layers.map {
+            Self.sceneGraphLayerProvider(layer: $0)
+        }
+        
+        var sceneGraphs: [FrameSceneGraph] = []
+        
+        for frameIndex in frameIndexes {
+            var sceneGraph = FrameSceneGraph(
+                contentSize: contentSize,
+                backgroundColor: sceneManifest.backgroundColor,
+                layers: [])
+            
+            for sceneGraphLayerProvider in sceneGraphLayerProviders {
+                if let sceneGraphLayer = sceneGraphLayerProvider
+                    .sceneGraphLayer(at: frameIndex)
+                {
+                    sceneGraph.layers.append(sceneGraphLayer)
+                }
+            }
+            
+            sceneGraphs.append(sceneGraph)
+        }
+        
+        return sceneGraphs
+    }
+    
+    private static func sceneGraphLayerProvider(
         layer: Scene.Layer
-    ) -> LayerProvider {
+    ) -> SceneGraphLayerProvider {
         
         switch layer.content {
         case .animation(let layerContent):
-            return AnimationLayerProvider(
+            return AnimationSceneGraphLayerProvider(
                 layer: layer,
                 layerContent: layerContent)
         }
@@ -50,15 +71,15 @@ struct FrameSceneGraphGenerator {
 
 // MARK: - Layer Providers
 
-private protocol LayerProvider {
+private protocol SceneGraphLayerProvider {
     
-    func layer(
+    func sceneGraphLayer(
         at frameIndex: Int
     ) -> FrameSceneGraph.Layer?
     
 }
 
-private struct AnimationLayerProvider: LayerProvider {
+private struct AnimationSceneGraphLayerProvider: SceneGraphLayerProvider {
     
     private let layer: Scene.Layer
     private let layerContent: Scene.AnimationLayerContent
@@ -96,7 +117,7 @@ private struct AnimationLayerProvider: LayerProvider {
         self.frameIndexesToSortedDrawingIndexes = frameIndexesToSortedDrawingIndexes
     }
     
-    func layer(
+    func sceneGraphLayer(
         at frameIndex: Int
     ) -> FrameSceneGraph.Layer? {
         

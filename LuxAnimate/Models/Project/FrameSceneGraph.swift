@@ -4,20 +4,20 @@
 
 import Foundation
 
-struct FrameSceneGraph {
+struct FrameSceneGraph: Codable {
     
-    struct Layer {
+    struct Layer: Codable {
         var content: LayerContent
         var contentSize: Size
         var transform: Matrix3
         var alpha: Double
     }
     
-    enum LayerContent {
+    enum LayerContent: Codable {
         case drawing(DrawingLayerContent)
     }
     
-    struct DrawingLayerContent {
+    struct DrawingLayerContent: Codable {
         var drawing: Scene.Drawing
     }
     

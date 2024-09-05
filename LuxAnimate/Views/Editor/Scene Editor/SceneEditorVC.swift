@@ -19,7 +19,7 @@ protocol SceneEditorVCDelegate: AnyObject {
         _ vc: SceneEditorVC,
         sceneID: String,
         newSceneManifest: Scene.Manifest,
-        newSceneAssets: [ProjectEditor.Asset])
+        newSceneAssets: [ProjectEditManager.NewAsset])
     
 }
 
@@ -262,7 +262,7 @@ extension SceneEditorVC: AnimEditorVCDelegate {
     func onRequestApplyEdit(
         _ vc: AnimEditorVC,
         newSceneManifest: Scene.Manifest,
-        newSceneAssets: [ProjectEditor.Asset]
+        newSceneAssets: [ProjectEditManager.NewAsset]
     ) {
         self.sceneManifest = newSceneManifest
         

@@ -15,7 +15,7 @@ protocol AnimEditorVCDelegate: AnyObject {
     func onRequestApplyEdit(
         _ vc: AnimEditorVC,
         newSceneManifest: Scene.Manifest,
-        newSceneAssets: [ProjectEditor.Asset])
+        newSceneAssets: [ProjectEditManager.NewAsset])
     
 }
 

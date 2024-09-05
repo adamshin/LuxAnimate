@@ -18,10 +18,11 @@ class RenderPreviewManager {
     }
     
     func update(projectManifest: Project.Manifest) {
-//        let previewManifest = RenderPreviewManifest.generate(
-//            projectManifest: projectManifest)
+        // Start rendering frames
         
-        // TODO: Re-render invalid frames
+        // I'll need to create a frame graph renderer.
+        // Probably best to use the same logic for both
+        // preview and full renders (configurable).
     }
     
 }
