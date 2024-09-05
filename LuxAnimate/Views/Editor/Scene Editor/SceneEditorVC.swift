@@ -117,13 +117,11 @@ class SceneEditorVC: UIViewController {
                 projectID: projectID,
                 sceneID: sceneID,
                 activeLayerID: layerID,
-                activeFrameIndex: 0)
-            
-            vc.delegate = self
-            
-            vc.update(
+                activeFrameIndex: 0,
                 projectManifest: projectManifest,
                 sceneManifest: sceneManifest)
+            
+            vc.delegate = self
             
             vc.update(
                 availableUndoCount: availableUndoCount,

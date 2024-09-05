@@ -6,11 +6,12 @@ import UIKit
 
 protocol AnimEditorToolbarVCDelegate: AnyObject {
     func onSelectBack(_ vc: AnimEditorToolbarVC)
-    func onSelectUndo(_ vc: AnimEditorToolbarVC)
-    func onSelectRedo(_ vc: AnimEditorToolbarVC)
     
     func onSelectPaintTool(_ vc: AnimEditorToolbarVC)
     func onSelectEraseTool(_ vc: AnimEditorToolbarVC)
+    
+    func onSelectUndo(_ vc: AnimEditorToolbarVC)
+    func onSelectRedo(_ vc: AnimEditorToolbarVC)
 }
 
 class AnimEditorToolbarVC: UIViewController {
@@ -30,14 +31,6 @@ class AnimEditorToolbarVC: UIViewController {
             guard let self else { return }
             self.delegate?.onSelectBack(self)
         }
-        bodyView.undoButton.addHandler { [weak self] in
-            guard let self else { return }
-            self.delegate?.onSelectUndo(self)
-        }
-        bodyView.redoButton.addHandler { [weak self] in
-            guard let self else { return }
-            self.delegate?.onSelectRedo(self)
-        }
         
         bodyView.paintButton.addHandler { [weak self] in
             guard let self else { return }
@@ -48,6 +41,15 @@ class AnimEditorToolbarVC: UIViewController {
             guard let self else { return }
             self.bodyView.selectEraseTool()
             self.delegate?.onSelectEraseTool(self)
+        }
+        
+        bodyView.undoButton.addHandler { [weak self] in
+            guard let self else { return }
+            self.delegate?.onSelectUndo(self)
+        }
+        bodyView.redoButton.addHandler { [weak self] in
+            guard let self else { return }
+            self.delegate?.onSelectRedo(self)
         }
         
         bodyView.selectPaintTool()

@@ -23,9 +23,10 @@ class AnimEditorVC: UIViewController {
     
     private let bodyView = AnimEditorView()
     
-    private let toolbarVC = AnimEditorToolbarVC()
-    private let toolControlsVC = AnimEditorToolControlsVC()
     private let workspaceVC = EditorWorkspaceVC()
+    private let toolbarVC = AnimEditorToolbarVC()
+    private let bottomBarVC = AnimEditorBottomBarVC()
+    private let toolControlsVC = AnimEditorToolControlsVC()
     
     private let assetLoader: AnimEditorAssetLoader
     
@@ -34,15 +35,13 @@ class AnimEditorVC: UIViewController {
     
     private let projectID: String
     private let sceneID: String
-    
-    private var projectManifest: Project.Manifest?
-    private var sceneManifest: Scene.Manifest?
-    
-    // TODO: Make these changeable.
-    // Changing these values should reload the frame editor.
     private let activeLayerID: String
-    private let activeFrameIndex: Int
-    private let onionSkinConfig: AnimEditorOnionSkinConfig
+    
+    private var activeFrameIndex: Int
+    private var projectManifest: Project.Manifest
+    private var sceneManifest: Scene.Manifest
+    
+    private var onionSkinConfig: AnimEditorOnionSkinConfig
     
     private var toolState: AnimEditorToolState?
     private var frameEditor: AnimFrameEditor?
@@ -55,12 +54,16 @@ class AnimEditorVC: UIViewController {
         projectID: String,
         sceneID: String,
         activeLayerID: String,
-        activeFrameIndex: Int
+        activeFrameIndex: Int,
+        projectManifest: Project.Manifest,
+        sceneManifest: Scene.Manifest
     ) {
         self.projectID = projectID
         self.sceneID = sceneID
         self.activeLayerID = activeLayerID
         self.activeFrameIndex = activeFrameIndex
+        self.projectManifest = projectManifest
+        self.sceneManifest = sceneManifest
         
         onionSkinConfig = AppConfig.onionSkinConfig
         
@@ -86,26 +89,75 @@ class AnimEditorVC: UIViewController {
         
         workspaceVC.delegate = self
         toolbarVC.delegate = self
+        bottomBarVC.delegate = self
         
-        addChild(toolbarVC, to: bodyView.toolbarContainer)
-        addChild(toolControlsVC, to: bodyView.toolControlsContainer)
         addChild(workspaceVC, to: bodyView.workspaceContainer)
+        addChild(toolbarVC, to: bodyView.toolbarContainer)
+        addChild(bottomBarVC, to: bodyView.bottomBarContainer)
+        addChild(toolControlsVC, to: bodyView.toolControlsContainer)
         
+        updateBottomBar()
         enterToolState(AnimEditorPaintToolState())
-        
-        reloadFrameEditor()
     }
     
     override var prefersStatusBarHidden: Bool { true }
     
+    // MARK: - UI
+    
+    private func updateBottomBar() {
+        bottomBarVC.update(
+            activeFrameIndex: activeFrameIndex)
+    }
+    
     // MARK: - Logic
     
+    private func set(
+        projectManifest: Project.Manifest,
+        sceneManifest: Scene.Manifest
+    ) {
+        self.projectManifest = projectManifest
+        self.sceneManifest = sceneManifest
+        
+        clampActiveFrameIndex()
+        updateBottomBar()
+        reloadFrameEditor()
+    }
+    
+    private func set(
+        activeFrameIndex: Int
+    ) {
+        self.activeFrameIndex = activeFrameIndex
+        
+        clampActiveFrameIndex()
+        updateBottomBar()
+        reloadFrameEditor()
+    }
+    
+    private func set(
+        onionSkinConfig: AnimEditorOnionSkinConfig
+    ) {
+        self.onionSkinConfig = onionSkinConfig
+        reloadFrameEditor()
+    }
+    
+    private func updateState(
+        availableUndoCount: Int,
+        availableRedoCount: Int
+    ) {
+        toolbarVC.update(
+            availableUndoCount: availableUndoCount,
+            availableRedoCount: availableRedoCount)
+    }
+    
+    private func clampActiveFrameIndex() {
+        activeFrameIndex = clamp(
+            activeFrameIndex,
+            min: 0,
+            max: sceneManifest.frameCount - 1)
+    }
+    
     private func reloadFrameEditor() {
-        guard 
-            let projectManifest,
-            let sceneManifest,
-            let toolState
-        else { return }
+        guard let toolState else { return }
         
         let frameEditor = AnimFrameEditor()
         frameEditor.delegate = self
@@ -196,17 +248,16 @@ class AnimEditorVC: UIViewController {
             return
         }
         
-        self.projectManifest = projectManifest
-        self.sceneManifest = sceneManifest
-        
-        reloadFrameEditor()
+        set(
+            projectManifest: projectManifest,
+            sceneManifest: sceneManifest)
     }
     
     func update(
         availableUndoCount: Int,
         availableRedoCount: Int
     ) {
-        toolbarVC.update(
+        updateState(
             availableUndoCount: availableUndoCount,
             availableRedoCount: availableRedoCount)
     }
@@ -221,6 +272,13 @@ extension AnimEditorVC: AnimEditorToolbarVCDelegate {
         dismiss(animated: true)
     }
     
+    func onSelectPaintTool(_ vc: AnimEditorToolbarVC) {
+        enterToolState(AnimEditorPaintToolState())
+    }
+    func onSelectEraseTool(_ vc: AnimEditorToolbarVC) {
+        enterToolState(AnimEditorEraseToolState())
+    }
+    
     func onSelectUndo(_ vc: AnimEditorToolbarVC) {
         delegate?.onRequestUndo(self)
     }
@@ -228,11 +286,15 @@ extension AnimEditorVC: AnimEditorToolbarVCDelegate {
         delegate?.onRequestRedo(self)
     }
     
-    func onSelectPaintTool(_ vc: AnimEditorToolbarVC) {
-        enterToolState(AnimEditorPaintToolState())
+}
+
+extension AnimEditorVC: AnimEditorBottomBarVCDelegate {
+    
+    func onSelectPrevFrame(_ vc: AnimEditorBottomBarVC) {
+        set(activeFrameIndex: activeFrameIndex - 1)
     }
-    func onSelectEraseTool(_ vc: AnimEditorToolbarVC) {
-        enterToolState(AnimEditorEraseToolState())
+    func onSelectNextFrame(_ vc: AnimEditorBottomBarVC) {
+        set(activeFrameIndex: activeFrameIndex + 1)
     }
     
 }
@@ -325,9 +387,7 @@ extension AnimEditorVC: AnimFrameEditorDelegate {
         drawingID: String,
         fullAssetID: String
     ) {
-        guard let sceneManifest else { return }
-        
-        self.sceneManifest?.layers = sceneManifest.layers.map { layer in
+        sceneManifest.layers = sceneManifest.layers.map { layer in
             if case .animation(let content) = layer.content {
                 let newDrawings = content.drawings.map { drawing in
                     if drawing.id == drawingID {

@@ -15,6 +15,11 @@ protocol AnimEditorAssetLoaderDelegate: AnyObject {
 
 class AnimEditorAssetLoader {
     
+    private enum LoadedAsset {
+        case loaded(MTLTexture)
+        case error
+    }
+    
     private struct CancelLoadError: Error { }
     
     weak var delegate: AnimEditorAssetLoaderDelegate?
@@ -26,7 +31,7 @@ class AnimEditorAssetLoader {
         qos: .background)
     
     private var assetIDs: Set<String> = []
-    private var loadedAssets: [String: MTLTexture] = [:]
+    private var loadedAssets: [String: LoadedAsset] = [:]
     
     // MARK: - Init
     
@@ -47,7 +52,13 @@ class AnimEditorAssetLoader {
     }
     
     func assetTexture(assetID: String) -> MTLTexture? {
-        loadedAssets[assetID]
+        guard let loadedAsset = loadedAssets[assetID]
+        else { return nil }
+        
+        return switch loadedAsset {
+        case .loaded(let texture): texture
+        case .error: nil
+        }
     }
     
     func storeAssetTexture(
@@ -55,7 +66,7 @@ class AnimEditorAssetLoader {
         texture: MTLTexture
     ) {
         assetIDs.insert(assetID)
-        loadedAssets[assetID] = texture
+        loadedAssets[assetID] = .loaded(texture)
     }
     
     // MARK: - Loading
@@ -77,18 +88,17 @@ class AnimEditorAssetLoader {
                         self.assetIDs.contains(assetID)
                     })
                 
-                self.loadedAssets[assetID] = texture
+                self.loadedAssets[assetID] = .loaded(texture)
                 self.delegate?.onLoadAsset(self)
                 
-                self.loadNextAsset()
-                
-            } catch is CancelLoadError {
-                self.loadNextAsset()
-                
             } catch {
-                self.delegate?.onError(self)
-                self.loadNextAsset()
+                if !(error is CancelLoadError) {
+                    self.loadedAssets[assetID] = .error
+                    self.delegate?.onError(self)
+                }
             }
+            
+            self.loadNextAsset()
         }
     }
     

@@ -32,8 +32,6 @@ class AnimFrameEditorLoadingState: AnimFrameEditorState {
     private let assetManifest:
         AnimFrameEditorHelper.AssetManifest
     
-    private var hasLoadedAllAssets = false
-    
     weak var delegate: AnimFrameEditorStateDelegate?
     
     // MARK: - Init
@@ -119,28 +117,15 @@ class AnimFrameEditorLoadingState: AnimFrameEditorState {
             self, enabled: false)
         
         let assetIDsToLoad = assetManifest.allAssetIDs()
-        if assetIDsToLoad.isEmpty {
-            enterEditingState()
-        } else {
-            delegate?.setAssetLoaderAssetIDs(
-                self, assetIDs: assetIDsToLoad)
-        }
+        
+        delegate?.setAssetLoaderAssetIDs(
+            self, assetIDs: assetIDsToLoad)
     }
     
     func onLoadAsset() { }
     
     func onFinishLoadingAssets() {
-        let assetIDsToLoad = assetManifest.allAssetIDs()
-        
-        let areAllAssetsLoaded = !assetIDsToLoad.contains {
-            delegate?.assetLoaderAssetTexture(
-                self, assetID: $0) == nil
-        }
-        
-        if areAllAssetsLoaded, !hasLoadedAllAssets {
-            hasLoadedAllAssets = true
-            enterEditingState()
-        }
+        enterEditingState()
     }
     
     func onFrame() -> EditorWorkspaceSceneGraph? { nil }

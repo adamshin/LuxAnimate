@@ -44,27 +44,6 @@ class AnimEditorToolbarView: UIView {
         return button
     }()
     
-    let undoButton = {
-        let button = UIButton(type: .system)
-        let image = UIImage(
-            systemName: "arrow.uturn.backward",
-            withConfiguration: iconConfig)
-        button.setImage(image, for: .normal)
-        button.tintColor = .editorLabel
-        button.pinWidth(to: buttonWidth)
-        return button
-    }()
-    let redoButton = {
-        let button = UIButton(type: .system)
-        let image = UIImage(
-            systemName: "arrow.uturn.forward",
-            withConfiguration: iconConfig)
-        button.setImage(image, for: .normal)
-        button.tintColor = .editorLabel
-        button.pinWidth(to: buttonWidth)
-        return button
-    }()
-    
     let paintButton = {
         let button = UIButton(type: .system)
         let image = UIImage(
@@ -79,6 +58,27 @@ class AnimEditorToolbarView: UIView {
         let button = UIButton(type: .system)
         let image = UIImage(
             systemName: "eraser.fill",
+            withConfiguration: iconConfig)
+        button.setImage(image, for: .normal)
+        button.tintColor = .editorLabel
+        button.pinWidth(to: buttonWidth)
+        return button
+    }()
+    
+    let undoButton = {
+        let button = UIButton(type: .system)
+        let image = UIImage(
+            systemName: "arrow.uturn.backward",
+            withConfiguration: iconConfig)
+        button.setImage(image, for: .normal)
+        button.tintColor = .editorLabel
+        button.pinWidth(to: buttonWidth)
+        return button
+    }()
+    let redoButton = {
+        let button = UIButton(type: .system)
+        let image = UIImage(
+            systemName: "arrow.uturn.forward",
             withConfiguration: iconConfig)
         button.setImage(image, for: .normal)
         button.tintColor = .editorLabel
