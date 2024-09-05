@@ -30,7 +30,7 @@ class AnimFrameEditorEraseToolState: AnimFrameEditorToolState {
     }
     
     func drawingCanvasTexture() -> MTLTexture {
-        internalState.drawingCanvasTexture()
+        internalState.activeCanvasTexture
     }
     
 }
@@ -86,6 +86,18 @@ extension AnimFrameEditorEraseToolState:
         _ s: AnimFrameEditorBrushToolInternalState
     ) -> Matrix3 {
         delegate?.layerTransform(self) ?? .identity
+    }
+    
+    func onUpdateActiveCanvasTexture(
+        _ s: AnimFrameEditorBrushToolInternalState
+    ) { }
+    
+    func onFinalizeStroke(
+        _ s: AnimFrameEditorBrushToolInternalState,
+        canvasTexture: MTLTexture
+    ) {
+        delegate?.onUpdateDrawingCanvasTexture(
+            self, canvasTexture: canvasTexture)
     }
     
 }

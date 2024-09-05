@@ -24,6 +24,10 @@ protocol AnimFrameEditorToolStateDelegate: AnyObject {
     
     // TODO: Methods for reporting edits
     
+    func onUpdateDrawingCanvasTexture(
+        _ s: AnimFrameEditorToolState,
+        canvasTexture: MTLTexture)
+    
 }
 
 protocol AnimFrameEditorToolState: AnyObject {

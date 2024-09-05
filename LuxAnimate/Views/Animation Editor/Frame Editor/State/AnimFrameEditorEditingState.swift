@@ -151,6 +151,20 @@ extension AnimFrameEditorEditingState: AnimFrameEditorToolStateDelegate {
         layer.transform
     }
     
+    func onUpdateDrawingCanvasTexture(
+        _ s: AnimFrameEditorToolState,
+        canvasTexture: MTLTexture
+    ) {
+        guard let drawing = activeDrawingManifest
+            .activeDrawing
+        else { return }
+        
+        delegate?.applyDrawingEdit(
+            self,
+            drawing: drawing,
+            drawingTexture: canvasTexture)
+    }
+    
 }
 
 extension AnimFrameEditorEditingState: AnimFrameEditorWorkspaceSceneGraphGeneratorDelegate {

@@ -149,4 +149,22 @@ extension AnimFrameEditor: AnimFrameEditorStateDelegate {
             self, enabled: enabled)
     }
     
+    func applyDrawingEdit(
+        _ e: AnimFrameEditorState,
+        drawing: Scene.Drawing,
+        drawingTexture: MTLTexture
+    ) {
+        // TODO: Save edit to disk.
+        // For now, just save it in the asset loader.
+        // This will be enough for testing.
+        
+        guard let assetID = drawing.assetIDs?.full
+        else { return }
+        
+        delegate?.storeAssetLoaderTexture(
+            self,
+            assetID: assetID,
+            texture: drawingTexture)
+    }
+    
 }

@@ -32,7 +32,7 @@ class AnimFrameEditorPaintToolState: AnimFrameEditorToolState {
     }
     
     func drawingCanvasTexture() -> MTLTexture {
-        internalState.drawingCanvasTexture()
+        internalState.activeCanvasTexture
     }
     
 }
@@ -42,6 +42,7 @@ class AnimFrameEditorPaintToolState: AnimFrameEditorToolState {
 extension AnimFrameEditorPaintToolState:
     AnimFrameEditorBrushToolInternalStateDelegate
 {
+    
     func brush(
         _ s: AnimFrameEditorBrushToolInternalState
     ) -> Brush? {
@@ -88,6 +89,18 @@ extension AnimFrameEditorPaintToolState:
         _ s: AnimFrameEditorBrushToolInternalState
     ) -> Matrix3 {
         delegate?.layerTransform(self) ?? .identity
+    }
+    
+    func onUpdateActiveCanvasTexture(
+        _ s: AnimFrameEditorBrushToolInternalState
+    ) { }
+    
+    func onFinalizeStroke(
+        _ s: AnimFrameEditorBrushToolInternalState,
+        canvasTexture: MTLTexture
+    ) {
+        delegate?.onUpdateDrawingCanvasTexture(
+            self, canvasTexture: canvasTexture)
     }
     
 }

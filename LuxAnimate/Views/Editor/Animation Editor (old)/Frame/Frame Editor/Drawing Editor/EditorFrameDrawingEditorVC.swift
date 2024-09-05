@@ -161,7 +161,7 @@ extension EditorFrameDrawingEditorVC: DrawingEditorToolVCDelegate {
     
     func onEditDrawing(
         _ vc: any DrawingEditorToolVC,
-        drawingTexture: any MTLTexture
+        drawingTexture: MTLTexture
     ) {
         do {
             try TextureBlitter.blit(

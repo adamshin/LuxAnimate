@@ -39,6 +39,13 @@ protocol AnimFrameEditorBrushToolInternalStateDelegate: AnyObject {
         _ s: AnimFrameEditorBrushToolInternalState
     ) -> Matrix3
     
+    func onUpdateActiveCanvasTexture(
+        _ s: AnimFrameEditorBrushToolInternalState)
+    
+    func onFinalizeStroke(
+        _ s: AnimFrameEditorBrushToolInternalState,
+        canvasTexture: MTLTexture)
+    
 }
 
 class AnimFrameEditorBrushToolInternalState {
@@ -62,7 +69,7 @@ class AnimFrameEditorBrushToolInternalState {
         brushEngine.onFrame()
     }
     
-    func drawingCanvasTexture() -> MTLTexture {
+    var activeCanvasTexture: MTLTexture {
         brushEngine.activeCanvasTexture
     }
     
@@ -119,11 +126,16 @@ extension AnimFrameEditorBrushToolInternalState: BrushEngineDelegate {
     
     func onUpdateActiveCanvasTexture(
         _ e: BrushEngine
-    ) { }
+    ) { 
+        delegate?.onUpdateActiveCanvasTexture(self)
+    }
 
     func onFinalizeStroke(
         _ e: BrushEngine,
         canvasTexture: MTLTexture
-    ) { }
+    ) { 
+        delegate?.onFinalizeStroke(
+            self, canvasTexture: canvasTexture)
+    }
     
 }
