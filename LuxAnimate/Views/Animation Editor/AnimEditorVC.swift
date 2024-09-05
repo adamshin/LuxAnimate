@@ -189,6 +189,13 @@ class AnimEditorVC: UIViewController {
         projectManifest: Project.Manifest,
         sceneManifest: Scene.Manifest
     ) {
+        guard sceneManifest.layers
+            .contains(where: { $0.id == activeLayerID })
+        else {
+            dismiss(animated: true)
+            return
+        }
+        
         self.projectManifest = projectManifest
         self.sceneManifest = sceneManifest
         
