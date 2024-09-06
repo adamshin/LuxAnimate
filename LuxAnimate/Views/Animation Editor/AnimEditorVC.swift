@@ -4,6 +4,21 @@
 
 import UIKit
 
+// Currently, we're asking the frame editor for a fresh
+// scene graph every frame. We should only do this when the
+// scene graph changes.
+
+// Also: maybe we should store the scene graph so we can
+// render the workspace even while the frame editor is
+// loading new frame data, etc. This would keep the
+// workspace responsive to pan/zoom input.
+
+// This means the workspace scene graph needs to contain
+// all the texture data needed to render itself. Textures
+// that may be mutated, like tool render buffers, should be
+// copied. Loaded asset textures are fine to include since
+// they won't be modified once created.
+
 protocol AnimEditorVCDelegate: AnyObject {
     
     func onRequestUndo(_ vc: AnimEditorVC)

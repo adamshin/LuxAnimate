@@ -10,25 +10,16 @@ class ProjectEditManagerWorkQueue {
         label: "ProjectEditManagerWorkQueue.queue",
         qos: .userInitiated)
     
-    func enqueueSync(
-        task: @escaping () throws -> Void
-    ) throws {
-        let taskSemaphore = DispatchSemaphore(value: 0)
-        var taskError: Error?
-        
+    func enqueueTask(_ task: @escaping () throws -> Void) {
         queue.async {
             do {
                 try task()
-            } catch {
-                taskError = error
-            }
-            taskSemaphore.signal()
+            } catch { }
         }
-        taskSemaphore.wait()
-        
-        if let taskError {
-            throw taskError
-        }
+    }
+    
+    func waitForAllTasksToComplete() {
+        queue.sync { }
     }
     
 }

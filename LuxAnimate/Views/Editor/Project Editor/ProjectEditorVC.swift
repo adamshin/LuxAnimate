@@ -10,7 +10,7 @@ class ProjectEditorVC: UIViewController {
     
     private let projectID: String
     
-    private let projectEditor: ProjectEditManager
+    private let projectEditManager: ProjectEditManager
     
     private weak var sceneEditorVC: SceneEditorVC?
     
@@ -19,7 +19,7 @@ class ProjectEditorVC: UIViewController {
     init(projectID: String) throws {
         self.projectID = projectID
         
-        projectEditor = try ProjectEditManager(
+        projectEditManager = try ProjectEditManager(
             projectID: projectID)
         
         super.init(nibName: nil, bundle: nil)
@@ -48,61 +48,52 @@ class ProjectEditorVC: UIViewController {
     
     private func updateUI() {
         contentVC.update(
-            projectManifest: projectEditor.projectManifest,
-            undoCount: projectEditor.availableUndoCount,
-            redoCount: projectEditor.availableRedoCount)
+            projectManifest: projectEditManager.projectManifest,
+            undoCount: projectEditManager.availableUndoCount,
+            redoCount: projectEditManager.availableRedoCount)
     }
     
     // MARK: - Logic
     
     private func addScene() {
-        do {
-            try projectEditor.createScene(
-                name: "Scene",
-                frameCount: 100,
-                backgroundColor: .white)
+        projectEditManager.createScene(
+            name: "Scene",
+            frameCount: 100,
+            backgroundColor: .white)
             
-            updateUI()
-            
-        } catch { }
+        // TODO: handle completion?
     }
     
     private func removeLastScene() {
-        guard let lastSceneRef = projectEditor
+        guard let lastSceneRef = projectEditManager
             .projectManifest.content.sceneRefs.last
         else { return }
         
         do {
-            try projectEditor.deleteScene(
+            try projectEditManager.deleteScene(
                 sceneID: lastSceneRef.id)
-                
-            updateUI()
+            
+            // TODO: handle completion?
             
         } catch { }
     }
     
     private func undo() {
-        do {
-            try projectEditor.applyUndo()
-            
-            updateUI()
-            
-            sceneEditorVC?.update(
-                projectManifest: projectEditor.projectManifest)
-            
-        } catch { }
+        projectEditManager.applyUndo()
+        
+        // TODO: handle completion?
+        
+        sceneEditorVC?.update(
+            projectManifest: projectEditManager.projectManifest)
     }
     
     private func redo() {
-        do {
-            try projectEditor.applyRedo()
+            projectEditManager.applyRedo()
             
-            updateUI()
+        // TODO: handle completion?
             
             sceneEditorVC?.update(
-                projectManifest: projectEditor.projectManifest)
-            
-        } catch { }
+                projectManifest: projectEditManager.projectManifest)
     }
     
 }
@@ -135,17 +126,21 @@ extension ProjectEditorVC: ProjectEditorContentVCDelegate {
         _ vc: ProjectEditorContentVC,
         sceneID: String
     ) {
-        let vc = SceneEditorVC(
-            projectID: projectID,
-            sceneID: sceneID)
+        let projectManifest = projectEditManager
+            .projectManifest
         
-        vc.delegate = self
-        
-        vc.update(
-            projectManifest: projectEditor.projectManifest)
-        
-        present(vc, animated: true)
-        sceneEditorVC = vc
+        do {
+            let vc = try SceneEditorVC(
+                projectID: projectID,
+                sceneID: sceneID,
+                projectManifest: projectManifest)
+            
+            vc.delegate = self
+            sceneEditorVC = vc
+            
+            present(vc, animated: true)
+            
+        } catch { }
     }
     
 }
@@ -153,28 +148,33 @@ extension ProjectEditorVC: ProjectEditorContentVCDelegate {
 extension ProjectEditorVC: SceneEditorVCDelegate {
     
     func availableUndoCount(_ vc: SceneEditorVC) -> Int {
-        projectEditor.availableUndoCount
+        projectEditManager.availableUndoCount
     }
     func availableRedoCount(_ vc: SceneEditorVC) -> Int {
-        projectEditor.availableRedoCount
+        projectEditManager.availableRedoCount
     }
     
-    func onRequestUndo(_ vc: SceneEditorVC) { undo() }
-    func onRequestRedo(_ vc: SceneEditorVC) { redo() }
+    func undo(_ vc: SceneEditorVC) { undo() }
+    func redo(_ vc: SceneEditorVC) { redo() }
     
-    func onRequestApplyEdit(
+    func applySceneEdit(
         _ vc: SceneEditorVC,
         sceneID: String,
         newSceneManifest: Scene.Manifest,
         newSceneAssets: [ProjectEditManager.NewAsset]
     ) {
         do {
-            try projectEditor.applySceneEdit(
+            try projectEditManager.applySceneEdit(
                 sceneID: sceneID,
                 newSceneManifest: newSceneManifest,
                 newSceneAssets: newSceneAssets)
             
-            updateUI()
+            // Should we be doing this here? or in response
+            // to some other action? Depends on how data is
+            // going to flow as edits happen.
+            DispatchQueue.main.async {
+                self.updateUI()
+            }
             
         } catch { }
     }

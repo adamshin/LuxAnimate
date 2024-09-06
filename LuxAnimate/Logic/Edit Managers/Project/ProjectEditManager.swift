@@ -13,10 +13,6 @@ extension ProjectEditManager {
         var data: Data
     }
     
-    enum EditError: Error {
-        case sceneNotFound
-    }
-    
 }
 
 class ProjectEditManager {
@@ -446,26 +442,30 @@ class ProjectEditManager {
     func applyEdit(
         newProjectManifest: Project.Manifest,
         newAssets: [NewAsset]
-    ) throws {
-        try workQueue.enqueueSync {
+    ) {
+        workQueue.enqueueTask {
             try self.applyEditInternal(
                 newProjectManifest: newProjectManifest,
                 newAssets: newAssets)
         }
     }
     
-    func applyUndo() throws {
-        try workQueue.enqueueSync {
+    func applyUndo() {
+        workQueue.enqueueTask {
             try self.consumeHistoryEntryInternal(
                 undo: true)
         }
     }
     
-    func applyRedo() throws {
-        try workQueue.enqueueSync {
+    func applyRedo() {
+        workQueue.enqueueTask {
             try self.consumeHistoryEntryInternal(
                 undo: false)
         }
+    }
+    
+    func waitForAllTasksToComplete() {
+        workQueue.waitForAllTasksToComplete()
     }
     
 }
