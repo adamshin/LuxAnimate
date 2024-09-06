@@ -6,6 +6,8 @@ import Metal
 
 protocol AnimEditorAssetLoaderDelegate: AnyObject {
     
+    // TODO: Pending asset method
+    
     func onUpdate(_ l: AnimEditorAssetLoader)
     func onFinish(_ l: AnimEditorAssetLoader)
     
@@ -109,6 +111,8 @@ class AnimEditorAssetLoader {
         
         guard shouldContinue() 
         else { throw CancelLoadError() }
+        
+        // TODO: Check with delegate for pending edit asset first
         
         let assetURL = FileHelper.shared.projectAssetURL(
             projectID: self.projectID,

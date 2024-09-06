@@ -6,7 +6,11 @@ import Foundation
 
 protocol ProjectAsyncEditManagerDelegate: AnyObject {
     
-    func onCompleteUndoRedo(_ m: ProjectAsyncEditManager)
+    func onUpdateState(_ m: ProjectAsyncEditManager)
+    
+    func onError(
+        _ m: ProjectAsyncEditManager,
+        error: Error)
     
 }
 
@@ -20,8 +24,10 @@ class ProjectAsyncEditManager {
         label: "ProjectAsyncEditManager.queue",
         qos: .userInitiated)
     
-    private(set) var projectManifest: Project.Manifest
+    private let pendingEditAssetStore =
+        ProjectAsyncEditManagerPendingEditAssetStore()
     
+    private(set) var projectManifest: Project.Manifest
     private(set) var availableUndoCount: Int
     private(set) var availableRedoCount: Int
     
@@ -42,91 +48,115 @@ class ProjectAsyncEditManager {
     
     // MARK: - Internal Logic
     
-    private func applyUndoSync() throws {
-        try editManager.applyUndo()
-        
-        projectManifest = editManager.projectManifest
-        availableUndoCount = editManager.availableUndoCount
-        availableRedoCount = editManager.availableRedoCount
-        
-        delegate?.onCompleteUndoRedo(self)
-    }
-    
-    private func applyRedoSync() throws {
-        try editManager.applyRedo()
-        
-        projectManifest = editManager.projectManifest
-        availableUndoCount = editManager.availableUndoCount
-        availableRedoCount = editManager.availableRedoCount
-        
-        delegate?.onCompleteUndoRedo(self)
-    }
-    
-    // MARK: - Interface
-    
-    func applyUndo() {
-        workQueue.async {
-            do {
-                try self.applyUndoSync()
-            } catch { }
-        }
-    }
-    
-    func applyRedo() {
-        workQueue.async {
-            do {
-                try self.applyRedoSync()
-            } catch { }
-        }
-    }
-    
-    func applyEdit(
+    private func applyEditInternal(
         edit: ProjectEditManager.Edit
     ) {
-        // TODO: Update local state immediately.
-        // Project manifest, undo/redo count
+        projectManifest = edit.projectManifest
+        
+        availableRedoCount = 0
+        availableUndoCount = min(
+            availableUndoCount + 1,
+            ProjectEditManager.editHistoryLimit)
+        
+        pendingEditAssetStore.storeAssets(edit.newAssets)
+        
+        delegate?.onUpdateState(self)
         
         workQueue.async {
             do {
                 try self.editManager.applyEdit(edit)
-            } catch { }
+            } catch { 
+                DispatchQueue.main.async {
+                    self.delegate?.onError(self, error: error)
+                }
+            }
+            
+            let newAssetIDs = edit.newAssets.map { $0.id }
+            self.pendingEditAssetStore.removeAssets(
+                assetIDs: newAssetIDs)
         }
     }
     
-    // These methods won't actually work here. Will they?
-    // We have to have an updated project manifest. Here,
-    // that doesn't get created until internally in the
-    // project edit manager.
-    
-    /*
-    func createScene(
-        name: String,
-        frameCount: Int,
-        backgroundColor: Color
+    private func applyUndoRedoInternal(
+        undo: Bool
     ) {
-        try! editManager.createScene(
-            name: name,
-            frameCount: frameCount,
-            backgroundColor: backgroundColor)
+        workQueue.async {
+            do {
+                if undo {
+                    try self.editManager.applyUndo()
+                } else {
+                    try self.editManager.applyRedo()
+                }
+                
+                DispatchQueue.main.async {
+                    self.projectManifest = self.editManager.projectManifest
+                    self.availableUndoCount = self.editManager.availableUndoCount
+                    self.availableRedoCount = self.editManager.availableRedoCount
+                    
+                    self.delegate?.onUpdateState(self)
+                }
+                
+            } catch {
+                DispatchQueue.main.async {
+                    self.delegate?.onError(self, error: error)
+                }
+            }
+        }
     }
     
-    func deleteScene(
-        sceneID: String
+    // MARK: - Interface
+    
+    func applyEdit(
+        edit: ProjectEditManager.Edit
     ) {
-        try! editManager.deleteScene(
-            sceneID: sceneID)
+        applyEditInternal(edit: edit)
     }
     
-    func applySceneEdit(
-        sceneID: String,
-        newSceneManifest: Scene.Manifest,
-        newSceneAssets: [ProjectEditManager.NewAsset]
-    ) {
-        try! editManager.applySceneEdit(
-            sceneID: sceneID,
-            newSceneManifest: newSceneManifest,
-            newSceneAssets: newSceneAssets)
+    func applyUndo() {
+        applyUndoRedoInternal(undo: true)
     }
-     */
+    
+    func applyRedo() {
+        applyUndoRedoInternal(undo: false)
+    }
+    
+    func pendingEditAsset(
+        assetID: String
+    ) -> ProjectEditManager.NewAsset? {
+        
+        pendingEditAssetStore.storedAsset(
+            assetID: assetID)
+    }
+    
+}
+
+// MARK: - Pending Edit Asset Store
+
+class ProjectAsyncEditManagerPendingEditAssetStore {
+    
+    private var storedAssets = ThreadSafeDictionary
+        <String, ProjectEditManager.NewAsset>()
+    
+    func storeAssets(
+        _ assets: [ProjectEditManager.NewAsset]
+    ) {
+        let values = Dictionary(
+            assets.map { ($0.id, $0) },
+            uniquingKeysWith: { $1 })
+        
+        storedAssets.setValues(values)
+    }
+    
+    func removeAssets(
+        assetIDs: [String]
+    ) {
+        storedAssets.removeValues(forKeys: assetIDs)
+    }
+    
+    func storedAsset(
+        assetID: String
+    ) -> ProjectEditManager.NewAsset? {
+        return storedAssets.getValue(forKey: assetID)
+    }
     
 }
