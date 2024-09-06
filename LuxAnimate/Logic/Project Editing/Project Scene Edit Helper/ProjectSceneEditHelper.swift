@@ -1,30 +1,49 @@
 //
-//  ProjectEditManager+Scene.swift
+//  ProjectSceneEditHelper.swift
 //
 
 import Foundation
 
-extension ProjectEditManager {
+struct ProjectSceneEditHelper {
     
-    func createScene(
-        name: String,
-        frameCount: Int,
-        backgroundColor: Color
-    ) {
+    struct NewSceneConfig {
+        var name: String
+        var frameCount: Int
+        var backgroundColor: Color
+    }
+    
+    struct SceneEdit {
+        var sceneID: String
+        var sceneManifest: Scene.Manifest
+        var newAssets: [ProjectEditManager.NewAsset]
+    }
+    
+    enum Error: Swift.Error {
+        case encoding
+        case invalidSceneID
+    }
+    
+    // MARK: - Methods
+    
+    static func createScene(
+        projectManifest: Project.Manifest,
+        config: NewSceneConfig
+    ) throws -> ProjectEditManager.Edit {
+        
         // Generate scene ID
         let sceneID = IDGenerator.id()
         
         // Create scene manifest
         let sceneManifest = Scene.Manifest(
             id: sceneID,
-            frameCount: frameCount,
-            backgroundColor: backgroundColor,
+            frameCount: config.frameCount,
+            backgroundColor: config.backgroundColor,
             layers: [],
             assetIDs: [])
         
         // Generate scene render manifest
-        let sceneRenderManifest = Self
-            .generateSceneRenderManifest(
+        let sceneRenderManifest = 
+            SceneRenderManifestGenerator.generate(
                 projectManifest: projectManifest,
                 sceneManifest: sceneManifest)
         
@@ -34,7 +53,9 @@ extension ProjectEditManager {
                 .shared.encode(sceneManifest),
             let sceneRenderManifestData = try? JSONFileEncoder
                 .shared.encode(sceneRenderManifest)
-        else { return }
+        else {
+            throw Error.encoding
+        }
         
         // Generate asset IDs
         let sceneManifestAssetID = IDGenerator.id()
@@ -43,7 +64,7 @@ extension ProjectEditManager {
         // Create scene ref
         let newSceneRef = Project.SceneRef(
             id: sceneID,
-            name: name,
+            name: config.name,
             manifestAssetID: sceneManifestAssetID,
             renderManifestAssetID: sceneRenderManifestAssetID,
             sceneAssetIDs: sceneManifest.assetIDs)
@@ -53,59 +74,62 @@ extension ProjectEditManager {
         newProjectManifest.content.sceneRefs.append(newSceneRef)
         
         // Create asset list
-        var newProjectAssets: [ProjectEditManager.NewAsset] = []
+        var newAssets: [ProjectEditManager.NewAsset] = []
         
-        newProjectAssets.append(ProjectEditManager.NewAsset(
+        newAssets.append(ProjectEditManager.NewAsset(
             id: sceneManifestAssetID,
             data: sceneManifestData))
         
-        newProjectAssets.append(ProjectEditManager.NewAsset(
+        newAssets.append(ProjectEditManager.NewAsset(
             id: sceneRenderManifestAssetID,
             data: sceneRenderManifestData))
         
-        // Apply edit
-        applyEdit(
-            newProjectManifest: newProjectManifest,
-            newAssets: newProjectAssets)
+        return ProjectEditManager.Edit(
+            projectManifest: newProjectManifest,
+            newAssets: newAssets)
     }
     
-    func deleteScene(
+    static func deleteScene(
+        projectManifest: Project.Manifest,
         sceneID: String
-    ) throws {
+    ) throws -> ProjectEditManager.Edit {
         
         guard let sceneIndex = projectManifest.content.sceneRefs
             .firstIndex(where: { $0.id == sceneID })
-        else { return }
+        else {
+            throw Error.invalidSceneID
+        }
         
         var newProjectManifest = projectManifest
         newProjectManifest.content.sceneRefs.remove(at: sceneIndex)
         
-        applyEdit(
-            newProjectManifest: newProjectManifest,
+        return ProjectEditManager.Edit(
+            projectManifest: newProjectManifest,
             newAssets: [])
     }
     
-    func applySceneEdit(
-        sceneID: String,
-        newSceneManifest: Scene.Manifest,
-        newSceneAssets: [ProjectEditManager.NewAsset]
-    ) throws {
+    static func applySceneEdit(
+        projectManifest: Project.Manifest,
+        sceneEdit: SceneEdit
+    ) throws -> ProjectEditManager.Edit {
         
         guard let sceneIndex = projectManifest.content.sceneRefs
-            .firstIndex(where: { $0.id == sceneID })
-        else { return }
+            .firstIndex(where: { $0.id == sceneEdit.sceneID })
+        else {
+            throw Error.invalidSceneID
+        }
         
         let sceneRef = projectManifest.content.sceneRefs[sceneIndex]
         
         // Generate scene render manifest
-        let sceneRenderManifest = Self
-            .generateSceneRenderManifest(
+        let sceneRenderManifest =
+            SceneRenderManifestGenerator.generate(
                 projectManifest: projectManifest,
-                sceneManifest: newSceneManifest)
+                sceneManifest: sceneEdit.sceneManifest)
         
         // Encode data
         let sceneManifestData = try JSONFileEncoder.shared
-            .encode(newSceneManifest)
+            .encode(sceneEdit.sceneManifest)
         let sceneRenderManifestData = try JSONFileEncoder.shared
             .encode(sceneRenderManifest)
         
@@ -118,68 +142,27 @@ extension ProjectEditManager {
         
         newSceneRef.manifestAssetID = sceneManifestAssetID
         newSceneRef.renderManifestAssetID = sceneRenderManifestAssetID
-        newSceneRef.sceneAssetIDs = newSceneManifest.assetIDs
+        newSceneRef.sceneAssetIDs = sceneEdit.sceneManifest.assetIDs
         
         // Update project manifest
         var newProjectManifest = projectManifest
         newProjectManifest.content.sceneRefs[sceneIndex] = newSceneRef
         
         // Create asset list
-        var newProjectAssets = newSceneAssets
+        var newAssets = sceneEdit.newAssets
         
-        newProjectAssets.append(ProjectEditManager.NewAsset(
+        newAssets.append(ProjectEditManager.NewAsset(
             id: sceneManifestAssetID,
             data: sceneManifestData))
         
-        newProjectAssets.append(ProjectEditManager.NewAsset(
+        newAssets.append(ProjectEditManager.NewAsset(
             id: sceneRenderManifestAssetID,
             data: sceneRenderManifestData))
         
         // Apply edit
-        applyEdit(
-            newProjectManifest: newProjectManifest,
-            newAssets: newProjectAssets)
-    }
-    
-}
-
-// MARK: - Scene Render Manifest
-
-extension ProjectEditManager {
-    
-    private static func generateSceneRenderManifest(
-        projectManifest: Project.Manifest,
-        sceneManifest: Scene.Manifest
-    ) -> Scene.RenderManifest {
-        
-        let frameIndexes = Array(0 ..< sceneManifest.frameCount)
-        
-        let frameSceneGraphs = FrameSceneGraphGenerator
-            .generate(
-                projectManifest: projectManifest,
-                sceneManifest: sceneManifest,
-                frameIndexes: frameIndexes)
-        
-        var sceneRenderManifest = Scene.RenderManifest(
-            frameRenderManifests: [:],
-            frameRenderManifestFingerprintsByFrameIndex: [])
-        
-        for frameSceneGraph in frameSceneGraphs {
-            let frameRenderManifest = FrameRenderManifest(
-                frameSceneGraph: frameSceneGraph)
-            
-            let fingerprint = frameRenderManifest.fingerprint()
-            
-            sceneRenderManifest
-                .frameRenderManifests[fingerprint]
-                = frameRenderManifest
-            
-            sceneRenderManifest
-                .frameRenderManifestFingerprintsByFrameIndex
-                .append(fingerprint)
-        }
-        
-        return sceneRenderManifest
+        return ProjectEditManager.Edit(
+            projectManifest: newProjectManifest,
+            newAssets: newAssets)
     }
     
 }

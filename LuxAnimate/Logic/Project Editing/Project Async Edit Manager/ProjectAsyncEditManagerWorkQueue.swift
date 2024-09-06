@@ -1,13 +1,13 @@
 //
-//  ProjectEditManagerWorkQueue.swift
+//  ProjectAsyncEditManagerWorkQueue.swift
 //
 
 import Foundation
 
-class ProjectEditManagerWorkQueue {
+class ProjectAsyncEditManagerWorkQueue {
     
     private let queue = DispatchQueue(
-        label: "ProjectEditManagerWorkQueue.queue",
+        label: "ProjectAsyncEditManagerWorkQueue.queue",
         qos: .userInitiated)
     
     func enqueueTask(_ task: @escaping () throws -> Void) {

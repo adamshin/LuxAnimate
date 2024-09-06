@@ -4,14 +4,19 @@
 
 import Foundation
 
-private let editHistoryLimit = 20
-
 extension ProjectEditManager {
+    
+    struct Edit {
+        var projectManifest: Project.Manifest
+        var newAssets: [NewAsset]
+    }
     
     struct NewAsset {
         var id: String
         var data: Data
     }
+    
+    static let editHistoryLimit = 20
     
 }
 
@@ -24,7 +29,6 @@ class ProjectEditManager {
     private(set) var availableUndoCount: Int = 0
     private(set) var availableRedoCount: Int = 0
     
-    private let workQueue = ProjectEditManagerWorkQueue()
     private let fileManager = FileManager.default
     
     // MARK: - Init
@@ -162,7 +166,7 @@ class ProjectEditManager {
         try adjustAllEditHistoryEntries(
             in: containingDirectoryURL,
             increment: true,
-            maxCount: editHistoryLimit)
+            maxCount: Self.editHistoryLimit)
         
         let url = containingDirectoryURL.appending(
             path: String(0),
@@ -190,7 +194,7 @@ class ProjectEditManager {
         try adjustAllEditHistoryEntries(
             in: containingDirectoryURL,
             increment: false,
-            maxCount: editHistoryLimit)
+            maxCount: Self.editHistoryLimit)
     }
     
     private func firstEditHistoryEntryURL(
@@ -289,12 +293,13 @@ class ProjectEditManager {
     // MARK: - Internal Logic
     
     private func applyEditInternal(
-        newProjectManifest: Project.Manifest,
-        newAssets: [NewAsset]
+        _ edit: Edit
     ) throws {
         
         // Setup
         let oldProjectManifest = self.projectManifest
+        let newProjectManifest = edit.projectManifest
+        let newAssets = edit.newAssets
         
         let projectManifestURL = FileHelper.shared
             .projectManifestURL(for: projectID)
@@ -348,7 +353,9 @@ class ProjectEditManager {
         updateAvailableUndoRedoCount()
     }
     
-    private func consumeHistoryEntryInternal(undo: Bool) throws {
+    private func consumeHistoryEntryInternal(
+        undo: Bool
+    ) throws {
         let consumedEntryContainingDirectoryURL = undo ?
             undoHistoryDirectoryURL() :
             redoHistoryDirectoryURL()
@@ -439,33 +446,16 @@ class ProjectEditManager {
     
     // MARK: - Interface
     
-    func applyEdit(
-        newProjectManifest: Project.Manifest,
-        newAssets: [NewAsset]
-    ) {
-        workQueue.enqueueTask {
-            try self.applyEditInternal(
-                newProjectManifest: newProjectManifest,
-                newAssets: newAssets)
-        }
+    func applyEdit(_ edit: Edit) throws {
+        try self.applyEditInternal(edit)
     }
     
-    func applyUndo() {
-        workQueue.enqueueTask {
-            try self.consumeHistoryEntryInternal(
-                undo: true)
-        }
+    func applyUndo() throws {
+        try self.consumeHistoryEntryInternal(undo: true)
     }
     
-    func applyRedo() {
-        workQueue.enqueueTask {
-            try self.consumeHistoryEntryInternal(
-                undo: false)
-        }
-    }
-    
-    func waitForAllTasksToComplete() {
-        workQueue.waitForAllTasksToComplete()
+    func applyRedo() throws {
+        try self.consumeHistoryEntryInternal(undo: false)
     }
     
 }

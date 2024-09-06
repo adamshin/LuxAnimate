@@ -56,12 +56,16 @@ class ProjectEditorVC: UIViewController {
     // MARK: - Logic
     
     private func addScene() {
-        projectEditManager.createScene(
+        let config = ProjectSceneEditHelper.NewSceneConfig(
             name: "Scene",
             frameCount: 100,
             backgroundColor: .white)
+        
+        let edit = try! ProjectSceneEditHelper.createScene(
+            projectManifest: projectEditManager.projectManifest,
+            config: config)
             
-        // TODO: handle completion?
+        try! projectEditManager.applyEdit(edit)
     }
     
     private func removeLastScene() {
@@ -69,17 +73,15 @@ class ProjectEditorVC: UIViewController {
             .projectManifest.content.sceneRefs.last
         else { return }
         
-        do {
-            try projectEditManager.deleteScene(
-                sceneID: lastSceneRef.id)
-            
-            // TODO: handle completion?
-            
-        } catch { }
+        let edit = try! ProjectSceneEditHelper.deleteScene(
+            projectManifest: projectEditManager.projectManifest,
+            sceneID: lastSceneRef.id)
+        
+        try! projectEditManager.applyEdit(edit)
     }
     
     private func undo() {
-        projectEditManager.applyUndo()
+        try! projectEditManager.applyUndo()
         
         // TODO: handle completion?
         
@@ -88,7 +90,7 @@ class ProjectEditorVC: UIViewController {
     }
     
     private func redo() {
-            projectEditManager.applyRedo()
+        try! projectEditManager.applyRedo()
             
         // TODO: handle completion?
             
@@ -163,20 +165,23 @@ extension ProjectEditorVC: SceneEditorVCDelegate {
         newSceneManifest: Scene.Manifest,
         newSceneAssets: [ProjectEditManager.NewAsset]
     ) {
-        do {
-            try projectEditManager.applySceneEdit(
-                sceneID: sceneID,
-                newSceneManifest: newSceneManifest,
-                newSceneAssets: newSceneAssets)
-            
-            // Should we be doing this here? or in response
-            // to some other action? Depends on how data is
-            // going to flow as edits happen.
-            DispatchQueue.main.async {
-                self.updateUI()
-            }
-            
-        } catch { }
+        let sceneEdit = ProjectSceneEditHelper.SceneEdit(
+            sceneID: sceneID,
+            sceneManifest: newSceneManifest,
+            newAssets: newSceneAssets)
+        
+        let edit = try! ProjectSceneEditHelper.applySceneEdit(
+            projectManifest: projectEditManager.projectManifest,
+            sceneEdit: sceneEdit)
+        
+        try! projectEditManager.applyEdit(edit)
+        
+        // Should we be doing this here? or in response
+        // to some other action? Depends on how data is
+        // going to flow as edits happen.
+        DispatchQueue.main.async {
+            self.updateUI()
+        }
     }
     
 }
