@@ -24,8 +24,8 @@ class ProjectEditorContentVC: UIViewController {
     weak var delegate: ProjectEditorContentVCDelegate?
     
     private var projectManifest: Project.Manifest?
-    private var undoCount = 0
-    private var redoCount = 0
+    private var availableUndoCount = 0
+    private var availableRedoCount = 0
     
     private lazy var backButton = UIBarButtonItem(
         title: "Back", style: .done,
@@ -87,13 +87,11 @@ class ProjectEditorContentVC: UIViewController {
     }
     
     func update(
-        projectManifest: Project.Manifest,
-        undoCount: Int,
-        redoCount: Int
+        projectEditManagerState state: ProjectEditManager.State
     ) {
-        self.projectManifest = projectManifest
-        self.undoCount = undoCount
-        self.redoCount = redoCount
+        projectManifest = state.projectManifest
+        availableUndoCount = state.availableUndoCount
+        availableRedoCount = state.availableRedoCount
         
         updateButtons()
         tableView.reloadData()
@@ -105,8 +103,8 @@ class ProjectEditorContentVC: UIViewController {
         removeSceneButton.isEnabled =
             projectManifest.content.sceneRefs.count > 0
         
-        undoButton.isEnabled = undoCount > 0
-        redoButton.isEnabled = redoCount > 0
+        undoButton.isEnabled = availableUndoCount > 0
+        redoButton.isEnabled = availableRedoCount > 0
     }
     
 }

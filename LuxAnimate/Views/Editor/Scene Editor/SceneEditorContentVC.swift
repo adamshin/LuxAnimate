@@ -23,7 +23,6 @@ class SceneEditorContentVC: UIViewController {
     
     weak var delegate: SceneEditorContentVCDelegate?
     
-    private var projectManifest: Project.Manifest?
     private var sceneRef: Project.SceneRef?
     private var sceneManifest: Scene.Manifest?
     
@@ -90,17 +89,14 @@ class SceneEditorContentVC: UIViewController {
     }
     
     func update(
-        projectManifest: Project.Manifest,
+        projectEditManagerState: ProjectEditManager.State,
         sceneRef: Project.SceneRef,
-        sceneManifest: Scene.Manifest,
-        availableUndoCount: Int,
-        availableRedoCount: Int
+        sceneManifest: Scene.Manifest
     ) {
-        self.projectManifest = projectManifest
         self.sceneRef = sceneRef
         self.sceneManifest = sceneManifest
-        self.availableUndoCount = availableUndoCount
-        self.availableRedoCount = availableRedoCount
+        self.availableUndoCount = projectEditManagerState.availableUndoCount
+        self.availableRedoCount = projectEditManagerState.availableRedoCount
         
         updateButtons()
         tableView.reloadData()

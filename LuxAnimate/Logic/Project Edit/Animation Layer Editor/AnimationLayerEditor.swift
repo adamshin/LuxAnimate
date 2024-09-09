@@ -4,6 +4,10 @@
 
 import Foundation
 
+// TODO: Replace this or refactor? Should this be a helper
+// object that just creates edit objects? Or should it
+// contain state, like the animation layer content?
+
 protocol AnimationLayerEditorDelegate: AnyObject {
     
     func onRequestApplyEdit(

@@ -6,18 +6,20 @@ import UIKit
 
 protocol SceneEditorVCDelegate: AnyObject {
     
-    func availableUndoCount(_ vc: SceneEditorVC) -> Int
-    func availableRedoCount(_ vc: SceneEditorVC) -> Int
+    func onRequestUndo(_ vc: SceneEditorVC)
+    func onRequestRedo(_ vc: SceneEditorVC)
     
-    func undo(_ vc: SceneEditorVC)
-    func redo(_ vc: SceneEditorVC)
-    
-    func applySceneEdit(
+    func onRequestEdit(
         _ vc: SceneEditorVC,
-        sceneID: String,
-        newSceneManifest: Scene.Manifest,
-        newSceneAssets: [ProjectEditManager.NewAsset])
+        edit: ProjectEditManager.Edit,
+        editContext: Any?)
     
+}
+
+struct SceneEditorVCEditContext {
+    var sender: SceneEditorVC
+    var sceneManifest: Scene.Manifest
+    var wrappedEditContext: Any?
 }
 
 class SceneEditorVC: UIViewController {
@@ -29,7 +31,9 @@ class SceneEditorVC: UIViewController {
     private let projectID: String
     private let sceneID: String
     
-    private let sceneEditManager: SceneEditManager
+    private var projectEditManagerState: ProjectEditManager.State
+    private var sceneRef: Project.SceneRef
+    private var sceneManifest: Scene.Manifest
     
     private weak var animEditorVC: AnimEditorVC?
     
@@ -38,16 +42,27 @@ class SceneEditorVC: UIViewController {
     init(
         projectID: String,
         sceneID: String,
-        projectManifest: Project.Manifest
+        projectEditManagerState: ProjectEditManager.State
     ) throws {
         
         self.projectID = projectID
         self.sceneID = sceneID
+        self.projectEditManagerState = projectEditManagerState
         
-        sceneEditManager = try SceneEditManager(
-            projectID: projectID,
-            sceneID: sceneID,
-            projectManifest: projectManifest)
+        let projectManifest = projectEditManagerState
+            .projectManifest
+        
+        let sceneRef = try Self.sceneRefFromProject(
+            projectManifest: projectManifest,
+            sceneID: sceneID)
+        
+        let sceneManifest = try SceneManifestLoader
+            .load(
+                projectManifest: projectManifest,
+                sceneID: sceneID)
+        
+        self.sceneRef = sceneRef
+        self.sceneManifest = sceneManifest
         
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
@@ -60,6 +75,20 @@ class SceneEditorVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        setupUI()
+        
+        updateState(
+            projectEditManagerState: projectEditManagerState,
+            sceneRef: sceneRef,
+            sceneManifest: sceneManifest,
+            editContext: nil)
+    }
+    
+    override var prefersStatusBarHidden: Bool { true }
+    
+    // MARK: - Setup
+    
+    private func setupUI() {
         contentVC.delegate = self
         
         let navController = UINavigationController(
@@ -67,109 +96,175 @@ class SceneEditorVC: UIViewController {
         addChild(navController, to: view)
     }
     
-    override var prefersStatusBarHidden: Bool { true }
-    
     // MARK: - Logic
     
-    private func handleUpdateData(fromEditor: Bool) {
-        guard let delegate else { return }
+    private func updateState(
+        projectEditManagerState: ProjectEditManager.State,
+        editContext: Any?
+    ) {
+        let projectManifest = projectEditManagerState
+            .projectManifest
         
-        guard let sceneRef = sceneEditManager
-            .projectManifest.content.sceneRefs
-            .first(where: { $0.id == sceneID })
-        else { return }
+        guard let sceneRef = try? Self.sceneRefFromProject(
+            projectManifest: projectManifest,
+            sceneID: sceneID)
+        else {
+            dismiss()
+            return
+        }
         
-        let availableUndoCount = delegate.availableUndoCount(self)
-        let availableRedoCount = delegate.availableRedoCount(self)
+        if let context = editContext as? SceneEditorVCEditContext,
+            context.sender == self
+        {
+            updateState(
+                projectEditManagerState: projectEditManagerState,
+                sceneRef: sceneRef,
+                sceneManifest: context.sceneManifest,
+                editContext: context.wrappedEditContext)
+            
+        } else {
+            do {
+                let sceneManifest = try SceneManifestLoader
+                    .load(
+                        projectManifest: projectManifest,
+                        sceneID: sceneID)
+                
+                updateState(
+                    projectEditManagerState: projectEditManagerState,
+                    sceneRef: sceneRef,
+                    sceneManifest: sceneManifest,
+                    editContext: nil)
+                
+            } catch { }
+        }
+    }
+    
+    private func updateState(
+        projectEditManagerState: ProjectEditManager.State,
+        sceneRef: Project.SceneRef,
+        sceneManifest: Scene.Manifest,
+        editContext: Any?
+    ) {
+        self.projectEditManagerState = projectEditManagerState
+        self.sceneRef = sceneRef
+        self.sceneManifest = sceneManifest
         
         contentVC.update(
-            projectManifest: sceneEditManager.projectManifest,
+            projectEditManagerState: projectEditManagerState,
             sceneRef: sceneRef,
-            sceneManifest: sceneEditManager.sceneManifest,
-            availableUndoCount: availableUndoCount,
-            availableRedoCount: availableRedoCount)
+            sceneManifest: sceneManifest)
         
         animEditorVC?.update(
-            availableUndoCount: availableUndoCount,
-            availableRedoCount: availableRedoCount)
+            projectEditManagerState: projectEditManagerState,
+            sceneManifest: sceneManifest,
+            editContext: editContext)
+    }
+    
+    // MARK: - Editing
+    
+    private func addLayer() {
+        let projectManifest = projectEditManagerState
+            .projectManifest
         
-//        if !fromEditor {
-//            animEditorVC?.update(
-//                projectManifest: projectManifest,
-//                sceneManifest: sceneManifest)
-//        }
+        let sceneEdit = SceneEditHelper.createAnimationLayer(
+            sceneManifest: sceneManifest)
+        
+        let edit = try! ProjectEditHelper.applySceneEdit(
+            projectManifest: projectManifest,
+            sceneEdit: sceneEdit)
+        
+        delegate?.onRequestEdit(
+            self,
+            edit: edit,
+            editContext: nil)
+    }
+    
+    private func removeLastLayer() {
+        guard let lastLayer = sceneManifest.layers.last
+        else { return }
+        
+        let projectManifest = projectEditManagerState
+            .projectManifest
+        
+        let sceneEdit = try! SceneEditHelper.deleteLayer(
+            sceneManifest: sceneManifest,
+            layerID: lastLayer.id)
+        
+        let edit = try! ProjectEditHelper.applySceneEdit(
+            projectManifest: projectManifest,
+            sceneEdit: sceneEdit)
+        
+        delegate?.onRequestEdit(
+            self,
+            edit: edit,
+            editContext: nil)
     }
     
     // MARK: - Navigation
     
+    private func dismiss() {
+        dismiss(animated: true)
+    }
+    
     private func showLayerEditor(layerID: String) {
-//        guard
-//            let delegate,
-//            let projectManifest,
-//            let sceneManifest
-//        else { return }
-//        
-//        guard let layer = sceneManifest.layers
-//            .first(where: { $0.id == layerID })
-//        else { return }
-//        
-//        let availableUndoCount = delegate.availableUndoCount(self)
-//        let availableRedoCount = delegate.availableRedoCount(self)
-//        
-//        switch layer.content {
-//        case .animation:
-//            let vc = AnimEditorVC(
-//                projectID: projectID,
-//                sceneID: sceneID,
-//                activeLayerID: layerID,
-//                activeFrameIndex: 0,
-//                projectManifest: projectManifest,
-//                sceneManifest: sceneManifest)
-//            
-//            vc.delegate = self
-//            
-//            vc.update(
-//                availableUndoCount: availableUndoCount,
-//                availableRedoCount: availableRedoCount)
-//            
-//            present(vc, animated: true)
-//            animEditorVC = vc
-//        }
+        guard let layer = sceneManifest.layers
+            .first(where: { $0.id == layerID })
+        else { return }
+        
+        switch layer.content {
+        case .animation:
+            showAnimationLayerEditor(layerID: layerID)
+        }
+    }
+    
+    private func showAnimationLayerEditor(layerID: String) {
+        let vc = AnimEditorVC(
+            projectID: projectID,
+            sceneID: sceneID,
+            activeLayerID: layerID,
+            projectEditManagerState: projectEditManagerState,
+            sceneManifest: sceneManifest,
+            activeFrameIndex: 0)
+        
+        vc.delegate = self
+        
+        present(vc, animated: true)
+        animEditorVC = vc
     }
     
     // MARK: - Interface
     
     func update(
-        projectManifest: Project.Manifest
+        projectEditManagerState: ProjectEditManager.State,
+        editContext: Any?
     ) {
-//        guard let sceneRef = projectManifest
-//            .content.sceneRefs
-//            .first(where: { $0.id == sceneID })
-//        else {
-//            dismiss(animated: true)
-//            return
-//        }
-//        
-//        let sceneManifestURL = FileHelper.shared
-//            .projectAssetURL(
-//                projectID: projectID,
-//                assetID: sceneRef.manifestAssetID)
-//            
-//        guard let sceneManifestData = try? Data(
-//            contentsOf: sceneManifestURL)
-//        else { return }
-//        
-//        guard let sceneManifest = try? JSONFileDecoder
-//            .shared.decode(
-//                Scene.Manifest.self,
-//                from: sceneManifestData)
-//        else { return }
-//        
-//        self.projectManifest = projectManifest
-//        self.sceneRef = sceneRef
-//        self.sceneManifest = sceneManifest
-//        
-//        handleUpdateData(fromEditor: false)
+        updateState(
+            projectEditManagerState: projectEditManagerState,
+            editContext: editContext)
+    }
+    
+}
+
+// MARK: - Scene Ref
+
+extension SceneEditorVC {
+    
+    enum SceneRefError: Error {
+        case invalidSceneID
+    }
+    
+    static func sceneRefFromProject(
+        projectManifest: Project.Manifest,
+        sceneID: String
+    ) throws -> Project.SceneRef {
+        
+        guard let sceneRef = projectManifest
+            .content.sceneRefs
+            .first(where: { $0.id == sceneID })
+        else {
+            throw SceneRefError.invalidSceneID
+        }
+        return sceneRef
     }
     
 }
@@ -183,67 +278,19 @@ extension SceneEditorVC: SceneEditorContentVCDelegate {
     }
     
     func onSelectAddLayer(_ vc: SceneEditorContentVC) { 
-//        guard let sceneManifest else { return }
-//        
-//        let drawings = (0 ..< 10).map { index in
-//            Scene.Drawing(
-//                id: IDGenerator.id(),
-//                frameIndex: index,
-//                assetIDs: nil)
-//        }
-//        
-//        let animationLayerContent = Scene.AnimationLayerContent(
-//            drawings: drawings)
-//        
-//        let transform = Matrix3.identity
-//        
-//        let layer = Scene.Layer(
-//            id: IDGenerator.id(),
-//            name: "Animation Layer",
-//            content: .animation(animationLayerContent),
-//            contentSize: newLayerContentSize,
-//            transform: transform,
-//            alpha: 1)
-//        
-//        var newSceneManifest = sceneManifest
-//        newSceneManifest.layers.append(layer)
-//        
-//        delegate?.applySceneEdit(
-//            self,
-//            sceneID: sceneID,
-//            newSceneManifest: newSceneManifest,
-//            newSceneAssets: [])
-//        
-//        self.sceneManifest = newSceneManifest
-//        
-//        handleUpdateData(fromEditor: false)
+        addLayer()
     }
     
     func onSelectRemoveLayer(_ vc: SceneEditorContentVC) {
-//        guard let sceneManifest else { return }
-//        
-//        guard !sceneManifest.layers.isEmpty else { return }
-//        
-//        var newSceneManifest = sceneManifest
-//        newSceneManifest.layers.removeLast()
-//        
-//        delegate?.applySceneEdit(
-//            self,
-//            sceneID: sceneID,
-//            newSceneManifest: newSceneManifest,
-//            newSceneAssets: [])
-//        
-//        self.sceneManifest = newSceneManifest
-//        
-//        handleUpdateData(fromEditor: false)
+        removeLastLayer()
     }
     
     func onSelectUndo(_ vc: SceneEditorContentVC) { 
-        delegate?.undo(self)
+        delegate?.onRequestUndo(self)
     }
     
     func onSelectRedo(_ vc: SceneEditorContentVC) {
-        delegate?.redo(self)
+        delegate?.onRequestRedo(self)
     }
     
     func onSelectLayer(
@@ -258,28 +305,35 @@ extension SceneEditorVC: SceneEditorContentVCDelegate {
 extension SceneEditorVC: AnimEditorVCDelegate {
     
     func onRequestUndo(_ vc: AnimEditorVC) {
-        delegate?.undo(self)
+        delegate?.onRequestUndo(self)
     }
     func onRequestRedo(_ vc: AnimEditorVC) {
-        delegate?.redo(self)
+        delegate?.onRequestRedo(self)
     }
     
-    func onRequestApplyEdit(
+    func onRequestSceneEdit(
         _ vc: AnimEditorVC,
-        newSceneManifest: Scene.Manifest,
-        newSceneAssets: [ProjectEditManager.NewAsset]
+        sceneEdit: ProjectEditHelper.SceneEdit,
+        editContext: Any?
     ) {
-//        self.sceneManifest = newSceneManifest
-//        
-//        delegate?.applySceneEdit(
-//            self,
-//            sceneID: sceneID,
-//            newSceneManifest: newSceneManifest,
-//            newSceneAssets: newSceneAssets)
-//        
-//        // TODO: what happens now?
-//        
-//        handleUpdateData(fromEditor: true)
+        do {
+            let projectManifest = projectEditManagerState
+                .projectManifest
+            
+            let edit = try ProjectEditHelper.applySceneEdit(
+                projectManifest: projectManifest,
+                sceneEdit: sceneEdit)
+            
+            let newEditContext = SceneEditorVCEditContext(
+                sender: self,
+                sceneManifest: sceneEdit.sceneManifest,
+                wrappedEditContext: editContext)
+            
+            delegate?.onRequestEdit(self,
+                edit: edit,
+                editContext: newEditContext)
+            
+        } catch { }
     }
     
 }

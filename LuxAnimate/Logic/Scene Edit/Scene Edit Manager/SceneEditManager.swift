@@ -4,16 +4,16 @@
 
 import Foundation
 
-private let newLayerContentSize = PixelSize(
-    width: 1920, height: 1080)
+// TODO: Figure out how this is going to work with the new
+// async edit manager system??
+
+// This should maybe be a helper object that generates edit
+// objects, instead of a "manager" that maintains state.
+// Then the only true manager object would be the project
+// edit manager. Down the tree, state is contained inside
+// each view controller.
 
 protocol SceneEditManagerDelegate: AnyObject {
-    
-    func applySceneEdit(
-        _ m: SceneEditManager,
-        sceneID: String,
-        newSceneManifest: Scene.Manifest,
-        newSceneAssets: [ProjectEditManager.NewAsset])
     
 //    func onUpdate(
 //        projectManifest: Project.Manifest,
@@ -86,54 +86,6 @@ class SceneEditManager {
         self.sceneManifest = sceneManifest
     }
     
-    func createAnimationLayer() {
-        let drawings = (0 ..< 10).map { index in
-            Scene.Drawing(
-                id: IDGenerator.id(),
-                frameIndex: index,
-                assetIDs: nil)
-        }
-        
-        let animationLayerContent = Scene.AnimationLayerContent(
-            drawings: drawings)
-        
-        let transform = Matrix3.identity
-        
-        let layer = Scene.Layer(
-            id: IDGenerator.id(),
-            name: "Animation Layer",
-            content: .animation(animationLayerContent),
-            contentSize: newLayerContentSize,
-            transform: transform,
-            alpha: 1)
-        
-        var newSceneManifest = sceneManifest
-        newSceneManifest.layers.append(layer)
-        
-        delegate?.applySceneEdit(
-            self,
-            sceneID: sceneID,
-            newSceneManifest: newSceneManifest,
-            newSceneAssets: [])
-        
-        self.sceneManifest = newSceneManifest
-        // Notify delegate that data has changed?
-    }
-    
-    func deleteLayer(
-        layerID: String
-    ) {
-        var newSceneManifest = sceneManifest
-        newSceneManifest.layers.removeLast()
-        
-        delegate?.applySceneEdit(
-            self,
-            sceneID: sceneID,
-            newSceneManifest: newSceneManifest,
-            newSceneAssets: [])
-        
-        self.sceneManifest = newSceneManifest
-        // Notify delegate that data has changed?
-    }
+    func applySceneEdit() { }
     
 }

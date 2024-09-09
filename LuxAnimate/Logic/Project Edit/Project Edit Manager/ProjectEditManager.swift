@@ -6,6 +6,12 @@ import Foundation
 
 extension ProjectEditManager {
     
+    struct State {
+        var projectManifest: Project.Manifest
+        var availableUndoCount: Int
+        var availableRedoCount: Int
+    }
+    
     struct Edit {
         var projectManifest: Project.Manifest
         var newAssets: [NewAsset]
@@ -24,10 +30,7 @@ class ProjectEditManager {
     
     private let projectID: String
     
-    private(set) var projectManifest: Project.Manifest
-    
-    private(set) var availableUndoCount: Int = 0
-    private(set) var availableRedoCount: Int = 0
+    private(set) var state: State
     
     private let fileManager = FileManager.default
     
@@ -43,14 +46,21 @@ class ProjectEditManager {
         let projectManifestData = try Data(
             contentsOf: projectManifestURL)
         
-        projectManifest = try JSONFileDecoder.shared.decode(
-            Project.Manifest.self,
-            from: projectManifestData)
+        let projectManifest = try JSONFileDecoder
+            .shared.decode(
+                Project.Manifest.self,
+                from: projectManifestData)
+        
+        state = State(
+            projectManifest: projectManifest,
+            availableUndoCount: 0,
+            availableRedoCount: 0)
         
         // Edit history
         try createEditHistoryDirectoriesIfNeeded()
         
-        updateAvailableUndoRedoCount()
+        state.availableUndoCount = undoEntryCount()
+        state.availableRedoCount = redoEntryCount()
     }
     
     // MARK: - Edit History
@@ -73,14 +83,18 @@ class ProjectEditManager {
     }
     
     private func undoEntryCount() -> Int {
-        editHistoryEntryCount(in: undoHistoryDirectoryURL())
+        editHistoryEntryCount(
+            in: undoHistoryDirectoryURL())
     }
     
     private func redoEntryCount() -> Int {
-        editHistoryEntryCount(in: redoHistoryDirectoryURL())
+        editHistoryEntryCount(
+            in: redoHistoryDirectoryURL())
     }
     
-    private func editHistoryEntryCount(in directoryURL: URL) -> Int {
+    private func editHistoryEntryCount(
+        in directoryURL: URL
+    ) -> Int {
         let contents = try? fileManager.contentsOfDirectory(
             at: directoryURL,
             includingPropertiesForKeys: [],
@@ -217,11 +231,6 @@ class ProjectEditManager {
         return urlsAndIndexes.min { $0.1 < $1.1 }?.0
     }
     
-    private func updateAvailableUndoRedoCount() {
-        availableUndoCount = undoEntryCount()
-        availableRedoCount = redoEntryCount()
-    }
-    
     // MARK: - Assets
     
     private func assetURLInProject(
@@ -297,7 +306,7 @@ class ProjectEditManager {
     ) throws {
         
         // Setup
-        let oldProjectManifest = self.projectManifest
+        let oldProjectManifest = state.projectManifest
         let newProjectManifest = edit.projectManifest
         let newAssets = edit.newAssets
         
@@ -349,8 +358,10 @@ class ProjectEditManager {
         }
         
         // Update state
-        self.projectManifest = newProjectManifest
-        updateAvailableUndoRedoCount()
+        state = State(
+            projectManifest: newProjectManifest,
+            availableUndoCount: undoEntryCount(),
+            availableRedoCount: redoEntryCount())
     }
     
     private func consumeHistoryEntryInternal(
@@ -369,7 +380,7 @@ class ProjectEditManager {
         else { return }
         
         // Setup
-        let currentProjectManifest = self.projectManifest
+        let currentProjectManifest = state.projectManifest
         
         let projectURL = FileHelper.shared.projectURL(for: projectID)
         
@@ -440,8 +451,10 @@ class ProjectEditManager {
         }
         
         // Update state
-        self.projectManifest = consumedProjectManifest
-        updateAvailableUndoRedoCount()
+        state = State(
+            projectManifest: consumedProjectManifest,
+            availableUndoCount: undoEntryCount(),
+            availableRedoCount: redoEntryCount())
     }
     
     // MARK: - Interface

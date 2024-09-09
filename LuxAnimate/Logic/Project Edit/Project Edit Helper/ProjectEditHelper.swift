@@ -1,10 +1,10 @@
 //
-//  ProjectSceneEditHelper.swift
+//  ProjectEditHelper.swift
 //
 
 import Foundation
 
-struct ProjectSceneEditHelper {
+struct ProjectEditHelper {
     
     struct NewSceneConfig {
         var name: String

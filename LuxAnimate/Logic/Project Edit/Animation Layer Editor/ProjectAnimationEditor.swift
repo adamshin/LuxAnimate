@@ -5,6 +5,11 @@
 import Foundation
 import Metal
 
+// Keeping this around because I need to pull out the image
+// slicing logic eventually. It should probably live in its
+// own helper object with an internal work queue that's
+// owned by the animation frame editor.
+
 /*
 protocol ProjectAnimationEditorDelegate: AnyObject {
     

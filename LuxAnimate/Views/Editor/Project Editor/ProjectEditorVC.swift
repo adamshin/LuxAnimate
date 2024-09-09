@@ -10,7 +10,7 @@ class ProjectEditorVC: UIViewController {
     
     private let projectID: String
     
-    private let projectEditManager: ProjectEditManager
+    private let projectEditManager: ProjectAsyncEditManager
     
     private weak var sceneEditorVC: SceneEditorVC?
     
@@ -19,11 +19,13 @@ class ProjectEditorVC: UIViewController {
     init(projectID: String) throws {
         self.projectID = projectID
         
-        projectEditManager = try ProjectEditManager(
+        projectEditManager = try ProjectAsyncEditManager(
             projectID: projectID)
         
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
+        
+        projectEditManager.delegate = self
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -33,69 +35,91 @@ class ProjectEditorVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        setupUI()
+        
+        update(
+            projectEditManagerState: projectEditManager.state,
+            editContext: nil)
+    }
+    
+    override var prefersStatusBarHidden: Bool { true }
+    
+    // MARK: - Setup
+    
+    private func setupUI() {
         contentVC.delegate = self
         
         let navController = UINavigationController(
             rootViewController: contentVC)
         addChild(navController, to: view)
-        
-        updateUI()
-    }
-    
-    override var prefersStatusBarHidden: Bool { true }
-    
-    // MARK: - Update
-    
-    private func updateUI() {
-        contentVC.update(
-            projectManifest: projectEditManager.projectManifest,
-            undoCount: projectEditManager.availableUndoCount,
-            redoCount: projectEditManager.availableRedoCount)
     }
     
     // MARK: - Logic
     
+    private func update(
+        projectEditManagerState: ProjectEditManager.State,
+        editContext: Any?
+    ) {
+        contentVC.update(
+            projectEditManagerState: projectEditManagerState)
+        
+        sceneEditorVC?.update(
+            projectEditManagerState: projectEditManagerState,
+            editContext: editContext)
+    }
+    
+    // MARK: - Editing
+    
     private func addScene() {
-        let config = ProjectSceneEditHelper.NewSceneConfig(
+        let projectManifest = projectEditManager
+            .state.projectManifest
+        
+        let config = ProjectEditHelper.NewSceneConfig(
             name: "Scene",
             frameCount: 100,
             backgroundColor: .white)
         
-        let edit = try! ProjectSceneEditHelper.createScene(
-            projectManifest: projectEditManager.projectManifest,
+        let edit = try! ProjectEditHelper.createScene(
+            projectManifest: projectManifest,
             config: config)
             
-        try! projectEditManager.applyEdit(edit)
+        projectEditManager.applyEdit(
+            edit: edit,
+            editContext: nil)
     }
     
     private func removeLastScene() {
-        guard let lastSceneRef = projectEditManager
-            .projectManifest.content.sceneRefs.last
+        let projectManifest = projectEditManager
+            .state.projectManifest
+        
+        guard let lastSceneRef = projectManifest
+            .content.sceneRefs.last
         else { return }
         
-        let edit = try! ProjectSceneEditHelper.deleteScene(
-            projectManifest: projectEditManager.projectManifest,
+        let edit = try! ProjectEditHelper.deleteScene(
+            projectManifest: projectManifest,
             sceneID: lastSceneRef.id)
         
-        try! projectEditManager.applyEdit(edit)
+        projectEditManager.applyEdit(
+            edit: edit,
+            editContext: nil)
     }
     
-    private func undo() {
-        try! projectEditManager.applyUndo()
-        
-        // TODO: handle completion?
-        
-        sceneEditorVC?.update(
-            projectManifest: projectEditManager.projectManifest)
-    }
+    // MARK: - Navigation
     
-    private func redo() {
-        try! projectEditManager.applyRedo()
+    private func showSceneEditor(sceneID: String) {
+        do {
+            let vc = try SceneEditorVC(
+                projectID: projectID,
+                sceneID: sceneID,
+                projectEditManagerState: projectEditManager.state)
             
-        // TODO: handle completion?
+            vc.delegate = self
+            sceneEditorVC = vc
             
-            sceneEditorVC?.update(
-                projectManifest: projectEditManager.projectManifest)
+            present(vc, animated: true)
+            
+        } catch { }
     }
     
 }
@@ -117,71 +141,58 @@ extension ProjectEditorVC: ProjectEditorContentVCDelegate {
     }
     
     func onSelectUndo(_ vc: ProjectEditorContentVC) {
-        undo()
+        projectEditManager.applyUndo()
     }
     
     func onSelectRedo(_ vc: ProjectEditorContentVC) {
-        redo()
+        projectEditManager.applyRedo()
     }
     
     func onSelectScene(
         _ vc: ProjectEditorContentVC,
         sceneID: String
     ) {
-        let projectManifest = projectEditManager
-            .projectManifest
-        
-        do {
-            let vc = try SceneEditorVC(
-                projectID: projectID,
-                sceneID: sceneID,
-                projectManifest: projectManifest)
-            
-            vc.delegate = self
-            sceneEditorVC = vc
-            
-            present(vc, animated: true)
-            
-        } catch { }
+        showSceneEditor(sceneID: sceneID)
     }
     
 }
 
 extension ProjectEditorVC: SceneEditorVCDelegate {
     
-    func availableUndoCount(_ vc: SceneEditorVC) -> Int {
-        projectEditManager.availableUndoCount
-    }
-    func availableRedoCount(_ vc: SceneEditorVC) -> Int {
-        projectEditManager.availableRedoCount
+    func onRequestUndo(_ vc: SceneEditorVC) {
+        projectEditManager.applyUndo()
     }
     
-    func undo(_ vc: SceneEditorVC) { undo() }
-    func redo(_ vc: SceneEditorVC) { redo() }
+    func onRequestRedo(_ vc: SceneEditorVC) {
+        projectEditManager.applyRedo()
+    }
     
-    func applySceneEdit(
+    func onRequestEdit(
         _ vc: SceneEditorVC,
-        sceneID: String,
-        newSceneManifest: Scene.Manifest,
-        newSceneAssets: [ProjectEditManager.NewAsset]
+        edit: ProjectEditManager.Edit,
+        editContext: Any?
     ) {
-        let sceneEdit = ProjectSceneEditHelper.SceneEdit(
-            sceneID: sceneID,
-            sceneManifest: newSceneManifest,
-            newAssets: newSceneAssets)
-        
-        let edit = try! ProjectSceneEditHelper.applySceneEdit(
-            projectManifest: projectEditManager.projectManifest,
-            sceneEdit: sceneEdit)
-        
-        try! projectEditManager.applyEdit(edit)
-        
-        // Should we be doing this here? or in response
-        // to some other action? Depends on how data is
-        // going to flow as edits happen.
-        DispatchQueue.main.async {
-            self.updateUI()
-        }
+        projectEditManager.applyEdit(
+            edit: edit,
+            editContext: editContext)
     }
+    
+}
+
+extension ProjectEditorVC: ProjectAsyncEditManagerDelegate {
+    
+    func onUpdateState(
+        _ m: ProjectAsyncEditManager,
+        editContext: Any?
+    ) {
+        update(
+            projectEditManagerState: projectEditManager.state,
+            editContext: editContext)
+    }
+    
+    func onError(
+        _ m: ProjectAsyncEditManager,
+        error: Error
+    ) { }
     
 }

@@ -24,14 +24,16 @@ protocol AnimEditorVCDelegate: AnyObject {
     func onRequestUndo(_ vc: AnimEditorVC)
     func onRequestRedo(_ vc: AnimEditorVC)
     
-    // TODO: Allow specifying synchronous vs asynchronous edits?
-    // Should the async edit method take a completion handler?
-    
-    func onRequestApplyEdit(
+    func onRequestSceneEdit(
         _ vc: AnimEditorVC,
-        newSceneManifest: Scene.Manifest,
-        newSceneAssets: [ProjectEditManager.NewAsset])
+        sceneEdit: ProjectEditHelper.SceneEdit,
+        editContext: Any?)
     
+}
+
+struct AnimEditorVCEditContext {
+    var sender: AnimEditorVC
+    var isFromFrameEditor: Bool
 }
 
 class AnimEditorVC: UIViewController {
@@ -52,9 +54,9 @@ class AnimEditorVC: UIViewController {
     private let sceneID: String
     private let activeLayerID: String
     
-    private var activeFrameIndex: Int
-    private var projectManifest: Project.Manifest
+    private var projectEditManagerState: ProjectEditManager.State
     private var sceneManifest: Scene.Manifest
+    private var activeFrameIndex: Int
     
     private var onionSkinConfig: AnimEditorOnionSkinConfig
     
@@ -69,16 +71,16 @@ class AnimEditorVC: UIViewController {
         projectID: String,
         sceneID: String,
         activeLayerID: String,
-        activeFrameIndex: Int,
-        projectManifest: Project.Manifest,
-        sceneManifest: Scene.Manifest
+        projectEditManagerState: ProjectEditManager.State,
+        sceneManifest: Scene.Manifest,
+        activeFrameIndex: Int
     ) {
         self.projectID = projectID
         self.sceneID = sceneID
         self.activeLayerID = activeLayerID
-        self.activeFrameIndex = activeFrameIndex
-        self.projectManifest = projectManifest
+        self.projectEditManagerState = projectEditManagerState
         self.sceneManifest = sceneManifest
+        self.activeFrameIndex = activeFrameIndex
         
         onionSkinConfig = AppConfig.onionSkinConfig
         
@@ -102,6 +104,19 @@ class AnimEditorVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        setupUI()
+        
+        clampActiveFrameIndex()
+        updateToolbar()
+        updateBottomBar()
+        enterToolState(AnimEditorPaintToolState())
+    }
+    
+    override var prefersStatusBarHidden: Bool { true }
+    
+    // MARK: - Setup
+    
+    private func setupUI() {
         workspaceVC.delegate = self
         toolbarVC.delegate = self
         bottomBarVC.delegate = self
@@ -110,14 +125,15 @@ class AnimEditorVC: UIViewController {
         addChild(toolbarVC, to: bodyView.toolbarContainer)
         addChild(bottomBarVC, to: bodyView.bottomBarContainer)
         addChild(toolControlsVC, to: bodyView.toolControlsContainer)
-        
-        updateBottomBar()
-        enterToolState(AnimEditorPaintToolState())
     }
     
-    override var prefersStatusBarHidden: Bool { true }
-    
     // MARK: - UI
+    
+    private func updateToolbar() {
+        toolbarVC.update(
+            availableUndoCount: projectEditManagerState.availableUndoCount,
+            availableRedoCount: projectEditManagerState.availableRedoCount)
+    }
     
     private func updateBottomBar() {
         bottomBarVC.update(
@@ -126,19 +142,42 @@ class AnimEditorVC: UIViewController {
     
     // MARK: - Logic
     
-    private func set(
-        projectManifest: Project.Manifest,
-        sceneManifest: Scene.Manifest
+    private func updateState(
+        projectEditManagerState: ProjectEditManager.State,
+        sceneManifest: Scene.Manifest,
+        editContext: Any?
     ) {
-        self.projectManifest = projectManifest
+        guard sceneManifest.layers
+            .contains(where: { $0.id == activeLayerID })
+        else {
+            dismiss()
+            return
+        }
+        
+        self.projectEditManagerState = projectEditManagerState
         self.sceneManifest = sceneManifest
         
+        let shouldReloadFrameEditor: Bool
+        if let context = editContext as? AnimEditorVCEditContext,
+            context.sender == self,
+            context.isFromFrameEditor
+        {
+            shouldReloadFrameEditor = false
+        } else {
+            shouldReloadFrameEditor = true
+        }
+        
         clampActiveFrameIndex()
+        
+        updateToolbar()
         updateBottomBar()
-        reloadFrameEditor()
+        
+        if shouldReloadFrameEditor {
+            reloadFrameEditor()
+        }
     }
     
-    private func set(
+    private func updateState(
         activeFrameIndex: Int
     ) {
         self.activeFrameIndex = activeFrameIndex
@@ -148,20 +187,11 @@ class AnimEditorVC: UIViewController {
         reloadFrameEditor()
     }
     
-    private func set(
+    private func updateState(
         onionSkinConfig: AnimEditorOnionSkinConfig
     ) {
         self.onionSkinConfig = onionSkinConfig
         reloadFrameEditor()
-    }
-    
-    private func updateState(
-        availableUndoCount: Int,
-        availableRedoCount: Int
-    ) {
-        toolbarVC.update(
-            availableUndoCount: availableUndoCount,
-            availableRedoCount: availableRedoCount)
     }
     
     private func clampActiveFrameIndex() {
@@ -173,6 +203,9 @@ class AnimEditorVC: UIViewController {
     
     private func reloadFrameEditor() {
         guard let toolState else { return }
+        
+        let projectManifest = projectEditManagerState
+            .projectManifest
         
         let frameEditor = AnimFrameEditor()
         frameEditor.delegate = self
@@ -250,31 +283,23 @@ class AnimEditorVC: UIViewController {
         commandBuffer.commit()
     }
     
+    // MARK: - Navigation
+    
+    private func dismiss() {
+        dismiss(animated: true)
+    }
+    
     // MARK: - Interface
     
     func update(
-        projectManifest: Project.Manifest,
-        sceneManifest: Scene.Manifest
-    ) {
-        guard sceneManifest.layers
-            .contains(where: { $0.id == activeLayerID })
-        else {
-            dismiss(animated: true)
-            return
-        }
-        
-        set(
-            projectManifest: projectManifest,
-            sceneManifest: sceneManifest)
-    }
-    
-    func update(
-        availableUndoCount: Int,
-        availableRedoCount: Int
+        projectEditManagerState: ProjectEditManager.State,
+        sceneManifest: Scene.Manifest,
+        editContext: Any?
     ) {
         updateState(
-            availableUndoCount: availableUndoCount,
-            availableRedoCount: availableRedoCount)
+            projectEditManagerState: projectEditManagerState,
+            sceneManifest: sceneManifest,
+            editContext: editContext)
     }
     
 }
@@ -284,7 +309,7 @@ class AnimEditorVC: UIViewController {
 extension AnimEditorVC: AnimEditorToolbarVCDelegate {
     
     func onSelectBack(_ vc: AnimEditorToolbarVC) {
-        dismiss(animated: true)
+        dismiss()
     }
     
     func onSelectPaintTool(_ vc: AnimEditorToolbarVC) {
@@ -306,10 +331,10 @@ extension AnimEditorVC: AnimEditorToolbarVCDelegate {
 extension AnimEditorVC: AnimEditorBottomBarVCDelegate {
     
     func onSelectPrevFrame(_ vc: AnimEditorBottomBarVC) {
-        set(activeFrameIndex: activeFrameIndex - 1)
+        updateState(activeFrameIndex: activeFrameIndex - 1)
     }
     func onSelectNextFrame(_ vc: AnimEditorBottomBarVC) {
-        set(activeFrameIndex: activeFrameIndex + 1)
+        updateState(activeFrameIndex: activeFrameIndex + 1)
     }
     
 }

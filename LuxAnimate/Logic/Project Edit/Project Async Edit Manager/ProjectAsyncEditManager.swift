@@ -6,7 +6,9 @@ import Foundation
 
 protocol ProjectAsyncEditManagerDelegate: AnyObject {
     
-    func onUpdateState(_ m: ProjectAsyncEditManager)
+    func onUpdateState(
+        _ m: ProjectAsyncEditManager,
+        editContext: Any?)
     
     func onError(
         _ m: ProjectAsyncEditManager,
@@ -27,9 +29,7 @@ class ProjectAsyncEditManager {
     private let pendingEditAssetStore =
         ProjectAsyncEditManagerPendingEditAssetStore()
     
-    private(set) var projectManifest: Project.Manifest
-    private(set) var availableUndoCount: Int
-    private(set) var availableRedoCount: Int
+    private(set) var state: ProjectEditManager.State
     
     weak var delegate: ProjectAsyncEditManagerDelegate?
     
@@ -41,27 +41,30 @@ class ProjectAsyncEditManager {
         editManager = try ProjectEditManager(
             projectID: projectID)
         
-        projectManifest = editManager.projectManifest
-        availableUndoCount = editManager.availableUndoCount
-        availableRedoCount = editManager.availableRedoCount
+        state = editManager.state
     }
     
     // MARK: - Internal Logic
     
     private func applyEditInternal(
-        edit: ProjectEditManager.Edit
+        edit: ProjectEditManager.Edit,
+        editContext: Any?
     ) {
-        projectManifest = edit.projectManifest
+        // Update state
+        state.projectManifest = edit.projectManifest
         
-        availableRedoCount = 0
-        availableUndoCount = min(
-            availableUndoCount + 1,
+        state.availableRedoCount = 0
+        state.availableUndoCount = min(
+            state.availableUndoCount + 1,
             ProjectEditManager.editHistoryLimit)
         
+        // Store pending assets
         pendingEditAssetStore.storeAssets(edit.newAssets)
         
-        delegate?.onUpdateState(self)
+        // Notify delegate
+        delegate?.onUpdateState(self, editContext: editContext)
         
+        // Perform edit
         workQueue.async {
             do {
                 try self.editManager.applyEdit(edit)
@@ -71,6 +74,7 @@ class ProjectAsyncEditManager {
                 }
             }
             
+            // Remove pending assets
             let newAssetIDs = edit.newAssets.map { $0.id }
             self.pendingEditAssetStore.removeAssets(
                 assetIDs: newAssetIDs)
@@ -89,11 +93,10 @@ class ProjectAsyncEditManager {
                 }
                 
                 DispatchQueue.main.async {
-                    self.projectManifest = self.editManager.projectManifest
-                    self.availableUndoCount = self.editManager.availableUndoCount
-                    self.availableRedoCount = self.editManager.availableRedoCount
+                    self.state = self.editManager.state
                     
-                    self.delegate?.onUpdateState(self)
+                    self.delegate?.onUpdateState(
+                        self, editContext: nil)
                 }
                 
             } catch {
@@ -107,9 +110,12 @@ class ProjectAsyncEditManager {
     // MARK: - Interface
     
     func applyEdit(
-        edit: ProjectEditManager.Edit
+        edit: ProjectEditManager.Edit,
+        editContext: Any?
     ) {
-        applyEditInternal(edit: edit)
+        applyEditInternal(
+            edit: edit,
+            editContext: editContext)
     }
     
     func applyUndo() {
