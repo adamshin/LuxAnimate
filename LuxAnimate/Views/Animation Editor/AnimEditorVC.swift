@@ -264,15 +264,16 @@ class AnimEditorVC: UIViewController {
     // MARK: - Frame
     
     private func onFrame(
-        drawable: CAMetalDrawable,
-        viewportSize: Size,
-        workspaceTransform: EditorWorkspaceTransform
+        drawable: CAMetalDrawable
     ) {
         let sceneGraph = frameEditor?.onFrame()
         
         if let sceneGraph {
             // Maybe only set this if it changes?
             workspaceVC.setContentSize(sceneGraph.contentSize)
+            
+            let viewportSize = workspaceVC.viewportSize()
+            let workspaceTransform = workspaceVC.workspaceTransform()
             
             draw(
                 drawable: drawable,
@@ -331,14 +332,9 @@ extension AnimEditorVC: EditorWorkspaceVCDelegate {
     
     func onFrame(
         _ vc: EditorWorkspaceVC,
-        drawable: CAMetalDrawable,
-        viewportSize: Size,
-        workspaceTransform: EditorWorkspaceTransform
+        drawable: CAMetalDrawable
     ) {
-        onFrame(
-            drawable: drawable,
-            viewportSize: viewportSize,
-            workspaceTransform: workspaceTransform)
+        onFrame(drawable: drawable)
     }
     
     func onSelectUndo(_ vc: EditorWorkspaceVC) {

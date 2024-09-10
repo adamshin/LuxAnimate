@@ -12,9 +12,7 @@ protocol EditorWorkspaceVCDelegate: AnyObject {
     
     func onFrame(
         _ vc: EditorWorkspaceVC,
-        drawable: CAMetalDrawable,
-        viewportSize: Size,
-        workspaceTransform: EditorWorkspaceTransform)
+        drawable: CAMetalDrawable)
     
     func onSelectUndo(_ vc: EditorWorkspaceVC)
     func onSelectRedo(_ vc: EditorWorkspaceVC)
@@ -89,6 +87,12 @@ class EditorWorkspaceVC: UIViewController {
         overlayView.removeAllToolGestureRecognizers()
     }
     
+    func viewportSize() -> Size {
+        Size(
+            metalView.bounds.width,
+            metalView.bounds.height)
+    }
+    
     func workspaceTransform() -> EditorWorkspaceTransform {
         workspaceTransformManager.transform()
     }
@@ -105,17 +109,8 @@ extension EditorWorkspaceVC: CAMetalDisplayLinkDelegate {
     ) {
         workspaceTransformManager.onFrame()
         
-        let viewportSize = Size(
-            metalView.bounds.width,
-            metalView.bounds.height)
-        
-        let workspaceTransform =
-            workspaceTransformManager.transform()
-        
-        delegate?.onFrame(self,
-            drawable: update.drawable,
-            viewportSize: viewportSize,
-            workspaceTransform: workspaceTransform)
+        delegate?.onFrame(
+            self, drawable: update.drawable)
     }
     
 }
