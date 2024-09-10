@@ -30,7 +30,9 @@ struct FrameSceneGraphGenerator {
         let contentSize = Size(metadata.viewportSize)
         
         let sceneGraphLayerProviders = sceneManifest.layers.map {
-            Self.sceneGraphLayerProvider(layer: $0)
+            Self.sceneGraphLayerProvider(
+                sceneManifest: sceneManifest,
+                layer: $0)
         }
         
         var sceneGraphs: [FrameSceneGraph] = []
@@ -56,12 +58,14 @@ struct FrameSceneGraphGenerator {
     }
     
     private static func sceneGraphLayerProvider(
+        sceneManifest: Scene.Manifest,
         layer: Scene.Layer
     ) -> SceneGraphLayerProvider {
         
         switch layer.content {
         case .animation(let layerContent):
             return AnimationSceneGraphLayerProvider(
+                sceneManifest: sceneManifest,
                 layer: layer,
                 layerContent: layerContent)
         }
@@ -88,6 +92,7 @@ private struct AnimationSceneGraphLayerProvider: SceneGraphLayerProvider {
     private let frameIndexesToSortedDrawingIndexes: [Int: Int]
     
     init(
+        sceneManifest: Scene.Manifest,
         layer: Scene.Layer,
         layerContent: Scene.AnimationLayerContent
     ) {
@@ -97,7 +102,7 @@ private struct AnimationSceneGraphLayerProvider: SceneGraphLayerProvider {
         sortedDrawings = layerContent.drawings.sorted(
             using: KeyPathComparator(\.frameIndex))
         
-        let maxFrameIndex = sortedDrawings.last?.frameIndex ?? 0
+        let maxFrameIndex = sceneManifest.frameCount - 1
         
         var frameIndexesToSortedDrawingIndexes: [Int: Int] = [:]
         

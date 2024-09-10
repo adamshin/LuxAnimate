@@ -70,11 +70,11 @@ struct AppConfig {
         wobblePressureAttenuation: 0)
     
     static let onionSkinConfig = AnimEditorOnionSkinConfig(
-        prevCount: 0,
-        nextCount: 0,
+        prevCount: 5,
+        nextCount: 5,
         prevColor: Color(hex: "FF4444"),
         nextColor: Color(hex: "22DD55"),
         alpha: 0.6,
-        alphaFalloff: 0.2)
+        alphaFalloff: 0.1)
     
 }

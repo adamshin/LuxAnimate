@@ -77,7 +77,8 @@ extension Color {
     
     func withAlpha(_ alpha: Double) -> Color {
         var c = self
-        c.a = UInt8(Double(c.a) * alpha)
+        let a = max(Double(c.a) * alpha, 0)
+        c.a = UInt8(a)
         return c
     }
     

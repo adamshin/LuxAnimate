@@ -167,12 +167,13 @@ class SceneEditorVC: UIViewController {
     
     // MARK: - Editing
     
-    private func addLayer() {
+    private func addLayer(drawingCount: Int) {
         let projectManifest = projectEditManagerState
             .projectManifest
         
         let sceneEdit = SceneEditHelper.createAnimationLayer(
-            sceneManifest: sceneManifest)
+            sceneManifest: sceneManifest,
+            drawingCount: drawingCount)
         
         let edit = try! ProjectEditHelper.applySceneEdit(
             projectManifest: projectManifest,
@@ -288,8 +289,11 @@ extension SceneEditorVC: SceneEditorContentVCDelegate {
         dismiss(animated: true)
     }
     
-    func onSelectAddLayer(_ vc: SceneEditorContentVC) { 
-        addLayer()
+    func onSelectAddLayer(
+        _ vc: SceneEditorContentVC,
+        drawingCount: Int
+    ) { 
+        addLayer(drawingCount: drawingCount)
     }
     
     func onSelectRemoveLayer(_ vc: SceneEditorContentVC) {

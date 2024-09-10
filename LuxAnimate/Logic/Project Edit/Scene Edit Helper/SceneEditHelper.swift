@@ -24,10 +24,11 @@ struct SceneEditHelper {
     // MARK: - Layer
     
     static func createAnimationLayer(
-        sceneManifest: Scene.Manifest
+        sceneManifest: Scene.Manifest,
+        drawingCount: Int
     ) -> ProjectEditHelper.SceneEdit {
         
-        let drawings = (0 ..< 10).map { index in
+        let drawings = (0 ..< drawingCount).map { index in
             Scene.Drawing(
                 id: IDGenerator.id(),
                 frameIndex: index,
