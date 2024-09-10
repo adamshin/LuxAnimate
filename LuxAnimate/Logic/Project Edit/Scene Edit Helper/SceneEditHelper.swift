@@ -17,6 +17,8 @@ struct SceneEditHelper {
     
     enum Error: Swift.Error {
         case invalidLayerID
+        case invalidLayerContent
+        case invalidDrawingID
     }
     
     // MARK: - Layer
@@ -78,45 +80,15 @@ struct SceneEditHelper {
     
     static func editDrawing(
         sceneManifest: Scene.Manifest,
+        layerID: String,
         drawingID: String,
         imageSet: DrawingAssetProcessor.ImageSet
     ) throws -> ProjectEditHelper.SceneEdit {
         
+        // Set up assets
         let fullAssetID = IDGenerator.id()
         let mediumAssetID = IDGenerator.id()
         let smallAssetID = IDGenerator.id()
-        
-        var newSceneManifest = sceneManifest
-        var assetIDsToRemove: [String] = []
-        
-        newSceneManifest.layers = sceneManifest.layers.map { layer in
-            guard case .animation(let content) = layer.content
-            else { return layer }
-            
-            let newDrawings = content.drawings.map { drawing in
-                guard drawing.id == drawingID
-                else { return drawing }
-                
-                if let assetIDs = drawing.assetIDs {
-                    assetIDsToRemove.append(assetIDs.full)
-                    assetIDsToRemove.append(assetIDs.medium)
-                    assetIDsToRemove.append(assetIDs.small)
-                }
-                
-                var newDrawing = drawing
-                newDrawing.assetIDs = Scene.DrawingAssetIDGroup(
-                    full: fullAssetID,
-                    medium: mediumAssetID,
-                    small: smallAssetID)
-                return newDrawing
-            }
-            var newContent = content
-            newContent.drawings = newDrawings
-            
-            var newLayer = layer
-            newLayer.content = .animation(newContent)
-            return newLayer
-        }
         
         let newAssets = [
             ProjectEditManager.NewAsset(
@@ -129,14 +101,53 @@ struct SceneEditHelper {
                 id: smallAssetID,
                 data: imageSet.small),
         ]
-        let newAssetIDs = newAssets.map { $0.id }
         
-        newSceneManifest.assetIDs.subtract(assetIDsToRemove)
-        newSceneManifest.assetIDs.formUnion(newAssetIDs)
+        let newAssetIDs = Scene.DrawingAssetIDGroup(
+            full: fullAssetID,
+            medium: mediumAssetID,
+            small: smallAssetID)
         
+        // Update drawing
+        var sceneManifest = sceneManifest
+        
+        guard let layerIndex = sceneManifest.layers
+            .firstIndex(where: { $0.id == layerID })
+        else {
+            throw Error.invalidLayerID
+        }
+        var layer = sceneManifest.layers[layerIndex]
+        
+        guard case .animation(var animationLayerContent)
+            = layer.content
+        else {
+            throw Error.invalidLayerContent
+        }
+        
+        var drawings = animationLayerContent.drawings
+        
+        guard let drawingIndex = drawings
+            .firstIndex(where: { $0.id == drawingID })
+        else {
+            throw Error.invalidDrawingID
+        }
+        
+        var drawing = drawings[drawingIndex]
+        let oldAssetIDs = drawing.assetIDs
+        drawing.assetIDs = newAssetIDs
+        
+        drawings[drawingIndex] = drawing
+        animationLayerContent.drawings = drawings
+        layer.content = .animation(animationLayerContent)
+        sceneManifest.layers[layerIndex] = layer
+        
+        // Update assets
+        sceneManifest.assetIDs.subtract(oldAssetIDs?.all ?? [])
+        sceneManifest.assetIDs.formUnion(newAssetIDs.all)
+        
+        // Return
         return ProjectEditHelper.SceneEdit(
             sceneID: sceneManifest.id,
-            sceneManifest: newSceneManifest,
+            sceneManifest: sceneManifest,
             newAssets: newAssets)
     }
     

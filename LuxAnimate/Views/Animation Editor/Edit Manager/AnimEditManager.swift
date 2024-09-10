@@ -14,6 +14,7 @@ protocol AnimEditManagerDelegate: AnyObject {
 
 class AnimEditManager {
     
+    private let layerID: String
     private var sceneManifest: Scene.Manifest
     
     private let drawingAssetProcessor = DrawingAssetProcessor()
@@ -23,8 +24,10 @@ class AnimEditManager {
     // MARK: - Init
     
     init(
+        layerID: String,
         sceneManifest: Scene.Manifest
     ) {
+        self.layerID = layerID
         self.sceneManifest = sceneManifest
     }
     
@@ -52,6 +55,7 @@ class AnimEditManager {
             
             let sceneEdit = try SceneEditHelper.editDrawing(
                 sceneManifest: sceneManifest,
+                layerID: layerID,
                 drawingID: drawingID,
                 imageSet: imageSet)
             

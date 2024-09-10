@@ -91,6 +91,7 @@ class AnimEditorVC: UIViewController {
         onionSkinConfig = AppConfig.onionSkinConfig
         
         editManager = AnimEditManager(
+            layerID: activeLayerID,
             sceneManifest: sceneManifest)
         
         assetLoader = AnimEditorAssetLoader(
