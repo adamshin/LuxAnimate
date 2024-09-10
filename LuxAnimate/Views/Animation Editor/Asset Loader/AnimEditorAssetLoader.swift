@@ -4,6 +4,8 @@
 
 import Metal
 
+// TODO: Make this thread safe
+
 protocol AnimEditorAssetLoaderDelegate: AnyObject {
     
     func pendingAssetData(
@@ -80,8 +82,10 @@ class AnimEditorAssetLoader {
             !loadedAssets.keys.contains($0)
         }
         guard let assetID else {
-            delegate?.onUpdate(self)
-            delegate?.onFinish(self)
+            DispatchQueue.main.async {
+                self.delegate?.onUpdate(self)
+                self.delegate?.onFinish(self)
+            }
             return
         }
         
@@ -94,12 +98,18 @@ class AnimEditorAssetLoader {
                     })
                 
                 self.loadedAssets[assetID] = .loaded(texture)
-                self.delegate?.onUpdate(self)
+                
+                DispatchQueue.main.async {
+                    self.delegate?.onUpdate(self)
+                }
                 
             } catch {
                 if !(error is CancelLoadError) {
                     self.loadedAssets[assetID] = .error
-                    self.delegate?.onUpdate(self)
+                    
+                    DispatchQueue.main.async {
+                        self.delegate?.onUpdate(self)
+                    }
                 }
             }
             
@@ -150,7 +160,7 @@ class AnimEditorAssetLoader {
             let output = try JXLDecoder.decode(
                 data: assetData,
                 progress: {
-                    self.assetIDs.contains(assetID)
+                    true//shouldContinue()
                 })
             
             let texture = try TextureCreator.createTexture(
@@ -161,7 +171,7 @@ class AnimEditorAssetLoader {
                 mipMapped: false,
                 usage: .shaderRead)
             
-            guard self.assetIDs.contains(assetID)
+            guard shouldContinue()
             else { throw CancelLoadError() }
             
             return texture
