@@ -178,10 +178,13 @@ class SceneEditorVC: UIViewController {
             projectManifest: projectManifest,
             sceneEdit: sceneEdit)
         
-        delegate?.onRequestEdit(
-            self,
+        let editContext = SceneEditorVCEditContext(
+            sender: self,
+            sceneManifest: sceneEdit.sceneManifest)
+        
+        delegate?.onRequestEdit(self,
             edit: edit,
-            editContext: nil)
+            editContext: editContext)
     }
     
     private func removeLastLayer() {
@@ -199,10 +202,13 @@ class SceneEditorVC: UIViewController {
             projectManifest: projectManifest,
             sceneEdit: sceneEdit)
         
-        delegate?.onRequestEdit(
-            self,
+        let editContext = SceneEditorVCEditContext(
+            sender: self,
+            sceneManifest: sceneEdit.sceneManifest)
+        
+        delegate?.onRequestEdit(self,
             edit: edit,
-            editContext: nil)
+            editContext: editContext)
     }
     
     // MARK: - Navigation
