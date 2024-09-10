@@ -125,6 +125,8 @@ class EditorWorkspaceTransformManager {
         endTransform: EditorWorkspaceTransform,
         duration: TimeInterval
     ) {
+        activeGestureTransform = nil
+        
         let now = Date().timeIntervalSince1970
         
         activeAnimation = Animation(
@@ -133,10 +135,7 @@ class EditorWorkspaceTransformManager {
             startTime: now,
             duration: duration)
         
-        self.activeGestureTransform = nil
-        baseTransform = endTransform
-        
-        delegate?.onUpdateTransform(self)
+        updateActiveAnimationTransform()
     }
     
     private func updateActiveAnimationTransform() {
@@ -254,7 +253,14 @@ class EditorWorkspaceTransformManager {
     func fitContentToViewport() {
         isContentFitToViewport = true
         
-        baseTransform = transformFittingContentToViewport()
+        let fitTransform = transformFittingContentToViewport()
+        
+        if activeAnimation != nil {
+            activeAnimation?.endTransform = fitTransform
+        } else {
+            baseTransform = fitTransform
+        }
+        
         delegate?.onUpdateTransform(self)
     }
     
