@@ -14,6 +14,11 @@ protocol SceneEditorVCDelegate: AnyObject {
         edit: ProjectEditManager.Edit,
         editContext: Any?)
     
+    func pendingEditAsset(
+        _ vc: SceneEditorVC,
+        assetID: String
+    ) -> ProjectEditManager.NewAsset?
+    
 }
 
 struct SceneEditorVCEditContext {
@@ -334,6 +339,15 @@ extension SceneEditorVC: AnimEditorVCDelegate {
                 editContext: newEditContext)
             
         } catch { }
+    }
+    
+    func pendingEditAsset(
+        _ vc: AnimEditorVC,
+        assetID: String
+    ) -> ProjectEditManager.NewAsset? {
+        
+        delegate?.pendingEditAsset(
+            self, assetID: assetID)
     }
     
 }

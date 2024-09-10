@@ -7,7 +7,7 @@ import Metal
 protocol AnimFrameEditorStateDelegate: AnyObject {
     
     func changeState(
-        _ e: AnimFrameEditorState,
+        _ s: AnimFrameEditorState,
         newState: AnimFrameEditorState)
     
     func setAssetLoaderAssetIDs(
@@ -15,30 +15,30 @@ protocol AnimFrameEditorStateDelegate: AnyObject {
         assetIDs: Set<String>)
     
     func assetLoaderAssetTexture(
-        _ e: AnimFrameEditorState,
+        _ s: AnimFrameEditorState,
         assetID: String) -> MTLTexture?
     
     func storeAssetLoaderTexture(
-        _ e: AnimFrameEditorState,
+        _ s: AnimFrameEditorState,
         assetID: String,
         texture: MTLTexture)
     
     func workspaceViewSize(
-        _ e: AnimFrameEditorState
+        _ s: AnimFrameEditorState
     ) -> Size
     
     func workspaceTransform(
-        _ e: AnimFrameEditorState
+        _ s: AnimFrameEditorState
     ) -> EditorWorkspaceTransform
     
     func setEditInteractionEnabled(
-        _ e: AnimFrameEditorState,
+        _ s: AnimFrameEditorState,
         enabled: Bool)
     
-    func applyDrawingEdit(
-        _ e: AnimFrameEditorState,
+    func onEdit(
+        _ s: AnimFrameEditorState,
         drawingID: String,
-        drawingTexture: MTLTexture)
+        drawingTexture: MTLTexture?)
     
 }
 

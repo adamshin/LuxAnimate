@@ -31,13 +31,10 @@ protocol AnimFrameEditorDelegate: AnyObject {
         _ e: AnimFrameEditor,
         enabled: Bool)
     
-    // TODO: Methods for reporting project edits
-    
-    // For testing
-    func editDrawing(
+    func onEdit(
         _ e: AnimFrameEditor,
         drawingID: String,
-        fullAssetID: String)
+        drawingTexture: MTLTexture?)
     
 }
 
@@ -102,7 +99,7 @@ class AnimFrameEditor {
 extension AnimFrameEditor: AnimFrameEditorStateDelegate {
     
     func changeState(
-        _ e: AnimFrameEditorState,
+        _ s: AnimFrameEditorState,
         newState: AnimFrameEditorState
     ) {
         enterState(newState)
@@ -118,7 +115,7 @@ extension AnimFrameEditor: AnimFrameEditorStateDelegate {
     }
     
     func assetLoaderAssetTexture(
-        _ e: AnimFrameEditorState,
+        _ s: AnimFrameEditorState,
         assetID: String
     ) -> MTLTexture? {
         delegate?.assetLoaderAssetTexture(
@@ -127,7 +124,7 @@ extension AnimFrameEditor: AnimFrameEditorStateDelegate {
     }
     
     func storeAssetLoaderTexture(
-        _ e: AnimFrameEditorState,
+        _ s: AnimFrameEditorState,
         assetID: String,
         texture: MTLTexture
     ) {
@@ -138,48 +135,45 @@ extension AnimFrameEditor: AnimFrameEditorStateDelegate {
     }
     
     func workspaceViewSize(
-        _ e: AnimFrameEditorState
+        _ s: AnimFrameEditorState
     ) -> Size {
         delegate?.workspaceViewSize(self) ?? .zero
     }
     
     func workspaceTransform(
-        _ e: AnimFrameEditorState
+        _ s: AnimFrameEditorState
     ) -> EditorWorkspaceTransform {
         delegate?.workspaceTransform(self) ?? .identity
     }
     
     func setEditInteractionEnabled(
-        _ e: any AnimFrameEditorState,
+        _ s: any AnimFrameEditorState,
         enabled: Bool
     ) {
         delegate?.setEditInteractionEnabled(
             self, enabled: enabled)
     }
     
-    func applyDrawingEdit(
-        _ e: AnimFrameEditorState,
+    func onEdit(
+        _ s: AnimFrameEditorState,
         drawingID: String,
-        drawingTexture: MTLTexture
+        drawingTexture: MTLTexture?
     ) {
-        // TODO: Save edit to disk.
-        // For now, just save it in the asset loader.
-        // This will be enough for testing.
+        // Do we report this up the chain?
+        // Maybe it goes all the way to the AnimEditorVC.
+        // In this scenario, the AnimEditorVC will maintain
+        // a queue of tasks.
         
-        guard let texture = try? TextureCopier.copy(drawingTexture)
-        else { return }
+        // Maybe when switching tools, we should halt the
+        // main thread until all pending tasks are complete.
+        // Except that may not work... we wouldn't have
+        // up-to-date data still at that point, because
+        // edit updates would be dispatched to the main
+        // queue and execute after.
         
-        let assetID = IDGenerator.id()
-        
-        delegate?.storeAssetLoaderTexture(
-            self,
-            assetID: assetID,
-            texture: texture)
-        
-        delegate?.editDrawing(
-            self,
-            drawingID: drawingID,
-            fullAssetID: assetID)
+        // Maybe we'd have to wait for all tasks to finish,
+        // then dispatch the tool switching code to the
+        // main queue after that.
     }
     
 }

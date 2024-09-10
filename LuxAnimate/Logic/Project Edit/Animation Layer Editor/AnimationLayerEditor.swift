@@ -73,7 +73,7 @@ class AnimationLayerEditor {
         drawings = drawings.filter { $0.frameIndex != frameIndex }
         animationLayerContent.drawings = drawings
         
-        self.animationLayerContent? = animationLayerContent
+        self.animationLayerContent = animationLayerContent
         
         delegate?.onRequestApplyEdit(self,
             edit: Edit(

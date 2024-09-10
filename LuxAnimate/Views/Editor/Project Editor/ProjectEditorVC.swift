@@ -177,6 +177,15 @@ extension ProjectEditorVC: SceneEditorVCDelegate {
             editContext: editContext)
     }
     
+    func pendingEditAsset(
+        _ vc: SceneEditorVC,
+        assetID: String
+    ) -> ProjectEditManager.NewAsset? {
+        
+        projectEditManager.pendingEditAsset(
+            assetID: assetID)
+    }
+    
 }
 
 extension ProjectEditorVC: ProjectAsyncEditManagerDelegate {

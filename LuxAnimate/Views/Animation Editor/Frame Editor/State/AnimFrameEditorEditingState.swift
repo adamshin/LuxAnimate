@@ -177,18 +177,18 @@ extension AnimFrameEditorEditingState:
         layer.transform
     }
     
-    func onUpdateDrawingCanvasTexture(
+    func onEdit(
         _ s: AnimFrameEditorToolState,
-        canvasTexture: MTLTexture
+        drawingTexture: MTLTexture?
     ) {
-        guard let activeDrawing =
-            activeDrawingManifest.activeDrawing
+        guard let activeDrawing = activeDrawingManifest
+            .activeDrawing
         else { return }
         
-        delegate?.applyDrawingEdit(
+        delegate?.onEdit(
             self,
             drawingID: activeDrawing.id,
-            drawingTexture: canvasTexture)
+            drawingTexture: drawingTexture)
     }
     
 }

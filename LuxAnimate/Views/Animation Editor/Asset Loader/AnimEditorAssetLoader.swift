@@ -6,7 +6,10 @@ import Metal
 
 protocol AnimEditorAssetLoaderDelegate: AnyObject {
     
-    // TODO: Pending asset method
+    func pendingAssetData(
+        _ l: AnimEditorAssetLoader,
+        assetID: String
+    ) -> Data?
     
     func onUpdate(_ l: AnimEditorAssetLoader)
     func onFinish(_ l: AnimEditorAssetLoader)
@@ -112,20 +115,40 @@ class AnimEditorAssetLoader {
         guard shouldContinue() 
         else { throw CancelLoadError() }
         
-        // TODO: Check with delegate for pending edit asset first
+        if let assetData = delegate?
+            .pendingAssetData(self, assetID: assetID)
+        {
+            return try loadAsset(
+                assetID: assetID,
+                assetData: assetData,
+                shouldContinue: shouldContinue)
+            
+        } else {
+            let assetURL = FileHelper.shared.projectAssetURL(
+                projectID: self.projectID,
+                assetID: assetID)
+            
+            let assetData = try Data(contentsOf: assetURL)
+            
+            return try loadAsset(
+                assetID: assetID,
+                assetData: assetData,
+                shouldContinue: shouldContinue)
+        }
+    }
+    
+    private func loadAsset(
+        assetID: String,
+        assetData: Data,
+        shouldContinue: () -> Bool
+    ) throws -> MTLTexture {
         
-        let assetURL = FileHelper.shared.projectAssetURL(
-            projectID: self.projectID,
-            assetID: assetID)
-        
-        let encodedData = try Data(contentsOf: assetURL)
-        
-        guard shouldContinue() 
+        guard shouldContinue()
         else { throw CancelLoadError() }
         
         do {
             let output = try JXLDecoder.decode(
-                data: encodedData,
+                data: assetData,
                 progress: {
                     self.assetIDs.contains(assetID)
                 })

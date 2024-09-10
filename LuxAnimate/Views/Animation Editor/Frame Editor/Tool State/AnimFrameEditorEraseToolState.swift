@@ -100,8 +100,9 @@ extension AnimFrameEditorEraseToolState:
         _ s: AnimFrameEditorBrushToolInternalState,
         canvasTexture: MTLTexture
     ) {
-        delegate?.onUpdateDrawingCanvasTexture(
-            self, canvasTexture: canvasTexture)
+        delegate?.onEdit(
+            self,
+            drawingTexture: canvasTexture)
     }
     
 }
