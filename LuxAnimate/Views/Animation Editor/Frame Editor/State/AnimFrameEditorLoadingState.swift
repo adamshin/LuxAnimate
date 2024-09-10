@@ -32,6 +32,9 @@ class AnimFrameEditorLoadingState: AnimFrameEditorState {
     private let assetManifest:
         AnimFrameEditorHelper.AssetManifest
     
+    private let workspaceSceneGraphGenerator
+        = AnimFrameEditorWorkspaceSceneGraphGenerator()
+    
     weak var delegate: AnimFrameEditorStateDelegate?
     
     // MARK: - Init
@@ -87,6 +90,8 @@ class AnimFrameEditorLoadingState: AnimFrameEditorState {
             .assetManifest(
                 frameSceneGraph: frameSceneGraph,
                 activeDrawingManifest: activeDrawingManifest)
+        
+        workspaceSceneGraphGenerator.delegate = self
     }
     
     // MARK: - Logic
@@ -128,6 +133,28 @@ class AnimFrameEditorLoadingState: AnimFrameEditorState {
         enterEditingState()
     }
     
-    func onFrame() -> EditorWorkspaceSceneGraph? { nil }
+    func onFrame() -> EditorWorkspaceSceneGraph? {
+        return nil
+//        workspaceSceneGraphGenerator
+//            .generate(
+//                frameSceneGraph: frameSceneGraph,
+//                activeDrawingManifest: activeDrawingManifest,
+//                activeDrawingTexture: nil,
+//                onionSkinConfig: onionSkinConfig)
+    }
+    
+}
+
+// MARK: - Delegates
+
+extension AnimFrameEditorLoadingState:
+    AnimFrameEditorWorkspaceSceneGraphGeneratorDelegate {
+    
+    func assetTexture(
+        _ g: AnimFrameEditorWorkspaceSceneGraphGenerator,
+        assetID: String
+    ) -> MTLTexture? {
+        nil
+    }
     
 }
