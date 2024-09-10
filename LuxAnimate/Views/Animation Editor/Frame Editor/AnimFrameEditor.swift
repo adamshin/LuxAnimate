@@ -159,21 +159,9 @@ extension AnimFrameEditor: AnimFrameEditorStateDelegate {
         drawingID: String,
         drawingTexture: MTLTexture?
     ) {
-        // Do we report this up the chain?
-        // Maybe it goes all the way to the AnimEditorVC.
-        // In this scenario, the AnimEditorVC will maintain
-        // a queue of tasks.
-        
-        // Maybe when switching tools, we should halt the
-        // main thread until all pending tasks are complete.
-        // Except that may not work... we wouldn't have
-        // up-to-date data still at that point, because
-        // edit updates would be dispatched to the main
-        // queue and execute after.
-        
-        // Maybe we'd have to wait for all tasks to finish,
-        // then dispatch the tool switching code to the
-        // main queue after that.
+        delegate?.onEdit(self,
+            drawingID: drawingID,
+            drawingTexture: drawingTexture)
     }
     
 }

@@ -471,6 +471,7 @@ extension AnimEditorVC: AnimEditorAssetLoaderDelegate {
         if let pendingAsset = delegate?
             .pendingEditAsset(self, assetID: assetID)
         {
+            print("Used pending asset")
             return pendingAsset.data
         }
         return nil

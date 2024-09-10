@@ -87,6 +87,7 @@ struct SceneEditHelper {
         let smallAssetID = IDGenerator.id()
         
         var newSceneManifest = sceneManifest
+        var assetIDsToRemove: [String] = []
         
         newSceneManifest.layers = sceneManifest.layers.map { layer in
             guard case .animation(let content) = layer.content
@@ -95,6 +96,12 @@ struct SceneEditHelper {
             let newDrawings = content.drawings.map { drawing in
                 guard drawing.id == drawingID
                 else { return drawing }
+                
+                if let assetIDs = drawing.assetIDs {
+                    assetIDsToRemove.append(assetIDs.full)
+                    assetIDsToRemove.append(assetIDs.medium)
+                    assetIDsToRemove.append(assetIDs.small)
+                }
                 
                 var newDrawing = drawing
                 newDrawing.assetIDs = Scene.DrawingAssetIDGroup(
@@ -122,6 +129,10 @@ struct SceneEditHelper {
                 id: smallAssetID,
                 data: imageSet.small),
         ]
+        let newAssetIDs = newAssets.map { $0.id }
+        
+        newSceneManifest.assetIDs.subtract(assetIDsToRemove)
+        newSceneManifest.assetIDs.formUnion(newAssetIDs)
         
         return ProjectEditHelper.SceneEdit(
             sceneID: sceneManifest.id,
