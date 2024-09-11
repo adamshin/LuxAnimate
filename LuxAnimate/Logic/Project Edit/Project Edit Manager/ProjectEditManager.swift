@@ -22,7 +22,7 @@ extension ProjectEditManager {
         var data: Data
     }
     
-    static let editHistoryLimit = 20
+    static let editHistoryLimit = 50
     
 }
 
