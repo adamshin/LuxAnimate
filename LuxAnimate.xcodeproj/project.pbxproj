@@ -170,6 +170,7 @@
 		66D084842BA3FE2E00EB8556 /* LibraryContentVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D084832BA3FE2E00EB8556 /* LibraryContentVC.swift */; };
 		66D084892BA4060E00EB8556 /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D084872BA4060E00EB8556 /* Project.swift */; };
 		66D0848C2BA55B4300EB8556 /* LibraryManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0848B2BA55B4300EB8556 /* LibraryManifest.swift */; };
+		66DE6BA52C923CE900A687C4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 66DE6BA42C923CE900A687C4 /* Assets.xcassets */; };
 		66E04CDB2C59829D00BD91F4 /* AnimationLayerEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E04CDA2C59829D00BD91F4 /* AnimationLayerEditor.swift */; };
 		66E312B62C3A0001006BE399 /* ProjectEditorContentVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E312B52C3A0001006BE399 /* ProjectEditorContentVC.swift */; };
 		66E3E4362C7ADE7C0086D388 /* AnimEditorToolbarVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E3E4352C7ADE7C0086D388 /* AnimEditorToolbarVC.swift */; };
@@ -353,6 +354,7 @@
 		66D084832BA3FE2E00EB8556 /* LibraryContentVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryContentVC.swift; sourceTree = "<group>"; };
 		66D084872BA4060E00EB8556 /* Project.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Project.swift; sourceTree = "<group>"; };
 		66D0848B2BA55B4300EB8556 /* LibraryManifest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryManifest.swift; sourceTree = "<group>"; };
+		66DE6BA42C923CE900A687C4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		66E04CDA2C59829D00BD91F4 /* AnimationLayerEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationLayerEditor.swift; sourceTree = "<group>"; };
 		66E312B52C3A0001006BE399 /* ProjectEditorContentVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectEditorContentVC.swift; sourceTree = "<group>"; };
 		66E3E4352C7ADE7C0086D388 /* AnimEditorToolbarVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorToolbarVC.swift; sourceTree = "<group>"; };
@@ -1135,6 +1137,7 @@
 			isa = PBXGroup;
 			children = (
 				66099BC92BDB3D5900243D9F /* Brushes */,
+				66DE6BA42C923CE900A687C4 /* Assets.xcassets */,
 				66D084472BA3840D00EB8556 /* LaunchScreen.storyboard */,
 			);
 			path = Resources;
@@ -1314,6 +1317,7 @@
 				66099BD12BDB3D6400243D9F /* brush1.png in Resources */,
 				66099BCF2BDB3D6400243D9F /* brush2.png in Resources */,
 				66099BCE2BDB3D6400243D9F /* brush4.png in Resources */,
+				66DE6BA52C923CE900A687C4 /* Assets.xcassets in Resources */,
 				6643CB222BEB354E0094B998 /* brush-square.png in Resources */,
 				66D084492BA3840D00EB8556 /* Base in Resources */,
 			);
