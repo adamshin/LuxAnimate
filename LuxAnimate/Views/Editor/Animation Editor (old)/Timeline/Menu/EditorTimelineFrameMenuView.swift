@@ -4,6 +4,7 @@
 
 import UIKit
 
+@MainActor
 protocol EditorTimelineFrameMenuViewDelegate: AnyObject {
     
     func onSelectCreateDrawing(

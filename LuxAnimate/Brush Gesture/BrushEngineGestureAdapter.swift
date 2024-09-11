@@ -4,6 +4,7 @@
 
 import Foundation
 
+@MainActor
 struct BrushEngineGestureAdapter {
     
     static func convert(

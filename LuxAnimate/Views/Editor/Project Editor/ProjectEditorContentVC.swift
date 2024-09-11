@@ -4,6 +4,7 @@
 
 import UIKit
 
+@MainActor
 protocol ProjectEditorContentVCDelegate: AnyObject {
     
     func onSelectBack(_ vc: ProjectEditorContentVC)

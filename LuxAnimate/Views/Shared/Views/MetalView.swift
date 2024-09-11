@@ -5,6 +5,7 @@
 import UIKit
 import Metal
 
+@MainActor
 protocol MetalViewDelegate: AnyObject {
     func draw(in layer: CAMetalLayer)
 }

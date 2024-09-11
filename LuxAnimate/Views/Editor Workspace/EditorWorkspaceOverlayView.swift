@@ -4,6 +4,7 @@
 
 import UIKit
 
+@MainActor
 protocol EditorWorkspaceOverlayViewDelegate: AnyObject {
     
     func onBeginWorkspaceTransformGesture(

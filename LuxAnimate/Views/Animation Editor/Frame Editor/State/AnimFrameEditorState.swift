@@ -4,6 +4,7 @@
 
 import Metal
 
+@MainActor
 protocol AnimFrameEditorStateDelegate: AnyObject {
     
     func changeState(
@@ -42,6 +43,7 @@ protocol AnimFrameEditorStateDelegate: AnyObject {
     
 }
 
+@MainActor
 protocol AnimFrameEditorState: AnyObject {
     
     var delegate: AnimFrameEditorStateDelegate? { get set }

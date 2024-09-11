@@ -7,6 +7,7 @@ import UIKit.UIGestureRecognizerSubclass
 
 // MARK: - CanvasMultiGestureRecognizerDelegate
 
+@MainActor
 protocol CanvasMultiGestureRecognizerGestureDelegate: AnyObject {
     
     func onBeginGesture()

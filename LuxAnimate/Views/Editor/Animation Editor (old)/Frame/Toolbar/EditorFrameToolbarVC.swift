@@ -4,6 +4,7 @@
 
 import UIKit
 
+@MainActor
 protocol EditorFrameToolbarVCDelegate: AnyObject {
     func onSelectBack(_ vc: EditorFrameToolbarVC)
     func onSelectBrushTool(_ vc: EditorFrameToolbarVC)

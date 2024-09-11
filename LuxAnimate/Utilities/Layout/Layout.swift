@@ -4,6 +4,7 @@
 
 import UIKit
 
+@MainActor
 protocol LayoutTarget {
     var leadingAnchor: NSLayoutXAxisAnchor { get }
     var trailingAnchor: NSLayoutXAxisAnchor { get }
@@ -20,6 +21,7 @@ protocol LayoutTarget {
 extension UIView: LayoutTarget { }
 extension UILayoutGuide: LayoutTarget { }
 
+@MainActor
 struct LayoutConstraints {
     var constraints: [NSLayoutConstraint]
     
@@ -189,6 +191,7 @@ extension UIView {
 
 extension UIView {
     
+    @MainActor
     enum HorizontalAnchor {
         case leading
         case trailing
@@ -207,6 +210,7 @@ extension UIView {
         }
     }
     
+    @MainActor
     enum VerticalAnchor {
         case top
         case bottom
@@ -221,6 +225,7 @@ extension UIView {
         }
     }
     
+    @MainActor
     enum SizeAnchor {
         case width
         case height
@@ -233,6 +238,7 @@ extension UIView {
         }
     }
     
+    @MainActor
     enum LayoutRelation {
         case equal
         case lessOrEqual

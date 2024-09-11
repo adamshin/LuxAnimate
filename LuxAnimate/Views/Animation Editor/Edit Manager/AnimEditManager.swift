@@ -4,6 +4,7 @@
 
 import Metal
 
+@MainActor
 protocol AnimEditManagerDelegate: AnyObject {
     
     func onRequestSceneEdit(
@@ -12,6 +13,7 @@ protocol AnimEditManagerDelegate: AnyObject {
     
 }
 
+@MainActor
 class AnimEditManager {
     
     private let layerID: String
@@ -66,10 +68,7 @@ class AnimEditManager {
     }
     
     func afterAllEditsFinish(_ block: @escaping () -> Void) {
-        // TODO: Actually wait for pending tasks
-        DispatchQueue.main.async {
-            block()
-        }
+        // TODO: Wait for pending tasks!
     }
     
 }

@@ -9,6 +9,7 @@ private let minScale: Scalar = 0.1
 private let maxScale: Scalar = 30
 private let scalePixelateThreshold: Scalar = 1.0
 
+@MainActor
 protocol AnimationFrameEditorCanvasVCDelegate: AnyObject {
     
     func onSelectUndo(_ vc: AnimationFrameEditorCanvasVC)

@@ -4,6 +4,7 @@
 
 import UIKit
 
+@MainActor
 protocol EditorWorkspaceMetalViewDelegate: AnyObject {
     func onRequestDraw(_ view: EditorWorkspaceMetalView)
 }

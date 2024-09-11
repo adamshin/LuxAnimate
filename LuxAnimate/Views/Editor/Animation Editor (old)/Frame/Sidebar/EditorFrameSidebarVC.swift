@@ -7,6 +7,7 @@ import UIKit
 private let scaleGamma: Double = 2.0
 private let smoothingGamma: Double = 1.5
 
+@MainActor
 protocol EditorFrameSidebarVCDelegate: AnyObject {
     
     func onSetBrushScale(

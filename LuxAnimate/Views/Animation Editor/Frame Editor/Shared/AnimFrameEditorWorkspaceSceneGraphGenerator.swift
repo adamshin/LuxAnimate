@@ -4,6 +4,7 @@
 
 import Metal
 
+@MainActor
 protocol AnimFrameEditorWorkspaceSceneGraphGeneratorDelegate: AnyObject {
     
     func assetTexture(
@@ -12,6 +13,7 @@ protocol AnimFrameEditorWorkspaceSceneGraphGeneratorDelegate: AnyObject {
     
 }
 
+@MainActor
 class AnimFrameEditorWorkspaceSceneGraphGenerator {
     
     weak var delegate: AnimFrameEditorWorkspaceSceneGraphGeneratorDelegate?

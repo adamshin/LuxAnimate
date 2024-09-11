@@ -8,6 +8,7 @@ import UIKit.UIGestureRecognizerSubclass
 private let moveThreshold: CGFloat = 25
 private let flickVelocityThreshold: CGFloat = 500
 
+@MainActor
 protocol EditorCollapsibleContentSwipeGestureRecognizerDelegate: AnyObject {
     func onSwipe(up: Bool)
 }

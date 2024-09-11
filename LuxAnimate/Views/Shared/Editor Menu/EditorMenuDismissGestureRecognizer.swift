@@ -7,6 +7,7 @@ import UIKit.UIGestureRecognizerSubclass
 
 private let maxDragDistance: CGFloat = 10
 
+@MainActor
 protocol EditorMenuDismissGestureRecognizerDelegate: AnyObject {
     
     func onDismiss(_ gesture: EditorMenuDismissGestureRecognizer)

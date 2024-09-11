@@ -188,7 +188,7 @@ extension ProjectEditorVC: SceneEditorVCDelegate {
     
 }
 
-extension ProjectEditorVC: ProjectAsyncEditManagerDelegate {
+extension ProjectEditorVC: @preconcurrency ProjectAsyncEditManagerDelegate {
     
     func onUpdateState(
         _ m: ProjectAsyncEditManager,

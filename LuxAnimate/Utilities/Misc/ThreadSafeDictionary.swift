@@ -4,7 +4,9 @@
 
 import Foundation
 
-class ThreadSafeDictionary<Key: Hashable, Value> {
+class ThreadSafeDictionary<Key: Hashable & Sendable, Value: Sendable>:
+    @unchecked Sendable
+{
     
     private var dictionary: [Key: Value] = [:]
     

@@ -17,6 +17,7 @@ private let cellSize: CGSize = CGSize(
 
 private let cellSpacing: CGFloat = 8
 
+@MainActor
 protocol TimelineTrackVCDelegate: AnyObject {
     
     func onBeginFrameScroll(_ vc: TimelineTrackVC)

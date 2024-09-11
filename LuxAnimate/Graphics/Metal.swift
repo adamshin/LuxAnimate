@@ -6,7 +6,7 @@ import Metal
 
 // MARK: - MetalInterface
 
-struct MetalInterface {
+struct MetalInterface: @unchecked Sendable {
     
     static let shared = MetalInterface()
     

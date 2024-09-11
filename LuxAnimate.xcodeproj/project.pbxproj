@@ -155,7 +155,6 @@
 		66CE19012C1BA8BC0078AA68 /* RenderCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66CE19002C1BA8BC0078AA68 /* RenderCacheManager.swift */; };
 		66D0843D2BA3840C00EB8556 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0843C2BA3840C00EB8556 /* AppDelegate.swift */; };
 		66D0843F2BA3840C00EB8556 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0843E2BA3840C00EB8556 /* SceneDelegate.swift */; };
-		66D084462BA3840D00EB8556 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 66D084452BA3840D00EB8556 /* Assets.xcassets */; };
 		66D084492BA3840D00EB8556 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 66D084482BA3840D00EB8556 /* Base */; };
 		66D084572BA3CDF700EB8556 /* AppVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D084562BA3CDEF00EB8556 /* AppVC.swift */; };
 		66D0846C2BA3CEC300EB8556 /* Layout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D084582BA3CEC300EB8556 /* Layout.swift */; };
@@ -338,7 +337,6 @@
 		66D084392BA3840C00EB8556 /* LuxAnimate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LuxAnimate.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66D0843C2BA3840C00EB8556 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		66D0843E2BA3840C00EB8556 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		66D084452BA3840D00EB8556 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		66D084482BA3840D00EB8556 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		66D0844A2BA3840D00EB8556 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		66D084562BA3CDEF00EB8556 /* AppVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVC.swift; sourceTree = "<group>"; };
@@ -1137,7 +1135,6 @@
 			isa = PBXGroup;
 			children = (
 				66099BC92BDB3D5900243D9F /* Brushes */,
-				66D084452BA3840D00EB8556 /* Assets.xcassets */,
 				66D084472BA3840D00EB8556 /* LaunchScreen.storyboard */,
 			);
 			path = Resources;
@@ -1318,7 +1315,6 @@
 				66099BCF2BDB3D6400243D9F /* brush2.png in Resources */,
 				66099BCE2BDB3D6400243D9F /* brush4.png in Resources */,
 				6643CB222BEB354E0094B998 /* brush-square.png in Resources */,
-				66D084462BA3840D00EB8556 /* Assets.xcassets in Resources */,
 				66D084492BA3840D00EB8556 /* Base in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -7,6 +7,7 @@ import UIKit
 private let frameCount = 120
 private let framesPerSecond = 24
 
+@MainActor
 protocol AnimationTimelineVCDelegate: AnyObject {
     
 //    func onBeginFrameScroll(_ vc: AnimationEditorTimelineVC)

@@ -36,6 +36,7 @@ private let plusIcon = UIImage(
 
 // MARK: - TimelineTrackCell
 
+@MainActor
 protocol TimelineTrackCellDelegate: AnyObject {
     
     func onSelect(_ cell: TimelineTrackCell)

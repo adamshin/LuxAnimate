@@ -4,6 +4,7 @@
 
 import UIKit
 
+@MainActor
 protocol AnimEditorToolbarVCDelegate: AnyObject {
     func onSelectBack(_ vc: AnimEditorToolbarVC)
     

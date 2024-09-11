@@ -6,6 +6,7 @@ import UIKit
 
 extension BrushGestureRecognizer {
     
+    @MainActor
     struct Stroke {
         var touch: UITouch
         
@@ -18,6 +19,7 @@ extension BrushGestureRecognizer {
         var estimationUpdateIndexesToSampleIndexes: [Int: Int]
     }
     
+    @MainActor
     struct Sample {
         var timeOffset: TimeInterval
         var isPredicted: Bool

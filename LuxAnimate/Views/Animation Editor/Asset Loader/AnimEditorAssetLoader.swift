@@ -18,7 +18,7 @@ protocol AnimEditorAssetLoaderDelegate: AnyObject {
     
 }
 
-class AnimEditorAssetLoader {
+class AnimEditorAssetLoader: @unchecked Sendable {
     
     enum LoadedAsset {
         case loaded(MTLTexture)

@@ -19,6 +19,7 @@ import UIKit
 // copied. Loaded asset textures are fine to include
 // directly since they're never modified once created.
 
+@MainActor
 protocol AnimEditorVCDelegate: AnyObject {
     
     func onRequestUndo(_ vc: AnimEditorVC)
@@ -29,6 +30,7 @@ protocol AnimEditorVCDelegate: AnyObject {
         sceneEdit: ProjectEditHelper.SceneEdit,
         editContext: Any?)
     
+    // Concurrency?
     func pendingEditAsset(
         _ vc: AnimEditorVC,
         assetID: String
@@ -458,7 +460,7 @@ extension AnimEditorVC: AnimEditManagerDelegate {
     
 }
 
-extension AnimEditorVC: AnimEditorAssetLoaderDelegate {
+extension AnimEditorVC: @preconcurrency AnimEditorAssetLoaderDelegate {
     
     func pendingAssetData(
         _ l: AnimEditorAssetLoader,

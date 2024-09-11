@@ -10,10 +10,10 @@ private let defaultBrushSmoothing: Double = 0
 
 private let brushColor: Color = .brushBlack
 
-private var lastPaintBrushScale: Double?
-private var lastPaintBrushSmoothing: Double?
-private var lastEraseBrushScale: Double?
-private var lastEraseBrushSmoothing: Double?
+@MainActor private var lastPaintBrushScale: Double?
+@MainActor private var lastPaintBrushSmoothing: Double?
+@MainActor private var lastEraseBrushScale: Double?
+@MainActor private var lastEraseBrushSmoothing: Double?
 
 class DrawingEditorBrushToolVC:
     UIViewController, DrawingEditorToolVC
@@ -85,9 +85,9 @@ class DrawingEditorBrushToolVC:
     
     required init?(coder: NSCoder) { fatalError() }
     
-    deinit {
-        brushGesture.view?.removeGestureRecognizer(brushGesture)
-    }
+//    deinit {
+//        brushGesture.view?.removeGestureRecognizer(brushGesture)
+//    }
     
     // MARK: - Lifecycle
     

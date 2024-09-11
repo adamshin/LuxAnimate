@@ -4,6 +4,7 @@
 
 import UIKit
 
+@MainActor
 protocol BrushGestureRecognizerInternalStateDelegate: AnyObject {
     
     var view: UIView? { get }
@@ -20,6 +21,7 @@ protocol BrushGestureRecognizerInternalStateDelegate: AnyObject {
     
 }
 
+@MainActor
 protocol BrushGestureRecognizerInternalState: AnyObject {
     
     var delegate: BrushGestureRecognizerInternalStateDelegate? { get set }
@@ -87,6 +89,7 @@ class BrushGestureRecognizerWaitingState: BrushGestureRecognizerInternalState {
 
 // MARK: - Pre Active
 
+@MainActor
 class BrushGestureRecognizerPreActiveState: BrushGestureRecognizerInternalState {
     
     weak var delegate: BrushGestureRecognizerInternalStateDelegate?
@@ -99,21 +102,23 @@ class BrushGestureRecognizerPreActiveState: BrushGestureRecognizerInternalState 
         self.activationTimer = nil
     }
     
-    deinit {
-        activationTimer?.invalidate()
-    }
-    
     func onStateBegin() {
         if stroke.touch.type == .direct {
             activationTimer = Timer.scheduledTimer(
                 withTimeInterval: BrushStrokeGestureConfig.fingerActivationDelay,
                 repeats: false)
             { [weak self] _ in
-                self?.activateStroke()
+                Task { @MainActor in
+                    self?.activateStroke()
+                }
             }
         } else {
             activateStroke()
         }
+    }
+    
+    func onStateEnd() {
+        activationTimer?.invalidate()
     }
     
     func resetGesture() {
@@ -283,10 +288,6 @@ class BrushGestureRecognizerPostActiveState: BrushGestureRecognizerInternalState
         self.stroke = stroke
     }
     
-    deinit {
-        finalizationTimer?.invalidate()
-    }
-    
     func onStateBegin() {
         delegate?.setGestureRecognizerState(.ended)
         
@@ -294,12 +295,16 @@ class BrushGestureRecognizerPostActiveState: BrushGestureRecognizerInternalState
             withTimeInterval: BrushStrokeGestureConfig.estimateFinalizationDelay,
             repeats: false)
         { [weak self] _ in
-            self?.delegate?.setState(
-                BrushGestureRecognizerWaitingState())
+            Task { @MainActor in
+                self?.delegate?.setState(
+                    BrushGestureRecognizerWaitingState())
+            }
         }
     }
     
     func onStateEnd() {
+        finalizationTimer?.invalidate()
+        
         delegate?.onEndBrushStroke()
     }
     

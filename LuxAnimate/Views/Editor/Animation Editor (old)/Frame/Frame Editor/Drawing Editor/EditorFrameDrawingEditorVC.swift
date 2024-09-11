@@ -5,6 +5,7 @@
 import UIKit
 import Metal
 
+@MainActor
 protocol EditorFrameDrawingEditorVCDelegate: AnyObject {
     
     func onSetBrushScale(

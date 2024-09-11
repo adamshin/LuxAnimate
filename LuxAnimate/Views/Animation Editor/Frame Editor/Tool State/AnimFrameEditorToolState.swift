@@ -4,6 +4,7 @@
 
 import Metal
 
+@MainActor
 protocol AnimFrameEditorToolStateDelegate: AnyObject {
     
     func workspaceViewSize(
@@ -28,6 +29,7 @@ protocol AnimFrameEditorToolStateDelegate: AnyObject {
     
 }
 
+@MainActor
 protocol AnimFrameEditorToolState: AnyObject {
     
     var delegate: AnimFrameEditorToolStateDelegate? { get set }

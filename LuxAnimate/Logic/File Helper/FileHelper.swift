@@ -9,9 +9,11 @@ struct FileHelper {
     static let libraryManifestFileName = "libraryManifest"
     static let projectManifestFileName = "projectManifest"
     
-    static let shared = FileHelper()
+    private static var fileManager: FileManager {
+        FileManager.default
+    }
     
-    private let fileManager = FileManager.default
+    static let shared = FileHelper()
     
     let libraryDirectoryURL: URL
     let libraryManifestURL: URL
@@ -19,7 +21,7 @@ struct FileHelper {
     let cacheDirectoryURL: URL
     
     init() {
-        let documentDirectoryURL = try! fileManager.url(
+        let documentDirectoryURL = try! Self.fileManager.url(
             for: .documentDirectory,
             in: .userDomainMask,
             appropriateFor: nil,
@@ -32,7 +34,7 @@ struct FileHelper {
         libraryManifestURL = libraryDirectoryURL.appending(
             path: Self.libraryManifestFileName)
         
-        cacheDirectoryURL = try! fileManager.url(
+        cacheDirectoryURL = try! Self.fileManager.url(
             for: .cachesDirectory,
             in: .userDomainMask,
             appropriateFor: nil,

@@ -116,13 +116,14 @@ class EditorFrameAssetLoader {
         // Wait for any pending load items to finish first
         loadQueue.async {
             DispatchQueue.main.async {
-                self.pendingLoadItems = loadItems
-                self.processNextPendingLoadItem()
+//                self.pendingLoadItems = loadItems
+//                self.processNextPendingLoadItem()
             }
         }
     }
     
     private func processNextPendingLoadItem() {
+        /*
         while let item = pendingLoadItems.first {
             pendingLoadItems.removeFirst()
             
@@ -198,6 +199,7 @@ class EditorFrameAssetLoader {
             }
             return
         }
+         */
     }
     
     // MARK: - Interface

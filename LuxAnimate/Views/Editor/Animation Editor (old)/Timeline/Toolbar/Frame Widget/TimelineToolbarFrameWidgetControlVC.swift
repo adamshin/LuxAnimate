@@ -16,6 +16,7 @@ private let numberFont = UIFont.monospacedDigitSystemFont(
     ofSize: 17,
     weight: .medium)
 
+@MainActor
 protocol TimelineToolbarFrameWidgetControlVCDelegate: AnyObject {
     
     func onChangeFocusedFrame(

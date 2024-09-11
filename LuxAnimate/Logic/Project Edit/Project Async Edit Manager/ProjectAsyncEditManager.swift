@@ -16,7 +16,7 @@ protocol ProjectAsyncEditManagerDelegate: AnyObject {
     
 }
 
-class ProjectAsyncEditManager {
+class ProjectAsyncEditManager: @unchecked Sendable {
     
     private let projectID: String
     

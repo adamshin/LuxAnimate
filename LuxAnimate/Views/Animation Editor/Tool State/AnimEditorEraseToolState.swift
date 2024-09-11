@@ -4,6 +4,7 @@
 
 import UIKit
 
+@MainActor
 protocol AnimEditorEraseToolStateDelegate: AnyObject {
     
     func onBeginBrushStroke(

@@ -4,6 +4,7 @@
 
 import UIKit
 
+@MainActor
 protocol EditorSidebarSliderContainerDelegate: AnyObject {
     func onChangeValue(_ v: EditorSidebarSliderContainer)
 }

@@ -4,6 +4,7 @@
 
 import UIKit
 
+@MainActor
 protocol AnimationFrameEditorVCDelegate: AnyObject {
     
     func onSelectUndo(_ vc: AnimationFrameEditorVC)

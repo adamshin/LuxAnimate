@@ -12,6 +12,7 @@ private let rotationSnapThreshold: Scalar =
 private let shortSnapDuration: TimeInterval = 1.0
 private let longSnapDuration: TimeInterval = 1.1
 
+@MainActor
 protocol EditorWorkspaceTransformManagerDelegate: AnyObject {
     
     func onUpdateTransform(
@@ -19,12 +20,13 @@ protocol EditorWorkspaceTransformManagerDelegate: AnyObject {
     
 }
 
+@MainActor
 class EditorWorkspaceTransformManager {
     
     struct SafeAreaInsets {
         var top, bottom, left, right: Double
         
-        static var zero = SafeAreaInsets(
+        static let zero = SafeAreaInsets(
             top: 0, bottom: 0,
             left: 0, right: 0)
     }

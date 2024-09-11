@@ -6,6 +6,7 @@ import UIKit
 
 // Temporary, for testing
 
+@MainActor
 protocol AnimEditorBottomBarVCDelegate: AnyObject {
     func onSelectPrevFrame(_ vc: AnimEditorBottomBarVC)
     func onSelectNextFrame(_ vc: AnimEditorBottomBarVC)

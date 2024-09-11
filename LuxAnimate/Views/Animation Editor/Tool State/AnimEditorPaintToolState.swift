@@ -4,6 +4,7 @@
 
 import UIKit
 
+@MainActor
 protocol AnimEditorPaintToolStateDelegate: AnyObject {
     
     func onBeginBrushStroke(

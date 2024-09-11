@@ -4,6 +4,7 @@
 
 import UIKit
 
+@MainActor
 protocol SceneEditorVCDelegate: AnyObject {
     
     func onRequestUndo(_ vc: SceneEditorVC)
@@ -14,6 +15,7 @@ protocol SceneEditorVCDelegate: AnyObject {
         edit: ProjectEditManager.Edit,
         editContext: Any?)
     
+    // TODO: nonisolated func?
     func pendingEditAsset(
         _ vc: SceneEditorVC,
         assetID: String

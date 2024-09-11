@@ -288,7 +288,7 @@ extension EditorFrameEditorVC: EditorFrameDrawingEditorVCDelegate {
 
 // MARK: - Other Delegates
 
-extension EditorFrameEditorVC: EditorFrameAssetLoaderDelegate {
+extension EditorFrameEditorVC: @preconcurrency EditorFrameAssetLoaderDelegate {
     
     func onUpdateProgress(_ loader: EditorFrameAssetLoader) {
         guard let activeDrawingID = scene?.activeDrawingID
@@ -307,7 +307,7 @@ extension EditorFrameEditorVC: EditorFrameAssetLoaderDelegate {
     
 }
 
-extension EditorFrameEditorVC: EditorFrameActiveDrawingRendererDelegate {
+extension EditorFrameEditorVC: @preconcurrency EditorFrameActiveDrawingRendererDelegate {
     
     func textureForActiveDrawing(
         _ r: EditorFrameActiveDrawingRenderer
@@ -360,7 +360,7 @@ extension EditorFrameEditorVC: EditorFrameActiveDrawingRendererDelegate {
     
 }
 
-extension EditorFrameEditorVC: EditorFrameSceneRendererDelegate {
+extension EditorFrameEditorVC: @preconcurrency EditorFrameSceneRendererDelegate {
     
     func frameScene(
         _ r: EditorFrameSceneRenderer

@@ -8,6 +8,7 @@ import Metal
 private let minZoomScale: Scalar = 0.1
 private let maxZoomScale: Scalar = 30
 
+@MainActor
 protocol EditorWorkspaceVCDelegate: AnyObject {
     
     func onFrame(
@@ -101,7 +102,7 @@ class EditorWorkspaceVC: UIViewController {
 
 // MARK: - Delegates
 
-extension EditorWorkspaceVC: CAMetalDisplayLinkDelegate {
+extension EditorWorkspaceVC: @preconcurrency CAMetalDisplayLinkDelegate {
     
     func metalDisplayLink(
         _ link: CAMetalDisplayLink,

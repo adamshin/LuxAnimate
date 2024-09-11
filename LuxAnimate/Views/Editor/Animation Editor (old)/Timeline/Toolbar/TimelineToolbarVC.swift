@@ -4,6 +4,7 @@
 
 import UIKit
 
+@MainActor
 protocol TimelineToolbarVCDelegate: AnyObject {
     
     func onChangeFocusedFrame(_ vc: TimelineToolbarVC, index: Int)

@@ -4,6 +4,7 @@
 
 import UIKit
 
+@MainActor
 protocol SceneEditorContentVCDelegate: AnyObject {
     
     func onSelectBack(_ vc: SceneEditorContentVC)

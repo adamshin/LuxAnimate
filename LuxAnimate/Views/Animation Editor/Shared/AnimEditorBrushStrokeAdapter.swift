@@ -4,6 +4,7 @@
 
 import Foundation
 
+@MainActor
 struct AnimEditorBrushStrokeAdapter {
     
     static func convert(

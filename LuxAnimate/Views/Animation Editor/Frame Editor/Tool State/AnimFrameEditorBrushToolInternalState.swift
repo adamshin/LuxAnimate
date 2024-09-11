@@ -5,6 +5,7 @@
 import UIKit
 import Metal
 
+@MainActor
 protocol AnimFrameEditorBrushToolInternalStateDelegate: AnyObject {
     
     func brush(
@@ -48,6 +49,7 @@ protocol AnimFrameEditorBrushToolInternalStateDelegate: AnyObject {
     
 }
 
+@MainActor
 class AnimFrameEditorBrushToolInternalState {
     
     weak var delegate: AnimFrameEditorBrushToolInternalStateDelegate?

@@ -10,6 +10,7 @@ class EditorMenuContentView: UIView {
     weak var menuView: EditorMenuView?
 }
 
+@MainActor
 protocol EditorMenuViewDelegate: AnyObject {
     func onPresent(_ v: EditorMenuView)
     func onDismiss(_ v: EditorMenuView)

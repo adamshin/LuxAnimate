@@ -25,6 +25,7 @@ private let flickVelocityThreshold: CGFloat = 500
 private let flickDecelDuration: TimeInterval = 0.2
 private let flickDistanceMultiplier: CGFloat = 0.0005
 
+@MainActor
 protocol EditorSidebarSliderDelegate: AnyObject {
     
     func onBeginPress(_ v: EditorSidebarSlider)

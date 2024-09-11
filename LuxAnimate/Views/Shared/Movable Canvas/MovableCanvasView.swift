@@ -11,6 +11,7 @@ private let rotationSnapThreshold: Scalar =
 
 // MARK: - MovableCanvasView
 
+@MainActor
 protocol MovableCanvasViewDelegate: AnyObject {
     
     func onUpdateCanvasTransform(

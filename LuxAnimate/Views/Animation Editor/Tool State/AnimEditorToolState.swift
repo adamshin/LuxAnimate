@@ -4,6 +4,7 @@
 
 import UIKit
 
+@MainActor
 protocol AnimEditorToolState: AnyObject {
     
     func beginState(

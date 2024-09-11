@@ -5,6 +5,7 @@
 import Foundation
 import Metal
 
+@MainActor
 protocol BrushEngineDelegate: AnyObject {
     
     func onUpdateActiveCanvasTexture(
@@ -23,6 +24,7 @@ extension BrushEngine {
     }
 }
 
+@MainActor
 class BrushEngine {
     
     weak var delegate: BrushEngineDelegate?

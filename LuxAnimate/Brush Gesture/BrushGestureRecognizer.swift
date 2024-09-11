@@ -17,6 +17,7 @@ struct BrushStrokeGestureConfig {
     
 }
 
+@MainActor
 protocol BrushGestureRecognizerGestureDelegate: AnyObject {
     
     func onBeginBrushStroke(quickTap: Bool)
@@ -30,6 +31,7 @@ protocol BrushGestureRecognizerGestureDelegate: AnyObject {
     
 }
 
+@MainActor
 class BrushGestureRecognizer: UIGestureRecognizer {
     
     weak var gestureDelegate: BrushGestureRecognizerGestureDelegate?

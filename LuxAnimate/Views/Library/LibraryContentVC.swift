@@ -13,6 +13,7 @@ private let bottomPadding: CGFloat = 40
 
 private let itemHeight: CGFloat = 240
 
+@MainActor
 protocol LibraryContentVCDelegate: AnyObject {
     
     func onSelectCreateProject()

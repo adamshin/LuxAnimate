@@ -4,13 +4,13 @@
 
 import Foundation
 
-private let dateFormatter: ISO8601DateFormatter = {
+nonisolated(unsafe) private let dateFormatter: ISO8601DateFormatter = {
     let f = ISO8601DateFormatter()
     f.formatOptions.insert(.withFractionalSeconds)
     return f
 }()
 
-class JSONFileEncoder: JSONEncoder {
+class JSONFileEncoder: JSONEncoder, @unchecked Sendable {
     
     static let shared = JSONFileEncoder()
     
@@ -33,7 +33,7 @@ class JSONFileEncoder: JSONEncoder {
     
 }
 
-class JSONFileDecoder: JSONDecoder {
+class JSONFileDecoder: JSONDecoder, @unchecked Sendable {
     
     static let shared = JSONFileDecoder()
     

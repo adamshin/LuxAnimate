@@ -26,7 +26,9 @@ struct AnimEditorToolSettingsStore {
         }
     }
     
-    private static let defaults = UserDefaults.standard
+    private static var defaults: UserDefaults {
+        UserDefaults.standard
+    }
     
     private static func getDouble(
         for setting: Setting

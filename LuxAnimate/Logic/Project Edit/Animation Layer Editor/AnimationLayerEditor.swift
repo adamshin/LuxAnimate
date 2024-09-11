@@ -8,6 +8,7 @@ import Foundation
 // object that just creates edit objects? Or should it
 // contain state, like the animation layer content?
 
+@MainActor
 protocol AnimationLayerEditorDelegate: AnyObject {
     
     func onRequestApplyEdit(
@@ -26,6 +27,7 @@ extension AnimationLayerEditor {
     
 }
 
+@MainActor
 class AnimationLayerEditor {
     
     weak var delegate: AnimationLayerEditorDelegate?

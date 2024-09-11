@@ -13,6 +13,7 @@ private let scaleDistanceThreshold: Scalar = 20
 
 private let pinchFlickVelocityThreshold: Scalar = 1800
 
+@MainActor
 protocol CanvasMultiGestureRecognizerInternalStateDelegate: AnyObject {
     
     var view: UIView? { get }
@@ -36,6 +37,7 @@ protocol CanvasMultiGestureRecognizerInternalStateDelegate: AnyObject {
     
 }
 
+@MainActor
 protocol CanvasMultiGestureRecognizerInternalState: AnyObject {
     
     var delegate: CanvasMultiGestureRecognizerInternalStateDelegate? { get set }
