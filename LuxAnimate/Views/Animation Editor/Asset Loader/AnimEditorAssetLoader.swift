@@ -11,7 +11,7 @@ protocol AnimEditorAssetLoaderDelegate: AnyObject {
     func pendingAssetData(
         _ l: AnimEditorAssetLoader,
         assetID: String
-    ) -> Data?
+    ) async -> Data?
     
     func onUpdate(_ l: AnimEditorAssetLoader)
     func onFinish(_ l: AnimEditorAssetLoader)
@@ -82,50 +82,47 @@ class AnimEditorAssetLoader: @unchecked Sendable {
             !loadedAssets.keys.contains($0)
         }
         guard let assetID else {
-            DispatchQueue.main.async {
-                self.delegate?.onUpdate(self)
-                self.delegate?.onFinish(self)
-            }
+            delegate?.onUpdate(self)
+            delegate?.onFinish(self)
             return
         }
         
         loadQueue.async {
-            do {
-                let texture = try self.loadAsset(
-                    assetID: assetID,
-                    shouldContinue: {
-                        self.assetIDs.contains(assetID)
-                    })
-                
-                self.loadedAssets[assetID] = .loaded(texture)
-                
-                DispatchQueue.main.async {
-                    self.delegate?.onUpdate(self)
-                }
-                
-            } catch {
-                if !(error is CancelLoadError) {
-                    self.loadedAssets[assetID] = .error
+            Task {
+                do {
+                    let texture = try await self.loadAsset(
+                        assetID: assetID,
+                        shouldContinue: {
+                            self.assetIDs.contains(assetID)
+                        })
                     
-                    DispatchQueue.main.async {
-                        self.delegate?.onUpdate(self)
+                    self.loadedAssets[assetID] = .loaded(texture)
+                    self.delegate?.onUpdate(self)
+                    
+                } catch {
+                    if !(error is CancelLoadError) {
+                        self.loadedAssets[assetID] = .error
+                        
+                        DispatchQueue.main.async {
+                            self.delegate?.onUpdate(self)
+                        }
                     }
                 }
+                
+                self.loadNextAsset()
             }
-            
-            self.loadNextAsset()
         }
     }
     
     private func loadAsset(
         assetID: String,
         shouldContinue: () -> Bool
-    ) throws -> MTLTexture {
+    ) async throws -> MTLTexture {
         
         guard shouldContinue() 
         else { throw CancelLoadError() }
         
-        if let assetData = delegate?
+        if let assetData = await delegate?
             .pendingAssetData(self, assetID: assetID)
         {
             return try loadAsset(

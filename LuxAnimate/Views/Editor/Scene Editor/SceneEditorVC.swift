@@ -15,9 +15,7 @@ protocol SceneEditorVCDelegate: AnyObject {
         edit: ProjectEditManager.Edit,
         editContext: Any?)
     
-    // TODO: nonisolated func?
     func pendingEditAsset(
-        _ vc: SceneEditorVC,
         assetID: String
     ) -> ProjectEditManager.NewAsset?
     
@@ -354,12 +352,9 @@ extension SceneEditorVC: AnimEditorVCDelegate {
     }
     
     func pendingEditAsset(
-        _ vc: AnimEditorVC,
         assetID: String
-    ) -> ProjectEditManager.NewAsset? {
-        
-        delegate?.pendingEditAsset(
-            self, assetID: assetID)
+    ) async -> ProjectEditManager.NewAsset? {
+        delegate?.pendingEditAsset(assetID: assetID)
     }
     
 }

@@ -32,9 +32,8 @@ protocol AnimEditorVCDelegate: AnyObject {
     
     // Concurrency?
     func pendingEditAsset(
-        _ vc: AnimEditorVC,
         assetID: String
-    ) -> ProjectEditManager.NewAsset?
+    ) async -> ProjectEditManager.NewAsset?
     
 }
 
@@ -460,28 +459,33 @@ extension AnimEditorVC: AnimEditManagerDelegate {
     
 }
 
-extension AnimEditorVC: @preconcurrency AnimEditorAssetLoaderDelegate {
+extension AnimEditorVC: AnimEditorAssetLoaderDelegate {
     
-    func pendingAssetData(
+    nonisolated func pendingAssetData(
         _ l: AnimEditorAssetLoader,
         assetID: String
-    ) -> Data? {
+    ) async -> Data? {
         
-        if let pendingAsset = delegate?
-            .pendingEditAsset(self, assetID: assetID)
-        {
-            print("Used pending asset")
-            return pendingAsset.data
+        return await Task { @MainActor () -> Data? in
+            if let pendingAsset = await delegate?
+                .pendingEditAsset(assetID: assetID)
+            {
+                return pendingAsset.data
+            }
+            return nil
+        }.value
+    }
+    
+    nonisolated func onUpdate(_ l: AnimEditorAssetLoader) {
+        Task { @MainActor in
+            self.frameEditor?.onAssetLoaderUpdate()
         }
-        return nil
     }
     
-    func onUpdate(_ l: AnimEditorAssetLoader) {
-        frameEditor?.onAssetLoaderUpdate()
-    }
-    
-    func onFinish(_ l: AnimEditorAssetLoader) {
-        frameEditor?.onAssetLoaderFinish()
+    nonisolated func onFinish(_ l: AnimEditorAssetLoader) {
+        Task { @MainActor in
+            self.frameEditor?.onAssetLoaderFinish()
+        }
     }
     
 }
