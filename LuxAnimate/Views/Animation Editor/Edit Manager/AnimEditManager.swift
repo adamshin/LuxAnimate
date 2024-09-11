@@ -69,6 +69,7 @@ class AnimEditManager {
     
     func afterAllEditsFinish(_ block: @escaping () -> Void) {
         // TODO: Wait for pending tasks!
+        block()
     }
     
 }
