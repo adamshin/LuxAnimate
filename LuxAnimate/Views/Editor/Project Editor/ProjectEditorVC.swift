@@ -58,7 +58,7 @@ class ProjectEditorVC: UIViewController {
     
     private func update(
         projectEditManagerState: ProjectEditManager.State,
-        editContext: Any?
+        editContext: Sendable?
     ) {
         contentVC.update(
             projectEditManagerState: projectEditManagerState)
@@ -170,7 +170,7 @@ extension ProjectEditorVC: SceneEditorVCDelegate {
     func onRequestEdit(
         _ vc: SceneEditorVC,
         edit: ProjectEditManager.Edit,
-        editContext: Any?
+        editContext: Sendable?
     ) {
         projectEditManager.applyEdit(
             edit: edit,
@@ -187,18 +187,20 @@ extension ProjectEditorVC: SceneEditorVCDelegate {
     
 }
 
-extension ProjectEditorVC: @preconcurrency ProjectAsyncEditManagerDelegate {
+extension ProjectEditorVC: ProjectAsyncEditManagerDelegate {
     
-    func onUpdateState(
+    nonisolated func onUpdateState(
         _ m: ProjectAsyncEditManager,
-        editContext: Any?
+        editContext: Sendable?
     ) {
-        update(
-            projectEditManagerState: projectEditManager.state,
-            editContext: editContext)
+        Task { @MainActor in
+            update(
+                projectEditManagerState: projectEditManager.state,
+                editContext: editContext)
+        }
     }
     
-    func onError(
+    nonisolated func onError(
         _ m: ProjectAsyncEditManager,
         error: Error
     ) { }

@@ -169,7 +169,7 @@ class EditorFrameEditorVC: UIViewController {
     
     func setProjectManifest(
         _ projectManifest: Project.Manifest,
-        editContext: Any?
+        editContext: Sendable?
     ) {
         self.projectManifest = projectManifest
         

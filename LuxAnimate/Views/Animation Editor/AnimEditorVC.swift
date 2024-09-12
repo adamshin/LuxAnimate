@@ -28,7 +28,7 @@ protocol AnimEditorVCDelegate: AnyObject {
     func onRequestSceneEdit(
         _ vc: AnimEditorVC,
         sceneEdit: ProjectEditHelper.SceneEdit,
-        editContext: Any?)
+        editContext: Sendable?)
     
     // Concurrency?
     func pendingEditAsset(
@@ -158,7 +158,7 @@ class AnimEditorVC: UIViewController {
     private func updateState(
         projectEditManagerState: ProjectEditManager.State,
         sceneManifest: Scene.Manifest,
-        editContext: Any?
+        editContext: Sendable?
     ) {
         guard sceneManifest.layers
             .contains(where: { $0.id == activeLayerID })
@@ -317,7 +317,7 @@ class AnimEditorVC: UIViewController {
     func update(
         projectEditManagerState: ProjectEditManager.State,
         sceneManifest: Scene.Manifest,
-        editContext: Any?
+        editContext: Sendable?
     ) {
         updateState(
             projectEditManagerState: projectEditManagerState,

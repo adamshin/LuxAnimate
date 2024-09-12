@@ -8,7 +8,7 @@ protocol ProjectAsyncEditManagerDelegate: AnyObject {
     
     func onUpdateState(
         _ m: ProjectAsyncEditManager,
-        editContext: Any?)
+        editContext: Sendable?)
     
     func onError(
         _ m: ProjectAsyncEditManager,
@@ -48,7 +48,7 @@ class ProjectAsyncEditManager: @unchecked Sendable {
     
     private func applyEditInternal(
         edit: ProjectEditManager.Edit,
-        editContext: Any?
+        editContext: Sendable?
     ) {
         // Update state
         state.projectManifest = edit.projectManifest
@@ -111,7 +111,7 @@ class ProjectAsyncEditManager: @unchecked Sendable {
     
     func applyEdit(
         edit: ProjectEditManager.Edit,
-        editContext: Any?
+        editContext: Sendable?
     ) {
         applyEditInternal(
             edit: edit,

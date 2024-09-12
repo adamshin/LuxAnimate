@@ -13,7 +13,7 @@ protocol SceneEditorVCDelegate: AnyObject {
     func onRequestEdit(
         _ vc: SceneEditorVC,
         edit: ProjectEditManager.Edit,
-        editContext: Any?)
+        editContext: Sendable?)
     
     func pendingEditAsset(
         assetID: String
@@ -24,7 +24,7 @@ protocol SceneEditorVCDelegate: AnyObject {
 struct SceneEditorVCEditContext {
     var sender: SceneEditorVC
     var sceneManifest: Scene.Manifest
-    var wrappedEditContext: Any?
+    var wrappedEditContext: Sendable?
 }
 
 class SceneEditorVC: UIViewController {
@@ -105,7 +105,7 @@ class SceneEditorVC: UIViewController {
     
     private func updateState(
         projectEditManagerState: ProjectEditManager.State,
-        editContext: Any?
+        editContext: Sendable?
     ) {
         let projectManifest = projectEditManagerState
             .projectManifest
@@ -148,7 +148,7 @@ class SceneEditorVC: UIViewController {
         projectEditManagerState: ProjectEditManager.State,
         sceneRef: Project.SceneRef,
         sceneManifest: Scene.Manifest,
-        editContext: Any?
+        editContext: Sendable?
     ) {
         self.projectEditManagerState = projectEditManagerState
         self.sceneRef = sceneRef
@@ -248,7 +248,7 @@ class SceneEditorVC: UIViewController {
     
     func update(
         projectEditManagerState: ProjectEditManager.State,
-        editContext: Any?
+        editContext: Sendable?
     ) {
         updateState(
             projectEditManagerState: projectEditManagerState,
@@ -329,7 +329,7 @@ extension SceneEditorVC: AnimEditorVCDelegate {
     func onRequestSceneEdit(
         _ vc: AnimEditorVC,
         sceneEdit: ProjectEditHelper.SceneEdit,
-        editContext: Any?
+        editContext: Sendable?
     ) {
         do {
             let projectManifest = projectEditManagerState

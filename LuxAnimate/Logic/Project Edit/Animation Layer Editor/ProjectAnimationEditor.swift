@@ -10,7 +10,7 @@ protocol ProjectAnimationEditorDelegate: AnyObject {
     
     func onEditProject(
         _ editor: ProjectAnimationEditor,
-        editContext: Any?)
+        editContext: Sendable?)
     
 }
 
@@ -191,7 +191,7 @@ extension ProjectAnimationEditor {
 //    func editDrawing(
 //        drawingID: String,
 //        drawingTexture: MTLTexture,
-//        editContext: Any?
+//        editContext: Sendable?
 //    ) throws {
 //        
 //        let texture = try TextureCopier.copy(drawingTexture)
