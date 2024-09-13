@@ -47,4 +47,34 @@ struct JXLDecoder {
             height: output.height)
     }
     
+    static func decodeAsync(
+        data: Data
+    ) async throws -> Output {
+        
+        guard let decoder = JXLDecoderShim(
+            inputData: data)
+        else {
+            throw DecodingError.internal
+        }
+        
+        processLoop: while true {
+            try Task.checkCancellation()
+            await Task.yield()
+            
+            let processResult = decoder.process()
+            
+            switch processResult {
+            case .success: break processLoop
+            case .failure: throw DecodingError.internal
+            default: break
+            }
+        }
+        
+        let output = decoder.output
+        return Output(
+            pixelData: output.pixelData,
+            width: output.width,
+            height: output.height)
+    }
+    
 }
