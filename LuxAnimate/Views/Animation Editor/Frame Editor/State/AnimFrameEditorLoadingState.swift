@@ -35,6 +35,8 @@ class AnimFrameEditorLoadingState: AnimFrameEditorState {
     private let workspaceSceneGraphGenerator
         = AnimFrameEditorWorkspaceSceneGraphGenerator()
     
+    private var loadStartTime: TimeInterval = 0
+    
     weak var delegate: AnimFrameEditorStateDelegate?
     
     // MARK: - Init
@@ -123,6 +125,8 @@ class AnimFrameEditorLoadingState: AnimFrameEditorState {
         
         let assetIDsToLoad = assetManifest.allAssetIDs()
         
+        loadStartTime = ProcessInfo.processInfo.systemUptime
+        
         delegate?.setAssetLoaderAssetIDs(
             self, assetIDs: assetIDsToLoad)
     }
@@ -130,6 +134,10 @@ class AnimFrameEditorLoadingState: AnimFrameEditorState {
     func onAssetLoaderUpdate() { }
     
     func onAssetLoaderFinish() {
+        let loadEndTime = ProcessInfo.processInfo.systemUptime
+        let loadTime = loadEndTime - loadStartTime
+//        print(String(format: "Load time: %0.4f", loadTime))
+        
         enterEditingState()
     }
     
