@@ -38,6 +38,7 @@ class SafeAssetLoader {
     
     private let projectID: String
     
+    private var assetIDs: Set<String> = []
     private var inProgressTasks: [String: Task<Void, Error>] = [:]
     private var loadedAssets: [String: LoadedAsset] = [:]
     
@@ -54,6 +55,8 @@ class SafeAssetLoader {
     // MARK: - Interface
     
     func update(assetIDs: Set<String>) {
+        self.assetIDs = assetIDs
+        
         loadedAssets = loadedAssets.filter {
             assetIDs.contains($0.key)
         }
@@ -92,6 +95,10 @@ class SafeAssetLoader {
         loadedAsset: LoadedAsset
     ) {
         inProgressTasks[assetID] = nil
+        
+        guard assetIDs.contains(assetID)
+        else { return }
+        
         loadedAssets[assetID] = loadedAsset
         
         delegate?.onUpdate(self)
@@ -105,7 +112,6 @@ class SafeAssetLoader {
     ) async throws {
         do {
             let assetData: Data
-            
             if let pendingAssetData = await delegate?
                 .pendingAssetData(self, assetID: assetID)
             {
