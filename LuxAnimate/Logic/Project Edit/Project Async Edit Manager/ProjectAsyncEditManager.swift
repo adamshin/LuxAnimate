@@ -8,6 +8,7 @@ protocol ProjectAsyncEditManagerDelegate: AnyObject {
     
     func onUpdateState(
         _ m: ProjectAsyncEditManager,
+        state: ProjectEditManager.State,
         editContext: Sendable?)
     
     func onError(
@@ -62,7 +63,9 @@ class ProjectAsyncEditManager: @unchecked Sendable {
         pendingEditAssetStore.storeAssets(edit.newAssets)
         
         // Notify delegate
-        delegate?.onUpdateState(self, editContext: editContext)
+        delegate?.onUpdateState(self,
+            state: state,
+            editContext: editContext)
         
         // Perform edit
         workQueue.async {
@@ -95,8 +98,9 @@ class ProjectAsyncEditManager: @unchecked Sendable {
                 DispatchQueue.main.async {
                     self.state = self.editManager.state
                     
-                    self.delegate?.onUpdateState(
-                        self, editContext: nil)
+                    self.delegate?.onUpdateState(self,
+                        state: self.state,
+                        editContext: nil)
                 }
                 
             } catch {

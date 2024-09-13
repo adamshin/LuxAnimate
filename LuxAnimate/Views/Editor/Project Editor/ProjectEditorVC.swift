@@ -191,11 +191,12 @@ extension ProjectEditorVC: ProjectAsyncEditManagerDelegate {
     
     nonisolated func onUpdateState(
         _ m: ProjectAsyncEditManager,
+        state: ProjectEditManager.State,
         editContext: Sendable?
     ) {
         Task { @MainActor in
             update(
-                projectEditManagerState: projectEditManager.state,
+                projectEditManagerState: state,
                 editContext: editContext)
         }
     }
