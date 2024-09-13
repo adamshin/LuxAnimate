@@ -2,12 +2,12 @@
 //  JXLDecoder.swift
 //
 
-import UIKit
+import Foundation
 
 struct JXLDecoder {
     
     struct Output {
-        var data: Data
+        var pixelData: Data
         var width: Int
         var height: Int
     }
@@ -22,26 +22,27 @@ struct JXLDecoder {
         progress: () -> Bool
     ) throws -> Output {
         
-        var isCancelled = false
+        guard let decoder = JXLDecoderShim(
+            inputData: data)
+        else {
+            throw DecodingError.internal
+        }
         
-        let output = JXLDecoderShim.decodeImage(
-            from: data,
-            progress: {
-                let shouldContinue = progress()
-                isCancelled = !shouldContinue
-                return shouldContinue
-            })
-        
-        guard let output else {
-            if isCancelled {
-                throw DecodingError.cancelled
-            } else {
-                throw DecodingError.internal
+        processLoop: while true {
+            guard progress() else { break }
+            
+            let processResult = decoder.process()
+            
+            switch processResult {
+            case .success: break processLoop
+            case .failure: throw DecodingError.internal
+            default: break
             }
         }
         
+        let output = decoder.output
         return Output(
-            data: output.data,
+            pixelData: output.pixelData,
             width: output.width,
             height: output.height)
     }

@@ -161,7 +161,7 @@ class AnimEditorAssetLoader: @unchecked Sendable {
                 })
             
             let texture = try TextureCreator.createTexture(
-                imageData: output.data,
+                pixelData: output.pixelData,
                 size: PixelSize(
                     width: output.width,
                     height: output.height),

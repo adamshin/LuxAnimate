@@ -10,13 +10,13 @@ struct ImageResizer {
     private let spriteRenderer = SpriteRenderer()
     
     func resize(
-        imageData: Data,
+        pixelData: Data,
         size: PixelSize,
         targetSize: PixelSize
     ) throws -> Data {
         
         let imageTexture = try TextureCreator.createTexture(
-            imageData: imageData,
+            pixelData: pixelData,
             size: size,
             mipMapped: true)
         

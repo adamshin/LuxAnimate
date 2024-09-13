@@ -11,7 +11,7 @@ struct TextureCreator {
     }
     
     static func createTexture(
-        imageData: Data,
+        pixelData: Data,
         size: PixelSize,
         mipMapped: Bool,
         usage: MTLTextureUsage = .shaderRead
@@ -38,7 +38,7 @@ struct TextureCreator {
         let bytesPerPixel = 4
         let bytesPerRow = size.width * bytesPerPixel
         
-        try imageData.withUnsafeBytes { pointer in
+        try pixelData.withUnsafeBytes { pointer in
             guard let baseAddress = pointer.baseAddress
             else { throw Error.emptyData }
             
@@ -72,16 +72,16 @@ struct TextureCreator {
         usage: MTLTextureUsage = .shaderRead
     ) throws -> MTLTexture {
         
-        let imageData = Self.emptyImageData(size: size)
+        let pixelData = Self.emptyPixelData(size: size)
         return try createTexture(
-            imageData: imageData,
+            pixelData: pixelData,
             size: size,
             mipMapped: mipMapped,
             usage: usage)
         
     }
     
-    private static func emptyImageData(
+    private static func emptyPixelData(
         size: PixelSize
     ) -> Data {
         let byteCount = size.width * size.height * 4
