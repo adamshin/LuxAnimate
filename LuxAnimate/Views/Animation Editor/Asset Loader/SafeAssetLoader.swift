@@ -75,6 +75,10 @@ class SafeAssetLoader {
             }
             inProgressTasks[assetID] = task
         }
+        
+        if inProgressTasks.isEmpty {
+            delegate?.onFinish(self)
+        }
     }
     
     func loadedAsset(assetID: String) -> LoadedAsset? {
@@ -99,7 +103,6 @@ class SafeAssetLoader {
     nonisolated private func loadAsset(
         assetID: String
     ) async throws {
-        
         do {
             let assetData: Data
             

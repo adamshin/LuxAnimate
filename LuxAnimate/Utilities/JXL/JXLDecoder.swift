@@ -58,7 +58,6 @@ struct JXLDecoder {
         }
         
         processLoop: while true {
-            // TODO: Check how many times this loop runs?
             try Task.checkCancellation()
             await Task.yield()
             
