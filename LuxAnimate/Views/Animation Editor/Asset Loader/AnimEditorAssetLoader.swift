@@ -4,23 +4,24 @@
 
 import Metal
 
-// TODO: Make this thread safe
+private let maxConcurrentOperations = 3
 
-protocol AnimEditorAssetLoaderDelegate: AnyObject {
+extension AnimEditorAssetLoader {
     
-    func pendingAssetData(
-        _ l: AnimEditorAssetLoader,
-        assetID: String
-    ) async -> Data?
+    @MainActor
+    protocol Delegate: AnyObject, Sendable {
+        
+        func pendingAssetData(
+            _ l: AnimEditorAssetLoader,
+            assetID: String
+        ) async -> Data?
+        
+        func onUpdate(_ l: AnimEditorAssetLoader)
+        func onFinish(_ l: AnimEditorAssetLoader)
+        
+    }
     
-    func onUpdate(_ l: AnimEditorAssetLoader)
-    func onFinish(_ l: AnimEditorAssetLoader)
-    
-}
-
-class AnimEditorAssetLoader: @unchecked Sendable {
-    
-    enum LoadedAsset {
+    enum LoadedAsset: @unchecked Sendable {
         case loaded(MTLTexture)
         case error
         
@@ -32,22 +33,28 @@ class AnimEditorAssetLoader: @unchecked Sendable {
         }
     }
     
-    private struct CancelLoadError: Error { }
-    
-    weak var delegate: AnimEditorAssetLoaderDelegate?
+}
+
+@MainActor
+class AnimEditorAssetLoader {
     
     private let projectID: String
     
-    private let loadQueue = DispatchQueue(
-        label: "AnimEditorAssetLoader.loadQueue",
-        qos: .background)
+    private let limitedConcurrencyQueue =
+        LimitedConcurrencyQueue(
+            maxConcurrentOperations: maxConcurrentOperations)
     
     private var assetIDs: Set<String> = []
+    private var inProgressTasks: [String: Task<Void, Error>] = [:]
     private var loadedAssets: [String: LoadedAsset] = [:]
+    
+    weak var delegate: Delegate?
     
     // MARK: - Init
     
-    init(projectID: String) {
+    init(
+        projectID: String
+    ) {
         self.projectID = projectID
     }
     
@@ -56,120 +63,100 @@ class AnimEditorAssetLoader: @unchecked Sendable {
     func update(assetIDs: Set<String>) {
         self.assetIDs = assetIDs
         
-        loadedAssets = loadedAssets.filter { assetID, _ in
-            assetIDs.contains(assetID)
+        loadedAssets = loadedAssets.filter {
+            assetIDs.contains($0.key)
         }
         
-        loadNextAsset()
+        for (assetID, task) in inProgressTasks {
+            if !assetIDs.contains(assetID) {
+                task.cancel()
+                inProgressTasks[assetID] = nil
+            }
+        }
+        
+        let assetIDsToLoad = assetIDs
+            .subtracting(Set(inProgressTasks.keys))
+            .subtracting(Set(loadedAssets.keys))
+        
+        for assetID in assetIDsToLoad {
+            let task = Task.detached(priority: .high) {
+                try await self.limitedConcurrencyQueue.enqueue {
+                    try await self.loadAsset(assetID: assetID)
+                }
+            }
+            inProgressTasks[assetID] = task
+        }
+        
+        if inProgressTasks.isEmpty {
+            delegate?.onFinish(self)
+        }
     }
     
     func loadedAsset(assetID: String) -> LoadedAsset? {
         loadedAssets[assetID]
     }
     
-    // MARK: - Loading
+    // MARK: - Internal Methods
     
-    private func loadNextAsset() {
-        let assetID = assetIDs.first {
-            !loadedAssets.keys.contains($0)
-        }
-        guard let assetID else {
-            delegate?.onUpdate(self)
+    private func storeLoadedAsset(
+        assetID: String,
+        loadedAsset: LoadedAsset
+    ) {
+        inProgressTasks[assetID] = nil
+        
+        guard assetIDs.contains(assetID)
+        else { return }
+        
+        loadedAssets[assetID] = loadedAsset
+        
+        delegate?.onUpdate(self)
+        if inProgressTasks.isEmpty {
             delegate?.onFinish(self)
-            return
-        }
-        
-        loadQueue.async {
-            Task {
-                do {
-                    let texture = try await self.loadAsset(
-                        assetID: assetID,
-                        shouldContinue: {
-                            self.assetIDs.contains(assetID)
-                        })
-                    
-                    self.loadedAssets[assetID] = .loaded(texture)
-                    self.delegate?.onUpdate(self)
-                    
-                } catch {
-                    if !(error is CancelLoadError) {
-                        self.loadedAssets[assetID] = .error
-                        
-                        DispatchQueue.main.async {
-                            self.delegate?.onUpdate(self)
-                        }
-                    }
-                }
-                
-                self.loadNextAsset()
-            }
         }
     }
     
-    private func loadAsset(
-        assetID: String,
-        shouldContinue: () -> Bool
-    ) async throws -> MTLTexture {
-        
-        guard shouldContinue() 
-        else { throw CancelLoadError() }
-        
-        if let assetData = await delegate?
-            .pendingAssetData(self, assetID: assetID)
-        {
-            return try loadAsset(
-                assetID: assetID,
-                assetData: assetData,
-                shouldContinue: shouldContinue)
-            
-        } else {
-            let assetURL = FileHelper.shared.projectAssetURL(
-                projectID: self.projectID,
-                assetID: assetID)
-            
-            let assetData = try Data(contentsOf: assetURL)
-            
-            return try loadAsset(
-                assetID: assetID,
-                assetData: assetData,
-                shouldContinue: shouldContinue)
-        }
-    }
-    
-    private func loadAsset(
-        assetID: String,
-        assetData: Data,
-        shouldContinue: () -> Bool
-    ) throws -> MTLTexture {
-        
-        guard shouldContinue()
-        else { throw CancelLoadError() }
-        
+    nonisolated private func loadAsset(
+        assetID: String
+    ) async throws {
         do {
-            let output = try JXLDecoder.decode(
-                data: assetData,
-                progress: {
-                    true//shouldContinue()
-                })
+            let assetData: Data
+            if let pendingAssetData = await delegate?
+                .pendingAssetData(self, assetID: assetID)
+            {
+                assetData = pendingAssetData
+                
+            } else {
+                let assetURL = FileHelper.shared
+                    .projectAssetURL(
+                        projectID: projectID,
+                        assetID: assetID)
+                
+                assetData = try Data(contentsOf: assetURL)
+            }
+            
+            try Task.checkCancellation()
+            
+            let decoderOutput = try await JXLDecoder
+                .decodeAsync(data: assetData)
             
             let texture = try TextureCreator.createTexture(
-                pixelData: output.pixelData,
+                pixelData: decoderOutput.pixelData,
                 size: PixelSize(
-                    width: output.width,
-                    height: output.height),
+                    width: decoderOutput.width,
+                    height: decoderOutput.height),
                 mipMapped: false,
                 usage: .shaderRead)
             
-            guard shouldContinue()
-            else { throw CancelLoadError() }
+            await self.storeLoadedAsset(
+                assetID: assetID,
+                loadedAsset: .loaded(texture))
             
-            return texture
-            
-        } catch JXLDecoder.DecodingError.cancelled {
-            throw CancelLoadError()
+        } catch is CancellationError {
             
         } catch {
-            throw error
+            await storeLoadedAsset(
+                assetID: assetID,
+                loadedAsset: .error)
         }
     }
     

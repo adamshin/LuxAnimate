@@ -51,7 +51,7 @@ class AnimEditorVC: UIViewController {
     private let toolControlsVC = AnimEditorToolControlsVC()
     
     private let editManager: AnimEditManager
-    private let assetLoader: SafeAssetLoader
+    private let assetLoader: AnimEditorAssetLoader
     
     private let workspaceRenderer = EditorWorkspaceRenderer(
         pixelFormat: AppConfig.metalLayerPixelFormat)
@@ -94,7 +94,7 @@ class AnimEditorVC: UIViewController {
             layerID: activeLayerID,
             sceneManifest: sceneManifest)
         
-        assetLoader = SafeAssetLoader(
+        assetLoader = AnimEditorAssetLoader(
             projectID: projectID)
         
         super.init(nibName: nil, bundle: nil)
@@ -449,10 +449,10 @@ extension AnimEditorVC: AnimEditManagerDelegate {
     
 }
 
-extension AnimEditorVC: SafeAssetLoader.Delegate {
+extension AnimEditorVC: AnimEditorAssetLoader.Delegate {
     
     func pendingAssetData(
-        _ l: SafeAssetLoader,
+        _ l: AnimEditorAssetLoader,
         assetID: String
     ) async -> Data? {
         
@@ -464,44 +464,12 @@ extension AnimEditorVC: SafeAssetLoader.Delegate {
         return nil
     }
     
-    nonisolated func onUpdate(_ l: SafeAssetLoader) {
-        Task { @MainActor in
-            self.frameEditor?.onAssetLoaderUpdate()
-        }
+    func onUpdate(_ l: AnimEditorAssetLoader) {
+        frameEditor?.onAssetLoaderUpdate()
     }
     
-    nonisolated func onFinish(_ l: SafeAssetLoader) {
-        Task { @MainActor in
-            self.frameEditor?.onAssetLoaderFinish()
-        }
-    }
-    
-    
-    nonisolated func pendingAssetData(
-        _ l: AnimEditorAssetLoader,
-        assetID: String
-    ) async -> Data? {
-        
-        return await Task { @MainActor () -> Data? in
-            if let pendingAsset = await delegate?
-                .pendingEditAsset(assetID: assetID)
-            {
-                return pendingAsset.data
-            }
-            return nil
-        }.value
-    }
-    
-    nonisolated func onUpdate(_ l: AnimEditorAssetLoader) {
-        Task { @MainActor in
-            self.frameEditor?.onAssetLoaderUpdate()
-        }
-    }
-    
-    nonisolated func onFinish(_ l: AnimEditorAssetLoader) {
-        Task { @MainActor in
-            self.frameEditor?.onAssetLoaderFinish()
-        }
+    func onFinish(_ l: AnimEditorAssetLoader) {
+        frameEditor?.onAssetLoaderFinish()
     }
     
 }
