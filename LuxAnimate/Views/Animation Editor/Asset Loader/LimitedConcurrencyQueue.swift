@@ -15,6 +15,12 @@ actor LimitedConcurrencyQueue {
         self.maxConcurrentOperations = maxConcurrentOperations
     }
     
+    deinit {
+        for continuation in queue {
+            continuation.resume(throwing: CancellationError())
+        }
+    }
+    
     func enqueue(
         _ operation: @escaping () async throws -> Void
     ) async throws {
