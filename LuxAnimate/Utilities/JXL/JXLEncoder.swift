@@ -2,8 +2,7 @@
 //  JXLEncoder.swift
 //
 
-import UIKit
-import Accelerate
+import Foundation
 
 struct JXLEncoder {
     
