@@ -409,16 +409,6 @@ extension AnimEditorVC: AnimFrameEditorDelegate {
         return asset?.texture
     }
     
-    func storeAssetLoaderTexture(
-        _ e: AnimFrameEditor,
-        assetID: String,
-        texture: MTLTexture
-    ) {
-        assetLoader.storeAssetTexture(
-            assetID: assetID,
-            texture: texture)
-    }
-    
     func setEditInteractionEnabled(
         _ e: AnimFrameEditor,
         enabled: Bool

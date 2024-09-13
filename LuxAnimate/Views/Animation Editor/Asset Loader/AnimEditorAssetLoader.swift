@@ -67,14 +67,6 @@ class AnimEditorAssetLoader: @unchecked Sendable {
         loadedAssets[assetID]
     }
     
-    func storeAssetTexture(
-        assetID: String,
-        texture: MTLTexture
-    ) {
-        assetIDs.insert(assetID)
-        loadedAssets[assetID] = .loaded(texture)
-    }
-    
     // MARK: - Loading
     
     private func loadNextAsset() {

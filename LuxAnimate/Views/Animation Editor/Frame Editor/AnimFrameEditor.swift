@@ -23,11 +23,6 @@ protocol AnimFrameEditorDelegate: AnyObject {
         _ e: AnimFrameEditor,
         assetID: String) -> MTLTexture?
     
-    func storeAssetLoaderTexture(
-        _ e: AnimFrameEditor,
-        assetID: String,
-        texture: MTLTexture)
-    
     func setEditInteractionEnabled(
         _ e: AnimFrameEditor,
         enabled: Bool)
@@ -123,17 +118,6 @@ extension AnimFrameEditor: AnimFrameEditorStateDelegate {
         delegate?.assetLoaderAssetTexture(
             self, 
             assetID: assetID)
-    }
-    
-    func storeAssetLoaderTexture(
-        _ s: AnimFrameEditorState,
-        assetID: String,
-        texture: MTLTexture
-    ) {
-        delegate?.storeAssetLoaderTexture(
-            self, 
-            assetID: assetID,
-            texture: texture)
     }
     
     func workspaceViewSize(

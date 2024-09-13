@@ -19,11 +19,6 @@ protocol AnimFrameEditorStateDelegate: AnyObject {
         _ s: AnimFrameEditorState,
         assetID: String) -> MTLTexture?
     
-    func storeAssetLoaderTexture(
-        _ s: AnimFrameEditorState,
-        assetID: String,
-        texture: MTLTexture)
-    
     func workspaceViewSize(
         _ s: AnimFrameEditorState
     ) -> Size
