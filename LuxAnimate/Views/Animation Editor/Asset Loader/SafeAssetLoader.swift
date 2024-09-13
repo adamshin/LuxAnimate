@@ -6,7 +6,7 @@ import Metal
 
 extension SafeAssetLoader {
     
-    protocol Delegate: AnyObject {
+    protocol Delegate: AnyObject, Sendable {
         
         func pendingAssetData(
             _ l: SafeAssetLoader,
@@ -36,6 +36,9 @@ actor SafeAssetLoader {
     
     private let projectID: String
     
+    private var inProgressTasks: [String: Task<Void, Error>] = [:]
+    private var loadedAssets: [String: LoadedAsset] = [:]
+    
     weak var delegate: Delegate?
     
     // MARK: - Init
@@ -51,46 +54,109 @@ actor SafeAssetLoader {
     // MARK: - Interface
     
     func update(assetIDs: Set<String>) {
+        loadedAssets = loadedAssets.filter {
+            assetIDs.contains($0.key)
+        }
         
+        for (assetID, task) in inProgressTasks {
+            if !assetIDs.contains(assetID) {
+                task.cancel()
+                inProgressTasks[assetID] = nil
+            }
+        }
+        
+        let assetIDsToLoad = assetIDs
+            .subtracting(Set(inProgressTasks.keys))
+            .subtracting(Set(loadedAssets.keys))
+        
+        for assetID in assetIDsToLoad {
+            let task = Task.detached(priority: .high) {
+                try await self.loadAsset(assetID: assetID)
+            }
+            inProgressTasks[assetID] = task
+        }
     }
     
     func loadedAsset(assetID: String) -> LoadedAsset? {
-        nil
+        loadedAssets[assetID]
     }
     
     // MARK: - Internal Methods
     
-    
-    
-}
-
-// Limiter
-
-actor LimitedConcurrencyQueue {
-    private var queue: [CheckedContinuation<Void, Error>] = []
-    private var runningCount = 0
-    private let maxConcurrent: Int
-
-    init(maxConcurrent: Int) {
-        self.maxConcurrent = maxConcurrent
-    }
-
-    func enqueue<T: Sendable>(_ work: @escaping () async throws -> T) async throws -> T {
-        if runningCount >= maxConcurrent {
-            try await withCheckedThrowingContinuation { continuation in
-                queue.append(continuation)
-            }
-        }
+    private func storeLoadedAsset(
+        assetID: String,
+        loadedAsset: LoadedAsset
+    ) {
+        inProgressTasks[assetID] = nil
+        loadedAssets[assetID] = loadedAsset
         
-        runningCount += 1
-        defer {
-            runningCount -= 1
-            if let next = queue.first {
-                queue.removeFirst()
-                next.resume()
-            }
+        delegate?.onUpdate(self)
+        if inProgressTasks.isEmpty {
+            delegate?.onFinish(self)
         }
-        
-        return try await work()
     }
+    
+    nonisolated private func loadAsset(
+        assetID: String
+    ) async throws {
+        
+        do {
+            let assetData: Data
+            
+            if let pendingAssetData = await delegate?
+                .pendingAssetData(self, assetID: assetID)
+            {
+                assetData = pendingAssetData
+                
+            } else {
+                let assetURL = FileHelper.shared
+                    .projectAssetURL(
+                        projectID: projectID,
+                        assetID: assetID)
+                
+                assetData = try Data(contentsOf: assetURL)
+            }
+            
+            try Task.checkCancellation()
+            await Task.yield()
+            
+            let texture = try await decodeTexture(
+                assetID: assetID,
+                assetData: assetData)
+            
+            await storeLoadedAsset(
+                assetID: assetID,
+                loadedAsset: .loaded(texture))
+            
+        } catch is CancellationError {
+            
+        } catch {
+            await storeLoadedAsset(
+                assetID: assetID,
+                loadedAsset: .error)
+        }
+    }
+    
+    nonisolated private func decodeTexture(
+        assetID: String,
+        assetData: Data
+    ) async throws -> MTLTexture {
+        
+        let output = try await JXLDecoder.decodeAsync(
+            data: assetData)
+        
+        let texture = try TextureCreator.createTexture(
+            pixelData: output.pixelData,
+            size: PixelSize(
+                width: output.width,
+                height: output.height),
+            mipMapped: false,
+            usage: .shaderRead)
+        
+        try Task.checkCancellation()
+        await Task.yield()
+        
+        return texture
+    }
+    
 }
