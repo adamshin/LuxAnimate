@@ -61,6 +61,11 @@ class EditorWorkspaceVC: UIViewController {
         view.addSubview(overlayView)
     }
     
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        displayLink.invalidate()
+    }
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
