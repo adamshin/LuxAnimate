@@ -34,7 +34,7 @@ actor LimitedConcurrencyQueue {
             }
         }
         
-        return try await operation()
+        try await operation()
     }
     
 }

@@ -38,6 +38,9 @@ class SafeAssetLoader {
     
     private let projectID: String
     
+    private let limitedConcurrencyQueue =
+        LimitedConcurrencyQueue(maxConcurrentOperations: 1)
+    
     private var assetIDs: Set<String> = []
     private var inProgressTasks: [String: Task<Void, Error>] = [:]
     private var loadedAssets: [String: LoadedAsset] = [:]
@@ -74,7 +77,9 @@ class SafeAssetLoader {
         
         for assetID in assetIDsToLoad {
             let task = Task.detached(priority: .high) {
-                try await self.loadAsset(assetID: assetID)
+                try await self.limitedConcurrencyQueue.enqueue {
+                    try await self.loadAsset(assetID: assetID)
+                }
             }
             inProgressTasks[assetID] = task
         }
@@ -127,13 +132,19 @@ class SafeAssetLoader {
             }
             
             try Task.checkCancellation()
-            await Task.yield()
             
-            let texture = try await decodeTexture(
-                assetID: assetID,
-                assetData: assetData)
+            let decoderOutput = try await JXLDecoder
+                .decodeAsync(data: assetData)
             
-            await storeLoadedAsset(
+            let texture = try TextureCreator.createTexture(
+                pixelData: decoderOutput.pixelData,
+                size: PixelSize(
+                    width: decoderOutput.width,
+                    height: decoderOutput.height),
+                mipMapped: false,
+                usage: .shaderRead)
+            
+            await self.storeLoadedAsset(
                 assetID: assetID,
                 loadedAsset: .loaded(texture))
             
@@ -144,28 +155,6 @@ class SafeAssetLoader {
                 assetID: assetID,
                 loadedAsset: .error)
         }
-    }
-    
-    nonisolated private func decodeTexture(
-        assetID: String,
-        assetData: Data
-    ) async throws -> MTLTexture {
-        
-        let output = try await JXLDecoder.decodeAsync(
-            data: assetData)
-        
-        let texture = try TextureCreator.createTexture(
-            pixelData: output.pixelData,
-            size: PixelSize(
-                width: output.width,
-                height: output.height),
-            mipMapped: false,
-            usage: .shaderRead)
-        
-        try Task.checkCancellation()
-        await Task.yield()
-        
-        return texture
     }
     
 }
