@@ -9,7 +9,8 @@ protocol AnimFrameEditorWorkspaceSceneGraphGeneratorDelegate: AnyObject {
     
     func assetTexture(
         _ g: AnimFrameEditorWorkspaceSceneGraphGenerator,
-        assetID: String) -> MTLTexture?
+        assetID: String
+    ) -> MTLTexture?
     
 }
 

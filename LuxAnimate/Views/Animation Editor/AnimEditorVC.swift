@@ -30,7 +30,6 @@ protocol AnimEditorVCDelegate: AnyObject {
         sceneEdit: ProjectEditHelper.SceneEdit,
         editContext: Sendable?)
     
-    // Concurrency?
     func pendingEditAsset(
         assetID: String
     ) async -> ProjectEditManager.NewAsset?
@@ -52,7 +51,7 @@ class AnimEditorVC: UIViewController {
     private let toolControlsVC = AnimEditorToolControlsVC()
     
     private let editManager: AnimEditManager
-    private let assetLoader: AnimEditorAssetLoader
+    private let assetLoader: SafeAssetLoader
     
     private let workspaceRenderer = EditorWorkspaceRenderer(
         pixelFormat: AppConfig.metalLayerPixelFormat)
@@ -95,7 +94,7 @@ class AnimEditorVC: UIViewController {
             layerID: activeLayerID,
             sceneManifest: sceneManifest)
         
-        assetLoader = AnimEditorAssetLoader(
+        assetLoader = SafeAssetLoader(
             projectID: projectID)
         
         super.init(nibName: nil, bundle: nil)
@@ -103,6 +102,7 @@ class AnimEditorVC: UIViewController {
         
         editManager.delegate = self
         assetLoader.delegate = self
+        
         clampActiveFrameIndex()
     }
     
@@ -449,7 +449,33 @@ extension AnimEditorVC: AnimEditManagerDelegate {
     
 }
 
-extension AnimEditorVC: AnimEditorAssetLoaderDelegate {
+extension AnimEditorVC: SafeAssetLoader.Delegate {
+    
+    func pendingAssetData(
+        _ l: SafeAssetLoader,
+        assetID: String
+    ) async -> Data? {
+        
+        if let pendingAsset = await delegate?
+            .pendingEditAsset(assetID: assetID)
+        {
+            return pendingAsset.data
+        }
+        return nil
+    }
+    
+    nonisolated func onUpdate(_ l: SafeAssetLoader) {
+        Task { @MainActor in
+            self.frameEditor?.onAssetLoaderUpdate()
+        }
+    }
+    
+    nonisolated func onFinish(_ l: SafeAssetLoader) {
+        Task { @MainActor in
+            self.frameEditor?.onAssetLoaderFinish()
+        }
+    }
+    
     
     nonisolated func pendingAssetData(
         _ l: AnimEditorAssetLoader,

@@ -21,7 +21,8 @@ protocol AnimFrameEditorDelegate: AnyObject {
     
     func assetLoaderAssetTexture(
         _ e: AnimFrameEditor,
-        assetID: String) -> MTLTexture?
+        assetID: String
+    ) -> MTLTexture?
     
     func setEditInteractionEnabled(
         _ e: AnimFrameEditor,
@@ -116,7 +117,7 @@ extension AnimFrameEditor: AnimFrameEditorStateDelegate {
         assetID: String
     ) -> MTLTexture? {
         delegate?.assetLoaderAssetTexture(
-            self, 
+            self,
             assetID: assetID)
     }
     

@@ -6,6 +6,7 @@ import Metal
 
 extension SafeAssetLoader {
     
+    @MainActor
     protocol Delegate: AnyObject, Sendable {
         
         func pendingAssetData(
@@ -18,7 +19,7 @@ extension SafeAssetLoader {
         
     }
     
-    enum LoadedAsset {
+    enum LoadedAsset: @unchecked Sendable {
         case loaded(MTLTexture)
         case error
         
@@ -32,7 +33,8 @@ extension SafeAssetLoader {
     
 }
 
-actor SafeAssetLoader {
+@MainActor
+class SafeAssetLoader {
     
     private let projectID: String
     
@@ -44,11 +46,9 @@ actor SafeAssetLoader {
     // MARK: - Init
     
     init(
-        projectID: String,
-        delegate: Delegate?
+        projectID: String
     ) {
         self.projectID = projectID
-        self.delegate = delegate
     }
     
     // MARK: - Interface
