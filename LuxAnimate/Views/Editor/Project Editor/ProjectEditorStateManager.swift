@@ -1,23 +1,27 @@
 //
-//  ProjectAsyncEditManager.swift
+//  ProjectEditorStateManager.swift
 //
 
 import Foundation
 
-protocol ProjectAsyncEditManagerDelegate: AnyObject {
+extension ProjectEditorStateManager {
     
-    func onUpdateState(
-        _ m: ProjectAsyncEditManager,
-        state: ProjectEditManager.State,
-        editContext: Sendable?)
-    
-    func onError(
-        _ m: ProjectAsyncEditManager,
-        error: Error)
+    protocol Delegate: AnyObject {
+        
+        func onUpdateState(
+            _ m: ProjectEditorStateManager,
+            state: ProjectEditManager.State,
+            editContext: Sendable?)
+        
+        func onEditError(
+            _ m: ProjectEditorStateManager,
+            error: Error)
+        
+    }
     
 }
 
-class ProjectAsyncEditManager: @unchecked Sendable {
+class ProjectEditorStateManager: @unchecked Sendable {
     
     private let projectID: String
     
@@ -27,12 +31,12 @@ class ProjectAsyncEditManager: @unchecked Sendable {
         label: "ProjectAsyncEditManager.queue",
         qos: .userInitiated)
     
-    private let pendingEditAssetStore =
-        ProjectAsyncEditManagerPendingEditAssetStore()
-    
     private(set) var state: ProjectEditManager.State
     
-    weak var delegate: ProjectAsyncEditManagerDelegate?
+    private var pendingEditAssets:
+        [String: ProjectEditManager.NewAsset] = [:]
+    
+    weak var delegate: Delegate?
     
     // MARK: - Init
     
@@ -60,7 +64,7 @@ class ProjectAsyncEditManager: @unchecked Sendable {
             ProjectEditManager.editHistoryLimit)
         
         // Store pending assets
-        pendingEditAssetStore.storeAssets(edit.newAssets)
+        storePendingEditAssets(edit.newAssets)
         
         // Notify delegate
         delegate?.onUpdateState(self,
@@ -71,16 +75,16 @@ class ProjectAsyncEditManager: @unchecked Sendable {
         workQueue.async {
             do {
                 try self.editManager.applyEdit(edit)
-            } catch { 
+            } catch {
                 DispatchQueue.main.async {
-                    self.delegate?.onError(self, error: error)
+                    self.delegate?.onEditError(
+                        self, error: error)
                 }
             }
             
             // Remove pending assets
             let newAssetIDs = edit.newAssets.map { $0.id }
-            self.pendingEditAssetStore.removeAssets(
-                assetIDs: newAssetIDs)
+            self.removePendingEditAssets(assetIDs: newAssetIDs)
         }
     }
     
@@ -105,9 +109,26 @@ class ProjectAsyncEditManager: @unchecked Sendable {
                 
             } catch {
                 DispatchQueue.main.async {
-                    self.delegate?.onError(self, error: error)
+                    self.delegate?.onEditError(
+                        self, error: error)
                 }
             }
+        }
+    }
+    
+    private func storePendingEditAssets(
+        _ assets: [ProjectEditManager.NewAsset]
+    ) {
+        for asset in assets {
+            pendingEditAssets[asset.id] = asset
+        }
+    }
+    
+    private func removePendingEditAssets(
+        assetIDs: [String]
+    ) {
+        for assetID in assetIDs {
+            pendingEditAssets[assetID] = nil
         }
     }
     
@@ -133,40 +154,7 @@ class ProjectAsyncEditManager: @unchecked Sendable {
     func pendingEditAsset(
         assetID: String
     ) -> ProjectEditManager.NewAsset? {
-        
-        pendingEditAssetStore.storedAsset(
-            assetID: assetID)
-    }
-    
-}
-
-// MARK: - Pending Edit Asset Store
-
-class ProjectAsyncEditManagerPendingEditAssetStore {
-    
-    private var storedAssets = ThreadSafeDictionary
-        <String, ProjectEditManager.NewAsset>()
-    
-    func storeAssets(
-        _ assets: [ProjectEditManager.NewAsset]
-    ) {
-        let values = Dictionary(
-            assets.map { ($0.id, $0) },
-            uniquingKeysWith: { $1 })
-        
-        storedAssets.setValues(values)
-    }
-    
-    func removeAssets(
-        assetIDs: [String]
-    ) {
-        storedAssets.removeValues(forKeys: assetIDs)
-    }
-    
-    func storedAsset(
-        assetID: String
-    ) -> ProjectEditManager.NewAsset? {
-        return storedAssets.getValue(forKey: assetID)
+        pendingEditAssets[assetID]
     }
     
 }

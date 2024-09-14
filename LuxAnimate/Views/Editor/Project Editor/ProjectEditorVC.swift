@@ -10,7 +10,7 @@ class ProjectEditorVC: UIViewController {
     
     private let projectID: String
     
-    private let projectEditManager: ProjectAsyncEditManager
+    private let stateManager: ProjectEditorStateManager
     
     private weak var sceneEditorVC: SceneEditorVC?
     
@@ -19,13 +19,13 @@ class ProjectEditorVC: UIViewController {
     init(projectID: String) throws {
         self.projectID = projectID
         
-        projectEditManager = try ProjectAsyncEditManager(
+        stateManager = try ProjectEditorStateManager(
             projectID: projectID)
         
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
         
-        projectEditManager.delegate = self
+        stateManager.delegate = self
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -38,7 +38,7 @@ class ProjectEditorVC: UIViewController {
         setupUI()
         
         update(
-            projectEditManagerState: projectEditManager.state,
+            projectEditManagerState: stateManager.state,
             editContext: nil)
     }
     
@@ -71,7 +71,7 @@ class ProjectEditorVC: UIViewController {
     // MARK: - Editing
     
     private func addScene() {
-        let projectManifest = projectEditManager
+        let projectManifest = stateManager
             .state.projectManifest
         
         let config = ProjectEditHelper.NewSceneConfig(
@@ -83,13 +83,13 @@ class ProjectEditorVC: UIViewController {
             projectManifest: projectManifest,
             config: config)
             
-        projectEditManager.applyEdit(
+        stateManager.applyEdit(
             edit: edit,
             editContext: nil)
     }
     
     private func removeLastScene() {
-        let projectManifest = projectEditManager
+        let projectManifest = stateManager
             .state.projectManifest
         
         guard let lastSceneRef = projectManifest
@@ -100,7 +100,7 @@ class ProjectEditorVC: UIViewController {
             projectManifest: projectManifest,
             sceneID: lastSceneRef.id)
         
-        projectEditManager.applyEdit(
+        stateManager.applyEdit(
             edit: edit,
             editContext: nil)
     }
@@ -112,7 +112,7 @@ class ProjectEditorVC: UIViewController {
             let vc = try SceneEditorVC(
                 projectID: projectID,
                 sceneID: sceneID,
-                projectEditManagerState: projectEditManager.state)
+                projectEditManagerState: stateManager.state)
             
             vc.delegate = self
             sceneEditorVC = vc
@@ -141,11 +141,11 @@ extension ProjectEditorVC: ProjectEditorContentVCDelegate {
     }
     
     func onSelectUndo(_ vc: ProjectEditorContentVC) {
-        projectEditManager.applyUndo()
+        stateManager.applyUndo()
     }
     
     func onSelectRedo(_ vc: ProjectEditorContentVC) {
-        projectEditManager.applyRedo()
+        stateManager.applyRedo()
     }
     
     func onSelectScene(
@@ -160,11 +160,11 @@ extension ProjectEditorVC: ProjectEditorContentVCDelegate {
 extension ProjectEditorVC: SceneEditorVCDelegate {
     
     func onRequestUndo(_ vc: SceneEditorVC) {
-        projectEditManager.applyUndo()
+        stateManager.applyUndo()
     }
     
     func onRequestRedo(_ vc: SceneEditorVC) {
-        projectEditManager.applyRedo()
+        stateManager.applyRedo()
     }
     
     func onRequestEdit(
@@ -172,7 +172,7 @@ extension ProjectEditorVC: SceneEditorVCDelegate {
         edit: ProjectEditManager.Edit,
         editContext: Sendable?
     ) {
-        projectEditManager.applyEdit(
+        stateManager.applyEdit(
             edit: edit,
             editContext: editContext)
     }
@@ -181,16 +181,16 @@ extension ProjectEditorVC: SceneEditorVCDelegate {
         assetID: String
     ) -> ProjectEditManager.NewAsset? {
         
-        projectEditManager.pendingEditAsset(
+        stateManager.pendingEditAsset(
             assetID: assetID)
     }
     
 }
 
-extension ProjectEditorVC: ProjectAsyncEditManagerDelegate {
+extension ProjectEditorVC: ProjectEditorStateManager.Delegate {
     
     nonisolated func onUpdateState(
-        _ m: ProjectAsyncEditManager,
+        _ m: ProjectEditorStateManager,
         state: ProjectEditManager.State,
         editContext: Sendable?
     ) {
@@ -201,8 +201,8 @@ extension ProjectEditorVC: ProjectAsyncEditManagerDelegate {
         }
     }
     
-    nonisolated func onError(
-        _ m: ProjectAsyncEditManager,
+    nonisolated func onEditError(
+        _ m: ProjectEditorStateManager,
         error: Error
     ) { }
     
