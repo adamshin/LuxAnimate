@@ -50,8 +50,8 @@ class AnimEditorVC: UIViewController {
     private let bottomBarVC = AnimEditorBottomBarVC()
     private let toolControlsVC = AnimEditorToolControlsVC()
     
-    private let editManager: AnimEditManager
     private let assetLoader: AnimEditorAssetLoader
+    private let frameEditProcessor: AnimFrameEditProcessor
     
     private let workspaceRenderer = EditorWorkspaceRenderer(
         pixelFormat: AppConfig.metalLayerPixelFormat)
@@ -90,7 +90,7 @@ class AnimEditorVC: UIViewController {
         
         onionSkinConfig = AppConfig.onionSkinConfig
         
-        editManager = AnimEditManager(
+        frameEditProcessor = AnimFrameEditProcessor(
             layerID: activeLayerID,
             sceneManifest: sceneManifest)
         
@@ -100,7 +100,7 @@ class AnimEditorVC: UIViewController {
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
         
-        editManager.delegate = self
+        frameEditProcessor.delegate = self
         assetLoader.delegate = self
         
         clampActiveFrameIndex()
@@ -170,7 +170,7 @@ class AnimEditorVC: UIViewController {
         self.projectEditManagerState = projectEditManagerState
         self.sceneManifest = sceneManifest
         
-        editManager.update(
+        frameEditProcessor.update(
             sceneManifest: sceneManifest)
         
         let shouldReloadFrameEditor: Bool
@@ -241,7 +241,7 @@ class AnimEditorVC: UIViewController {
     private func enterToolState(
         _ newToolState: AnimEditorToolState
     ) {
-        editManager.afterAllEditsFinish {
+        frameEditProcessor.afterAllEditsFinish {
             self.enterToolStateInternal(newToolState)
         }
     }
@@ -421,17 +421,17 @@ extension AnimEditorVC: AnimFrameEditorDelegate {
         drawingID: String,
         drawingTexture: MTLTexture?
     ) {
-        editManager.applyEdit(
+        frameEditProcessor.applyEdit(
             drawingID: drawingID,
             drawingTexture: drawingTexture)
     }
     
 }
 
-extension AnimEditorVC: AnimEditManagerDelegate {
+extension AnimEditorVC: AnimFrameEditProcessor.Delegate {
     
     func onRequestSceneEdit(
-        _ m: AnimEditManager,
+        _ p: AnimFrameEditProcessor,
         sceneEdit: ProjectEditHelper.SceneEdit
     ) {
         // Should isFromFrameEditor always be true?

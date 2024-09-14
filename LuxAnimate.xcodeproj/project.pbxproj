@@ -151,7 +151,7 @@
 		66BC14CD2C891EF900749C7A /* AnimEditorOnionSkinConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BC14CC2C891EF900749C7A /* AnimEditorOnionSkinConfig.swift */; };
 		66BC14CF2C8924E300749C7A /* AnimFrameEditorWorkspaceSceneGraphGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BC14CE2C8924E300749C7A /* AnimFrameEditorWorkspaceSceneGraphGenerator.swift */; };
 		66BD7A332C8FB5E500A91913 /* DrawingAssetProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BD7A322C8FB5E500A91913 /* DrawingAssetProcessor.swift */; };
-		66BD7A352C8FF53C00A91913 /* AnimEditManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BD7A342C8FF53C00A91913 /* AnimEditManager.swift */; };
+		66BD7A352C8FF53C00A91913 /* AnimFrameEditProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BD7A342C8FF53C00A91913 /* AnimFrameEditProcessor.swift */; };
 		66C8D5912C767C910013B999 /* AnimEditorBrushStrokeAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C8D5902C767C910013B999 /* AnimEditorBrushStrokeAdapter.swift */; };
 		66CE19012C1BA8BC0078AA68 /* RenderCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66CE19002C1BA8BC0078AA68 /* RenderCacheManager.swift */; };
 		66D0843D2BA3840C00EB8556 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0843C2BA3840C00EB8556 /* AppDelegate.swift */; };
@@ -334,7 +334,7 @@
 		66BC14CC2C891EF900749C7A /* AnimEditorOnionSkinConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorOnionSkinConfig.swift; sourceTree = "<group>"; };
 		66BC14CE2C8924E300749C7A /* AnimFrameEditorWorkspaceSceneGraphGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimFrameEditorWorkspaceSceneGraphGenerator.swift; sourceTree = "<group>"; };
 		66BD7A322C8FB5E500A91913 /* DrawingAssetProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingAssetProcessor.swift; sourceTree = "<group>"; };
-		66BD7A342C8FF53C00A91913 /* AnimEditManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditManager.swift; sourceTree = "<group>"; };
+		66BD7A342C8FF53C00A91913 /* AnimFrameEditProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimFrameEditProcessor.swift; sourceTree = "<group>"; };
 		66C8D5902C767C910013B999 /* AnimEditorBrushStrokeAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorBrushStrokeAdapter.swift; sourceTree = "<group>"; };
 		66CE19002C1BA8BC0078AA68 /* RenderCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderCacheManager.swift; sourceTree = "<group>"; };
 		66D084392BA3840C00EB8556 /* LuxAnimate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LuxAnimate.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -888,7 +888,7 @@
 			isa = PBXGroup;
 			children = (
 				668A14D52C7D3EB500D73D36 /* Frame Editor */,
-				66BD7A362C8FF54500A91913 /* Edit Manager */,
+				66BD7A362C8FF54500A91913 /* Frame Edit Processor */,
 				6678A9BF2C8398ED00838EA3 /* Asset Loader */,
 				668A14D02C7D3D2C00D73D36 /* Toolbar */,
 				66A59E952C8A1DED00CF553E /* Bottom Bar */,
@@ -1061,12 +1061,12 @@
 			path = "Drawing Asset Processor";
 			sourceTree = "<group>";
 		};
-		66BD7A362C8FF54500A91913 /* Edit Manager */ = {
+		66BD7A362C8FF54500A91913 /* Frame Edit Processor */ = {
 			isa = PBXGroup;
 			children = (
-				66BD7A342C8FF53C00A91913 /* AnimEditManager.swift */,
+				66BD7A342C8FF53C00A91913 /* AnimFrameEditProcessor.swift */,
 			);
-			path = "Edit Manager";
+			path = "Frame Edit Processor";
 			sourceTree = "<group>";
 		};
 		66D084302BA3840B00EB8556 = {
@@ -1329,7 +1329,7 @@
 				66311CE82BD78B6D00D53489 /* UIImageDataExtractor.swift in Sources */,
 				66D084892BA4060E00EB8556 /* Project.swift in Sources */,
 				66D0848C2BA55B4300EB8556 /* LibraryManifest.swift in Sources */,
-				66BD7A352C8FF53C00A91913 /* AnimEditManager.swift in Sources */,
+				66BD7A352C8FF53C00A91913 /* AnimFrameEditProcessor.swift in Sources */,
 				66211E9A2BF2B7C4005490C4 /* EditorFrameAssetLoader.swift in Sources */,
 				66099BD52BDB568E00243D9F /* TextureDataReader.swift in Sources */,
 				66099BA52BDB193800243D9F /* EditorFrameToolbarVC.swift in Sources */,
