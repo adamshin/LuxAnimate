@@ -84,7 +84,9 @@ class ProjectEditorStateManager: @unchecked Sendable {
             
             // Remove pending assets
             let newAssetIDs = edit.newAssets.map { $0.id }
-            self.removePendingEditAssets(assetIDs: newAssetIDs)
+            DispatchQueue.main.async {
+                self.removePendingEditAssets(assetIDs: newAssetIDs)
+            }
         }
     }
     
