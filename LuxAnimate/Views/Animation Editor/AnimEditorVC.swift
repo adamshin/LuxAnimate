@@ -32,7 +32,7 @@ protocol AnimEditorVCDelegate: AnyObject {
     
     func pendingEditAsset(
         assetID: String
-    ) async -> ProjectEditManager.NewAsset?
+    ) -> ProjectEditManager.NewAsset?
     
 }
 
@@ -454,9 +454,9 @@ extension AnimEditorVC: AnimEditorAssetLoader.Delegate {
     func pendingAssetData(
         _ l: AnimEditorAssetLoader,
         assetID: String
-    ) async -> Data? {
+    ) -> Data? {
         
-        if let pendingAsset = await delegate?
+        if let pendingAsset = delegate?
             .pendingEditAsset(assetID: assetID)
         {
             return pendingAsset.data

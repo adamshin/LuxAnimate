@@ -353,7 +353,7 @@ extension SceneEditorVC: AnimEditorVCDelegate {
     
     func pendingEditAsset(
         assetID: String
-    ) async -> ProjectEditManager.NewAsset? {
+    ) -> ProjectEditManager.NewAsset? {
         delegate?.pendingEditAsset(assetID: assetID)
     }
     

@@ -134,9 +134,9 @@ class AnimFrameEditorLoadingState: AnimFrameEditorState {
     func onAssetLoaderUpdate() { }
     
     func onAssetLoaderFinish() {
-//        let loadEndTime = ProcessInfo.processInfo.systemUptime
-//        let loadTime = loadEndTime - loadStartTime
-//        print(String(format: "Load time: %0.4f", loadTime))
+        let loadEndTime = ProcessInfo.processInfo.systemUptime
+        let loadTime = loadEndTime - loadStartTime
+        print(String(format: "Load time: %0.4f", loadTime))
         
         enterEditingState()
     }

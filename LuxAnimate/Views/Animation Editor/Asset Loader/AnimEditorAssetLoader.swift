@@ -14,7 +14,7 @@ extension AnimEditorAssetLoader {
         func pendingAssetData(
             _ l: AnimEditorAssetLoader,
             assetID: String
-        ) async -> Data?
+        ) -> Data?
         
         func onUpdate(_ l: AnimEditorAssetLoader)
         func onFinish(_ l: AnimEditorAssetLoader)
@@ -79,7 +79,7 @@ class AnimEditorAssetLoader {
             .subtracting(Set(loadedAssets.keys))
         
         for assetID in assetIDsToLoad {
-            let task = Task.detached(priority: .high) {
+            let task = Task.detached(priority: .userInitiated) {
                 try await self.limitedConcurrencyQueue.enqueue {
                     try await self.loadAsset(assetID: assetID)
                 }
