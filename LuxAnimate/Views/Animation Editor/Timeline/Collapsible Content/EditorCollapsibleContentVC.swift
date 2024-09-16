@@ -95,8 +95,6 @@ class EditorCollapsibleContentVC: UIViewController {
     // MARK: - Interface
     
     func setExpanded(_ expanded: Bool, animated: Bool) {
-        guard isExpanded != expanded else { return }
-        
         isExpanded = expanded
         delegate?.onSetExpanded(self, expanded)
         

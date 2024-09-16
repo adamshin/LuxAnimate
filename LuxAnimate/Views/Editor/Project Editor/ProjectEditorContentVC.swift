@@ -88,7 +88,7 @@ class ProjectEditorContentVC: UIViewController {
     }
     
     func update(
-        projectEditManagerState state: ProjectEditManager.State
+        projectState state: ProjectEditManager.State
     ) {
         projectManifest = state.projectManifest
         availableUndoCount = state.availableUndoCount

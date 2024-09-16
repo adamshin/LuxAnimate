@@ -38,7 +38,7 @@ class ProjectEditorVC: UIViewController {
         setupUI()
         
         update(
-            projectEditManagerState: stateManager.state,
+            projectState: stateManager.state,
             editContext: nil)
     }
     
@@ -57,14 +57,14 @@ class ProjectEditorVC: UIViewController {
     // MARK: - Logic
     
     private func update(
-        projectEditManagerState: ProjectEditManager.State,
+        projectState: ProjectEditManager.State,
         editContext: Sendable?
     ) {
         contentVC.update(
-            projectEditManagerState: projectEditManagerState)
+            projectState: projectState)
         
         sceneEditorVC?.update(
-            projectEditManagerState: projectEditManagerState,
+            projectState: projectState,
             editContext: editContext)
     }
     
@@ -112,7 +112,7 @@ class ProjectEditorVC: UIViewController {
             let vc = try SceneEditorVC(
                 projectID: projectID,
                 sceneID: sceneID,
-                projectEditManagerState: stateManager.state)
+                projectState: stateManager.state)
             
             vc.delegate = self
             sceneEditorVC = vc
@@ -196,7 +196,7 @@ extension ProjectEditorVC: ProjectEditorStateManager.Delegate {
     ) {
         Task { @MainActor in
             update(
-                projectEditManagerState: state,
+                projectState: state,
                 editContext: editContext)
         }
     }

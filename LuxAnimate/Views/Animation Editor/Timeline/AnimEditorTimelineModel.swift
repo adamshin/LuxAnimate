@@ -22,7 +22,7 @@ extension AnimEditorTimelineModel {
     static func generate(
         projectID: String,
         sceneManifest: Scene.Manifest,
-        animationLayerContent: Scene.AnimationLayerContent
+        layerContent: Scene.AnimationLayerContent
     ) -> Self {
         
         let emptyFrame = Frame(
@@ -34,7 +34,7 @@ extension AnimEditorTimelineModel {
             count: sceneManifest.frameCount)
         
         // Put drawings on frames
-        let drawings = animationLayerContent.drawings
+        let drawings = layerContent.drawings
         for drawing in drawings {
             guard frames.indices.contains(drawing.frameIndex)
             else { continue }

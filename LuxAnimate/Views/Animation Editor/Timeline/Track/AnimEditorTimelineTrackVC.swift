@@ -28,9 +28,9 @@ extension AnimEditorTimelineTrackVC {
         func onEndFrameScroll(
             _ vc: AnimEditorTimelineTrackVC)
         
-        func onChangeFocusedFrame(
+        func onChangeFocusedFrameIndex(
             _ vc: AnimEditorTimelineTrackVC,
-            frameIndex: Int)
+            _ focusedFrameIndex: Int)
         
         func onSelectFocusedFrame(
             _ vc: AnimEditorTimelineTrackVC,
@@ -162,8 +162,8 @@ class AnimEditorTimelineTrackVC: UIViewController {
         
         if focusedFrameIndex != frameIndex {
             focusedFrameIndex = frameIndex
-            delegate?.onChangeFocusedFrame(
-                self, frameIndex: frameIndex)
+            delegate?.onChangeFocusedFrameIndex(
+                self, frameIndex)
         }
     }
     
@@ -457,7 +457,7 @@ extension AnimEditorTimelineTrackVC:
             delegate?.onSelectFocusedFrame(self, frameIndex: frameIndex)
         } else {
             focusFrame(at: frameIndex, animated: true)
-            delegate?.onChangeFocusedFrame(self, frameIndex: frameIndex)
+            delegate?.onChangeFocusedFrameIndex(self, focusedFrameIndex)
         }
     }
     

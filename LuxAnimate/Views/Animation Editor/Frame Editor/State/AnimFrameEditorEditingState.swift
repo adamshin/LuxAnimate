@@ -6,16 +6,13 @@ import Metal
 
 class AnimFrameEditorEditingState: AnimFrameEditorState {
     
-    private let projectID: String
-    private let sceneID: String
-    private let activeLayerID: String
-    private let activeFrameIndex: Int
-    private let onionSkinConfig: AnimEditorOnionSkinConfig
-    
     private let projectManifest: Project.Manifest
     private let sceneManifest: Scene.Manifest
     private let layer: Scene.Layer
-    private let animationLayerContent: Scene.AnimationLayerContent
+    private let layerContent: Scene.AnimationLayerContent
+    private let frameIndex: Int
+    private let onionSkinConfig: AnimEditorOnionSkinConfig
+    private let editorToolState: AnimEditorToolState
     
     private let frameSceneGraph: FrameSceneGraph
     
@@ -38,30 +35,24 @@ class AnimFrameEditorEditingState: AnimFrameEditorState {
     // MARK: - Init
     
     init(
-        projectID: String,
-        sceneID: String,
-        activeLayerID: String,
-        activeFrameIndex: Int,
-        onionSkinConfig: AnimEditorOnionSkinConfig,
         projectManifest: Project.Manifest,
         sceneManifest: Scene.Manifest,
         layer: Scene.Layer,
-        animationLayerContent: Scene.AnimationLayerContent,
+        layerContent: Scene.AnimationLayerContent,
+        frameIndex: Int,
+        onionSkinConfig: AnimEditorOnionSkinConfig,
         editorToolState: AnimEditorToolState,
         frameSceneGraph: FrameSceneGraph,
         activeDrawingManifest: AnimFrameEditorHelper.ActiveDrawingManifest,
         assetManifest: AnimFrameEditorHelper.AssetManifest
     ) {
-        self.projectID = projectID
-        self.sceneID = sceneID
-        self.activeLayerID = activeLayerID
-        self.activeFrameIndex = activeFrameIndex
-        self.onionSkinConfig = onionSkinConfig
-        
         self.projectManifest = projectManifest
         self.sceneManifest = sceneManifest
         self.layer = layer
-        self.animationLayerContent = animationLayerContent
+        self.layerContent = layerContent
+        self.frameIndex = frameIndex
+        self.onionSkinConfig = onionSkinConfig
+        self.editorToolState = editorToolState
         
         self.frameSceneGraph = frameSceneGraph
         self.activeDrawingManifest = activeDrawingManifest
@@ -86,6 +77,7 @@ class AnimFrameEditorEditingState: AnimFrameEditorState {
         toolState?.delegate = self
         
         workspaceSceneGraphGenerator.delegate = self
+        updateWorkspaceSceneGraph()
     }
     
     // MARK: - Logic
@@ -134,14 +126,7 @@ class AnimFrameEditorEditingState: AnimFrameEditorState {
     func onFrame() -> EditorWorkspaceSceneGraph? {
         toolState?.onFrame()
         
-        // TODO: Maybe we shouldn't regenerate the entire
-        // workspace scene graph each frame. That's a lot
-        // of work. All we're changing is the active
-        // drawing texture. Technically, I don't think we
-        // even need to regenerate it because the textures
-        // in the workspace scene graph point to the render
-        // buffer in the tools.
-        updateWorkspaceSceneGraph()
+//        updateWorkspaceSceneGraph()
         
         return workspaceSceneGraph
     }

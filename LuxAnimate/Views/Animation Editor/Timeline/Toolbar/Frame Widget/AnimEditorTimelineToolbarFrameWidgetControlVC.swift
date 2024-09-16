@@ -22,9 +22,9 @@ extension AnimEditorTimelineToolbarFrameWidgetControlVC {
     @MainActor
     protocol Delegate: AnyObject {
         
-        func onChangeFocusedFrame(
+        func onChangeFocusedFrameIndex(
             _ vc: AnimEditorTimelineToolbarFrameWidgetControlVC,
-            index: Int)
+            _ focusedFrameIndex: Int)
         
     }
     
@@ -116,8 +116,8 @@ class AnimEditorTimelineToolbarFrameWidgetControlVC: UIViewController {
         focusedFrameIndex = clampedIndex
         updateFrameLabel()
         
-        delegate?.onChangeFocusedFrame(
-            self, index: clampedIndex)
+        delegate?.onChangeFocusedFrameIndex(
+            self, clampedIndex)
     }
     
     private func updateFrameLabel() {

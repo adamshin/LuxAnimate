@@ -36,7 +36,7 @@ class SceneEditorVC: UIViewController {
     private let projectID: String
     private let sceneID: String
     
-    private var projectEditManagerState: ProjectEditManager.State
+    private var projectState: ProjectEditManager.State
     private var sceneRef: Project.SceneRef
     private var sceneManifest: Scene.Manifest
     
@@ -47,14 +47,14 @@ class SceneEditorVC: UIViewController {
     init(
         projectID: String,
         sceneID: String,
-        projectEditManagerState: ProjectEditManager.State
+        projectState: ProjectEditManager.State
     ) throws {
         
         self.projectID = projectID
         self.sceneID = sceneID
-        self.projectEditManagerState = projectEditManagerState
+        self.projectState = projectState
         
-        let projectManifest = projectEditManagerState
+        let projectManifest = projectState
             .projectManifest
         
         let sceneRef = try Self.sceneRefFromProject(
@@ -83,7 +83,7 @@ class SceneEditorVC: UIViewController {
         setupUI()
         
         updateState(
-            projectEditManagerState: projectEditManagerState,
+            projectState: projectState,
             sceneRef: sceneRef,
             sceneManifest: sceneManifest,
             editContext: nil)
@@ -104,10 +104,10 @@ class SceneEditorVC: UIViewController {
     // MARK: - Logic
     
     private func updateState(
-        projectEditManagerState: ProjectEditManager.State,
+        projectState: ProjectEditManager.State,
         editContext: Sendable?
     ) {
-        let projectManifest = projectEditManagerState
+        let projectManifest = projectState
             .projectManifest
         
         guard let sceneRef = try? Self.sceneRefFromProject(
@@ -122,7 +122,7 @@ class SceneEditorVC: UIViewController {
             context.sender == self
         {
             updateState(
-                projectEditManagerState: projectEditManagerState,
+                projectState: projectState,
                 sceneRef: sceneRef,
                 sceneManifest: context.sceneManifest,
                 editContext: context.wrappedEditContext)
@@ -135,7 +135,7 @@ class SceneEditorVC: UIViewController {
                         sceneID: sceneID)
                 
                 updateState(
-                    projectEditManagerState: projectEditManagerState,
+                    projectState: projectState,
                     sceneRef: sceneRef,
                     sceneManifest: sceneManifest,
                     editContext: nil)
@@ -145,22 +145,22 @@ class SceneEditorVC: UIViewController {
     }
     
     private func updateState(
-        projectEditManagerState: ProjectEditManager.State,
+        projectState: ProjectEditManager.State,
         sceneRef: Project.SceneRef,
         sceneManifest: Scene.Manifest,
         editContext: Sendable?
     ) {
-        self.projectEditManagerState = projectEditManagerState
+        self.projectState = projectState
         self.sceneRef = sceneRef
         self.sceneManifest = sceneManifest
         
         contentVC.update(
-            projectEditManagerState: projectEditManagerState,
+            projectState: projectState,
             sceneRef: sceneRef,
             sceneManifest: sceneManifest)
         
         animEditorVC?.update(
-            projectEditManagerState: projectEditManagerState,
+            projectState: projectState,
             sceneManifest: sceneManifest,
             editContext: editContext)
     }
@@ -168,7 +168,7 @@ class SceneEditorVC: UIViewController {
     // MARK: - Editing
     
     private func addLayer(drawingCount: Int) {
-        let projectManifest = projectEditManagerState
+        let projectManifest = projectState
             .projectManifest
         
         let sceneEdit = SceneEditHelper.createAnimationLayer(
@@ -192,7 +192,7 @@ class SceneEditorVC: UIViewController {
         guard let lastLayer = sceneManifest.layers.last
         else { return }
         
-        let projectManifest = projectEditManagerState
+        let projectManifest = projectState
             .projectManifest
         
         let sceneEdit = try! SceneEditHelper.deleteLayer(
@@ -235,9 +235,9 @@ class SceneEditorVC: UIViewController {
                 projectID: projectID,
                 sceneID: sceneID,
                 activeLayerID: layerID,
-                projectEditManagerState: projectEditManagerState,
+                projectState: projectState,
                 sceneManifest: sceneManifest,
-                activeFrameIndex: 0)
+                focusedFrameIndex: 0)
             
             vc.delegate = self
             
@@ -250,11 +250,11 @@ class SceneEditorVC: UIViewController {
     // MARK: - Interface
     
     func update(
-        projectEditManagerState: ProjectEditManager.State,
+        projectState: ProjectEditManager.State,
         editContext: Sendable?
     ) {
         updateState(
-            projectEditManagerState: projectEditManagerState,
+            projectState: projectState,
             editContext: editContext)
     }
     
@@ -335,7 +335,7 @@ extension SceneEditorVC: AnimEditorVCDelegate {
         editContext: Sendable?
     ) {
         do {
-            let projectManifest = projectEditManagerState
+            let projectManifest = projectState
                 .projectManifest
             
             let edit = try ProjectEditHelper.applySceneEdit(

@@ -9,9 +9,9 @@ extension AnimEditorTimelineVC {
     @MainActor
     protocol Delegate: AnyObject {
         
-        func onChangeFocusedFrame(
+        func onChangeFocusedFrameIndex(
             _ vc: AnimEditorTimelineVC,
-            frameIndex: Int)
+            _ focusedFrameIndex: Int)
         
         func onSelectPlayPause(
             _ vc: AnimEditorTimelineVC)
@@ -58,13 +58,17 @@ class AnimEditorTimelineVC: UIViewController {
     init(
         projectID: String,
         sceneManifest: Scene.Manifest,
-        animationLayerContent: Scene.AnimationLayerContent,
+        layerContent: Scene.AnimationLayerContent,
         focusedFrameIndex: Int
     ) {
         self.projectID = projectID
         self.focusedFrameIndex = focusedFrameIndex
         
         super.init(nibName: nil, bundle: nil)
+        
+        update(
+            sceneManifest: sceneManifest,
+            layerContent: layerContent)
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -91,6 +95,8 @@ class AnimEditorTimelineVC: UIViewController {
         addChild(collapsibleContentVC, to: view)
         addChild(toolbarVC, to: collapsibleContentVC.barView)
         addChild(trackVC, to: collapsibleContentVC.collapsibleContentView)
+        
+        collapsibleContentVC.setExpanded(true, animated: false)
     }
     
     // MARK: - Menu
@@ -122,12 +128,12 @@ class AnimEditorTimelineVC: UIViewController {
     
     func update(
         sceneManifest: Scene.Manifest,
-        animationLayerContent: Scene.AnimationLayerContent
+        layerContent: Scene.AnimationLayerContent
     ) {
         let model = AnimEditorTimelineModel.generate(
             projectID: projectID,
             sceneManifest: sceneManifest,
-            animationLayerContent: animationLayerContent)
+            layerContent: layerContent)
         
         self.model = model
         
@@ -135,10 +141,13 @@ class AnimEditorTimelineVC: UIViewController {
         trackVC.setModel(model)
     }
     
-    func setFocusedFrameIndex(_ index: Int) {
-        focusedFrameIndex = index
-        toolbarVC.setFocusedFrameIndex(index)
-        trackVC.setFocusedFrameIndex(index)
+    func update(
+        focusedFrameIndex: Int
+    ) {
+        self.focusedFrameIndex = focusedFrameIndex
+        
+        toolbarVC.setFocusedFrameIndex(focusedFrameIndex)
+        trackVC.setFocusedFrameIndex(focusedFrameIndex)
     }
     
     func setExpanded(_ expanded: Bool) {
@@ -175,15 +184,15 @@ extension AnimEditorTimelineVC:
 extension AnimEditorTimelineVC:
     AnimEditorTimelineToolbarVC.Delegate {
     
-    func onChangeFocusedFrame(
+    func onChangeFocusedFrameIndex(
         _ vc: AnimEditorTimelineToolbarVC,
-        frameIndex: Int
+        _ focusedFrameIndex: Int
     ) {
-        focusedFrameIndex = frameIndex
-        trackVC.setFocusedFrameIndex(frameIndex)
+        self.focusedFrameIndex = focusedFrameIndex
+        trackVC.setFocusedFrameIndex(focusedFrameIndex)
         
-        delegate?.onChangeFocusedFrame(
-            self, frameIndex: frameIndex)
+        delegate?.onChangeFocusedFrameIndex(
+            self, focusedFrameIndex)
     }
     
     func onSelectPlayPause(_ vc: AnimEditorTimelineToolbarVC) {
@@ -206,15 +215,15 @@ extension AnimEditorTimelineVC:
 //        delegate?.onEndFrameScroll(self)
     }
     
-    func onChangeFocusedFrame(
+    func onChangeFocusedFrameIndex(
         _ vc: AnimEditorTimelineTrackVC,
-        frameIndex: Int
+        _ focusedFrameIndex: Int
     ) {
-        focusedFrameIndex = frameIndex
-        toolbarVC.setFocusedFrameIndex(frameIndex)
+        self.focusedFrameIndex = focusedFrameIndex
+        toolbarVC.setFocusedFrameIndex(focusedFrameIndex)
         
-        delegate?.onChangeFocusedFrame(
-            self, frameIndex: frameIndex)
+        delegate?.onChangeFocusedFrameIndex(
+            self, focusedFrameIndex)
     }
     
     func onSelectFocusedFrame(

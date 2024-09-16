@@ -11,17 +11,12 @@ class AnimFrameEditorLoadingState: AnimFrameEditorState {
         case invalidLayerContent
     }
     
-    private let projectID: String
-    private let sceneID: String
-    private let activeLayerID: String
-    private let activeFrameIndex: Int
-    private let onionSkinConfig: AnimEditorOnionSkinConfig
-    
     private let projectManifest: Project.Manifest
     private let sceneManifest: Scene.Manifest
     private let layer: Scene.Layer
-    private let animationLayerContent: Scene.AnimationLayerContent
-    
+    private let layerContent: Scene.AnimationLayerContent
+    private let frameIndex: Int
+    private let onionSkinConfig: AnimEditorOnionSkinConfig
     private let editorToolState: AnimEditorToolState
     
     private let frameSceneGraph: FrameSceneGraph
@@ -32,9 +27,6 @@ class AnimFrameEditorLoadingState: AnimFrameEditorState {
     private let assetManifest:
         AnimFrameEditorHelper.AssetManifest
     
-    private let workspaceSceneGraphGenerator
-        = AnimFrameEditorWorkspaceSceneGraphGenerator()
-    
     private var loadStartTime: TimeInterval = 0
     
     weak var delegate: AnimFrameEditorStateDelegate?
@@ -42,73 +34,49 @@ class AnimFrameEditorLoadingState: AnimFrameEditorState {
     // MARK: - Init
     
     init(
-        projectID: String,
-        sceneID: String,
-        activeLayerID: String,
-        activeFrameIndex: Int,
-        onionSkinConfig: AnimEditorOnionSkinConfig,
         projectManifest: Project.Manifest,
         sceneManifest: Scene.Manifest,
+        layer: Scene.Layer,
+        layerContent: Scene.AnimationLayerContent,
+        frameIndex: Int,
+        onionSkinConfig: AnimEditorOnionSkinConfig,
         editorToolState: AnimEditorToolState
-    ) throws {
-        
-        guard let layer = sceneManifest.layers.first(
-            where: { $0.id == activeLayerID })
-        else {
-            throw Error.invalidLayerID
-        }
-        
-        guard case .animation(let animationLayerContent)
-            = layer.content
-        else {
-            throw Error.invalidLayerContent
-        }
-        
-        self.projectID = projectID
-        self.sceneID = sceneID
-        self.activeLayerID = activeLayerID
-        self.activeFrameIndex = activeFrameIndex
-        self.onionSkinConfig = onionSkinConfig
-        
+    ) {
         self.projectManifest = projectManifest
         self.sceneManifest = sceneManifest
         self.layer = layer
-        self.animationLayerContent = animationLayerContent
-        
+        self.layerContent = layerContent
+        self.frameIndex = frameIndex
+        self.onionSkinConfig = onionSkinConfig
         self.editorToolState = editorToolState
         
         frameSceneGraph = FrameSceneGraphGenerator.generate(
             projectManifest: projectManifest,
             sceneManifest: sceneManifest,
-            frameIndex: activeFrameIndex)
+            frameIndex: frameIndex)
         
         activeDrawingManifest = AnimFrameEditorHelper
             .activeDrawingManifest(
-                animationLayerContent: animationLayerContent,
-                frameIndex: activeFrameIndex,
+                layerContent: layerContent,
+                frameIndex: frameIndex,
                 onionSkinConfig: onionSkinConfig)
         
         assetManifest = AnimFrameEditorHelper
             .assetManifest(
                 frameSceneGraph: frameSceneGraph,
                 activeDrawingManifest: activeDrawingManifest)
-        
-        workspaceSceneGraphGenerator.delegate = self
     }
     
     // MARK: - Logic
     
     private func enterEditingState() {
         let newState = AnimFrameEditorEditingState(
-            projectID: projectID,
-            sceneID: sceneID,
-            activeLayerID: activeLayerID,
-            activeFrameIndex: activeFrameIndex,
-            onionSkinConfig: onionSkinConfig,
             projectManifest: projectManifest,
             sceneManifest: sceneManifest,
             layer: layer,
-            animationLayerContent: animationLayerContent,
+            layerContent: layerContent,
+            frameIndex: frameIndex,
+            onionSkinConfig: onionSkinConfig,
             editorToolState: editorToolState,
             frameSceneGraph: frameSceneGraph,
             activeDrawingManifest: activeDrawingManifest,
@@ -141,28 +109,6 @@ class AnimFrameEditorLoadingState: AnimFrameEditorState {
         enterEditingState()
     }
     
-    func onFrame() -> EditorWorkspaceSceneGraph? {
-        return nil
-//        workspaceSceneGraphGenerator
-//            .generate(
-//                frameSceneGraph: frameSceneGraph,
-//                activeDrawingManifest: activeDrawingManifest,
-//                activeDrawingTexture: nil,
-//                onionSkinConfig: onionSkinConfig)
-    }
-    
-}
-
-// MARK: - Delegates
-
-extension AnimFrameEditorLoadingState:
-    AnimFrameEditorWorkspaceSceneGraphGeneratorDelegate {
-    
-    func assetTexture(
-        _ g: AnimFrameEditorWorkspaceSceneGraphGenerator,
-        assetID: String
-    ) -> MTLTexture? {
-        nil
-    }
+    func onFrame() -> EditorWorkspaceSceneGraph? { nil }
     
 }

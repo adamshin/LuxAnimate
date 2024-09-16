@@ -15,12 +15,12 @@ struct AnimFrameEditorHelper {
     }
     
     static func activeDrawingManifest(
-        animationLayerContent: Scene.AnimationLayerContent,
+        layerContent: Scene.AnimationLayerContent,
         frameIndex: Int,
         onionSkinConfig: AnimEditorOnionSkinConfig
     ) -> ActiveDrawingManifest {
         
-        let drawings = animationLayerContent.drawings
+        let drawings = layerContent.drawings
         
         let sortedDrawings = drawings.sorted {
             $0.frameIndex < $1.frameIndex

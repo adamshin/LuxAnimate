@@ -98,14 +98,14 @@ class SceneEditorContentVC: UIViewController {
     }
     
     func update(
-        projectEditManagerState: ProjectEditManager.State,
+        projectState: ProjectEditManager.State,
         sceneRef: Project.SceneRef,
         sceneManifest: Scene.Manifest
     ) {
         self.sceneRef = sceneRef
         self.sceneManifest = sceneManifest
-        self.availableUndoCount = projectEditManagerState.availableUndoCount
-        self.availableRedoCount = projectEditManagerState.availableRedoCount
+        self.availableUndoCount = projectState.availableUndoCount
+        self.availableRedoCount = projectState.availableRedoCount
         
         updateButtons()
         tableView.reloadData()

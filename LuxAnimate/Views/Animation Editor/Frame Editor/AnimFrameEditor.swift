@@ -4,34 +4,38 @@
 
 import Metal
 
-@MainActor
-protocol AnimFrameEditorDelegate: AnyObject {
+extension AnimFrameEditor {
     
-    func workspaceViewSize(
-        _ e: AnimFrameEditor
-    ) -> Size
-    
-    func workspaceTransform(
-        _ e: AnimFrameEditor
-    ) -> EditorWorkspaceTransform
-    
-    func setAssetLoaderAssetIDs(
-        _ e: AnimFrameEditor,
-        assetIDs: Set<String>)
-    
-    func assetLoaderAssetTexture(
-        _ e: AnimFrameEditor,
-        assetID: String
-    ) -> MTLTexture?
-    
-    func setEditInteractionEnabled(
-        _ e: AnimFrameEditor,
-        enabled: Bool)
-    
-    func onEdit(
-        _ e: AnimFrameEditor,
-        drawingID: String,
-        drawingTexture: MTLTexture?)
+    @MainActor
+    protocol Delegate: AnyObject {
+        
+        func workspaceViewSize(
+            _ e: AnimFrameEditor
+        ) -> Size
+        
+        func workspaceTransform(
+            _ e: AnimFrameEditor
+        ) -> EditorWorkspaceTransform
+        
+        func setAssetLoaderAssetIDs(
+            _ e: AnimFrameEditor,
+            assetIDs: Set<String>)
+        
+        func assetLoaderAssetTexture(
+            _ e: AnimFrameEditor,
+            assetID: String
+        ) -> MTLTexture?
+        
+        func setEditInteractionEnabled(
+            _ e: AnimFrameEditor,
+            enabled: Bool)
+        
+        func onEdit(
+            _ e: AnimFrameEditor,
+            drawingID: String,
+            drawingTexture: MTLTexture?)
+        
+    }
     
 }
 
@@ -40,7 +44,7 @@ class AnimFrameEditor {
     
     private var state: AnimFrameEditorState?
     
-    weak var delegate: AnimFrameEditorDelegate?
+    weak var delegate: Delegate?
     
     // MARK: - State
     
@@ -53,29 +57,24 @@ class AnimFrameEditor {
     // MARK: - Interface
     
     func begin(
-        projectID: String,
-        sceneID: String,
-        activeLayerID: String,
-        activeFrameIndex: Int,
-        onionSkinConfig: AnimEditorOnionSkinConfig,
         projectManifest: Project.Manifest,
         sceneManifest: Scene.Manifest,
+        layer: Scene.Layer,
+        layerContent: Scene.AnimationLayerContent,
+        frameIndex: Int,
+        onionSkinConfig: AnimEditorOnionSkinConfig,
         editorToolState: AnimEditorToolState
     ) {
-        do {
-            let state = try AnimFrameEditorLoadingState(
-                projectID: projectID,
-                sceneID: sceneID,
-                activeLayerID: activeLayerID,
-                activeFrameIndex: activeFrameIndex,
-                onionSkinConfig: onionSkinConfig,
-                projectManifest: projectManifest,
-                sceneManifest: sceneManifest,
-                editorToolState: editorToolState)
-            
-            enterState(state)
-            
-        } catch { }
+        let state = AnimFrameEditorLoadingState(
+            projectManifest: projectManifest,
+            sceneManifest: sceneManifest,
+            layer: layer,
+            layerContent: layerContent,
+            frameIndex: frameIndex,
+            onionSkinConfig: onionSkinConfig,
+            editorToolState: editorToolState)
+        
+        enterState(state)
     }
     
     func onFrame() -> EditorWorkspaceSceneGraph? {

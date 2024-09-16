@@ -9,9 +9,9 @@ extension AnimEditorTimelineToolbarVC {
     @MainActor
     protocol Delegate: AnyObject {
         
-        func onChangeFocusedFrame(
+        func onChangeFocusedFrameIndex(
             _ vc: AnimEditorTimelineToolbarVC,
-            frameIndex: Int)
+            _ focusedFrameIndex: Int)
         
         func onSelectPlayPause(
             _ vc: AnimEditorTimelineToolbarVC)
@@ -62,16 +62,16 @@ class AnimEditorTimelineToolbarVC: UIViewController {
         let frameIndex = 0
         frameWidgetVC.setFocusedFrameIndex(frameIndex)
         
-        delegate?.onChangeFocusedFrame(
-            self, frameIndex: frameIndex)
+        delegate?.onChangeFocusedFrameIndex(
+            self, frameIndex)
     }
     
     @objc private func onSelectLastFrame() {
         let frameIndex = frameCount - 1
         frameWidgetVC.setFocusedFrameIndex(frameIndex)
         
-        delegate?.onChangeFocusedFrame(
-            self, frameIndex: frameIndex)
+        delegate?.onChangeFocusedFrameIndex(
+            self, frameIndex)
     }
     
     @objc private func onSelectPlayPause() {
@@ -107,12 +107,12 @@ class AnimEditorTimelineToolbarVC: UIViewController {
 extension AnimEditorTimelineToolbarVC:
     AnimEditorTimelineToolbarFrameWidgetVC.Delegate {
     
-    func onChangeFocusedFrame(
+    func onChangeFocusedFrameIndex(
         _ vc: AnimEditorTimelineToolbarFrameWidgetVC,
-        frameIndex: Int
+        _ focusedFrameIndex: Int
     ) {
-        delegate?.onChangeFocusedFrame(
-            self, frameIndex: frameIndex)
+        delegate?.onChangeFocusedFrameIndex(
+            self, focusedFrameIndex)
     }
     
 }
