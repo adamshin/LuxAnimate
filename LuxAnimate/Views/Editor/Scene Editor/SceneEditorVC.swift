@@ -230,18 +230,21 @@ class SceneEditorVC: UIViewController {
     }
     
     private func showAnimationLayerEditor(layerID: String) {
-        let vc = AnimEditorVC(
-            projectID: projectID,
-            sceneID: sceneID,
-            activeLayerID: layerID,
-            projectEditManagerState: projectEditManagerState,
-            sceneManifest: sceneManifest,
-            activeFrameIndex: 0)
-        
-        vc.delegate = self
-        
-        present(vc, animated: true)
-        animEditorVC = vc
+        do {
+            let vc = try AnimEditorVC(
+                projectID: projectID,
+                sceneID: sceneID,
+                activeLayerID: layerID,
+                projectEditManagerState: projectEditManagerState,
+                sceneManifest: sceneManifest,
+                activeFrameIndex: 0)
+            
+            vc.delegate = self
+            
+            present(vc, animated: true)
+            animEditorVC = vc
+            
+        } catch { }
     }
     
     // MARK: - Interface

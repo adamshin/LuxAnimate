@@ -19,7 +19,7 @@ class TimelineToolbarVC: UIViewController {
     weak var delegate: TimelineToolbarVCDelegate?
     
     private let bodyView = TimelineToolbarView()
-    private let frameWidgetVC = TimelineToolbarFrameWidgetVC()
+//    private let frameWidgetVC = TimelineToolbarFrameWidgetVC()
     
     private var frameCount = 0
     
@@ -41,21 +41,21 @@ class TimelineToolbarVC: UIViewController {
         bodyView.expandButton.addTarget(
             self, action: #selector(onSelectExpand))
         
-        frameWidgetVC.delegate = self
-        addChild(frameWidgetVC, to: bodyView.frameWidgetContainer)
+//        frameWidgetVC.delegate = self
+//        addChild(frameWidgetVC, to: bodyView.frameWidgetContainer)
     }
     
     // MARK: - Handlers
     
     @objc private func onSelectFirstFrame() {
         let index = 0
-        frameWidgetVC.setFocusedFrameIndex(index)
+//        frameWidgetVC.setFocusedFrameIndex(index)
         delegate?.onChangeFocusedFrame(self, index: index)
     }
     
     @objc private func onSelectLastFrame() {
         let index = frameCount - 1
-        frameWidgetVC.setFocusedFrameIndex(index)
+//        frameWidgetVC.setFocusedFrameIndex(index)
         delegate?.onChangeFocusedFrame(self, index: index)
     }
     
@@ -70,7 +70,7 @@ class TimelineToolbarVC: UIViewController {
     // MARK: - Interface
     
     func setPlaying(_ playing: Bool) {
-        frameWidgetVC.setPlaying(playing)
+//        frameWidgetVC.setPlaying(playing)
         bodyView.setPlayButtonPlaying(playing)
     }
     
@@ -80,22 +80,22 @@ class TimelineToolbarVC: UIViewController {
     
     func setFrameCount(_ frameCount: Int) {
         self.frameCount = frameCount
-        frameWidgetVC.setFrameCount(frameCount)
+//        frameWidgetVC.setFrameCount(frameCount)
     }
     
     func setFocusedFrameIndex(_ index: Int) {
-        frameWidgetVC.setFocusedFrameIndex(index)
+//        frameWidgetVC.setFocusedFrameIndex(index)
     }
     
 }
 
-extension TimelineToolbarVC: TimelineToolbarFrameWidgetVCDelegate {
-    
-    func onChangeFocusedFrame(
-        _ vc: TimelineToolbarFrameWidgetVC,
-        index: Int
-    ) {
-        delegate?.onChangeFocusedFrame(self, index: index)
-    }
-    
-}
+//extension TimelineToolbarVC: TimelineToolbarFrameWidgetVCDelegate {
+//    
+//    func onChangeFocusedFrame(
+//        _ vc: TimelineToolbarFrameWidgetVC,
+//        index: Int
+//    ) {
+//        delegate?.onChangeFocusedFrame(self, index: index)
+//    }
+//    
+//}

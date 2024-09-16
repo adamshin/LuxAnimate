@@ -19,6 +19,10 @@ import UIKit
 // copied. Loaded asset textures are fine to include
 // directly since they're never modified once created.
 
+// TODO:
+// Factor out frame editor container?
+// Factor out tool state machine?
+
 @MainActor
 protocol AnimEditorVCDelegate: AnyObject {
     
@@ -47,8 +51,9 @@ class AnimEditorVC: UIViewController {
     
     private let workspaceVC = EditorWorkspaceVC()
     private let toolbarVC = AnimEditorToolbarVC()
-    private let bottomBarVC = AnimEditorBottomBarVC()
     private let toolControlsVC = AnimEditorToolControlsVC()
+    
+    private let timelineVC: AnimEditorTimelineVC
     
     private let assetLoader: AnimEditorAssetLoader
     private let frameEditProcessor: AnimFrameEditProcessor
@@ -62,6 +67,9 @@ class AnimEditorVC: UIViewController {
     
     private var projectEditManagerState: ProjectEditManager.State
     private var sceneManifest: Scene.Manifest
+    private var layer: Scene.Layer
+    private var animationLayerContent: Scene.AnimationLayerContent
+    
     private var activeFrameIndex: Int
     
     private var onionSkinConfig: AnimEditorOnionSkinConfig
@@ -80,7 +88,8 @@ class AnimEditorVC: UIViewController {
         projectEditManagerState: ProjectEditManager.State,
         sceneManifest: Scene.Manifest,
         activeFrameIndex: Int
-    ) {
+    ) throws {
+        
         self.projectID = projectID
         self.sceneID = sceneID
         self.activeLayerID = activeLayerID
@@ -88,14 +97,27 @@ class AnimEditorVC: UIViewController {
         self.sceneManifest = sceneManifest
         self.activeFrameIndex = activeFrameIndex
         
-        onionSkinConfig = AppConfig.onionSkinConfig
+        let (layer, animationLayerContent) =
+            try AnimEditorLayerReader.layerData(
+                sceneManifest: sceneManifest,
+                layerID: activeLayerID)
         
-        frameEditProcessor = AnimFrameEditProcessor(
-            layerID: activeLayerID,
-            sceneManifest: sceneManifest)
+        self.layer = layer
+        self.animationLayerContent = animationLayerContent
+        
+        timelineVC = AnimEditorTimelineVC(
+            projectID: projectID,
+            sceneManifest: sceneManifest,
+            animationLayerContent: animationLayerContent,
+            focusedFrameIndex: activeFrameIndex)
+        
+        onionSkinConfig = AppConfig.onionSkinConfig
         
         assetLoader = AnimEditorAssetLoader(
             projectID: projectID)
+        
+        frameEditProcessor = AnimFrameEditProcessor(
+            layerID: activeLayerID)
         
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
@@ -130,12 +152,14 @@ class AnimEditorVC: UIViewController {
     private func setupUI() {
         workspaceVC.delegate = self
         toolbarVC.delegate = self
-        bottomBarVC.delegate = self
+        timelineVC.delegate = self
         
         addChild(workspaceVC, to: bodyView.workspaceContainer)
         addChild(toolbarVC, to: bodyView.toolbarContainer)
-        addChild(bottomBarVC, to: bodyView.bottomBarContainer)
         addChild(toolControlsVC, to: bodyView.toolControlsContainer)
+        
+        // TODO: Proper view containment
+        addChild(timelineVC, to: bodyView.workspaceContainer)
     }
     
     private func setupToolState() {
@@ -149,8 +173,10 @@ class AnimEditorVC: UIViewController {
             availableUndoCount: projectEditManagerState.availableUndoCount,
             availableRedoCount: projectEditManagerState.availableRedoCount)
         
-        bottomBarVC.update(
-            activeFrameIndex: activeFrameIndex)
+//        timelineVC.update(
+//            projectID: projectID,
+//            sceneManifest: sceneManifest,
+//            animationLayerContent: ??)
     }
     
     // MARK: - Logic
@@ -160,8 +186,10 @@ class AnimEditorVC: UIViewController {
         sceneManifest: Scene.Manifest,
         editContext: Sendable?
     ) {
-        guard sceneManifest.layers
-            .contains(where: { $0.id == activeLayerID })
+        guard let (layer, animationLayerContent) =
+            try? AnimEditorLayerReader.layerData(
+                sceneManifest: sceneManifest,
+                layerID: activeLayerID)
         else {
             dismiss()
             return
@@ -169,9 +197,12 @@ class AnimEditorVC: UIViewController {
         
         self.projectEditManagerState = projectEditManagerState
         self.sceneManifest = sceneManifest
+        self.layer = layer
+        self.animationLayerContent = animationLayerContent
         
-        frameEditProcessor.update(
-            sceneManifest: sceneManifest)
+        timelineVC.update(
+            sceneManifest: sceneManifest,
+            animationLayerContent: animationLayerContent)
         
         let shouldReloadFrameEditor: Bool
         if let context = editContext as? AnimEditorVCEditContext,
@@ -186,6 +217,7 @@ class AnimEditorVC: UIViewController {
         clampActiveFrameIndex()
         updateUI()
         
+        // TODO: Factor this out into a frame editor container object?
         if shouldReloadFrameEditor {
             reloadFrameEditor()
         }
@@ -241,9 +273,7 @@ class AnimEditorVC: UIViewController {
     private func enterToolState(
         _ newToolState: AnimEditorToolState
     ) {
-        frameEditProcessor.afterAllEditsFinish {
-            self.enterToolStateInternal(newToolState)
-        }
+        enterToolStateInternal(newToolState)
     }
     
     private func enterToolStateInternal(
@@ -369,14 +399,42 @@ extension AnimEditorVC: AnimEditorToolbarVCDelegate {
     
 }
 
-extension AnimEditorVC: AnimEditorBottomBarVCDelegate {
+extension AnimEditorVC: AnimEditorTimelineVC.Delegate {
     
-    func onSelectPrevFrame(_ vc: AnimEditorBottomBarVC) {
-        updateState(activeFrameIndex: activeFrameIndex - 1)
+    func onChangeFocusedFrame(
+        _ vc: AnimEditorTimelineVC,
+        frameIndex: Int
+    ) {
+        updateState(activeFrameIndex: frameIndex)
     }
-    func onSelectNextFrame(_ vc: AnimEditorBottomBarVC) {
-        updateState(activeFrameIndex: activeFrameIndex + 1)
-    }
+    
+    func onSelectPlayPause(
+        _ vc: AnimEditorTimelineVC
+    ) { }
+    
+    func onRequestCreateDrawing(
+        _ vc: AnimEditorTimelineVC,
+        frameIndex: Int
+    ) { }
+    
+    func onRequestDeleteDrawing(
+        _ vc: AnimEditorTimelineVC,
+        frameIndex: Int
+    ) { }
+    
+    func onRequestInsertSpacing(
+        _ vc: AnimEditorTimelineVC,
+        frameIndex: Int
+    ) { }
+    
+    func onRequestRemoveSpacing(
+        _ vc: AnimEditorTimelineVC,
+        frameIndex: Int
+    ) { }
+    
+    func onChangeContentAreaSize(
+        _ vc: AnimEditorTimelineVC
+    ) { }
     
 }
 
@@ -421,7 +479,12 @@ extension AnimEditorVC: AnimFrameEditorDelegate {
         drawingID: String,
         drawingTexture: MTLTexture?
     ) {
+        // TODO: Is this logic right?
+        // Subsequent edits need to stack on top of each other
+        // Do we need an updated scene manifest each time?
+        // Maybe this is fine since we're just editing a single drawing
         frameEditProcessor.applyEdit(
+            sceneManifest: sceneManifest,
             drawingID: drawingID,
             drawingTexture: drawingTexture)
     }

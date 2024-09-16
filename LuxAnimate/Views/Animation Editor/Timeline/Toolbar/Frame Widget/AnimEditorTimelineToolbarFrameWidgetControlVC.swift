@@ -1,5 +1,5 @@
 //
-//  TimelineToolbarFrameWidgetControlVC.swift
+//  AnimEditorTimelineToolbarFrameWidgetControlVC.swift
 //
 
 import UIKit
@@ -16,18 +16,23 @@ private let numberFont = UIFont.monospacedDigitSystemFont(
     ofSize: 17,
     weight: .medium)
 
-@MainActor
-protocol TimelineToolbarFrameWidgetControlVCDelegate: AnyObject {
+
+extension AnimEditorTimelineToolbarFrameWidgetControlVC {
     
-    func onChangeFocusedFrame(
-        _ vc: TimelineToolbarFrameWidgetControlVC,
-        index: Int)
+    @MainActor
+    protocol Delegate: AnyObject {
+        
+        func onChangeFocusedFrame(
+            _ vc: AnimEditorTimelineToolbarFrameWidgetControlVC,
+            index: Int)
+        
+    }
     
 }
 
-class TimelineToolbarFrameWidgetControlVC: UIViewController {
+class AnimEditorTimelineToolbarFrameWidgetControlVC: UIViewController {
     
-    weak var delegate: TimelineToolbarFrameWidgetControlVCDelegate?
+    weak var delegate: Delegate?
     
     private let frameNumberLabel = UILabel()
     

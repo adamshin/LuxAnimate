@@ -39,7 +39,6 @@ extension AnimFrameEditProcessor {
 class AnimFrameEditProcessor {
     
     private let layerID: String
-    private var sceneManifest: Scene.Manifest
     
     private let drawingAssetProcessor = DrawingAssetProcessor()
     
@@ -48,22 +47,15 @@ class AnimFrameEditProcessor {
     // MARK: - Init
     
     init(
-        layerID: String,
-        sceneManifest: Scene.Manifest
+        layerID: String
     ) {
         self.layerID = layerID
-        self.sceneManifest = sceneManifest
     }
     
     // MARK: - Interface
     
-    func update(
-        sceneManifest: Scene.Manifest
-    ) {
-        self.sceneManifest = sceneManifest
-    }
-    
     func applyEdit(
+        sceneManifest: Scene.Manifest,
         drawingID: String,
         drawingTexture: MTLTexture?
     ) {
@@ -87,11 +79,6 @@ class AnimFrameEditProcessor {
                 self, sceneEdit: sceneEdit)
             
         } catch { }
-    }
-    
-    func afterAllEditsFinish(_ block: @escaping () -> Void) {
-        // TODO: Wait for pending tasks!
-        block()
     }
     
 }
