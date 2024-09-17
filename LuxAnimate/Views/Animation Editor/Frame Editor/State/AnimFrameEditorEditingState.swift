@@ -77,7 +77,6 @@ class AnimFrameEditorEditingState: AnimFrameEditorState {
         toolState?.delegate = self
         
         workspaceSceneGraphGenerator.delegate = self
-        updateWorkspaceSceneGraph()
     }
     
     // MARK: - Logic
@@ -117,6 +116,8 @@ class AnimFrameEditorEditingState: AnimFrameEditorState {
                 toolState?.setDrawingCanvasTexture(activeDrawingTexture)
             }
         }
+        
+        updateWorkspaceSceneGraph()
     }
     
     func onAssetLoaderUpdate() { }

@@ -768,10 +768,10 @@
 		668A14CF2C7D3D1800D73D36 /* Animation Editor */ = {
 			isa = PBXGroup;
 			children = (
+				668A14D52C7D3EB500D73D36 /* Frame Editor */,
+				6651A9D42C961FEF00E3520A /* Timeline */,
 				668A14D02C7D3D2C00D73D36 /* Toolbar */,
 				668A14D12C7D3D8A00D73D36 /* Tool Controls */,
-				6651A9D42C961FEF00E3520A /* Timeline */,
-				668A14D52C7D3EB500D73D36 /* Frame Editor */,
 				664175B32C7E556000205FEC /* Tool State */,
 				6678A9BF2C8398ED00838EA3 /* Asset Loader */,
 				668A14D42C7D3E3800D73D36 /* Shared */,
