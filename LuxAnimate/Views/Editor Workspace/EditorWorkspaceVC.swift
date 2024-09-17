@@ -11,10 +11,6 @@ private let maxZoomScale: Scalar = 30
 @MainActor
 protocol EditorWorkspaceVCDelegate: AnyObject {
     
-    func onFrame(
-        _ vc: EditorWorkspaceVC,
-        drawable: CAMetalDrawable)
-    
     func onSelectUndo(_ vc: EditorWorkspaceVC)
     func onSelectRedo(_ vc: EditorWorkspaceVC)
     
@@ -24,22 +20,15 @@ class EditorWorkspaceVC: UIViewController {
     
     weak var delegate: EditorWorkspaceVCDelegate?
     
-    private let metalView = EditorWorkspaceMetalView()
+    let metalView = EditorWorkspaceMetalView()
     private let overlayView = EditorWorkspaceOverlayView()
     
     private let workspaceTransformManager = EditorWorkspaceTransformManager()
-    
-    private lazy var displayLink = CAMetalDisplayLink(
-        metalLayer: metalView.metalLayer)
     
     // MARK: - Init
     
     init() {
         super.init(nibName: nil, bundle: nil)
-        
-        displayLink.delegate = self
-        displayLink.preferredFrameLatency = 1
-        displayLink.add(to: .main, forMode: .common)
         
         workspaceTransformManager.delegate = self
         workspaceTransformManager.setMinScale(minZoomScale)
@@ -61,11 +50,6 @@ class EditorWorkspaceVC: UIViewController {
         view.addSubview(overlayView)
     }
     
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        displayLink.invalidate()
-    }
-    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
@@ -79,6 +63,10 @@ class EditorWorkspaceVC: UIViewController {
     }
     
     // MARK: - Interface
+    
+    func onFrame() {
+        workspaceTransformManager.onFrame()
+    }
     
     func setContentSize(_ contentSize: Size) {
         workspaceTransformManager
@@ -106,20 +94,6 @@ class EditorWorkspaceVC: UIViewController {
 }
 
 // MARK: - Delegates
-
-extension EditorWorkspaceVC: @preconcurrency CAMetalDisplayLinkDelegate {
-    
-    func metalDisplayLink(
-        _ link: CAMetalDisplayLink,
-        needsUpdate update: CAMetalDisplayLink.Update
-    ) {
-        workspaceTransformManager.onFrame()
-        
-        delegate?.onFrame(
-            self, drawable: update.drawable)
-    }
-    
-}
 
 extension EditorWorkspaceVC: EditorWorkspaceTransformManagerDelegate {
     

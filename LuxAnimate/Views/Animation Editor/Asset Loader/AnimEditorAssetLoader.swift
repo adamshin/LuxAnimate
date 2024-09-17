@@ -79,7 +79,7 @@ class AnimEditorAssetLoader {
             .subtracting(Set(loadedAssets.keys))
         
         for assetID in assetIDsToLoad {
-            let task = Task.detached(priority: .userInitiated) {
+            let task = Task.detached(priority: .high) {
                 try await self.limitedConcurrencyQueue.enqueue {
                     try await self.loadAsset(assetID: assetID)
                 }

@@ -41,6 +41,8 @@ class AnimEditorVC: UIViewController {
     private let workspaceRenderer = EditorWorkspaceRenderer(
         pixelFormat: AppConfig.metalLayerPixelFormat)
     
+    private let displayLink = WrappedDisplayLink()
+    
     private let projectID: String
     private let sceneID: String
     private let activeLayerID: String
@@ -125,6 +127,7 @@ class AnimEditorVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        setupDisplayLink()
     }
     
     override var prefersStatusBarHidden: Bool { true }
@@ -142,6 +145,12 @@ class AnimEditorVC: UIViewController {
         
         // TODO: Proper view structure
         addChild(timelineVC, to: bodyView.workspaceContainer)
+    }
+    
+    private func setupDisplayLink() {
+        displayLink.setCallback { [weak self] _ in
+            self?.onFrame()
+        }
     }
     
     // MARK: - Logic
@@ -273,34 +282,37 @@ class AnimEditorVC: UIViewController {
     
     // MARK: - Frame
     
-    private func onFrame(
-        drawable: CAMetalDrawable
-    ) {
-        let sceneGraph = frameEditor?.onFrame()
-        
-        if let sceneGraph {
-            // Maybe only set this if it changes?
-            workspaceVC.setContentSize(sceneGraph.contentSize)
+    private func onFrame() {
+        autoreleasepool {
+            workspaceVC.onFrame()
             
-            let viewportSize = workspaceVC.viewportSize()
-            let workspaceTransform = workspaceVC.workspaceTransform()
-            
-            draw(
-                drawable: drawable,
-                viewportSize: viewportSize,
-                workspaceTransform: workspaceTransform,
-                sceneGraph: sceneGraph)
+            let sceneGraph = frameEditor?.onFrame()
+            if let sceneGraph {
+                // Maybe only set this if it changes?
+                workspaceVC.setContentSize(sceneGraph.contentSize)
+                
+                let viewportSize = workspaceVC.viewportSize()
+                let workspaceTransform = workspaceVC.workspaceTransform()
+                
+                draw(
+                    viewportSize: viewportSize,
+                    workspaceTransform: workspaceTransform,
+                    sceneGraph: sceneGraph)
+            }
         }
     }
     
     // MARK: - Render
     
     private func draw(
-        drawable: CAMetalDrawable,
         viewportSize: Size,
         workspaceTransform: EditorWorkspaceTransform,
         sceneGraph: EditorWorkspaceSceneGraph
     ) {
+        guard let drawable = workspaceVC
+            .metalView.metalLayer.nextDrawable()
+        else { return }
+        
         let commandBuffer = MetalInterface.shared
             .commandQueue.makeCommandBuffer()!
         
@@ -339,13 +351,6 @@ class AnimEditorVC: UIViewController {
 // MARK: - Delegates
 
 extension AnimEditorVC: EditorWorkspaceVCDelegate {
-    
-    func onFrame(
-        _ vc: EditorWorkspaceVC,
-        drawable: CAMetalDrawable
-    ) {
-        onFrame(drawable: drawable)
-    }
     
     func onSelectUndo(_ vc: EditorWorkspaceVC) {
         delegate?.onRequestUndo(self)
