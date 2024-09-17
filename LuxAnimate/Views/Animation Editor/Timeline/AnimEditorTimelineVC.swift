@@ -107,7 +107,7 @@ class AnimEditorTimelineVC: UIViewController {
         
         let frame = model.frames[frameIndex]
         
-        let contentView = EditorTimelineFrameMenuView(
+        let contentView = AnimEditorTimelineFrameMenuView(
             frameIndex: frameIndex,
             hasDrawing: frame.hasDrawing)
         
@@ -258,10 +258,10 @@ extension AnimEditorTimelineVC:
 }
 
 extension AnimEditorTimelineVC:
-    EditorTimelineFrameMenuViewDelegate {
+    AnimEditorTimelineFrameMenuView.Delegate {
     
     func onSelectCreateDrawing(
-        _ v: EditorTimelineFrameMenuView,
+        _ v: AnimEditorTimelineFrameMenuView,
         frameIndex: Int
     ) {
         delegate?.onRequestCreateDrawing(self,
@@ -269,7 +269,7 @@ extension AnimEditorTimelineVC:
     }
     
     func onSelectDeleteDrawing(
-        _ v: EditorTimelineFrameMenuView,
+        _ v: AnimEditorTimelineFrameMenuView,
         frameIndex: Int
     ) {
         delegate?.onRequestDeleteDrawing(self,
@@ -277,7 +277,7 @@ extension AnimEditorTimelineVC:
     }
     
     func onSelectInsertSpacing(
-        _ v: EditorTimelineFrameMenuView,
+        _ v: AnimEditorTimelineFrameMenuView,
         frameIndex: Int
     ) {
         delegate?.onRequestInsertSpacing(self,
@@ -285,7 +285,7 @@ extension AnimEditorTimelineVC:
     }
     
     func onSelectRemoveSpacing(
-        _ v: EditorTimelineFrameMenuView,
+        _ v: AnimEditorTimelineFrameMenuView,
         frameIndex: Int
     ) {
         delegate?.onRequestRemoveSpacing(self,
@@ -293,4 +293,3 @@ extension AnimEditorTimelineVC:
     }
     
 }
-

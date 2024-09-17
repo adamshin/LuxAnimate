@@ -1,33 +1,37 @@
 //
-//  EditorTimelineFrameMenuView.swift
+//  AnimEditorTimelineFrameMenuView.swift
 //
 
 import UIKit
 
-@MainActor
-protocol EditorTimelineFrameMenuViewDelegate: AnyObject {
-    
-    func onSelectCreateDrawing(
-        _ v: EditorTimelineFrameMenuView,
-        frameIndex: Int)
-    
-    func onSelectDeleteDrawing(
-        _ v: EditorTimelineFrameMenuView,
-        frameIndex: Int)
-    
-    func onSelectInsertSpacing(
-        _ v: EditorTimelineFrameMenuView,
-        frameIndex: Int)
-    
-    func onSelectRemoveSpacing(
-        _ v: EditorTimelineFrameMenuView,
-        frameIndex: Int)
+extension AnimEditorTimelineFrameMenuView {
+
+    @MainActor
+    protocol Delegate: AnyObject {
+        
+        func onSelectCreateDrawing(
+            _ v: AnimEditorTimelineFrameMenuView,
+            frameIndex: Int)
+        
+        func onSelectDeleteDrawing(
+            _ v: AnimEditorTimelineFrameMenuView,
+            frameIndex: Int)
+        
+        func onSelectInsertSpacing(
+            _ v: AnimEditorTimelineFrameMenuView,
+            frameIndex: Int)
+        
+        func onSelectRemoveSpacing(
+            _ v: AnimEditorTimelineFrameMenuView,
+            frameIndex: Int)
+        
+    }
     
 }
 
-class EditorTimelineFrameMenuView: EditorMenuContentView {
+class AnimEditorTimelineFrameMenuView: EditorMenuContentView {
     
-    weak var delegate: EditorTimelineFrameMenuViewDelegate?
+    weak var delegate: Delegate?
     
     private let frameIndex: Int
     
