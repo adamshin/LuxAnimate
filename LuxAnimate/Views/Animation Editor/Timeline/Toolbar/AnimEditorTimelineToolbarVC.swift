@@ -27,7 +27,7 @@ class AnimEditorTimelineToolbarVC: UIViewController {
     
     weak var delegate: Delegate?
     
-    private let bodyView = TimelineToolbarView()
+    private let bodyView = AnimEditorTimelineToolbarView()
     
     private let frameWidgetVC =
         AnimEditorTimelineToolbarFrameWidgetVC()
