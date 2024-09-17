@@ -1,5 +1,5 @@
 //
-//  EditorSidebarSlider.swift
+//  AnimEditorToolSidebarSlider.swift
 //
 
 import UIKit
@@ -25,21 +25,25 @@ private let flickVelocityThreshold: CGFloat = 500
 private let flickDecelDuration: TimeInterval = 0.2
 private let flickDistanceMultiplier: CGFloat = 0.0005
 
-@MainActor
-protocol EditorSidebarSliderDelegate: AnyObject {
+extension AnimEditorToolSidebarSlider {
     
-    func onBeginPress(_ v: EditorSidebarSlider)
-    func onEndPress(_ v: EditorSidebarSlider)
-    func onChangeValue(_ v: EditorSidebarSlider)
+    @MainActor
+    protocol Delegate: AnyObject {
+        
+        func onBeginPress(_ v: AnimEditorToolSidebarSlider)
+        func onEndPress(_ v: AnimEditorToolSidebarSlider)
+        func onChangeValue(_ v: AnimEditorToolSidebarSlider)
+        
+    }
     
 }
 
-class EditorSidebarSlider: UIView {
+class AnimEditorToolSidebarSlider: UIView {
     
-    weak var delegate: EditorSidebarSliderDelegate?
+    weak var delegate: Delegate?
     
     private let contentView = UIView()
-    private let cardView = EditorSidebarCardView()
+    private let cardView = AnimEditorToolSidebarCardView()
     private let thumbView = CircleView()
     
     private let pressGesture = UILongPressGestureRecognizer()
@@ -203,7 +207,7 @@ class EditorSidebarSlider: UIView {
 
 // MARK: - Delegates
 
-extension EditorSidebarSlider: UIGestureRecognizerDelegate {
+extension AnimEditorToolSidebarSlider: UIGestureRecognizerDelegate {
     
     func gestureRecognizer(
         _ gestureRecognizer: UIGestureRecognizer,

@@ -1,12 +1,12 @@
 //
-//  EditorSidebarCardView.swift
+//  AnimEditorToolSidebarCardView.swift
 //
 
 import UIKit
 
 private let outlineWidth: CGFloat = 1.0
 
-class EditorSidebarCardView: UIView {
+class AnimEditorToolSidebarCardView: UIView {
     
     private let blurView = ChromeBlurView(
         overlayColor: .editorBarOverlay)

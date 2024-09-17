@@ -17,12 +17,12 @@ class AnimEditorBrushToolControlsVC: UIViewController {
     
     weak var delegate: AnimEditorBrushToolControlsVCDelegate?
     
-    private let scaleSlider = EditorSidebarSliderContainer(
+    private let scaleSlider = AnimEditorToolSidebarSliderContainer(
         title: "Size",
         gamma: scaleGamma,
         valueDisplayMode: .percent(minValue: 1))
     
-    private let smoothingSlider = EditorSidebarSliderContainer(
+    private let smoothingSlider = AnimEditorToolSidebarSliderContainer(
         title: "Smoothing",
         gamma: smoothingGamma,
         valueDisplayMode: .percent(minValue: 0))
@@ -59,9 +59,10 @@ class AnimEditorBrushToolControlsVC: UIViewController {
     
 }
 
-extension AnimEditorBrushToolControlsVC: EditorSidebarSliderContainerDelegate {
+extension AnimEditorBrushToolControlsVC:
+    AnimEditorToolSidebarSliderContainer.Delegate {
     
-    func onChangeValue(_ v: EditorSidebarSliderContainer) {
+    func onChangeValue(_ v: AnimEditorToolSidebarSliderContainer) {
         switch v {
         case scaleSlider:
             delegate?.onChangeScale(self)

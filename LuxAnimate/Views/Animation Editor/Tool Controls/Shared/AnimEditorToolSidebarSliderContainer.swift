@@ -1,17 +1,24 @@
 //
-//  EditorSidebarSliderContainer.swift
+//  AnimEditorToolSidebarSliderContainer.swift
 //
 
 import UIKit
 
-@MainActor
-protocol EditorSidebarSliderContainerDelegate: AnyObject {
-    func onChangeValue(_ v: EditorSidebarSliderContainer)
+extension AnimEditorToolSidebarSliderContainer {
+    
+    @MainActor
+    protocol Delegate: AnyObject {
+        
+        func onChangeValue(
+            _ v: AnimEditorToolSidebarSliderContainer)
+        
+    }
+    
 }
 
-class EditorSidebarSliderContainer: UIView {
+class AnimEditorToolSidebarSliderContainer: UIView {
     
-    weak var delegate: EditorSidebarSliderContainerDelegate?
+    weak var delegate: Delegate?
     
     enum ValueDisplayMode {
         case percent(minValue: Int)
@@ -19,7 +26,7 @@ class EditorSidebarSliderContainer: UIView {
     
     private let gamma: Double
     
-    private let slider = EditorSidebarSlider()
+    private let slider = AnimEditorToolSidebarSlider()
     private let popupView: PopupView
     
     init(
@@ -61,17 +68,18 @@ class EditorSidebarSliderContainer: UIView {
     
 }
 
-extension EditorSidebarSliderContainer: EditorSidebarSliderDelegate {
+extension AnimEditorToolSidebarSliderContainer:
+    AnimEditorToolSidebarSlider.Delegate {
     
-    func onBeginPress(_ v: EditorSidebarSlider) {
+    func onBeginPress(_ v: AnimEditorToolSidebarSlider) {
         popupView.setVisible(true, animated: true)
     }
     
-    func onEndPress(_ v: EditorSidebarSlider) {
+    func onEndPress(_ v: AnimEditorToolSidebarSlider) {
         popupView.setVisible(false, animated: true)
     }
     
-    func onChangeValue(_ v: EditorSidebarSlider) {
+    func onChangeValue(_ v: AnimEditorToolSidebarSlider) {
         popupView.updateValue(value)
         delegate?.onChangeValue(self)
     }
@@ -80,7 +88,7 @@ extension EditorSidebarSliderContainer: EditorSidebarSliderDelegate {
 
 private class PopupView: UIView {
     
-    private let valueDisplayMode: EditorSidebarSliderContainer.ValueDisplayMode
+    private let valueDisplayMode: AnimEditorToolSidebarSliderContainer.ValueDisplayMode
     
     private let cardView = EditorMenuCardView()
     private let titleLabel = UILabel()
@@ -88,7 +96,7 @@ private class PopupView: UIView {
     
     init(
         title: String,
-        valueDisplayMode: EditorSidebarSliderContainer.ValueDisplayMode
+        valueDisplayMode: AnimEditorToolSidebarSliderContainer.ValueDisplayMode
     ) {
         self.valueDisplayMode = valueDisplayMode
         super.init(frame: .zero)
