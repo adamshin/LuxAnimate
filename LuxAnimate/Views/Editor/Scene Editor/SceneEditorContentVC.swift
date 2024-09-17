@@ -9,7 +9,7 @@ protocol SceneEditorContentVCDelegate: AnyObject {
     
     func onSelectBack(_ vc: SceneEditorContentVC)
     
-    func onSelectAddLayer(_ vc: SceneEditorContentVC, drawingCount: Int)
+    func onSelectAddLayer(_ vc: SceneEditorContentVC)
     func onSelectRemoveLayer(_ vc: SceneEditorContentVC)
     func onSelectUndo(_ vc: SceneEditorContentVC)
     func onSelectRedo(_ vc: SceneEditorContentVC)
@@ -37,9 +37,6 @@ class SceneEditorContentVC: UIViewController {
     private lazy var addLayerButton = UIBarButtonItem(
         title: "Add Layer", style: .plain,
         target: self, action: #selector(onSelectAddLayer))
-    private lazy var addLayer10DrawingsButton = UIBarButtonItem(
-        title: "Add Layer (10 drawings)", style: .plain,
-        target: self, action: #selector(onSelectAddLayer10Drawings))
     private lazy var removeLayerButton = UIBarButtonItem(
         title: "Remove Layer", style: .plain,
         target: self, action: #selector(onSelectRemoveLayer))
@@ -66,8 +63,6 @@ class SceneEditorContentVC: UIViewController {
             removeLayerButton,
             UIBarButtonItem.fixedSpace(20),
             addLayerButton,
-            UIBarButtonItem.fixedSpace(20),
-            addLayer10DrawingsButton,
         ]
         
         view.addSubview(tableView)
@@ -82,10 +77,7 @@ class SceneEditorContentVC: UIViewController {
         delegate?.onSelectBack(self)
     }
     @objc private func onSelectAddLayer() {
-        delegate?.onSelectAddLayer(self, drawingCount: 1)
-    }
-    @objc private func onSelectAddLayer10Drawings() {
-        delegate?.onSelectAddLayer(self, drawingCount: 10)
+        delegate?.onSelectAddLayer(self)
     }
     @objc private func onSelectRemoveLayer() {
         delegate?.onSelectRemoveLayer(self)

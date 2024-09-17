@@ -167,13 +167,13 @@ class SceneEditorVC: UIViewController {
     
     // MARK: - Editing
     
-    private func addLayer(drawingCount: Int) {
+    private func addLayer() {
         let projectManifest = projectState
             .projectManifest
         
         let sceneEdit = SceneEditBuilder.createAnimationLayer(
             sceneManifest: sceneManifest,
-            drawingCount: drawingCount)
+            drawingCount: 1)
         
         let edit = try! ProjectEditBuilder.applySceneEdit(
             projectManifest: projectManifest,
@@ -293,10 +293,9 @@ extension SceneEditorVC: SceneEditorContentVCDelegate {
     }
     
     func onSelectAddLayer(
-        _ vc: SceneEditorContentVC,
-        drawingCount: Int
+        _ vc: SceneEditorContentVC
     ) { 
-        addLayer(drawingCount: drawingCount)
+        addLayer()
     }
     
     func onSelectRemoveLayer(_ vc: SceneEditorContentVC) {
