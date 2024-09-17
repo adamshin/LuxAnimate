@@ -88,10 +88,13 @@ class AnimEditorVC: UIViewController {
         self.layer = layer
         self.layerContent = layerContent
         
-        timelineVC = AnimEditorTimelineVC(
+        let timelineModel = AnimEditorTimelineModel.generate(
             projectID: projectID,
             sceneManifest: sceneManifest,
-            layerContent: layerContent,
+            layerContent: layerContent)
+        
+        timelineVC = AnimEditorTimelineVC(
+            timelineModel: timelineModel,
             focusedFrameIndex: focusedFrameIndex)
         
         onionSkinConfig = AppConfig.onionSkinConfig
@@ -170,12 +173,13 @@ class AnimEditorVC: UIViewController {
             availableUndoCount: projectState.availableUndoCount,
             availableRedoCount: projectState.availableRedoCount)
         
-        timelineVC.update(
+        let timelineModel = AnimEditorTimelineModel.generate(
+            projectID: projectID,
             sceneManifest: sceneManifest,
             layerContent: layerContent)
         
-        timelineVC.update(
-            focusedFrameIndex: focusedFrameIndex)
+        timelineVC.update(timelineModel: timelineModel)
+        timelineVC.update(focusedFrameIndex: focusedFrameIndex)
         
         let shouldReloadFrameEditor: Bool
         if let context = editContext as? AnimEditorVCEditContext,

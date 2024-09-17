@@ -48,27 +48,21 @@ class AnimEditorTimelineVC: UIViewController {
     private let toolbarVC = AnimEditorTimelineToolbarVC()
     private let trackVC = AnimEditorTimelineTrackVC()
     
-    private let projectID: String
-    
-    private var model: AnimEditorTimelineModel = .empty
+    private var timelineModel: AnimEditorTimelineModel
     private var focusedFrameIndex = 0
     
     // MARK: - Init
     
     init(
-        projectID: String,
-        sceneManifest: Scene.Manifest,
-        layerContent: Scene.AnimationLayerContent,
+        timelineModel: AnimEditorTimelineModel,
         focusedFrameIndex: Int
     ) {
-        self.projectID = projectID
+        self.timelineModel = timelineModel
         self.focusedFrameIndex = focusedFrameIndex
         
         super.init(nibName: nil, bundle: nil)
         
-        update(
-            sceneManifest: sceneManifest,
-            layerContent: layerContent)
+        update(timelineModel: timelineModel)
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -105,7 +99,7 @@ class AnimEditorTimelineVC: UIViewController {
         guard let cell = trackVC.cell(at: frameIndex)
         else { return }
         
-        let frame = model.frames[frameIndex]
+        let frame = timelineModel.frames[frameIndex]
         
         let contentView = AnimEditorTimelineFrameMenuView(
             frameIndex: frameIndex,
@@ -127,18 +121,12 @@ class AnimEditorTimelineVC: UIViewController {
     // MARK: - Interface
     
     func update(
-        sceneManifest: Scene.Manifest,
-        layerContent: Scene.AnimationLayerContent
+        timelineModel: AnimEditorTimelineModel
     ) {
-        let model = AnimEditorTimelineModel.generate(
-            projectID: projectID,
-            sceneManifest: sceneManifest,
-            layerContent: layerContent)
+        self.timelineModel = timelineModel
         
-        self.model = model
-        
-        toolbarVC.setFrameCount(model.frames.count)
-        trackVC.setModel(model)
+        toolbarVC.setFrameCount(timelineModel.frames.count)
+        trackVC.setTimelineModel(timelineModel)
     }
     
     func update(
@@ -230,7 +218,7 @@ extension AnimEditorTimelineVC:
         _ vc: AnimEditorTimelineTrackVC,
         frameIndex: Int
     ) {
-        let frame = model.frames[frameIndex]
+        let frame = timelineModel.frames[frameIndex]
         if !frame.hasDrawing {
             delegate?.onRequestCreateDrawing(self,
                 frameIndex: frameIndex)

@@ -268,7 +268,7 @@ class AnimEditorTimelineTrackVC: UIViewController {
     
     // MARK: - Interface
     
-    func setModel(_ model: AnimEditorTimelineModel) {
+    func setTimelineModel(_ model: AnimEditorTimelineModel) {
         let oldModel = self.model
         self.model = model
         
