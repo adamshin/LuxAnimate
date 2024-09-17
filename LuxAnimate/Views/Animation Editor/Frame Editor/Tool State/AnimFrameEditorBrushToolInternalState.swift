@@ -43,9 +43,9 @@ protocol AnimFrameEditorBrushToolInternalStateDelegate: AnyObject {
     func onUpdateActiveCanvasTexture(
         _ s: AnimFrameEditorBrushToolInternalState)
     
-    func onFinalizeStroke(
+    func onEdit(
         _ s: AnimFrameEditorBrushToolInternalState,
-        canvasTexture: MTLTexture)
+        imageSet: DrawingAssetProcessor.ImageSet)
     
 }
 
@@ -55,6 +55,8 @@ class AnimFrameEditorBrushToolInternalState {
     weak var delegate: AnimFrameEditorBrushToolInternalStateDelegate?
     
     private let brushEngine: BrushEngine
+    
+    private let drawingAssetProcessor = DrawingAssetProcessor()
     
     init(
         canvasSize: PixelSize,
@@ -139,9 +141,18 @@ extension AnimFrameEditorBrushToolInternalState: BrushEngineDelegate {
     func onFinalizeStroke(
         _ e: BrushEngine,
         canvasTexture: MTLTexture
-    ) { 
-        delegate?.onFinalizeStroke(
-            self, canvasTexture: canvasTexture)
+    ) {
+        do {
+            // TODO: Do this on a background queue
+            let texture = try TextureCopier
+                .copy(canvasTexture)
+            
+            let imageSet = try drawingAssetProcessor
+                .generate(sourceTexture: texture)
+            
+            delegate?.onEdit(self, imageSet: imageSet)
+            
+        } catch { }
     }
     
 }

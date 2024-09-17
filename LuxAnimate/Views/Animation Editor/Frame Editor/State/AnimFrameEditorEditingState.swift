@@ -164,7 +164,7 @@ extension AnimFrameEditorEditingState:
     
     func onEdit(
         _ s: AnimFrameEditorToolState,
-        drawingTexture: MTLTexture?
+        imageSet: DrawingAssetProcessor.ImageSet
     ) {
         guard let activeDrawing = activeDrawingManifest
             .activeDrawing
@@ -173,7 +173,7 @@ extension AnimFrameEditorEditingState:
         delegate?.onEdit(
             self,
             drawingID: activeDrawing.id,
-            drawingTexture: drawingTexture)
+            imageSet: imageSet)
     }
     
 }

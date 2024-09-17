@@ -22,8 +22,8 @@ struct DrawingAssetProcessor {
         let imageHeight = sourceTexture.height
         
         let imageAspectRatio =
-        Double(imageWidth) /
-        Double(imageHeight)
+            Double(imageWidth) /
+            Double(imageHeight)
         
         // Read full data
         let imageData = try TextureDataReader

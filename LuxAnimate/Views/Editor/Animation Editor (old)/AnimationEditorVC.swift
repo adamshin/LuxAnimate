@@ -30,7 +30,7 @@ class AnimationEditorVC: UIViewController {
     private let layerID: String
     private let initialFrameIndex: Int
     
-    private let editor: AnimationLayerEditor
+//    private let editor: AnimationLayerEditor
     
     private var projectManifest: Project.Manifest?
     private var sceneManifest: Scene.Manifest?
@@ -53,12 +53,12 @@ class AnimationEditorVC: UIViewController {
         timelineVC = AnimationEditorTimelineVC()
         frameVC = try AnimationFrameVC(projectID: projectID)
         
-        editor = AnimationLayerEditor(layerID: layerID)
+//        editor = AnimationLayerEditor(layerID: layerID)
         
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
         
-        editor.delegate = self
+//        editor.delegate = self
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -110,7 +110,7 @@ class AnimationEditorVC: UIViewController {
         self.sceneManifest = sceneManifest
         self.animationLayerContent = animationLayerContent
         
-        editor.update(animationLayerContent: animationLayerContent)
+//        editor.update(animationLayerContent: animationLayerContent)
         
         timelineVC.update(
             projectID: projectID,
@@ -153,28 +153,28 @@ extension AnimationEditorVC: AnimationTimelineVCDelegate {
         _ vc: AnimationEditorTimelineVC,
         frameIndex: Int
     ) {
-        editor.createDrawing(at: frameIndex)
+//        editor.createDrawing(at: frameIndex)
     }
     
     func onRequestDeleteDrawing(
         _ vc: AnimationEditorTimelineVC,
         frameIndex: Int
     ) {
-        editor.deleteDrawing(at: frameIndex)
+//        editor.deleteDrawing(at: frameIndex)
     }
     
     func onRequestInsertSpacing(
         _ vc: AnimationEditorTimelineVC, 
         frameIndex: Int
     ) {
-        editor.insertSpacing(at: frameIndex)
+//        editor.insertSpacing(at: frameIndex)
     }
     
     func onRequestRemoveSpacing(
         _ vc: AnimationEditorTimelineVC,
         frameIndex: Int
     ) {
-        editor.removeSpacing(at: frameIndex)
+//        editor.removeSpacing(at: frameIndex)
     }
     
     func onChangeContentAreaSize(
@@ -211,6 +211,7 @@ extension AnimationEditorVC: AnimationFrameVCDelegate {
     
 }
 
+/*
 extension AnimationEditorVC: AnimationLayerEditorDelegate {
     
     func onRequestApplyEdit(
@@ -244,3 +245,4 @@ extension AnimationEditorVC: AnimationLayerEditorDelegate {
     }
     
 }
+*/

@@ -74,14 +74,11 @@ class ProjectEditorVC: UIViewController {
         let projectManifest = stateManager
             .state.projectManifest
         
-        let config = ProjectEditHelper.NewSceneConfig(
+        let edit = try! ProjectEditBuilder.createScene(
+            projectManifest: projectManifest,
             name: "Scene",
             frameCount: 100,
             backgroundColor: .white)
-        
-        let edit = try! ProjectEditHelper.createScene(
-            projectManifest: projectManifest,
-            config: config)
             
         stateManager.applyEdit(
             edit: edit,
@@ -96,7 +93,7 @@ class ProjectEditorVC: UIViewController {
             .content.sceneRefs.last
         else { return }
         
-        let edit = try! ProjectEditHelper.deleteScene(
+        let edit = try! ProjectEditBuilder.deleteScene(
             projectManifest: projectManifest,
             sceneID: lastSceneRef.id)
         

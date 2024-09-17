@@ -96,13 +96,12 @@ extension AnimFrameEditorEraseToolState:
         _ s: AnimFrameEditorBrushToolInternalState
     ) { }
     
-    func onFinalizeStroke(
+    func onEdit(
         _ s: AnimFrameEditorBrushToolInternalState,
-        canvasTexture: MTLTexture
+        imageSet: DrawingAssetProcessor.ImageSet
     ) {
         delegate?.onEdit(
-            self,
-            drawingTexture: canvasTexture)
+            self, imageSet: imageSet)
     }
     
 }

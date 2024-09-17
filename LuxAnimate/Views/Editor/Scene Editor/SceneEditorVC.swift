@@ -61,7 +61,7 @@ class SceneEditorVC: UIViewController {
             projectManifest: projectManifest,
             sceneID: sceneID)
         
-        let sceneManifest = try SceneManifestLoader
+        let sceneManifest = try SceneEditorSceneManifestLoader
             .load(
                 projectManifest: projectManifest,
                 sceneID: sceneID)
@@ -129,7 +129,7 @@ class SceneEditorVC: UIViewController {
             
         } else {
             do {
-                let sceneManifest = try SceneManifestLoader
+                let sceneManifest = try SceneEditorSceneManifestLoader
                     .load(
                         projectManifest: projectManifest,
                         sceneID: sceneID)
@@ -171,11 +171,11 @@ class SceneEditorVC: UIViewController {
         let projectManifest = projectState
             .projectManifest
         
-        let sceneEdit = SceneEditHelper.createAnimationLayer(
+        let sceneEdit = SceneEditBuilder.createAnimationLayer(
             sceneManifest: sceneManifest,
             drawingCount: drawingCount)
         
-        let edit = try! ProjectEditHelper.applySceneEdit(
+        let edit = try! ProjectEditBuilder.applySceneEdit(
             projectManifest: projectManifest,
             sceneEdit: sceneEdit)
         
@@ -195,11 +195,11 @@ class SceneEditorVC: UIViewController {
         let projectManifest = projectState
             .projectManifest
         
-        let sceneEdit = try! SceneEditHelper.deleteLayer(
+        let sceneEdit = try! SceneEditBuilder.deleteLayer(
             sceneManifest: sceneManifest,
             layerID: lastLayer.id)
         
-        let edit = try! ProjectEditHelper.applySceneEdit(
+        let edit = try! ProjectEditBuilder.applySceneEdit(
             projectManifest: projectManifest,
             sceneEdit: sceneEdit)
         
@@ -331,14 +331,14 @@ extension SceneEditorVC: AnimEditorVCDelegate {
     
     func onRequestSceneEdit(
         _ vc: AnimEditorVC,
-        sceneEdit: ProjectEditHelper.SceneEdit,
+        sceneEdit: ProjectEditBuilder.SceneEdit,
         editContext: Sendable?
     ) {
         do {
             let projectManifest = projectState
                 .projectManifest
             
-            let edit = try ProjectEditHelper.applySceneEdit(
+            let edit = try ProjectEditBuilder.applySceneEdit(
                 projectManifest: projectManifest,
                 sceneEdit: sceneEdit)
             

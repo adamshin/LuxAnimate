@@ -12,7 +12,7 @@ protocol AnimEditorVCDelegate: AnyObject {
     
     func onRequestSceneEdit(
         _ vc: AnimEditorVC,
-        sceneEdit: ProjectEditHelper.SceneEdit,
+        sceneEdit: ProjectEditBuilder.SceneEdit,
         editContext: Sendable?)
     
     func pendingEditAsset(
@@ -37,7 +37,6 @@ class AnimEditorVC: UIViewController {
     private let timelineVC: AnimEditorTimelineVC
     
     private let assetLoader: AnimEditorAssetLoader
-    private let frameEditProcessor: AnimFrameEditProcessor
     
     private let workspaceRenderer = EditorWorkspaceRenderer(
         pixelFormat: AppConfig.metalLayerPixelFormat)
@@ -100,9 +99,6 @@ class AnimEditorVC: UIViewController {
         assetLoader = AnimEditorAssetLoader(
             projectID: projectID)
         
-        frameEditProcessor = AnimFrameEditProcessor(
-            layerID: activeLayerID)
-        
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
         
@@ -110,7 +106,6 @@ class AnimEditorVC: UIViewController {
             availableUndoCount: projectState.availableUndoCount,
             availableRedoCount: projectState.availableRedoCount)
         
-        frameEditProcessor.delegate = self
         assetLoader.delegate = self
         
         enterToolState(AnimEditorPaintToolState())
@@ -381,6 +376,10 @@ extension AnimEditorVC: AnimEditorToolbarVCDelegate {
 
 extension AnimEditorVC: AnimEditorTimelineVC.Delegate {
     
+    func onChangeContentAreaSize(
+        _ vc: AnimEditorTimelineVC
+    ) { }
+    
     func onChangeFocusedFrameIndex(
         _ vc: AnimEditorTimelineVC,
         _ focusedFrameIndex: Int
@@ -397,26 +396,98 @@ extension AnimEditorVC: AnimEditorTimelineVC.Delegate {
     func onRequestCreateDrawing(
         _ vc: AnimEditorTimelineVC,
         frameIndex: Int
-    ) { }
+    ) {
+        do {
+            let layerContentEdit = try AnimationLayerEditBuilder
+                .createDrawing(
+                    layerContent: layerContent,
+                    frameIndex: frameIndex)
+            
+            let sceneEdit = try AnimationLayerEditBuilder
+                .applyAnimationLayerContentEdit(
+                    sceneManifest: sceneManifest,
+                    layer: layer,
+                    layerContentEdit: layerContentEdit)
+            
+            delegate?.onRequestSceneEdit(
+                self,
+                sceneEdit: sceneEdit,
+                editContext: nil)
+            
+        } catch { }
+    }
     
     func onRequestDeleteDrawing(
         _ vc: AnimEditorTimelineVC,
         frameIndex: Int
-    ) { }
+    ) {
+        do {
+            let layerContentEdit = AnimationLayerEditBuilder
+                .deleteDrawing(
+                    layerContent: layerContent,
+                    frameIndex: frameIndex)
+            
+            let sceneEdit = try AnimationLayerEditBuilder
+                .applyAnimationLayerContentEdit(
+                    sceneManifest: sceneManifest,
+                    layer: layer,
+                    layerContentEdit: layerContentEdit)
+            
+            delegate?.onRequestSceneEdit(
+                self,
+                sceneEdit: sceneEdit,
+                editContext: nil)
+            
+        } catch { }
+    }
     
     func onRequestInsertSpacing(
         _ vc: AnimEditorTimelineVC,
         frameIndex: Int
-    ) { }
+    ) {
+        do {
+            let layerContentEdit = AnimationLayerEditBuilder
+                .insertSpacing(
+                    layerContent: layerContent,
+                    frameIndex: frameIndex)
+            
+            let sceneEdit = try AnimationLayerEditBuilder
+                .applyAnimationLayerContentEdit(
+                    sceneManifest: sceneManifest,
+                    layer: layer,
+                    layerContentEdit: layerContentEdit)
+            
+            delegate?.onRequestSceneEdit(
+                self,
+                sceneEdit: sceneEdit,
+                editContext: nil)
+            
+        } catch { }
+    }
     
     func onRequestRemoveSpacing(
         _ vc: AnimEditorTimelineVC,
         frameIndex: Int
-    ) { }
-    
-    func onChangeContentAreaSize(
-        _ vc: AnimEditorTimelineVC
-    ) { }
+    ) {
+        do {
+            let layerContentEdit = try AnimationLayerEditBuilder
+                .removeSpacing(
+                    layerContent: layerContent,
+                    frameIndex: frameIndex)
+            
+            let sceneEdit = try AnimationLayerEditBuilder
+                .applyAnimationLayerContentEdit(
+                    sceneManifest: sceneManifest,
+                    layer: layer,
+                    layerContentEdit: layerContentEdit)
+            
+            delegate?.onRequestSceneEdit(
+                self,
+                sceneEdit: sceneEdit,
+                editContext: nil)
+            
+        } catch { }
+    }
     
 }
 
@@ -459,37 +530,32 @@ extension AnimEditorVC: AnimFrameEditor.Delegate {
     func onEdit(
         _ e: AnimFrameEditor,
         drawingID: String,
-        drawingTexture: MTLTexture?
+        imageSet: DrawingAssetProcessor.ImageSet
     ) {
-        // TODO: Is this logic right?
-        // Subsequent edits need to stack on top of each other
-        // Do we need an updated scene manifest each time?
-        // Maybe this is fine since we're just editing a single drawing
-        frameEditProcessor.applyEdit(
-            sceneManifest: sceneManifest,
-            drawingID: drawingID,
-            drawingTexture: drawingTexture)
-    }
-    
-}
-
-extension AnimEditorVC: AnimFrameEditProcessor.Delegate {
-    
-    func onRequestSceneEdit(
-        _ p: AnimFrameEditProcessor,
-        sceneEdit: ProjectEditHelper.SceneEdit
-    ) {
-        // Should isFromFrameEditor always be true?
-        // We may want the ability to dispatch edits from
-        // here that don't come from the frame editor.
-        let editContext = AnimEditorVCEditContext(
-            sender: self,
-            isFromFrameEditor: true)
-        
-        delegate?.onRequestSceneEdit(
-            self,
-            sceneEdit: sceneEdit,
-            editContext: editContext)
+        do {
+            let imageSet = AnimationLayerEditBuilder
+                .DrawingImageSet(
+                    full: imageSet.full,
+                    medium: imageSet.medium,
+                    small: imageSet.small)
+            
+            let sceneEdit = try AnimationLayerEditBuilder
+                .editDrawing(
+                    sceneManifest: sceneManifest,
+                    layerID: layer.id,
+                    drawingID: drawingID,
+                    imageSet: imageSet)
+            
+            let editContext = AnimEditorVCEditContext(
+                sender: self,
+                isFromFrameEditor: true)
+            
+            delegate?.onRequestSceneEdit(
+                self,
+                sceneEdit: sceneEdit,
+                editContext: editContext)
+            
+        } catch { }
     }
     
 }

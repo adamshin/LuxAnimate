@@ -1,12 +1,12 @@
 //
-//  SceneManifestLoader.swift
+//  SceneEditorSceneManifestLoader.swift
 //
 
 import Foundation
 
 // TODO: Modify this to load asynchronously?
 
-struct SceneManifestLoader {
+struct SceneEditorSceneManifestLoader {
     
     enum Error: Swift.Error {
         case invalidSceneID

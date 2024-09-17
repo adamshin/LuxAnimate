@@ -33,7 +33,7 @@ extension AnimFrameEditor {
         func onEdit(
             _ e: AnimFrameEditor,
             drawingID: String,
-            drawingTexture: MTLTexture?)
+            imageSet: DrawingAssetProcessor.ImageSet)
         
     }
     
@@ -143,11 +143,12 @@ extension AnimFrameEditor: AnimFrameEditorStateDelegate {
     func onEdit(
         _ s: AnimFrameEditorState,
         drawingID: String,
-        drawingTexture: MTLTexture?
+        imageSet: DrawingAssetProcessor.ImageSet
     ) {
-        delegate?.onEdit(self,
+        delegate?.onEdit(
+            self,
             drawingID: drawingID,
-            drawingTexture: drawingTexture)
+            imageSet: imageSet)
     }
     
 }

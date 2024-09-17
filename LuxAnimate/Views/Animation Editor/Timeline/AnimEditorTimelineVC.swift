@@ -9,6 +9,9 @@ extension AnimEditorTimelineVC {
     @MainActor
     protocol Delegate: AnyObject {
         
+        func onChangeContentAreaSize(
+            _ vc: AnimEditorTimelineVC)
+        
         func onChangeFocusedFrameIndex(
             _ vc: AnimEditorTimelineVC,
             _ focusedFrameIndex: Int)
@@ -31,9 +34,6 @@ extension AnimEditorTimelineVC {
         func onRequestRemoveSpacing(
             _ vc: AnimEditorTimelineVC,
             frameIndex: Int)
-        
-        func onChangeContentAreaSize(
-            _ vc: AnimEditorTimelineVC)
         
     }
     
@@ -102,26 +102,26 @@ class AnimEditorTimelineVC: UIViewController {
     // MARK: - Menu
     
     private func showFrameMenu(frameIndex: Int) {
-//        guard let cell = trackVC.cell(at: frameIndex)
-//        else { return }
-//        
-//        let frame = model.frames[frameIndex]
-//        
-//        let contentView = EditorTimelineFrameMenuView(
-//            frameIndex: frameIndex,
-//            hasDrawing: frame.hasDrawing)
-//        
-//        let menu = EditorMenuView(
-//            contentView: contentView,
-//            presentation: .init(
-//                sourceView: cell,
-//                sourceViewEffect: .fade))
-//        
-//        contentView.delegate = self
-//        menu.delegate = self
-//        menu.present(in: self)
-//        
-//        trackVC.setOpenMenuFrameIndex(frameIndex)
+        guard let cell = trackVC.cell(at: frameIndex)
+        else { return }
+        
+        let frame = model.frames[frameIndex]
+        
+        let contentView = EditorTimelineFrameMenuView(
+            frameIndex: frameIndex,
+            hasDrawing: frame.hasDrawing)
+        
+        let menu = EditorMenuView(
+            contentView: contentView,
+            presentation: .init(
+                sourceView: cell,
+                sourceViewEffect: .fade))
+        
+        contentView.delegate = self
+        menu.delegate = self
+        menu.present(in: self)
+        
+        trackVC.setOpenMenuFrameIndex(frameIndex)
     }
     
     // MARK: - Interface

@@ -35,7 +35,7 @@ protocol AnimFrameEditorStateDelegate: AnyObject {
     func onEdit(
         _ s: AnimFrameEditorState,
         drawingID: String,
-        drawingTexture: MTLTexture?)
+        imageSet: DrawingAssetProcessor.ImageSet)
     
 }
 
