@@ -43,15 +43,15 @@ enum Scene {
         var id: String
         var frameIndex: Int
         
-        var assetIDs: DrawingAssetIDGroup?
-    }
-    
-    struct DrawingAssetIDGroup: Codable {
-        var full: String
-        var medium: String
-        var small: String
+        var fullAssetID: String?
+        var thumbnailAssetID: String?
         
-        var all: [String] { [full, medium, small] }
+        var allAssetIDs: [String] {
+            [
+                fullAssetID,
+                thumbnailAssetID
+            ].compactMap { $0 }
+        }
     }
     
     // MARK: - Render Manifest

@@ -13,8 +13,7 @@ struct AnimationLayerEditBuilder {
     
     struct DrawingImageSet {
         var full: Data
-        var medium: Data
-        var small: Data
+        var thumbnail: Data
     }
     
     enum Error: Swift.Error {
@@ -66,7 +65,8 @@ struct AnimationLayerEditBuilder {
         let drawing = Scene.Drawing(
             id: IDGenerator.id(),
             frameIndex: frameIndex,
-            assetIDs: nil)
+            fullAssetID: nil,
+            thumbnailAssetID: nil)
         
         var layerContent = layerContent
         layerContent.drawings.append(drawing)
@@ -161,25 +161,16 @@ struct AnimationLayerEditBuilder {
         
         // Set up assets
         let fullAssetID = IDGenerator.id()
-        let mediumAssetID = IDGenerator.id()
-        let smallAssetID = IDGenerator.id()
+        let thumbnailAssetID = IDGenerator.id()
         
         let newAssets = [
             ProjectEditManager.NewAsset(
                 id: fullAssetID,
                 data: imageSet.full),
             ProjectEditManager.NewAsset(
-                id: mediumAssetID,
-                data: imageSet.medium),
-            ProjectEditManager.NewAsset(
-                id: smallAssetID,
-                data: imageSet.small),
+                id: thumbnailAssetID,
+                data: imageSet.thumbnail),
         ]
-        
-        let newAssetIDs = Scene.DrawingAssetIDGroup(
-            full: fullAssetID,
-            medium: mediumAssetID,
-            small: smallAssetID)
         
         // Update drawing
         var sceneManifest = sceneManifest
@@ -207,8 +198,12 @@ struct AnimationLayerEditBuilder {
         }
         
         var drawing = drawings[drawingIndex]
-        let oldAssetIDs = drawing.assetIDs
-        drawing.assetIDs = newAssetIDs
+        let oldAssetIDs = drawing.allAssetIDs
+        
+        drawing.fullAssetID = fullAssetID
+        drawing.thumbnailAssetID = thumbnailAssetID
+        
+        let newAssetIDs = drawing.allAssetIDs
         
         drawings[drawingIndex] = drawing
         layerContent.drawings = drawings
@@ -216,8 +211,8 @@ struct AnimationLayerEditBuilder {
         sceneManifest.layers[layerIndex] = layer
         
         // Update assets
-        sceneManifest.assetIDs.subtract(oldAssetIDs?.all ?? [])
-        sceneManifest.assetIDs.formUnion(newAssetIDs.all)
+        sceneManifest.assetIDs.subtract(oldAssetIDs)
+        sceneManifest.assetIDs.formUnion(newAssetIDs)
         
         // Return
         return ProjectEditBuilder.SceneEdit(

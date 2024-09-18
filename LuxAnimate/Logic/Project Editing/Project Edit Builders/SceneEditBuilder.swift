@@ -24,7 +24,8 @@ struct SceneEditBuilder {
             Scene.Drawing(
                 id: IDGenerator.id(),
                 frameIndex: index,
-                assetIDs: nil)
+                fullAssetID: nil,
+                thumbnailAssetID: nil)
         }
         
         let animationLayerContent = Scene.AnimationLayerContent(

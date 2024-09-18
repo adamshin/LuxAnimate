@@ -155,8 +155,7 @@ class AnimFrameEditorWorkspaceSceneGraphGenerator {
         if let replacementTexture {
             texture = replacementTexture
         } else {
-            let assetID = drawing.assetIDs?.full
-            texture = assetID.flatMap {
+            texture = drawing.fullAssetID.flatMap {
                 delegate?.assetTexture(self, assetID: $0)
             }
         }

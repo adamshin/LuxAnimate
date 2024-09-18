@@ -82,7 +82,7 @@ struct AnimFrameEditorHelper {
     ) -> AssetManifest {
         
         let activeDrawingAssetID = activeDrawingManifest
-            .activeDrawing?.assetIDs?.full
+            .activeDrawing?.fullAssetID
         
         var drawings: [Scene.Drawing] = []
         
@@ -100,7 +100,7 @@ struct AnimFrameEditorHelper {
         
         var otherAssetIDs = Set<String>()
         for drawing in drawings {
-            if let fullAssetID = drawing.assetIDs?.full {
+            if let fullAssetID = drawing.fullAssetID {
                 otherAssetIDs.insert(fullAssetID)
             }
         }

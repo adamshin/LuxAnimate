@@ -1444,7 +1444,7 @@
 				DEVELOPMENT_TEAM = 28XM46LW7H;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = LuxAnimate/System/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Lux Animate";
+				INFOPLIST_KEY_CFBundleDisplayName = "Lux Animate PNG";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
@@ -1457,7 +1457,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = adamshin.LuxAnimate;
+				PRODUCT_BUNDLE_IDENTIFIER = adamshin.LuxAnimatePNG;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -1480,7 +1480,7 @@
 				DEVELOPMENT_TEAM = 28XM46LW7H;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = LuxAnimate/System/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Lux Animate";
+				INFOPLIST_KEY_CFBundleDisplayName = "Lux Animate PNG";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
@@ -1493,7 +1493,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = adamshin.LuxAnimate;
+				PRODUCT_BUNDLE_IDENTIFIER = adamshin.LuxAnimatePNG;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;

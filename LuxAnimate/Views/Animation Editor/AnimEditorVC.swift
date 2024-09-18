@@ -545,8 +545,7 @@ extension AnimEditorVC: AnimFrameEditor.Delegate {
             let imageSet = AnimationLayerEditBuilder
                 .DrawingImageSet(
                     full: imageSet.full,
-                    medium: imageSet.medium,
-                    small: imageSet.small)
+                    thumbnail: imageSet.thumbnail)
             
             let sceneEdit = try AnimationLayerEditBuilder
                 .editDrawing(

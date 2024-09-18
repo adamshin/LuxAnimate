@@ -106,11 +106,10 @@ class AnimFrameEditorEditingState: AnimFrameEditorState {
             self, enabled: true)
         
         if let activeDrawing = activeDrawingManifest.activeDrawing,
-            let assetIDs = activeDrawing.assetIDs
+            let fullAssetID = activeDrawing.fullAssetID
         {
             let activeDrawingTexture = delegate?.assetLoaderAssetTexture(
-                self,
-                assetID: assetIDs.full)
+                self, assetID: fullAssetID)
             
             if let activeDrawingTexture {
                 toolState?.setDrawingCanvasTexture(activeDrawingTexture)

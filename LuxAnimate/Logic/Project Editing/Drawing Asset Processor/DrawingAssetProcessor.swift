@@ -10,8 +10,7 @@ struct DrawingAssetProcessor {
     
     struct ImageSet {
         var full: Data
-        var medium: Data
-        var small: Data
+        var thumbnail: Data
     }
     
     func generate(
@@ -29,26 +28,16 @@ struct DrawingAssetProcessor {
         let imageData = try TextureDataReader
             .read(sourceTexture)
         
-        // Resize images
-        let mediumImageSize = PixelSize(
+        // Generate thumbnail
+        let thumbnailSize = PixelSize(
             fitting: PixelSize(
-                width: AppConfig.assetPreviewMediumSize,
-                height: AppConfig.assetPreviewMediumSize),
+                width: AppConfig.drawingThumbnailSize,
+                height: AppConfig.drawingThumbnailSize),
             aspectRatio: imageAspectRatio)
         
-        let smallImageSize = PixelSize(
-            fitting: PixelSize(
-                width: AppConfig.assetPreviewSmallSize,
-                height: AppConfig.assetPreviewSmallSize),
-            aspectRatio: imageAspectRatio)
-        
-        let mediumImageData = try imageResizer.resize(
+        let thumbnailImageData = try imageResizer.resize(
             imageTexture: sourceTexture,
-            targetSize: mediumImageSize)
-        
-        let smallImageData = try imageResizer.resize(
-            imageTexture: sourceTexture,
-            targetSize: smallImageSize)
+            targetSize: thumbnailSize)
         
         // Encode images
         let fullEncodedData = try! JXLEncoder.encode(
@@ -60,28 +49,18 @@ struct DrawingAssetProcessor {
             quality: 100,
             effort: 1)
         
-        let mediumEncodedData = try! JXLEncoder.encode(
+        let thumbnailEncodedData = try! JXLEncoder.encode(
             input: .init(
-                data: mediumImageData,
-                width: mediumImageSize.width,
-                height: mediumImageSize.height),
-            lossless: false,
-            quality: 90,
-            effort: 1)
-        
-        let smallEncodedData = try! JXLEncoder.encode(
-            input: .init(
-                data: smallImageData,
-                width: smallImageSize.width,
-                height: smallImageSize.height),
+                data: thumbnailImageData,
+                width: thumbnailSize.width,
+                height: thumbnailSize.height),
             lossless: false,
             quality: 90,
             effort: 1)
         
         return ImageSet(
             full: fullEncodedData,
-            medium: mediumEncodedData,
-            small: smallEncodedData)
+            thumbnail: thumbnailEncodedData)
     }
     
 }

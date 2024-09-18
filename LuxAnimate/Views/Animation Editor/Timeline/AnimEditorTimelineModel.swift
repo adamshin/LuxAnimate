@@ -40,10 +40,10 @@ extension AnimEditorTimelineModel {
             else { continue }
             
             let thumbnailURL: URL?
-            if let assetIDs = drawing.assetIDs {
+            if let thumbnailAssetID = drawing.thumbnailAssetID {
                 thumbnailURL = FileHelper.shared.projectAssetURL(
                     projectID: projectID,
-                    assetID: assetIDs.small)
+                    assetID: thumbnailAssetID)
             } else {
                 thumbnailURL = nil
             }
