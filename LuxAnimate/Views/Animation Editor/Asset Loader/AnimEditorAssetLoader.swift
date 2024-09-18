@@ -3,6 +3,7 @@
 //
 
 import Metal
+@preconcurrency import MetalKit
 
 private let maxConcurrentOperations = 3
 
@@ -44,6 +45,9 @@ class AnimEditorAssetLoader {
         LimitedConcurrencyQueue(
             maxConcurrentOperations: maxConcurrentOperations)
     
+    private let textureLoader = MTKTextureLoader(
+        device: MetalInterface.shared.device)
+    
     private var assetIDs: Set<String> = []
     private var inProgressTasks: [String: Task<Void, Error>] = [:]
     private var loadedAssets: [String: LoadedAsset] = [:]
@@ -52,9 +56,7 @@ class AnimEditorAssetLoader {
     
     // MARK: - Init
     
-    init(
-        projectID: String
-    ) {
+    init(projectID: String) {
         self.projectID = projectID
     }
     
@@ -136,17 +138,11 @@ class AnimEditorAssetLoader {
             
             try Task.checkCancellation()
             
-            // TODO: PNG decode
-            let decoderOutput = try await JXLDecoder
-                .decodeAsync(data: assetData)
-            
-            let texture = try TextureCreator.createTexture(
-                pixelData: decoderOutput.pixelData,
-                size: PixelSize(
-                    width: decoderOutput.width,
-                    height: decoderOutput.height),
-                mipMapped: false,
-                usage: .shaderRead)
+            let texture = try await textureLoader.newTexture(
+                data: assetData,
+                options: [
+                    .textureUsage: MTLTextureUsage.shaderRead.rawValue
+                ])
             
             await self.storeLoadedAsset(
                 assetID: assetID,
