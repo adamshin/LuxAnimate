@@ -144,6 +144,8 @@ class AnimEditorAssetLoader {
                     .textureUsage: MTLTextureUsage.shaderRead.rawValue
                 ])
             
+            try Task.checkCancellation()
+            
             await self.storeLoadedAsset(
                 assetID: assetID,
                 loadedAsset: .loaded(texture))
