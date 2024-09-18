@@ -5,7 +5,7 @@
 import Metal
 import MetalKit
 
-private let maxConcurrentOperations = 3
+private let maxConcurrentOperations = 10
 
 extension AnimEditorAssetLoader {
     
@@ -49,6 +49,8 @@ class AnimEditorAssetLoader {
     private var inProgressTasks: [String: Task<Void, Error>] = [:]
     private var loadedAssets: [String: LoadedAsset] = [:]
     
+    private var loadStartTime: TimeInterval = 0
+    
     weak var delegate: Delegate?
     
     // MARK: - Init
@@ -66,6 +68,8 @@ class AnimEditorAssetLoader {
             assetIDs.contains($0.key)
         }
         
+        let cancelledTaskCount = inProgressTasks.count
+        
         for (assetID, task) in inProgressTasks {
             if !assetIDs.contains(assetID) {
                 task.cancel()
@@ -77,6 +81,14 @@ class AnimEditorAssetLoader {
             .subtracting(Set(inProgressTasks.keys))
             .subtracting(Set(loadedAssets.keys))
         
+        loadStartTime = ProcessInfo.processInfo.systemUptime
+        print("""
+            Starting load. \
+            New: \(assetIDsToLoad.count), \
+            Reused: \(self.loadedAssets.count), \
+            Cancelling: \(cancelledTaskCount)
+            """)
+        
         for assetID in assetIDsToLoad {
             let task = Task.detached(priority: .high) {
                 try await self.limitedConcurrencyQueue.enqueue {
@@ -87,6 +99,7 @@ class AnimEditorAssetLoader {
         }
         
         if inProgressTasks.isEmpty {
+            print("Finished load - no tasks")
             delegate?.onFinish(self)
         }
     }
@@ -104,12 +117,27 @@ class AnimEditorAssetLoader {
         inProgressTasks[assetID] = nil
         
         guard assetIDs.contains(assetID)
-        else { return }
+        else {
+//            print("Cancelled loading asset (final check)")
+            return
+        }
         
         loadedAssets[assetID] = loadedAsset
         
         delegate?.onUpdate(self)
+        
+//        print("Loaded asset")
+        
         if inProgressTasks.isEmpty {
+            let loadEndTime = ProcessInfo.processInfo.systemUptime
+            let loadTime = loadEndTime - loadStartTime
+            let loadTimeMs = Int(loadTime * 1000)
+            
+            print("""
+                Finished load. \
+                Time: \(loadTimeMs) ms
+                """)
+            
             delegate?.onFinish(self)
         }
     }
@@ -152,8 +180,11 @@ class AnimEditorAssetLoader {
                 loadedAsset: .loaded(texture))
             
         } catch is CancellationError {
+//            print("Cancelled loading asset")
             
         } catch {
+//            print("Error loading asset")
+            
             await storeLoadedAsset(
                 assetID: assetID,
                 loadedAsset: .error)

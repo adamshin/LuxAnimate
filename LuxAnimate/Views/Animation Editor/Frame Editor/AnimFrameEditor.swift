@@ -65,7 +65,7 @@ class AnimFrameEditor {
         onionSkinConfig: AnimEditorOnionSkinConfig,
         editorToolState: AnimEditorToolState
     ) {
-        print("AnimFrameEditor began")
+//        print("AnimFrameEditor began")
         
         let state = AnimFrameEditorLoadingState(
             projectManifest: projectManifest,
