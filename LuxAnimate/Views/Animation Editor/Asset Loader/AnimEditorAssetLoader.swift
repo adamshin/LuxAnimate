@@ -136,6 +136,7 @@ class AnimEditorAssetLoader {
             
             try Task.checkCancellation()
             
+            // TODO: PNG decode
             let decoderOutput = try await JXLDecoder
                 .decodeAsync(data: assetData)
             

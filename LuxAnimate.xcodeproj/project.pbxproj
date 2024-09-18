@@ -54,8 +54,6 @@
 		66311CD22BD713BE00D53489 /* MovableCanvasTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66311CD12BD713BE00D53489 /* MovableCanvasTransform.swift */; };
 		66311CDB2BD73FAF00D53489 /* ImageResizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66311CDA2BD73FAF00D53489 /* ImageResizer.swift */; };
 		66311CDD2BD7403100D53489 /* SpriteRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66311CDC2BD7403100D53489 /* SpriteRenderer.swift */; };
-		66311CE22BD740D900D53489 /* JXLTextureLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66311CE12BD740D900D53489 /* JXLTextureLoader.swift */; };
-		66311CE82BD78B6D00D53489 /* UIImageDataExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66311CE72BD78B6D00D53489 /* UIImageDataExtractor.swift */; };
 		6632594C2BB66C1A00460F70 /* JXLEncoderShim.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6632594B2BB66C1A00460F70 /* JXLEncoderShim.mm */; };
 		6632594E2BB6725B00460F70 /* JXLEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6632594D2BB6725B00460F70 /* JXLEncoder.swift */; };
 		6632595F2BB6E94E00460F70 /* libjxl.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6632595E2BB6E94E00460F70 /* libjxl.xcframework */; };
@@ -209,8 +207,6 @@
 		66311CD12BD713BE00D53489 /* MovableCanvasTransform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovableCanvasTransform.swift; sourceTree = "<group>"; };
 		66311CDA2BD73FAF00D53489 /* ImageResizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageResizer.swift; sourceTree = "<group>"; };
 		66311CDC2BD7403100D53489 /* SpriteRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteRenderer.swift; sourceTree = "<group>"; };
-		66311CE12BD740D900D53489 /* JXLTextureLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = JXLTextureLoader.swift; path = LuxAnimate/Graphics/JXLTextureLoader.swift; sourceTree = SOURCE_ROOT; };
-		66311CE72BD78B6D00D53489 /* UIImageDataExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageDataExtractor.swift; sourceTree = "<group>"; };
 		663259492BB66A3300460F70 /* JXLEncoderShim.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JXLEncoderShim.h; sourceTree = "<group>"; };
 		6632594A2BB66BB300460F70 /* BridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BridgingHeader.h; sourceTree = "<group>"; };
 		6632594B2BB66C1A00460F70 /* JXLEncoderShim.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = JXLEncoderShim.mm; sourceTree = "<group>"; };
@@ -537,8 +533,6 @@
 				66B491B22BD9993F008A2A2E /* TextureCreator.swift */,
 				66211EAD2BF3159B005490C4 /* TextureCopier.swift */,
 				66099BD42BDB568E00243D9F /* TextureDataReader.swift */,
-				66311CE12BD740D900D53489 /* JXLTextureLoader.swift */,
-				66311CE72BD78B6D00D53489 /* UIImageDataExtractor.swift */,
 				66311CDA2BD73FAF00D53489 /* ImageResizer.swift */,
 			);
 			path = Graphics;
@@ -1153,7 +1147,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				66099BC52BDB32F500243D9F /* BrushEngine.swift in Sources */,
-				66311CE82BD78B6D00D53489 /* UIImageDataExtractor.swift in Sources */,
 				66D084892BA4060E00EB8556 /* Project.swift in Sources */,
 				66D0848C2BA55B4300EB8556 /* LibraryManifest.swift in Sources */,
 				66099BD52BDB568E00243D9F /* TextureDataReader.swift in Sources */,
@@ -1177,7 +1170,6 @@
 				66D084822BA3FDFC00EB8556 /* LibraryManager.swift in Sources */,
 				664C281D2C741011002166D6 /* EditorWorkspaceVC.swift in Sources */,
 				667BF74B2BA655CB003E3430 /* FileHelper.swift in Sources */,
-				66311CE22BD740D900D53489 /* JXLTextureLoader.swift in Sources */,
 				664175B72C7E558500205FEC /* AnimEditorEraseToolState.swift in Sources */,
 				664B59462BC5A9D1003FA90E /* BrushGestureRecognizerStroke.swift in Sources */,
 				66D0846D2BA3CEC300EB8556 /* CGGeometry.swift in Sources */,

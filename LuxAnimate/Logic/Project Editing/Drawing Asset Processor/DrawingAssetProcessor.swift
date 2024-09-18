@@ -3,8 +3,14 @@
 //
 
 import Metal
+import ImageIO
+import UniformTypeIdentifiers
 
 struct DrawingAssetProcessor {
+    
+    enum Error: Swift.Error {
+        case encoding
+    }
     
     private let imageResizer = ImageResizer()
     
@@ -40,27 +46,78 @@ struct DrawingAssetProcessor {
             targetSize: thumbnailSize)
         
         // Encode images
-        let fullEncodedData = try! JXLEncoder.encode(
-            input: .init(
-                data: imageData,
-                width: imageWidth,
-                height: imageHeight),
-            lossless: true,
-            quality: 100,
-            effort: 1)
+        let fullEncodedData = try Self.encodePNG(
+            imageData: imageData,
+            imageWidth: imageWidth,
+            imageHeight: imageHeight)
         
-        let thumbnailEncodedData = try! JXLEncoder.encode(
-            input: .init(
-                data: thumbnailImageData,
-                width: thumbnailSize.width,
-                height: thumbnailSize.height),
-            lossless: false,
-            quality: 90,
-            effort: 1)
+        let thumbnailEncodedData = try Self.encodePNG(
+            imageData: thumbnailImageData,
+            imageWidth: thumbnailSize.width,
+            imageHeight: thumbnailSize.height)
         
         return ImageSet(
             full: fullEncodedData,
             thumbnail: thumbnailEncodedData)
+    }
+    
+    private static func encodePNG(
+        imageData: Data,
+        imageWidth: Int,
+        imageHeight: Int
+    ) throws -> Data {
+        
+        guard let outputData = CFDataCreateMutable(nil, 0)
+        else {
+            throw Error.encoding
+        }
+        
+        guard let destination = CGImageDestinationCreateWithData(
+            outputData, UTType.png.identifier as CFString, 1, nil)
+        else {
+            throw Error.encoding
+        }
+        
+        guard let dataProvider = CGDataProvider(
+            data: imageData as CFData)
+        else {
+            throw Error.encoding
+        }
+        
+        let bitsPerComponent = 8
+        let bitsPerPixel = bitsPerComponent * 4
+        let bytesPerRow = imageWidth * 4
+        
+        let colorSpace = CGColorSpace(name: CGColorSpace.sRGB)!
+        let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.last.rawValue)
+        
+        guard let cgImage = CGImage(
+            width: imageWidth,
+            height: imageHeight,
+            bitsPerComponent: bitsPerComponent,
+            bitsPerPixel: bitsPerPixel,
+            bytesPerRow: bytesPerRow,
+            space: colorSpace,
+            bitmapInfo: bitmapInfo,
+            provider: dataProvider,
+            decode: nil,
+            shouldInterpolate: false,
+            intent: .defaultIntent
+        ) else {
+            throw Error.encoding
+        }
+        
+        let options: [CFString: Any] = [
+            kCGImageDestinationOptimizeColorForSharing: true
+        ]
+        
+        CGImageDestinationAddImage(destination, cgImage, options as CFDictionary)
+        
+        guard CGImageDestinationFinalize(destination) else {
+            throw Error.encoding
+        }
+        
+        return outputData as Data
     }
     
 }
