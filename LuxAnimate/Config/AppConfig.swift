@@ -28,7 +28,8 @@ struct AppConfig {
         sizeWobble: 0.4,
         offsetWobble: 0.1,
         wobbleFrequency: 0.25,
-        wobblePressureAttenuation: 0.5)
+        wobblePressureAttenuation: 0.5,
+        baseSmoothing: 0)
     
     static let penBrushConfig = Brush.Configuration(
         stampTextureName: "brush1.png",
@@ -41,7 +42,8 @@ struct AppConfig {
         sizeWobble: 0.1,
         offsetWobble: 0.05,
         wobbleFrequency: 0.7,
-        wobblePressureAttenuation: 0.6)
+        wobblePressureAttenuation: 0.6,
+        baseSmoothing: 0.1)
     
     static let roundBrushConfig = Brush.Configuration(
         stampTextureName: "brush1.png",
@@ -54,7 +56,8 @@ struct AppConfig {
         sizeWobble: 0,
         offsetWobble: 0,
         wobbleFrequency: 0,
-        wobblePressureAttenuation: 0)
+        wobblePressureAttenuation: 0,
+        baseSmoothing: 0)
     
     static let eraseBrushConfig = Brush.Configuration(
         stampTextureName: "brush1.png",
@@ -67,7 +70,8 @@ struct AppConfig {
         sizeWobble: 0,
         offsetWobble: 0,
         wobbleFrequency: 0,
-        wobblePressureAttenuation: 0)
+        wobblePressureAttenuation: 0,
+        baseSmoothing: 0)
     
     static let onionSkinConfig = AnimEditorOnionSkinConfig(
         prevCount: 5,

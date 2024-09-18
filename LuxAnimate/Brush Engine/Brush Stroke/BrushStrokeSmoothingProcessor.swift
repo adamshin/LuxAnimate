@@ -21,9 +21,14 @@ class BrushStrokeSmoothingProcessor {
     
     private var lastFinalizedState: State
     
-    init(smoothing: Double) {
+    init(brush: Brush, smoothing: Double) {
+        let adjustedSmoothing = map(
+            smoothing,
+            in: (0, 1),
+            to: (brush.config.baseSmoothing, 1))
+        
         let windowSize = clamp(
-            Int(smoothing * Double(maxSmoothingWindowSize)),
+            Int(adjustedSmoothing * Double(maxSmoothingWindowSize)),
             min: minSmoothingWindowSize,
             max: maxSmoothingWindowSize)
         
