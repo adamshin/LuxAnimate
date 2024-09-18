@@ -3,7 +3,7 @@
 //
 
 import Metal
-@preconcurrency import MetalKit
+import MetalKit
 
 private let maxConcurrentOperations = 3
 
@@ -44,9 +44,6 @@ class AnimEditorAssetLoader {
     private let limitedConcurrencyQueue =
         LimitedConcurrencyQueue(
             maxConcurrentOperations: maxConcurrentOperations)
-    
-    private let textureLoader = MTKTextureLoader(
-        device: MetalInterface.shared.device)
     
     private var assetIDs: Set<String> = []
     private var inProgressTasks: [String: Task<Void, Error>] = [:]
@@ -138,10 +135,14 @@ class AnimEditorAssetLoader {
             
             try Task.checkCancellation()
             
+            let textureLoader = MTKTextureLoader(
+                device: MetalInterface.shared.device)
+            
             let texture = try await textureLoader.newTexture(
                 data: assetData,
                 options: [
-                    .textureUsage: MTLTextureUsage.shaderRead.rawValue
+                    .textureUsage: MTLTextureUsage.shaderRead.rawValue,
+//                    .SRGB: false,
                 ])
             
             try Task.checkCancellation()
