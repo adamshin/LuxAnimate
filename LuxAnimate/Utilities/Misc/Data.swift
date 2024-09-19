@@ -2,6 +2,8 @@
 //  Data.swift
 //
 
+import Foundation
+
 extension UInt64 {
     
     var data: Data {
