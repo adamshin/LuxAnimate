@@ -108,11 +108,11 @@ class AnimFrameEditorEditingState: AnimFrameEditorState {
         if let activeDrawing = activeDrawingManifest.activeDrawing,
             let fullAssetID = activeDrawing.fullAssetID
         {
-            let activeDrawingTexture = delegate?.assetLoaderAssetTexture(
+            let activeDrawingAsset = delegate?.assetLoaderAsset(
                 self, assetID: fullAssetID)
             
-            if let activeDrawingTexture {
-                toolState?.setDrawingCanvasTexture(activeDrawingTexture)
+            if let texture = activeDrawingAsset?.texture {
+                toolState?.setDrawingCanvasTexture(texture)
             }
         }
         
@@ -120,8 +120,6 @@ class AnimFrameEditorEditingState: AnimFrameEditorState {
     }
     
     func onAssetLoaderUpdate() { }
-    
-    func onAssetLoaderFinish() { }
     
     func onFrame() -> EditorWorkspaceSceneGraph? {
         toolState?.onFrame()
@@ -186,8 +184,10 @@ extension AnimFrameEditorEditingState:
         assetID: String
     ) -> MTLTexture? {
         
-        delegate?.assetLoaderAssetTexture(
+        let asset = delegate?.assetLoaderAsset(
             self, assetID: assetID)
+        
+        return asset?.texture
     }
     
 }

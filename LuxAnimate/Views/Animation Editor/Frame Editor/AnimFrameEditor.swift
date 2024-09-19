@@ -21,10 +21,15 @@ extension AnimFrameEditor {
             _ e: AnimFrameEditor,
             assetIDs: Set<String>)
         
-        func assetLoaderAssetTexture(
+        func assetLoaderHasLoadedAssets(
+            _ e: AnimFrameEditor,
+            assetIDs: Set<String>
+        ) -> Bool
+        
+        func assetLoaderAsset(
             _ e: AnimFrameEditor,
             assetID: String
-        ) -> MTLTexture?
+        ) -> AnimEditorAssetLoader.LoadedAsset?
         
         func setEditInteractionEnabled(
             _ e: AnimFrameEditor,
@@ -87,10 +92,6 @@ class AnimFrameEditor {
         state?.onAssetLoaderUpdate()
     }
     
-    func onAssetLoaderFinish() {
-        state?.onAssetLoaderFinish()
-    }
-    
 }
 
 // MARK: - Delegates
@@ -109,17 +110,24 @@ extension AnimFrameEditor: AnimFrameEditorStateDelegate {
         assetIDs: Set<String>
     ) {
         delegate?.setAssetLoaderAssetIDs(
-            self, 
-            assetIDs: assetIDs)
+            self, assetIDs: assetIDs)
     }
     
-    func assetLoaderAssetTexture(
+    func assetLoaderHasLoadedAssets(
+        _ s: AnimFrameEditorState,
+        assetIDs: Set<String>
+    ) -> Bool {
+        delegate?.assetLoaderHasLoadedAssets(
+            self, assetIDs: assetIDs)
+        ?? false
+    }
+    
+    func assetLoaderAsset(
         _ s: AnimFrameEditorState,
         assetID: String
-    ) -> MTLTexture? {
-        delegate?.assetLoaderAssetTexture(
-            self,
-            assetID: assetID)
+    ) -> AnimEditorAssetLoader.LoadedAsset? {
+        delegate?.assetLoaderAsset(
+            self, assetID: assetID)
     }
     
     func workspaceViewSize(

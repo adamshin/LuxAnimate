@@ -15,10 +15,15 @@ protocol AnimFrameEditorStateDelegate: AnyObject {
         _ s: AnimFrameEditorState,
         assetIDs: Set<String>)
     
-    func assetLoaderAssetTexture(
+    func assetLoaderHasLoadedAssets(
+        _ s: AnimFrameEditorState,
+        assetIDs: Set<String>
+    ) -> Bool
+    
+    func assetLoaderAsset(
         _ s: AnimFrameEditorState,
         assetID: String
-    ) -> MTLTexture?
+    ) -> AnimEditorAssetLoader.LoadedAsset?
     
     func workspaceViewSize(
         _ s: AnimFrameEditorState
@@ -47,7 +52,6 @@ protocol AnimFrameEditorState: AnyObject {
     func beginState()
     
     func onAssetLoaderUpdate()
-    func onAssetLoaderFinish()
     
     func onFrame() -> EditorWorkspaceSceneGraph?
     

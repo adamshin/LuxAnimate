@@ -521,12 +521,18 @@ extension AnimEditorVC: AnimFrameEditor.Delegate {
         assetLoader.update(assetIDs: assetIDs)
     }
     
-    func assetLoaderAssetTexture(
+    func assetLoaderHasLoadedAssets(
+        _ e: AnimFrameEditor,
+        assetIDs: Set<String>
+    ) -> Bool {
+        assetIDs.isSubset(of: assetLoader.loadedAssets.keys)
+    }
+    
+    func assetLoaderAsset(
         _ e: AnimFrameEditor,
         assetID: String
-    ) -> MTLTexture? {
-        let asset = assetLoader.loadedAsset(assetID: assetID)
-        return asset?.texture
+    ) -> AnimEditorAssetLoader.LoadedAsset? {
+        assetLoader.loadedAssets[assetID]
     }
     
     func setEditInteractionEnabled(
@@ -585,10 +591,6 @@ extension AnimEditorVC: AnimEditorAssetLoader.Delegate {
     
     func onUpdate(_ l: AnimEditorAssetLoader) {
         frameEditor?.onAssetLoaderUpdate()
-    }
-    
-    func onFinish(_ l: AnimEditorAssetLoader) {
-        frameEditor?.onAssetLoaderFinish()
     }
     
 }
