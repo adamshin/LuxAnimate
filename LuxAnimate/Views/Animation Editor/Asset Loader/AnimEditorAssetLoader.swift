@@ -45,8 +45,6 @@ class AnimEditorAssetLoader {
     
     private(set) var loadedAssets: [String: LoadedAsset] = [:]
     
-    private var loadStartTime: TimeInterval = 0
-    
     weak var delegate: Delegate?
     
     // MARK: - Init
@@ -58,74 +56,65 @@ class AnimEditorAssetLoader {
     // MARK: - Interface
     
     func update(assetIDs: Set<String>) {
-        Task {
-            self.assetIDs = assetIDs
-            
-            loadedAssets = loadedAssets.filter {
-                assetIDs.contains($0.key)
-            }
-            
-            var cancelledTasks: [Task<Void, Error>] = []
-            
-            for (assetID, task) in inProgressTasks {
-                if !assetIDs.contains(assetID) {
-                    task.cancel()
-                    inProgressTasks[assetID] = nil
-                    cancelledTasks.append(task)
-                }
-            }
-            
-            // My suspicion is that this is the problem.
-            
-            // While we're suspended here waiting for tasks
-            // to finish, another update call comes along.
-            // It sees no in progress tasks - since we
-            // removed them - and proceeds with starting a
-            // new set of loading tasks. So we have too
-            // many tasks in memory, and memory use spikes.
-            
-            // I can test this by seeing if a "Starting
-            // load" message appears in between these two
-            // messages with emojis.
-            
-            // If so, I need to protect this whole method
-            // from re-entrancy. I should use my semaphore
-            // or concurrency limiter.
-            
-            print("🔴 Awaiting cancellation of \(cancelledTasks.count) tasks...")
-            for task in cancelledTasks {
-                _ = await task.result
-            }
-            print("🟢 Cancelled \(cancelledTasks.count) tasks.")
-            
-            let assetIDsToLoad = self.assetIDs
-                .subtracting(Set(inProgressTasks.keys))
-                .subtracting(Set(loadedAssets.keys))
-            
-            loadStartTime = ProcessInfo.processInfo.systemUptime
-            print("""
-                Starting load. \
-                New: \(assetIDsToLoad.count), \
-                Reused: \(self.loadedAssets.count)
-                """)
-            
-            for assetID in assetIDsToLoad {
-                let task = Task.detached(priority: .high) {
-//                    try await self.concurrencyLimiter.run {
-                        try await self.loadAsset(assetID: assetID)
-//                    }
-                }
-                inProgressTasks[assetID] = task
-            }
-            
-            if inProgressTasks.isEmpty {
-                print("Finished load - no tasks")
-                delegate?.onUpdate(self)
+        Task.detached(priority: .userInitiated) {
+            try await self.updateLimiter.run {
+                await self.updateInternal(assetIDs: assetIDs)
             }
         }
     }
     
     // MARK: - Internal Methods
+    
+    private func updateInternal(
+        assetIDs: Set<String>
+    ) async {
+        print("\n▶️ Starting update...")
+        
+        self.assetIDs = assetIDs
+        
+        loadedAssets = loadedAssets.filter {
+            assetIDs.contains($0.key)
+        }
+        
+        var cancelledTasks: [Task<Void, Error>] = []
+        
+        for (assetID, task) in inProgressTasks {
+            if !assetIDs.contains(assetID) {
+                task.cancel()
+                inProgressTasks[assetID] = nil
+                cancelledTasks.append(task)
+            }
+        }
+        
+        print("🔴 Awaiting cancellation of \(cancelledTasks.count) tasks...")
+        for task in cancelledTasks {
+            _ = await task.result
+        }
+        print("🟢 Cancelled \(cancelledTasks.count) tasks.")
+        
+        let assetIDsToLoad = self.assetIDs
+            .subtracting(Set(inProgressTasks.keys))
+            .subtracting(Set(loadedAssets.keys))
+        
+        print("""
+            Starting load. \
+            New: \(assetIDsToLoad.count), \
+            Reused: \(self.loadedAssets.count)
+            """)
+        
+        for assetID in assetIDsToLoad {
+            let task = Task.detached(priority: .high) {
+                try await self.loadAsset(assetID: assetID)
+            }
+            inProgressTasks[assetID] = task
+        }
+        
+        if inProgressTasks.isEmpty {
+            delegate?.onUpdate(self)
+        }
+        
+        print("✅ Finished update.")
+    }
     
     private func storeLoadedAsset(
         assetID: String,
@@ -135,26 +124,12 @@ class AnimEditorAssetLoader {
         
         guard assetIDs.contains(assetID)
         else {
-//            print("Cancelled loading asset (final check)")
+            print("Cancelled loading asset (final check)")
             return
         }
         
         loadedAssets[assetID] = loadedAsset
-        
         delegate?.onUpdate(self)
-        
-//        print("Loaded asset")
-        
-        if inProgressTasks.isEmpty {
-            let loadEndTime = ProcessInfo.processInfo.systemUptime
-            let loadTime = loadEndTime - loadStartTime
-            let loadTimeMs = Int(loadTime * 1000)
-            
-            print("""
-                Finished load. \
-                Time: \(loadTimeMs) ms
-                """)
-        }
     }
     
     nonisolated private func loadAsset(

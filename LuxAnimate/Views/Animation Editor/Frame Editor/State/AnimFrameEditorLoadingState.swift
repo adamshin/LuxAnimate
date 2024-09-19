@@ -29,6 +29,8 @@ class AnimFrameEditorLoadingState: AnimFrameEditorState {
     
     private let assetIDsToLoad: Set<String>
     
+    private var loadStartTime: TimeInterval = 0
+    
     weak var delegate: AnimFrameEditorStateDelegate?
     
     // MARK: - Init
@@ -93,6 +95,8 @@ class AnimFrameEditorLoadingState: AnimFrameEditorState {
         delegate?.setEditInteractionEnabled(
             self, enabled: false)
         
+        loadStartTime = ProcessInfo.processInfo.systemUptime
+        
         delegate?.setAssetLoaderAssetIDs(
             self, assetIDs: assetIDsToLoad)
     }
@@ -103,6 +107,15 @@ class AnimFrameEditorLoadingState: AnimFrameEditorState {
         if delegate.assetLoaderHasLoadedAssets(
             self, assetIDs: assetIDsToLoad)
         {
+            let loadEndTime = ProcessInfo.processInfo.systemUptime
+            let loadTime = loadEndTime - loadStartTime
+            let loadTimeMs = Int(loadTime * 1000)
+            
+            print("""
+                Finished load. \
+                Time: \(loadTimeMs) ms
+                """)
+            
             enterEditingState()
         }
     }
