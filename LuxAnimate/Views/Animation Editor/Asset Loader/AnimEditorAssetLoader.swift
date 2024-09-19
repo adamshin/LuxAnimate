@@ -5,7 +5,7 @@
 import Metal
 import MetalKit
 
-private let maxConcurrentOperations = 10
+private let concurrencyLimit = 10
 
 extension AnimEditorAssetLoader {
     
@@ -41,9 +41,8 @@ class AnimEditorAssetLoader {
     
     private let projectID: String
     
-    private let limitedConcurrencyQueue =
-        LimitedConcurrencyQueue(
-            maxConcurrentOperations: maxConcurrentOperations)
+    private let concurrencyLimiter =
+        ConcurrencyLimiter(limit: concurrencyLimit)
     
     private var assetIDs: Set<String> = []
     private var inProgressTasks: [String: Task<Void, Error>] = [:]
@@ -91,7 +90,7 @@ class AnimEditorAssetLoader {
         
         for assetID in assetIDsToLoad {
             let task = Task.detached(priority: .high) {
-                try await self.limitedConcurrencyQueue.enqueue {
+                try await self.concurrencyLimiter.run {
                     try await self.loadAsset(assetID: assetID)
                 }
             }
