@@ -111,10 +111,7 @@ class AnimFrameEditorLoadingState: AnimFrameEditorState {
             let loadTime = loadEndTime - loadStartTime
             let loadTimeMs = Int(loadTime * 1000)
             
-            print("""
-                Finished load. \
-                Time: \(loadTimeMs) ms
-                """)
+            print("Loaded assets. \(loadTimeMs) ms")
             
             enterEditingState()
         }

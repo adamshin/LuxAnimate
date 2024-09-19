@@ -68,8 +68,6 @@ class AnimEditorAssetLoader {
     private func updateInternal(
         assetIDs: Set<String>
     ) async {
-        print("\n▶️ Starting update...")
-        
         self.assetIDs = assetIDs
         
         loadedAssets = loadedAssets.filter {
@@ -86,21 +84,13 @@ class AnimEditorAssetLoader {
             }
         }
         
-        print("🔴 Awaiting cancellation of \(cancelledTasks.count) tasks...")
         for task in cancelledTasks {
             _ = await task.result
         }
-        print("🟢 Cancelled \(cancelledTasks.count) tasks.")
         
         let assetIDsToLoad = self.assetIDs
             .subtracting(Set(inProgressTasks.keys))
             .subtracting(Set(loadedAssets.keys))
-        
-        print("""
-            Starting load. \
-            New: \(assetIDsToLoad.count), \
-            Reused: \(self.loadedAssets.count)
-            """)
         
         for assetID in assetIDsToLoad {
             let task = Task.detached(priority: .high) {
@@ -112,8 +102,6 @@ class AnimEditorAssetLoader {
         if inProgressTasks.isEmpty {
             delegate?.onUpdate(self)
         }
-        
-        print("✅ Finished update.")
     }
     
     private func storeLoadedAsset(
@@ -122,11 +110,7 @@ class AnimEditorAssetLoader {
     ) {
         inProgressTasks[assetID] = nil
         
-        guard assetIDs.contains(assetID)
-        else {
-            print("Cancelled loading asset (final check)")
-            return
-        }
+        guard assetIDs.contains(assetID) else { return }
         
         loadedAssets[assetID] = loadedAsset
         delegate?.onUpdate(self)
@@ -170,11 +154,8 @@ class AnimEditorAssetLoader {
                 loadedAsset: .loaded(texture))
             
         } catch is CancellationError {
-//            print("Cancelled loading asset")
             
         } catch {
-//            print("Error loading asset")
-            
             await storeLoadedAsset(
                 assetID: assetID,
                 loadedAsset: .error)
