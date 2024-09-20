@@ -40,7 +40,7 @@
 		661D9F652C941C44008BB9E9 /* AnimEditorAssetLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 661D9F642C941C44008BB9E9 /* AnimEditorAssetLoader.swift */; };
 		661D9F672C943FB5008BB9E9 /* ConcurrencyLimiter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 661D9F662C943FB5008BB9E9 /* ConcurrencyLimiter.swift */; };
 		661E9F2D2C9C95A700A75A2F /* AsyncSemaphore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 661E9F2C2C9C95A700A75A2F /* AsyncSemaphore.swift */; };
-		661E9F2F2C9CF48B00A75A2F /* AnimEditorStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 661E9F2E2C9CF48B00A75A2F /* AnimEditorStateManager.swift */; };
+		661E9F2F2C9CF48B00A75A2F /* AnimEditorState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 661E9F2E2C9CF48B00A75A2F /* AnimEditorState.swift */; };
 		66211E8B2BEDDEB0005490C4 /* LayoutInvalidatingFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66211E8A2BEDDEB0005490C4 /* LayoutInvalidatingFlowLayout.swift */; };
 		66211E8D2BEDE491005490C4 /* LibraryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66211E8C2BEDE491005490C4 /* LibraryCell.swift */; };
 		66211E8F2BEEC8B8005490C4 /* AnimEditorTimelineToolbarFrameWidgetVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66211E8E2BEEC8B8005490C4 /* AnimEditorTimelineToolbarFrameWidgetVC.swift */; };
@@ -189,7 +189,7 @@
 		661D9F642C941C44008BB9E9 /* AnimEditorAssetLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorAssetLoader.swift; sourceTree = "<group>"; };
 		661D9F662C943FB5008BB9E9 /* ConcurrencyLimiter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcurrencyLimiter.swift; sourceTree = "<group>"; };
 		661E9F2C2C9C95A700A75A2F /* AsyncSemaphore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncSemaphore.swift; sourceTree = "<group>"; };
-		661E9F2E2C9CF48B00A75A2F /* AnimEditorStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorStateManager.swift; sourceTree = "<group>"; };
+		661E9F2E2C9CF48B00A75A2F /* AnimEditorState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorState.swift; sourceTree = "<group>"; };
 		66211E8A2BEDDEB0005490C4 /* LayoutInvalidatingFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutInvalidatingFlowLayout.swift; sourceTree = "<group>"; };
 		66211E8C2BEDE491005490C4 /* LibraryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryCell.swift; sourceTree = "<group>"; };
 		66211E8E2BEEC8B8005490C4 /* AnimEditorTimelineToolbarFrameWidgetVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorTimelineToolbarFrameWidgetVC.swift; sourceTree = "<group>"; };
@@ -747,7 +747,7 @@
 				668A14D42C7D3E3800D73D36 /* Shared */,
 				6619CB612C791E9700458B79 /* AnimEditorVC.swift */,
 				66E3E4372C7ADEC90086D388 /* AnimEditorView.swift */,
-				661E9F2E2C9CF48B00A75A2F /* AnimEditorStateManager.swift */,
+				661E9F2E2C9CF48B00A75A2F /* AnimEditorState.swift */,
 			);
 			path = "Animation Editor";
 			sourceTree = "<group>";
@@ -1243,7 +1243,7 @@
 				664C28212C75306D002166D6 /* EditorWorkspaceSceneGraph.swift in Sources */,
 				6622325B2BE0750300C8813F /* EditorCollapsibleContentVC.swift in Sources */,
 				664175BE2C7E824700205FEC /* AnimFrameEditorPaintToolState.swift in Sources */,
-				661E9F2F2C9CF48B00A75A2F /* AnimEditorStateManager.swift in Sources */,
+				661E9F2F2C9CF48B00A75A2F /* AnimEditorState.swift in Sources */,
 				66A653042C209DFB0060A216 /* XXHash.swift in Sources */,
 				66E312B62C3A0001006BE399 /* ProjectEditorContentVC.swift in Sources */,
 				66D0843F2BA3840C00EB8556 /* SceneDelegate.swift in Sources */,

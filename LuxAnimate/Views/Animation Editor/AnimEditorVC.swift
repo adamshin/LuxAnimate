@@ -44,10 +44,9 @@ class AnimEditorVC: UIViewController {
     private let sceneID: String
     private let layerID: String
     
+    private var state: AnimEditorState
     private var toolState: AnimEditorToolState?
     private var frameEditor: AnimFrameEditor?
-    
-    private let stateManager: AnimEditorStateManager
     
     private let assetLoader: AnimEditorAssetLoader
     
@@ -75,7 +74,7 @@ class AnimEditorVC: UIViewController {
         self.sceneID = sceneID
         self.layerID = layerID
         
-        stateManager = try AnimEditorStateManager(
+        state = try AnimEditorState(
             projectID: projectID,
             layerID: layerID,
             projectState: projectState,
@@ -106,7 +105,7 @@ class AnimEditorVC: UIViewController {
         setupUI()
         setupDisplayLink()
         
-        setInitialUIState()
+        setInitialState()
         
         enterToolState(AnimEditorPaintToolState())
     }
@@ -134,11 +133,9 @@ class AnimEditorVC: UIViewController {
         }
     }
     
-    // MARK: - UI
+    // MARK: - State
     
-    private func setInitialUIState() {
-        let state = stateManager.state
-        
+    private func setInitialState() {
         toolbarVC.update(state: state)
         
         timelineVC.update(
@@ -147,19 +144,15 @@ class AnimEditorVC: UIViewController {
             focusedFrameIndex: state.focusedFrameIndex)
     }
     
-    // MARK: - Logic
-    
     private func updateState(
         projectState: ProjectEditManager.State,
         sceneManifest: Scene.Manifest,
         editContext: Sendable?
     ) {
         do {
-            try stateManager.update(
+            try state.update(
                 projectState: projectState,
                 sceneManifest: sceneManifest)
-            
-            let state = stateManager.state
             
             toolbarVC.update(state: state)
             
@@ -168,16 +161,15 @@ class AnimEditorVC: UIViewController {
             timelineVC.update(
                 focusedFrameIndex: state.focusedFrameIndex)
             
-            let shouldReloadFrameEditor = {
-                if let context = editContext as? AnimEditorVCEditContext,
-                   context.sender == self,
-                   context.isFromFrameEditor
-                {
-                    return false
-                } else {
-                    return true
-                }
-            }()
+            let shouldReloadFrameEditor: Bool
+            if let context = editContext as? AnimEditorVCEditContext,
+               context.sender == self,
+               context.isFromFrameEditor
+            {
+                shouldReloadFrameEditor = false
+            } else {
+                shouldReloadFrameEditor = true
+            }
             
             if shouldReloadFrameEditor {
                 reloadFrameEditor()
@@ -192,13 +184,12 @@ class AnimEditorVC: UIViewController {
         focusedFrameIndex: Int,
         fromTimelineVC: Bool
     ) {
-        let oldIndex = stateManager.state.focusedFrameIndex
+        let oldIndex = state.focusedFrameIndex
         
-        stateManager.update(
+        state.update(
             focusedFrameIndex: focusedFrameIndex)
         
-        let state = stateManager.state
-        let newIndex = stateManager.state.focusedFrameIndex
+        let newIndex = state.focusedFrameIndex
         
         if oldIndex != newIndex {
             if !fromTimelineVC {
@@ -212,7 +203,7 @@ class AnimEditorVC: UIViewController {
     private func updateState(
         onionSkinConfig: AnimEditorOnionSkinConfig
     ) {
-        stateManager.update(
+        state.update(
             onionSkinConfig: onionSkinConfig)
         
         reloadFrameEditor()
@@ -222,8 +213,6 @@ class AnimEditorVC: UIViewController {
     
     private func reloadFrameEditor() {
         guard let toolState else { return }
-        
-        let state = stateManager.state
         
         let frameEditor = AnimFrameEditor()
         frameEditor.delegate = self

@@ -1,32 +1,27 @@
 //
-//  AnimEditorStateManager.swift
+//  AnimEditorState.swift
 //
 
 import Foundation
-
-extension AnimEditorStateManager {
     
-    struct State {
-        var projectState: ProjectEditManager.State
-        var sceneManifest: Scene.Manifest
-        var layer: Scene.Layer
-        var layerContent: Scene.AnimationLayerContent
-        
-        var focusedFrameIndex: Int
-        var onionSkinConfig: AnimEditorOnionSkinConfig
-        
-        var timelineModel: AnimEditorTimelineModel
-    }
+struct AnimEditorState {
+    
+    let projectID: String
+    let layerID: String
+    
+    var projectState: ProjectEditManager.State
+    var sceneManifest: Scene.Manifest
+    var layer: Scene.Layer
+    var layerContent: Scene.AnimationLayerContent
+    
+    var focusedFrameIndex: Int
+    var onionSkinConfig: AnimEditorOnionSkinConfig
+    
+    var timelineModel: AnimEditorTimelineModel
     
 }
 
-@MainActor
-class AnimEditorStateManager {
-    
-    private let projectID: String
-    private let layerID: String
-    
-    private(set) var state: State
+extension AnimEditorState {
     
     // MARK: - Init
     
@@ -38,9 +33,6 @@ class AnimEditorStateManager {
         focusedFrameIndex: Int,
         onionSkinConfig: AnimEditorOnionSkinConfig
     ) throws {
-        
-        self.projectID = projectID
-        self.layerID = layerID
         
         let (layer, layerContent) =
             try LayerReader.layerData(
@@ -57,14 +49,15 @@ class AnimEditorStateManager {
             sceneManifest: sceneManifest,
             layerContent: layerContent)
         
-        state = State(
-            projectState: projectState,
-            sceneManifest: sceneManifest,
-            layer: layer,
-            layerContent: layerContent,
-            focusedFrameIndex: focusedFrameIndex,
-            onionSkinConfig: onionSkinConfig,
-            timelineModel: timelineModel)
+        self.projectID = projectID
+        self.layerID = layerID
+        self.projectState = projectState
+        self.sceneManifest = sceneManifest
+        self.layer = layer
+        self.layerContent = layerContent
+        self.focusedFrameIndex = focusedFrameIndex
+        self.onionSkinConfig = onionSkinConfig
+        self.timelineModel = timelineModel
     }
     
     // MARK: - Internal Logic
@@ -80,7 +73,7 @@ class AnimEditorStateManager {
     
     // MARK: - Update
     
-    func update(
+    mutating func update(
         projectState: ProjectEditManager.State,
         sceneManifest: Scene.Manifest
     ) throws {
@@ -92,7 +85,7 @@ class AnimEditorStateManager {
         
         let focusedFrameIndex =
             Self.clampedFocusedFrameIndex(
-                focusedFrameIndex: state.focusedFrameIndex,
+                focusedFrameIndex: focusedFrameIndex,
                 sceneManifest: sceneManifest)
         
         let timelineModel = AnimEditorTimelineModel.generate(
@@ -100,28 +93,26 @@ class AnimEditorStateManager {
             sceneManifest: sceneManifest,
             layerContent: layerContent)
         
-        state.projectState = projectState
-        state.sceneManifest = sceneManifest
-        state.layer = layer
-        state.layerContent = layerContent
-        state.focusedFrameIndex = focusedFrameIndex
-        state.timelineModel = timelineModel
+        self.projectState = projectState
+        self.sceneManifest = sceneManifest
+        self.layer = layer
+        self.layerContent = layerContent
+        self.focusedFrameIndex = focusedFrameIndex
+        self.timelineModel = timelineModel
     }
     
-    func update(
+    mutating func update(
         focusedFrameIndex: Int
     ) {
-        let focusedFrameIndex = Self.clampedFocusedFrameIndex(
+        self.focusedFrameIndex = Self.clampedFocusedFrameIndex(
             focusedFrameIndex: focusedFrameIndex,
-            sceneManifest: state.sceneManifest)
-        
-        state.focusedFrameIndex = focusedFrameIndex
+            sceneManifest: sceneManifest)
     }
     
-    func update(
+    mutating func update(
         onionSkinConfig: AnimEditorOnionSkinConfig
     ) {
-        state.onionSkinConfig = onionSkinConfig
+        self.onionSkinConfig = onionSkinConfig
     }
     
 }

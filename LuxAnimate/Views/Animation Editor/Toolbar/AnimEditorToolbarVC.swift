@@ -56,9 +56,7 @@ class AnimEditorToolbarVC: UIViewController {
         bodyView.selectPaintTool()
     }
     
-    func update(
-        state: AnimEditorStateManager.State
-    ) {
+    func update(state: AnimEditorState) {
         let undoAvailable =
             state.projectState.availableUndoCount > 0
         let redoAvailable =
