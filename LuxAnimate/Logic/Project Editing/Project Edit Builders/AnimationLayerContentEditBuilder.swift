@@ -46,7 +46,7 @@ struct AnimationLayerContentEditBuilder {
         return ProjectEditBuilder.SceneEdit(
             sceneID: sceneManifest.id,
             sceneManifest: sceneManifest,
-            newAssets: [])
+            newAssets: layerContentEdit.newAssets)
     }
     
     // MARK: - Animation Layer
