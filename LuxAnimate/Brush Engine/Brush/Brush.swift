@@ -50,7 +50,6 @@ struct Brush {
             throw LoadError.textureNotFound
         }
         
-        // TODO: fix sRGB gamma issue?
         let loader = MTKTextureLoader(
             device: MetalInterface.shared.device)
         
@@ -60,7 +59,7 @@ struct Brush {
                 .textureStorageMode: MTLStorageMode.private.rawValue,
                 .textureUsage: MTLTextureUsage.shaderRead.rawValue,
                 .generateMipmaps: true,
-//                .SRGB: true,
+                .SRGB: false,
             ])
     }
     
