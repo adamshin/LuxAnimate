@@ -34,6 +34,8 @@ extension Color {
     
     static let debugRed = Color(hex: "FF3B30")
     
+    static let halfGray = Color(hex: "808080")
+    
 }
 
 extension Color {
@@ -43,20 +45,29 @@ extension Color {
     }
     
     init(_ color: UIColor) {
-        var red: CGFloat = 0
-        var green: CGFloat = 0
-        var blue: CGFloat = 0
-        var alpha: CGFloat = 0
+        let srgbColor = color.cgColor.converted(
+            to: CGColorSpace(name: CGColorSpace.sRGB)!,
+            intent: .absoluteColorimetric,
+            options: nil)
         
-        color.getRed(
-            &red, green: &green,
-            blue: &blue, alpha: &alpha)
+        guard let srgbColor,
+            let components = srgbColor.components,
+            srgbColor.numberOfComponents == 4
+        else {
+            self = .clear
+            return
+        }
+        
+        let r = components[0]
+        let g = components[1]
+        let b = components[2]
+        let a = components[3]
         
         self.init(
-            UInt8(red * 255),
-            UInt8(green * 255),
-            UInt8(blue * 255),
-            UInt8(alpha * 255))
+            UInt8(r * 255),
+            UInt8(g * 255),
+            UInt8(b * 255),
+            UInt8(a * 255))
     }
     
     init(hex: String) {
@@ -80,6 +91,18 @@ extension Color {
         let a = max(Double(c.a) * alpha, 0)
         c.a = UInt8(a)
         return c
+    }
+    
+    var cgColor: CGColor {
+        CGColor(
+            srgbRed: CGFloat(r) / 255,
+            green: CGFloat(g) / 255,
+            blue: CGFloat(b) / 255,
+            alpha: CGFloat(a) / 255)
+    }
+    
+    var uiColor: UIColor {
+        UIColor(cgColor: cgColor)
     }
     
     var mtlClearColor: MTLClearColor {
