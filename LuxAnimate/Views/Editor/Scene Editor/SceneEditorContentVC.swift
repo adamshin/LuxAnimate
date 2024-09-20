@@ -26,6 +26,7 @@ class SceneEditorContentVC: UIViewController {
     
     private var sceneRef: Project.SceneRef?
     private var sceneManifest: Scene.Manifest?
+    private var assetCount = 0
     
     private var availableUndoCount = 0
     private var availableRedoCount = 0
@@ -96,6 +97,8 @@ class SceneEditorContentVC: UIViewController {
     ) {
         self.sceneRef = sceneRef
         self.sceneManifest = sceneManifest
+        assetCount = sceneManifest.assetIDs().count
+        
         self.availableUndoCount = projectState.availableUndoCount
         self.availableRedoCount = projectState.availableRedoCount
         
@@ -157,15 +160,37 @@ extension SceneEditorContentVC: UITableViewDataSource {
         case 0:
             switch indexPath.row {
             case 0:
-                cell.textLabel?.text = "Scene ID: \(sceneRef.id)"
+                cell.textLabel?.text = sceneRef.name
+                
             case 1:
-                cell.textLabel?.text = "Scene Name: \(sceneRef.name)"
+                let layerCount = sceneManifest.layers.count
+                
+                let layerText = "\(layerCount) \(layerCount == 1 ? "layer" : "layers")"
+                
+                let assetText = "\(assetCount) \(assetCount == 1 ? "asset" : "assets")"
+                
+                cell.textLabel?.text = "\(layerText), \(assetText)"
+                
             default:
                 break
             }
+            
         case 1:
             let layer = sceneManifest.layers[indexPath.row]
-            cell.textLabel?.text = "Layer ID: \(layer.id)"
+            
+            let layerContentText: String
+            switch layer.content {
+            case .animation(let content):
+                let drawingCount = content.drawings.count
+                layerContentText = "\(drawingCount) \(drawingCount == 1 ? "drawing" : "drawings")"
+            }
+            
+            cell.textLabel?.text = """
+                Layer \(indexPath.row + 1)\
+                \u{2002}\u{2022}\u{2002}\
+                \(layerContentText)
+                """
+            
         default:
             break
         }

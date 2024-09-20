@@ -126,8 +126,8 @@ extension ProjectEditorContentVC: UITableViewDataSource {
     ) -> Int {
         switch section {
         case 0: 
-            2
-        case 1: 
+            3
+        case 1:
             projectManifest?.content.sceneRefs.count ?? 0
         default:
             0
@@ -149,15 +149,39 @@ extension ProjectEditorContentVC: UITableViewDataSource {
         case 0:
             switch indexPath.row {
             case 0:
-                cell.textLabel?.text = "Project ID: \(projectManifest.id)"
+                cell.textLabel?.text = projectManifest.name
+                
             case 1:
-                cell.textLabel?.text = "Project Name: \(projectManifest.name)"
+                let viewportSize = projectManifest
+                    .content.metadata.viewportSize
+                let framesPerSecond = projectManifest
+                    .content.metadata.framesPerSecond
+                
+                cell.textLabel?.text = """
+                    \(viewportSize.width) × \(viewportSize.height)\
+                    \u{2002}\u{2022}\u{2002}\
+                    \(framesPerSecond) fps
+                    """
+                
+            case 2:
+                let sceneCount = projectManifest
+                    .content.sceneRefs.count
+                let assetCount = projectManifest
+                    .assetIDs.count
+                
+                let sceneText = "\(sceneCount) \(sceneCount == 1 ? "scene" : "scenes")"
+                
+                let assetText = "\(assetCount) \(assetCount == 1 ? "asset" : "assets")"
+                
+                cell.textLabel?.text = "\(sceneText), \(assetText)"
+                
             default:
                 break
             }
+            
         case 1:
-            let sceneRef = projectManifest.content.sceneRefs[indexPath.row]
-            cell.textLabel?.text = "Scene ID: \(sceneRef.id)"
+            cell.textLabel?.text = "Scene \(indexPath.row + 1)"
+            
         default:
             break
         }
