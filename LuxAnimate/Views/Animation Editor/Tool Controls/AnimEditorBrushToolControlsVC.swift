@@ -34,14 +34,6 @@ class AnimEditorBrushToolControlsVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Testing
-        let colorTestView1 = UIView()
-        view.addSubview(colorTestView1)
-        colorTestView1.backgroundColor = AppConfig.paintBrushColor.uiColor
-        colorTestView1.pinSize(to: 100)
-        colorTestView1.pinEdges(.trailing)
-        colorTestView1.pin(.centerY)
-        
         let stack = UIStackView()
         stack.axis = .vertical
         view.addSubview(stack)

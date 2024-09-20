@@ -244,7 +244,6 @@ extension AnimEditorTimelineVC:
         if let data = delegate?.pendingAssetData(
             self, assetID: assetID)
         {
-            print("Used pending asset data for timeline thumbnail!")
             return data
             
         } else {
