@@ -45,15 +45,13 @@ class AnimEditorVC: UIViewController {
     private let layerID: String
     
     private var state: AnimEditorState
+    
     private var toolState: AnimEditorToolState?
     private var frameEditor: AnimFrameEditor?
     
-    private let editBuilder = AnimEditorEditBuilder()
-    
     private let assetLoader: AnimEditorAssetLoader
-    
-    private let workspaceRenderer = EditorWorkspaceRenderer(
-        pixelFormat: AppConfig.metalLayerPixelFormat)
+    private let editBuilder = AnimEditorEditBuilder()
+    private let workspaceRenderer = EditorWorkspaceRenderer()
     
     private let displayLink = WrappedDisplayLink()
     
@@ -82,7 +80,8 @@ class AnimEditorVC: UIViewController {
             projectState: projectState,
             sceneManifest: sceneManifest,
             focusedFrameIndex: focusedFrameIndex,
-            onionSkinConfig: AppConfig.onionSkinConfig)
+            onionSkinConfig: AppConfig.onionSkinConfig,
+            selectedTool: .paint)
         
         assetLoader = AnimEditorAssetLoader(
             projectID: projectID)
@@ -90,8 +89,8 @@ class AnimEditorVC: UIViewController {
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
         
-        editBuilder.delegate = self
         assetLoader.delegate = self
+        editBuilder.delegate = self
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -109,8 +108,6 @@ class AnimEditorVC: UIViewController {
         setupDisplayLink()
         
         setInitialState()
-        
-        enterToolState(AnimEditorPaintToolState())
     }
     
     override var prefersStatusBarHidden: Bool { true }
@@ -139,82 +136,93 @@ class AnimEditorVC: UIViewController {
     // MARK: - State
     
     private func setInitialState() {
-        toolbarVC.update(state: state)
+        toolbarVC.update(
+            projectState: state.projectState)
+        toolbarVC.update(
+            selectedTool: state.selectedTool)
         
         timelineVC.update(
             timelineModel: state.timelineModel)
         timelineVC.update(
             focusedFrameIndex: state.focusedFrameIndex)
+        
+        updateToolState(
+            selectedTool: state.selectedTool)
+        
+        updateFrameEditor()
     }
     
-    private func updateState(
-        projectState: ProjectEditManager.State,
-        sceneManifest: Scene.Manifest,
-        editContext: Sendable?
+    private func applyStateUpdate(
+        update: AnimEditorState.Update,
+        fromFrameEditor: Bool = false,
+        fromTimeline: Bool = false
     ) {
-        do {
-            try state.update(
-                projectState: projectState,
-                sceneManifest: sceneManifest)
-            
-            toolbarVC.update(state: state)
-            
+        let state = update.state
+        let changes = update.changes
+        
+        self.state = state
+        
+        if changes.projectState {
+            toolbarVC.update(
+                projectState: state.projectState)
+        }
+        if changes.selectedTool {
+            toolbarVC.update(
+                selectedTool: state.selectedTool)
+        }
+        
+        if !fromTimeline, changes.timelineModel {
             timelineVC.update(
                 timelineModel: state.timelineModel)
+        }
+        if !fromTimeline, changes.focusedFrameIndex {
             timelineVC.update(
                 focusedFrameIndex: state.focusedFrameIndex)
-            
-            let shouldReloadFrameEditor: Bool
-            if let context = editContext as? AnimEditorVCEditContext,
-               context.sender == self,
-               context.isFromFrameEditor
-            {
-                shouldReloadFrameEditor = false
-            } else {
-                shouldReloadFrameEditor = true
-            }
-            
-            if shouldReloadFrameEditor {
-                reloadFrameEditor()
-            }
-            
-        } catch {
-            dismiss()
+        }
+        
+        if changes.selectedTool {
+            updateToolState(
+                selectedTool: state.selectedTool)
+        }
+        
+        if !fromFrameEditor,
+            changes.projectState ||
+            changes.focusedFrameIndex ||
+            changes.onionSkinConfig ||
+            changes.selectedTool
+        {
+            updateFrameEditor()
         }
     }
     
-    private func updateState(
-        focusedFrameIndex: Int,
-        fromTimelineVC: Bool
+    // MARK: - Tool State
+    
+    private func updateToolState(
+        selectedTool: AnimEditorState.Tool
     ) {
-        let oldIndex = state.focusedFrameIndex
-        
-        state.update(
-            focusedFrameIndex: focusedFrameIndex)
-        
-        let newIndex = state.focusedFrameIndex
-        
-        if oldIndex != newIndex {
-            if !fromTimelineVC {
-                timelineVC.update(
-                    focusedFrameIndex: state.focusedFrameIndex)
-            }
-            reloadFrameEditor()
+        switch selectedTool {
+        case .paint: enterToolState(AnimEditorPaintToolState())
+        case .erase: enterToolState(AnimEditorEraseToolState())
         }
     }
     
-    private func updateState(
-        onionSkinConfig: AnimEditorOnionSkinConfig
+    private func enterToolState(
+        _ newToolState: AnimEditorToolState
     ) {
-        state.update(
-            onionSkinConfig: onionSkinConfig)
+        toolState?.endState(
+            workspaceVC: workspaceVC,
+            toolControlsVC: toolControlsVC)
         
-        reloadFrameEditor()
+        toolState = newToolState
+        
+        newToolState.beginState(
+            workspaceVC: workspaceVC,
+            toolControlsVC: toolControlsVC)
     }
     
     // MARK: - Frame Editor
     
-    private func reloadFrameEditor() {
+    private func updateFrameEditor() {
         guard let toolState else { return }
         
         let frameEditor = AnimFrameEditor()
@@ -229,24 +237,6 @@ class AnimEditorVC: UIViewController {
             frameIndex: state.focusedFrameIndex,
             onionSkinConfig: state.onionSkinConfig,
             editorToolState: toolState)
-    }
-    
-    // MARK: - Tool State
-    
-    private func enterToolState(
-        _ newToolState: AnimEditorToolState
-    ) {
-        toolState?.endState(
-            workspaceVC: workspaceVC,
-            toolControlsVC: toolControlsVC)
-        
-        toolState = newToolState
-        
-        newToolState.beginState(
-            workspaceVC: workspaceVC,
-            toolControlsVC: toolControlsVC)
-        
-        reloadFrameEditor()
     }
     
     // MARK: - Frame
@@ -309,10 +299,25 @@ class AnimEditorVC: UIViewController {
         sceneManifest: Scene.Manifest,
         editContext: Sendable?
     ) {
-        updateState(
-            projectState: projectState,
-            sceneManifest: sceneManifest,
-            editContext: editContext)
+        let fromFrameEditor: Bool =
+            if let context = editContext
+                as? AnimEditorVCEditContext,
+                context.sender == self,
+                context.isFromFrameEditor
+            { true } else { false }
+        
+        do {
+            let update = try state.update(
+                projectState: projectState,
+                sceneManifest: sceneManifest)
+            
+            applyStateUpdate(
+                update: update,
+                fromFrameEditor: fromFrameEditor)
+            
+        } catch {
+            dismiss()
+        }
     }
     
 }
@@ -337,10 +342,12 @@ extension AnimEditorVC: AnimEditorToolbarVCDelegate {
     }
     
     func onSelectPaintTool(_ vc: AnimEditorToolbarVC) {
-        enterToolState(AnimEditorPaintToolState())
+        let update = state.update(selectedTool: .paint)
+        applyStateUpdate(update: update)
     }
     func onSelectEraseTool(_ vc: AnimEditorToolbarVC) {
-        enterToolState(AnimEditorEraseToolState())
+        let update = state.update(selectedTool: .erase)
+        applyStateUpdate(update: update)
     }
     
     func onSelectUndo(_ vc: AnimEditorToolbarVC) {
@@ -362,9 +369,12 @@ extension AnimEditorVC: AnimEditorTimelineVC.Delegate {
         _ vc: AnimEditorTimelineVC,
         _ focusedFrameIndex: Int
     ) {
-        updateState(
-            focusedFrameIndex: focusedFrameIndex,
-            fromTimelineVC: true)
+        let update = state.update(
+            focusedFrameIndex: focusedFrameIndex)
+        
+        applyStateUpdate(
+            update: update,
+            fromTimeline: true)
     }
     
     func onSelectPlayPause(

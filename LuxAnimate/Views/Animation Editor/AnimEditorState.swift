@@ -6,6 +6,11 @@ import Foundation
     
 struct AnimEditorState {
     
+    enum Tool {
+        case paint
+        case erase
+    }
+    
     let projectID: String
     let layerID: String
     
@@ -17,7 +22,26 @@ struct AnimEditorState {
     var focusedFrameIndex: Int
     var onionSkinConfig: AnimEditorOnionSkinConfig
     
+    var selectedTool: Tool
+    
     var timelineModel: AnimEditorTimelineModel
+    
+}
+
+extension AnimEditorState {
+    
+    struct Update {
+        var state: AnimEditorState
+        var changes: Changes
+    }
+    
+    struct Changes {
+        var projectState: Bool = false
+        var focusedFrameIndex: Bool = false
+        var onionSkinConfig: Bool = false
+        var selectedTool: Bool = false
+        var timelineModel: Bool = false
+    }
     
 }
 
@@ -31,7 +55,8 @@ extension AnimEditorState {
         projectState: ProjectEditManager.State,
         sceneManifest: Scene.Manifest,
         focusedFrameIndex: Int,
-        onionSkinConfig: AnimEditorOnionSkinConfig
+        onionSkinConfig: AnimEditorOnionSkinConfig,
+        selectedTool: Tool
     ) throws {
         
         let (layer, layerContent) =
@@ -58,6 +83,7 @@ extension AnimEditorState {
         self.focusedFrameIndex = focusedFrameIndex
         self.onionSkinConfig = onionSkinConfig
         self.timelineModel = timelineModel
+        self.selectedTool = selectedTool
     }
     
     // MARK: - Internal Logic
@@ -73,10 +99,10 @@ extension AnimEditorState {
     
     // MARK: - Update
     
-    mutating func update(
+    func update(
         projectState: ProjectEditManager.State,
         sceneManifest: Scene.Manifest
-    ) throws {
+    ) throws -> Update {
         
         let (layer, layerContent) =
             try LayerReader.layerData(
@@ -93,26 +119,66 @@ extension AnimEditorState {
             sceneManifest: sceneManifest,
             layerContent: layerContent)
         
-        self.projectState = projectState
-        self.sceneManifest = sceneManifest
-        self.layer = layer
-        self.layerContent = layerContent
-        self.focusedFrameIndex = focusedFrameIndex
-        self.timelineModel = timelineModel
+        var state = self
+        state.projectState = projectState
+        state.sceneManifest = sceneManifest
+        state.layer = layer
+        state.layerContent = layerContent
+        state.focusedFrameIndex = focusedFrameIndex
+        state.timelineModel = timelineModel
+        
+        let changes = Changes(
+            projectState: true,
+            focusedFrameIndex: true,
+            timelineModel: true)
+        
+        return Update(state: state, changes: changes)
     }
     
-    mutating func update(
+    func update(
         focusedFrameIndex: Int
-    ) {
-        self.focusedFrameIndex = Self.clampedFocusedFrameIndex(
+    ) -> Update {
+        
+        var state = self
+        let oldIndex = state.focusedFrameIndex
+        
+        state.focusedFrameIndex = Self.clampedFocusedFrameIndex(
             focusedFrameIndex: focusedFrameIndex,
             sceneManifest: sceneManifest)
+        
+        let newIndex = state.focusedFrameIndex
+        let indexChanged = oldIndex != newIndex
+        
+        let changes = Changes(
+            focusedFrameIndex: indexChanged)
+        
+        return Update(state: state, changes: changes)
     }
     
-    mutating func update(
+    func update(
         onionSkinConfig: AnimEditorOnionSkinConfig
-    ) {
-        self.onionSkinConfig = onionSkinConfig
+    ) -> Update {
+        
+        var state = self
+        state.onionSkinConfig = onionSkinConfig
+        
+        let changes = Changes(
+            onionSkinConfig: true)
+        
+        return Update(state: state, changes: changes)
+    }
+    
+    func update(
+        selectedTool: Tool
+    ) -> Update {
+        
+        var state = self
+        state.selectedTool = selectedTool
+        
+        let changes = Changes(
+            selectedTool: true)
+        
+        return Update(state: state, changes: changes)
     }
     
 }

@@ -35,12 +35,10 @@ class AnimEditorToolbarVC: UIViewController {
         
         bodyView.paintButton.addHandler { [weak self] in
             guard let self else { return }
-            self.bodyView.selectPaintTool()
             self.delegate?.onSelectPaintTool(self)
         }
         bodyView.eraseButton.addHandler { [weak self] in
             guard let self else { return }
-            self.bodyView.selectEraseTool()
             self.delegate?.onSelectEraseTool(self)
         }
         
@@ -52,18 +50,23 @@ class AnimEditorToolbarVC: UIViewController {
             guard let self else { return }
             self.delegate?.onSelectRedo(self)
         }
-        
-        bodyView.selectPaintTool()
     }
     
-    func update(state: AnimEditorState) {
+    func update(projectState: ProjectEditManager.State) {
         let undoAvailable =
-            state.projectState.availableUndoCount > 0
+            projectState.availableUndoCount > 0
         let redoAvailable =
-            state.projectState.availableRedoCount > 0
+            projectState.availableRedoCount > 0
         
         bodyView.undoButton.isEnabled = undoAvailable
         bodyView.redoButton.isEnabled = redoAvailable
+    }
+    
+    func update(selectedTool: AnimEditorState.Tool) {
+        switch selectedTool {
+        case .paint: bodyView.selectPaintTool()
+        case .erase: bodyView.selectEraseTool()
+        }
     }
     
 }

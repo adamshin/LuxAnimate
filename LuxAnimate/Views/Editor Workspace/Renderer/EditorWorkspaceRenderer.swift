@@ -14,7 +14,7 @@ struct EditorWorkspaceRenderer {
     private let blankTexture: MTLTexture
     
     init(
-        pixelFormat: MTLPixelFormat
+        pixelFormat: MTLPixelFormat = AppConfig.metalLayerPixelFormat
     ) {
         spriteRenderer = SpriteRenderer(pixelFormat: pixelFormat)
         blankTexture = createBlankTexture(color: .white)!

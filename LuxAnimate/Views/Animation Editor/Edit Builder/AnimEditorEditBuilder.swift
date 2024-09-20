@@ -23,6 +23,8 @@ class AnimEditorEditBuilder {
     
     weak var delegate: Delegate?
     
+    // MARK: - Apply Edit
+    
     private func apply(
         edit: AnimationLayerContentEditBuilder.Edit,
         state: AnimEditorState,
@@ -40,6 +42,8 @@ class AnimEditorEditBuilder {
             sceneEdit: sceneEdit,
             editContext: editContext)
     }
+    
+    // MARK: - Interface
     
     func createDrawing(
         state: AnimEditorState,
