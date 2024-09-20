@@ -234,7 +234,7 @@ class SceneEditorVC: UIViewController {
             let vc = try AnimEditorVC(
                 projectID: projectID,
                 sceneID: sceneID,
-                activeLayerID: layerID,
+                layerID: layerID,
                 projectState: projectState,
                 sceneManifest: sceneManifest,
                 focusedFrameIndex: 0)

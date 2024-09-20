@@ -48,24 +48,8 @@ class AnimEditorTimelineVC: UIViewController {
     private let toolbarVC = AnimEditorTimelineToolbarVC()
     private let trackVC = AnimEditorTimelineTrackVC()
     
-    private var timelineModel: AnimEditorTimelineModel
+    private var timelineModel: AnimEditorTimelineModel = .empty
     private var focusedFrameIndex = 0
-    
-    // MARK: - Init
-    
-    init(
-        timelineModel: AnimEditorTimelineModel,
-        focusedFrameIndex: Int
-    ) {
-        self.timelineModel = timelineModel
-        self.focusedFrameIndex = focusedFrameIndex
-        
-        super.init(nibName: nil, bundle: nil)
-        
-        update(timelineModel: timelineModel)
-    }
-    
-    required init?(coder: NSCoder) { fatalError() }
     
     // MARK: - Lifecycle
     
@@ -77,6 +61,9 @@ class AnimEditorTimelineVC: UIViewController {
         super.viewDidLoad()
         
         setupUI()
+        
+        update(timelineModel: timelineModel)
+        update(focusedFrameIndex: focusedFrameIndex)
     }
     
     // MARK: - Setup

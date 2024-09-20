@@ -57,11 +57,15 @@ class AnimEditorToolbarVC: UIViewController {
     }
     
     func update(
-        availableUndoCount: Int,
-        availableRedoCount: Int
+        state: AnimEditorStateManager.State
     ) {
-        bodyView.undoButton.isEnabled = availableUndoCount > 0
-        bodyView.redoButton.isEnabled = availableRedoCount > 0
+        let undoAvailable =
+            state.projectState.availableUndoCount > 0
+        let redoAvailable =
+            state.projectState.availableRedoCount > 0
+        
+        bodyView.undoButton.isEnabled = undoAvailable
+        bodyView.redoButton.isEnabled = redoAvailable
     }
     
 }
