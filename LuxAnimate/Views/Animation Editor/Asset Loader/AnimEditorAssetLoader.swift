@@ -143,8 +143,9 @@ class AnimEditorAssetLoader {
             let texture = try await textureLoader.newTexture(
                 data: assetData,
                 options: [
+                    .textureStorageMode: MTLStorageMode.private.rawValue,
                     .textureUsage: MTLTextureUsage.shaderRead.rawValue,
-//                    .SRGB: false,
+                    .SRGB: false,
                 ])
             
             try Task.checkCancellation()

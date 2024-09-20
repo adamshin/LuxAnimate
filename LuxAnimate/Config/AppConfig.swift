@@ -7,7 +7,7 @@ import Metal
 
 struct AppConfig {
     
-    static let pixelFormat: MTLPixelFormat = .rgba8Unorm
+    static let pixelFormat: MTLPixelFormat = .bgra8Unorm
     static let metalLayerPixelFormat: MTLPixelFormat = .bgra8Unorm
     
     static let drawingThumbnailSize = 300
@@ -15,6 +15,7 @@ struct AppConfig {
     static let brushRenderDebug = false
     
     static let paintBrushConfig = roundBrushConfig
+    static let paintBrushColor = Color.red
     
     static let wobbleBrushConfig = Brush.Configuration(
         stampTextureName: "brush1.png",

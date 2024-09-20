@@ -89,7 +89,8 @@ struct DrawingAssetProcessor {
         let bytesPerRow = imageWidth * 4
         
         let colorSpace = CGColorSpace(name: CGColorSpace.sRGB)!
-        let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.last.rawValue)
+        let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.first.rawValue)
+            .union(.byteOrder32Little)
         
         guard let cgImage = CGImage(
             width: imageWidth,

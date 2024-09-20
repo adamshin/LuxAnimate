@@ -4,7 +4,7 @@
 
 import UIKit
 
-private let brushColor = Color.halfGray
+private let brushColor = AppConfig.paintBrushColor
 
 class AnimFrameEditorPaintToolState: AnimFrameEditorToolState {
     
