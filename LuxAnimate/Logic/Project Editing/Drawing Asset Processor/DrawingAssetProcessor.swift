@@ -89,6 +89,7 @@ struct DrawingAssetProcessor {
         let bytesPerRow = imageWidth * 4
         
         let colorSpace = CGColorSpace(name: CGColorSpace.sRGB)!
+        
         let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.first.rawValue)
             .union(.byteOrder32Little)
         
@@ -108,11 +109,7 @@ struct DrawingAssetProcessor {
             throw Error.encoding
         }
         
-        let options: [CFString: Any] = [
-            kCGImageDestinationOptimizeColorForSharing: true
-        ]
-        
-        CGImageDestinationAddImage(destination, cgImage, options as CFDictionary)
+        CGImageDestinationAddImage(destination, cgImage, nil)
         
         guard CGImageDestinationFinalize(destination) else {
             throw Error.encoding

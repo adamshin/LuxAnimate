@@ -15,7 +15,7 @@ struct AppConfig {
     static let brushRenderDebug = false
     
     static let paintBrushConfig = roundBrushConfig
-    static let paintBrushColor = Color.red
+    static let paintBrushColor = Color.brushGreen
     
     static let wobbleBrushConfig = Brush.Configuration(
         stampTextureName: "brush1.png",
