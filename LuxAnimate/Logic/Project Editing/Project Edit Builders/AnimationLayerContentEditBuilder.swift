@@ -1,12 +1,12 @@
 //
-//  AnimationLayerEditBuilder.swift
+//  AnimationLayerContentEditBuilder.swift
 //
 
 import Foundation
 
-struct AnimationLayerEditBuilder {
+struct AnimationLayerContentEditBuilder {
     
-    struct AnimationLayerContentEdit {
+    struct Edit {
         var layerContent: Scene.AnimationLayerContent
         var newAssets: [ProjectEditManager.NewAsset]
     }
@@ -28,7 +28,7 @@ struct AnimationLayerEditBuilder {
     static func applyAnimationLayerContentEdit(
         sceneManifest: Scene.Manifest,
         layer: Scene.Layer,
-        layerContentEdit: AnimationLayerContentEdit
+        layerContentEdit: Edit
     ) throws -> ProjectEditBuilder.SceneEdit {
         
         var layer = layer
@@ -54,7 +54,7 @@ struct AnimationLayerEditBuilder {
     static func createDrawing(
         layerContent: Scene.AnimationLayerContent,
         frameIndex: Int
-    ) throws -> AnimationLayerContentEdit {
+    ) throws -> Edit {
         
         guard !layerContent.drawings
             .contains(where: { $0.frameIndex == frameIndex })
@@ -71,7 +71,7 @@ struct AnimationLayerEditBuilder {
         var layerContent = layerContent
         layerContent.drawings.append(drawing)
         
-        return AnimationLayerContentEdit(
+        return Edit(
             layerContent: layerContent,
             newAssets: [])
     }
@@ -79,7 +79,7 @@ struct AnimationLayerEditBuilder {
     static func deleteDrawing(
         layerContent: Scene.AnimationLayerContent,
         frameIndex: Int
-    ) -> AnimationLayerContentEdit {
+    ) -> Edit {
         
         var layerContent = layerContent
         var drawings = layerContent.drawings
@@ -87,7 +87,7 @@ struct AnimationLayerEditBuilder {
         drawings = drawings.filter { $0.frameIndex != frameIndex }
         layerContent.drawings = drawings
         
-        return AnimationLayerContentEdit(
+        return Edit(
             layerContent: layerContent,
             newAssets: [])
     }
@@ -95,7 +95,7 @@ struct AnimationLayerEditBuilder {
     static func insertSpacing(
         layerContent: Scene.AnimationLayerContent,
         frameIndex: Int
-    ) -> AnimationLayerContentEdit {
+    ) -> Edit {
         
         var drawings = layerContent.drawings
         
@@ -108,7 +108,7 @@ struct AnimationLayerEditBuilder {
         var layerContent = layerContent
         layerContent.drawings = drawings
         
-        return AnimationLayerContentEdit(
+        return Edit(
             layerContent: layerContent,
             newAssets: [])
     }
@@ -116,7 +116,7 @@ struct AnimationLayerEditBuilder {
     static func removeSpacing(
         layerContent: Scene.AnimationLayerContent,
         frameIndex: Int
-    ) throws -> AnimationLayerContentEdit {
+    ) throws -> Edit {
         
         var drawings = layerContent.drawings
         
@@ -145,7 +145,7 @@ struct AnimationLayerEditBuilder {
         var layerContent = layerContent
         layerContent.drawings = drawings
         
-        return AnimationLayerContentEdit(
+        return Edit(
             layerContent: layerContent,
             newAssets: [])
     }
@@ -156,7 +156,7 @@ struct AnimationLayerEditBuilder {
         layerContent: Scene.AnimationLayerContent,
         drawingID: String,
         imageSet: DrawingImageSet
-    ) throws -> AnimationLayerContentEdit {
+    ) throws -> Edit {
         
         // Set up assets
         let fullAssetID = IDGenerator.id()
@@ -192,7 +192,7 @@ struct AnimationLayerEditBuilder {
         layerContent.drawings = drawings
         
         // Return
-        return AnimationLayerContentEdit(
+        return Edit(
             layerContent: layerContent,
             newAssets: newAssets)
     }

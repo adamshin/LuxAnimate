@@ -48,6 +48,8 @@ class AnimEditorVC: UIViewController {
     private var toolState: AnimEditorToolState?
     private var frameEditor: AnimFrameEditor?
     
+    private let editBuilder = AnimEditorEditBuilder()
+    
     private let assetLoader: AnimEditorAssetLoader
     
     private let workspaceRenderer = EditorWorkspaceRenderer(
@@ -88,6 +90,7 @@ class AnimEditorVC: UIViewController {
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
         
+        editBuilder.delegate = self
         assetLoader.delegate = self
     }
     
@@ -372,104 +375,36 @@ extension AnimEditorVC: AnimEditorTimelineVC.Delegate {
         _ vc: AnimEditorTimelineVC,
         frameIndex: Int
     ) {
-        /*
-        do {
-            let layerContentEdit = try AnimationLayerEditBuilder
-                .createDrawing(
-                    layerContent: layerContent,
-                    frameIndex: frameIndex)
-            
-            let sceneEdit = try AnimationLayerEditBuilder
-                .applyAnimationLayerContentEdit(
-                    sceneManifest: sceneManifest,
-                    layer: layer,
-                    layerContentEdit: layerContentEdit)
-            
-            delegate?.onRequestSceneEdit(
-                self,
-                sceneEdit: sceneEdit,
-                editContext: nil)
-            
-        } catch { }
-         */
+        try? editBuilder.createDrawing(
+            state: state,
+            frameIndex: frameIndex)
     }
     
     func onRequestDeleteDrawing(
         _ vc: AnimEditorTimelineVC,
         frameIndex: Int
     ) {
-        /*
-        do {
-            let layerContentEdit = AnimationLayerEditBuilder
-                .deleteDrawing(
-                    layerContent: layerContent,
-                    frameIndex: frameIndex)
-            
-            let sceneEdit = try AnimationLayerEditBuilder
-                .applyAnimationLayerContentEdit(
-                    sceneManifest: sceneManifest,
-                    layer: layer,
-                    layerContentEdit: layerContentEdit)
-            
-            delegate?.onRequestSceneEdit(
-                self,
-                sceneEdit: sceneEdit,
-                editContext: nil)
-            
-        } catch { }
-         */
+        try? editBuilder.deleteDrawing(
+            state: state,
+            frameIndex: frameIndex)
     }
     
     func onRequestInsertSpacing(
         _ vc: AnimEditorTimelineVC,
         frameIndex: Int
     ) {
-        /*
-        do {
-            let layerContentEdit = AnimationLayerEditBuilder
-                .insertSpacing(
-                    layerContent: layerContent,
-                    frameIndex: frameIndex)
-            
-            let sceneEdit = try AnimationLayerEditBuilder
-                .applyAnimationLayerContentEdit(
-                    sceneManifest: sceneManifest,
-                    layer: layer,
-                    layerContentEdit: layerContentEdit)
-            
-            delegate?.onRequestSceneEdit(
-                self,
-                sceneEdit: sceneEdit,
-                editContext: nil)
-            
-        } catch { }
-         */
+        try? editBuilder.insertSpacing(
+            state: state,
+            frameIndex: frameIndex)
     }
     
     func onRequestRemoveSpacing(
         _ vc: AnimEditorTimelineVC,
         frameIndex: Int
     ) {
-        /*
-        do {
-            let layerContentEdit = try AnimationLayerEditBuilder
-                .removeSpacing(
-                    layerContent: layerContent,
-                    frameIndex: frameIndex)
-            
-            let sceneEdit = try AnimationLayerEditBuilder
-                .applyAnimationLayerContentEdit(
-                    sceneManifest: sceneManifest,
-                    layer: layer,
-                    layerContentEdit: layerContentEdit)
-            
-            delegate?.onRequestSceneEdit(
-                self,
-                sceneEdit: sceneEdit,
-                editContext: nil)
-            
-        } catch { }
-         */
+        try? editBuilder.removeSpacing(
+            state: state,
+            frameIndex: frameIndex)
     }
     
 }
@@ -521,31 +456,30 @@ extension AnimEditorVC: AnimFrameEditor.Delegate {
         drawingID: String,
         imageSet: DrawingAssetProcessor.ImageSet
     ) {
-        /*
-        do {
-            let imageSet = AnimationLayerEditBuilder
-                .DrawingImageSet(
-                    full: imageSet.full,
-                    thumbnail: imageSet.thumbnail)
-            
-            let sceneEdit = try AnimationLayerEditBuilder
-                .editDrawing(
-                    sceneManifest: sceneManifest,
-                    layerID: layer.id,
-                    drawingID: drawingID,
-                    imageSet: imageSet)
-            
-            let editContext = AnimEditorVCEditContext(
-                sender: self,
-                isFromFrameEditor: true)
-            
-            delegate?.onRequestSceneEdit(
-                self,
-                sceneEdit: sceneEdit,
-                editContext: editContext)
-            
-        } catch { }
-         */
+        let editContext = AnimEditorVCEditContext(
+            sender: self,
+            isFromFrameEditor: true)
+        
+        try? editBuilder.editDrawing(
+            state: state,
+            drawingID: drawingID,
+            imageSet: imageSet,
+            editContext: editContext)
+    }
+    
+}
+
+extension AnimEditorVC: AnimEditorEditBuilder.Delegate {
+    
+    func onRequestSceneEdit(
+        _ b: AnimEditorEditBuilder,
+        sceneEdit: ProjectEditBuilder.SceneEdit,
+        editContext: Sendable?
+    ) {
+        delegate?.onRequestSceneEdit(
+            self,
+            sceneEdit: sceneEdit,
+            editContext: editContext)
     }
     
 }

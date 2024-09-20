@@ -77,7 +77,7 @@ class AnimEditorTimelineVC: UIViewController {
         addChild(toolbarVC, to: collapsibleContentVC.barView)
         addChild(trackVC, to: collapsibleContentVC.collapsibleContentView)
         
-        collapsibleContentVC.setExpanded(true, animated: false)
+        collapsibleContentVC.setExpanded(false, animated: false)
     }
     
     // MARK: - Menu
