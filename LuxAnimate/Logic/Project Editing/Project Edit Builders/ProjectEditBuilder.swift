@@ -29,8 +29,6 @@ struct ProjectEditBuilder {
             throw Error.invalidSceneID
         }
         
-        let sceneRef = projectManifest.content.sceneRefs[sceneIndex]
-        
         // Generate scene render manifest
         let sceneRenderManifest =
             SceneRenderManifestGenerator.generate(
@@ -48,17 +46,19 @@ struct ProjectEditBuilder {
         let sceneRenderManifestAssetID = IDGenerator.id()
         
         // Update scene ref
-        var newSceneRef = sceneRef
+        var sceneRef = projectManifest.content.sceneRefs[sceneIndex]
         
-        newSceneRef.manifestAssetID = sceneManifestAssetID
-        newSceneRef.renderManifestAssetID = sceneRenderManifestAssetID
-        newSceneRef.sceneAssetIDs = sceneEdit.sceneManifest.assetIDs
+        sceneRef.manifestAssetID = sceneManifestAssetID
+        sceneRef.renderManifestAssetID = sceneRenderManifestAssetID
+        
+        sceneRef.sceneAssetIDs = sceneEdit.sceneManifest.assetIDs()
         
         // Update project manifest
-        var newProjectManifest = projectManifest
-        newProjectManifest.content.sceneRefs[sceneIndex] = newSceneRef
+        var projectManifest = projectManifest
+        projectManifest.content.sceneRefs[sceneIndex] = sceneRef
+        projectManifest.updateAssetIDs()
         
-        // Create asset list
+        // Create new asset list
         var newAssets = sceneEdit.newAssets
         
         newAssets.append(ProjectEditManager.NewAsset(
@@ -71,7 +71,7 @@ struct ProjectEditBuilder {
         
         // Apply edit
         return ProjectEditManager.Edit(
-            projectManifest: newProjectManifest,
+            projectManifest: projectManifest,
             newAssets: newAssets)
     }
     
@@ -92,8 +92,7 @@ struct ProjectEditBuilder {
             id: sceneID,
             frameCount: frameCount,
             backgroundColor: backgroundColor,
-            layers: [],
-            assetIDs: [])
+            layers: [])
         
         // Generate scene render manifest
         let sceneRenderManifest =
@@ -111,17 +110,20 @@ struct ProjectEditBuilder {
         let sceneManifestAssetID = IDGenerator.id()
         let sceneRenderManifestAssetID = IDGenerator.id()
         
+        let sceneAssetIDs = sceneManifest.assetIDs()
+        
         // Create scene ref
-        let newSceneRef = Project.SceneRef(
+        let sceneRef = Project.SceneRef(
             id: sceneID,
             name: name,
             manifestAssetID: sceneManifestAssetID,
             renderManifestAssetID: sceneRenderManifestAssetID,
-            sceneAssetIDs: sceneManifest.assetIDs)
+            sceneAssetIDs: sceneAssetIDs)
         
         // Update project manifest
-        var newProjectManifest = projectManifest
-        newProjectManifest.content.sceneRefs.append(newSceneRef)
+        var projectManifest = projectManifest
+        projectManifest.content.sceneRefs.append(sceneRef)
+        projectManifest.updateAssetIDs()
         
         // Create asset list
         var newAssets: [ProjectEditManager.NewAsset] = []
@@ -135,7 +137,7 @@ struct ProjectEditBuilder {
             data: sceneRenderManifestData))
         
         return ProjectEditManager.Edit(
-            projectManifest: newProjectManifest,
+            projectManifest: projectManifest,
             newAssets: newAssets)
     }
     
@@ -150,11 +152,12 @@ struct ProjectEditBuilder {
             throw Error.invalidSceneID
         }
         
-        var newProjectManifest = projectManifest
-        newProjectManifest.content.sceneRefs.remove(at: sceneIndex)
+        var projectManifest = projectManifest
+        projectManifest.content.sceneRefs.remove(at: sceneIndex)
+        projectManifest.updateAssetIDs()
         
         return ProjectEditManager.Edit(
-            projectManifest: newProjectManifest,
+            projectManifest: projectManifest,
             newAssets: [])
     }
     

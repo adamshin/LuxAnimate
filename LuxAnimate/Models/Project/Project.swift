@@ -6,17 +6,15 @@ import Foundation
 
 enum Project {
     
-    // MARK: - Manifest
-    
     struct Manifest: Codable {
         var id: String
         var name: String
         var createdAt: Date
         
         var content: Content
+        
+        var assetIDs: Set<String>
     }
-    
-    // MARK: - Content
     
     struct Content: Codable {
         var metadata: ContentMetadata
@@ -34,8 +32,29 @@ enum Project {
         
         var manifestAssetID: String
         var renderManifestAssetID: String
-        
         var sceneAssetIDs: Set<String>
+    }
+    
+}
+
+// MARK: - Asset IDs
+
+extension Project.Manifest {
+    
+    mutating func updateAssetIDs() {
+        assetIDs = getAssetIDs()
+    }
+    
+    private func getAssetIDs() -> Set<String> {
+        var assetIDs = Set<String>()
+        
+        for sceneRef in content.sceneRefs {
+            assetIDs.insert(sceneRef.manifestAssetID)
+            assetIDs.insert(sceneRef.renderManifestAssetID)
+            assetIDs.formUnion(sceneRef.sceneAssetIDs)
+        }
+        
+        return assetIDs
     }
     
 }

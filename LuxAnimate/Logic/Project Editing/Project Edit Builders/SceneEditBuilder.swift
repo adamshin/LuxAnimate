@@ -64,10 +64,6 @@ struct SceneEditBuilder {
         var sceneManifest = sceneManifest
         sceneManifest.layers.remove(at: layerIndex)
         
-        // TODO: Remove old asset IDs!
-        // Maybe each layer should maintain its own list of asset IDs?
-        // Then when applying a scene edit, we recalculate all asset IDs?
-        
         return ProjectEditBuilder.SceneEdit(
             sceneID: sceneManifest.id,
             sceneManifest: sceneManifest,

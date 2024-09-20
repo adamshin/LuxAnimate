@@ -69,7 +69,8 @@ struct ProjectCreator {
             id: id,
             name: name,
             createdAt: now,
-            content: content)
+            content: content,
+            assetIDs: [])
     }
     
     private func setupInitialContent(

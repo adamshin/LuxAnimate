@@ -153,11 +153,10 @@ struct AnimationLayerEditBuilder {
     // MARK: - Drawing
     
     static func editDrawing(
-        sceneManifest: Scene.Manifest,
-        layerID: String,
+        layerContent: Scene.AnimationLayerContent,
         drawingID: String,
         imageSet: DrawingImageSet
-    ) throws -> ProjectEditBuilder.SceneEdit {
+    ) throws -> AnimationLayerContentEdit {
         
         // Set up assets
         let fullAssetID = IDGenerator.id()
@@ -173,22 +172,6 @@ struct AnimationLayerEditBuilder {
         ]
         
         // Update drawing
-        var sceneManifest = sceneManifest
-        
-        guard let layerIndex = sceneManifest.layers
-            .firstIndex(where: { $0.id == layerID })
-        else {
-            throw Error.invalidLayerID
-        }
-        
-        var layer = sceneManifest.layers[layerIndex]
-        
-        guard case .animation(var layerContent)
-            = layer.content
-        else {
-            throw Error.invalidLayerContent
-        }
-        
         var drawings = layerContent.drawings
         
         guard let drawingIndex = drawings
@@ -198,26 +181,19 @@ struct AnimationLayerEditBuilder {
         }
         
         var drawing = drawings[drawingIndex]
-        let oldAssetIDs = drawing.allAssetIDs
         
         drawing.fullAssetID = fullAssetID
         drawing.thumbnailAssetID = thumbnailAssetID
         
-        let newAssetIDs = drawing.allAssetIDs
-        
         drawings[drawingIndex] = drawing
-        layerContent.drawings = drawings
-        layer.content = .animation(layerContent)
-        sceneManifest.layers[layerIndex] = layer
         
-        // Update assets
-        sceneManifest.assetIDs.subtract(oldAssetIDs)
-        sceneManifest.assetIDs.formUnion(newAssetIDs)
+        // Update layer content
+        var layerContent = layerContent
+        layerContent.drawings = drawings
         
         // Return
-        return ProjectEditBuilder.SceneEdit(
-            sceneID: sceneManifest.id,
-            sceneManifest: sceneManifest,
+        return AnimationLayerContentEdit(
+            layerContent: layerContent,
             newAssets: newAssets)
     }
     

@@ -15,8 +15,6 @@ enum Scene {
         var backgroundColor: Color
         
         var layers: [Layer]
-        
-        var assetIDs: Set<String>
     }
     
     struct Layer: Codable {
@@ -32,7 +30,6 @@ enum Scene {
     
     enum LayerContent: Codable {
         case animation(AnimationLayerContent)
-        // TODO: Image, video, layer group
     }
     
     struct AnimationLayerContent: Codable {
@@ -45,13 +42,6 @@ enum Scene {
         
         var fullAssetID: String?
         var thumbnailAssetID: String?
-        
-        var allAssetIDs: [String] {
-            [
-                fullAssetID,
-                thumbnailAssetID
-            ].compactMap { $0 }
-        }
     }
     
     // MARK: - Render Manifest
@@ -59,6 +49,59 @@ enum Scene {
     struct RenderManifest: Codable {
         var frameRenderManifests: [String: FrameRenderManifest]
         var frameRenderManifestFingerprintsByFrameIndex: [String]
+    }
+    
+}
+
+// MARK: - Asset IDs
+
+extension Scene.Manifest {
+    
+    func assetIDs() -> Set<String> {
+        var assetIDs = Set<String>()
+        
+        for layer in layers {
+            assetIDs.formUnion(layer.assetIDs())
+        }
+        
+        return assetIDs
+    }
+    
+}
+
+extension Scene.Layer {
+    
+    func assetIDs() -> Set<String> {
+        switch content {
+        case .animation(let content):
+            return content.assetIDs()
+        }
+    }
+    
+}
+
+extension Scene.AnimationLayerContent {
+    
+    func assetIDs() -> Set<String> {
+        var assetIDs = Set<String>()
+        
+        for drawing in drawings {
+            assetIDs.formUnion(drawing.assetIDs())
+        }
+        
+        return assetIDs
+    }
+    
+}
+
+extension Scene.Drawing {
+    
+    func assetIDs() -> Set<String> {
+        let assetIDs = [
+            fullAssetID,
+            thumbnailAssetID
+        ]
+        return Set(assetIDs.compactMap { $0 })
     }
     
 }
