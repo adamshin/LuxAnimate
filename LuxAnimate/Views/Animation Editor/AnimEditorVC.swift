@@ -440,13 +440,9 @@ extension AnimEditorVC: AnimEditorTimelineVC.Delegate {
         _ vc: AnimEditorTimelineVC,
         assetID: String
     ) -> Data? {
-        
-        if let pendingAsset = delegate?
-            .pendingEditAsset(assetID: assetID)
-        {
-            return pendingAsset.data
-        }
-        return nil
+        delegate?
+            .pendingEditAsset(assetID: assetID)?
+            .data
     }
     
 }
@@ -532,13 +528,9 @@ extension AnimEditorVC: AnimEditorAssetLoader.Delegate {
         _ l: AnimEditorAssetLoader,
         assetID: String
     ) -> Data? {
-        
-        if let pendingAsset = delegate?
-            .pendingEditAsset(assetID: assetID)
-        {
-            return pendingAsset.data
-        }
-        return nil
+        delegate?
+            .pendingEditAsset(assetID: assetID)?
+            .data
     }
     
     func onUpdate(_ l: AnimEditorAssetLoader) {
