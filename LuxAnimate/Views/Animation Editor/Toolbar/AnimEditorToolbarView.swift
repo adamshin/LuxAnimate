@@ -65,6 +65,17 @@ class AnimEditorToolbarView: UIView {
         return button
     }()
     
+    let onionSkinButton = {
+        let button = UIButton(type: .system)
+        let image = UIImage(
+            systemName: "square.on.square.dashed",
+            withConfiguration: iconConfig)
+        button.setImage(image, for: .normal)
+        button.tintColor = .editorLabel
+        button.pinWidth(to: buttonWidth)
+        return button
+    }()
+    
     let undoButton = {
         let button = UIButton(type: .system)
         let image = UIImage(
@@ -136,6 +147,7 @@ class AnimEditorToolbarView: UIView {
         leftStack.addArrangedSubview(paintButton)
         leftStack.addArrangedSubview(eraseButton)
         
+        rightStack.addArrangedSubview(onionSkinButton)
         rightStack.addArrangedSubview(undoButton)
         rightStack.addArrangedSubview(redoButton)
     }
@@ -149,6 +161,11 @@ class AnimEditorToolbarView: UIView {
     func selectEraseTool() {
         paintButton.tintColor = .editorLabel
         eraseButton.tintColor = .tint
+    }
+    
+    func setOnionSkinOn(_ on: Bool) {
+        onionSkinButton.tintColor =
+            on ? .tint : .editorLabel
     }
     
 }

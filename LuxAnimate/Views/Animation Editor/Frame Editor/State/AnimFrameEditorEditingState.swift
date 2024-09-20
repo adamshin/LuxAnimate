@@ -11,7 +11,7 @@ class AnimFrameEditorEditingState: AnimFrameEditorState {
     private let layer: Scene.Layer
     private let layerContent: Scene.AnimationLayerContent
     private let frameIndex: Int
-    private let onionSkinConfig: AnimEditorOnionSkinConfig
+    private let onionSkinConfig: AnimEditorOnionSkinConfig?
     private let editorToolState: AnimEditorToolState
     
     private let frameSceneGraph: FrameSceneGraph
@@ -40,7 +40,7 @@ class AnimFrameEditorEditingState: AnimFrameEditorState {
         layer: Scene.Layer,
         layerContent: Scene.AnimationLayerContent,
         frameIndex: Int,
-        onionSkinConfig: AnimEditorOnionSkinConfig,
+        onionSkinConfig: AnimEditorOnionSkinConfig?,
         editorToolState: AnimEditorToolState,
         frameSceneGraph: FrameSceneGraph,
         activeDrawingManifest: AnimFrameEditorHelper.ActiveDrawingManifest,

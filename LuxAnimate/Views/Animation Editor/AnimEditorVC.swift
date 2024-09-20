@@ -80,6 +80,7 @@ class AnimEditorVC: UIViewController {
             projectState: projectState,
             sceneManifest: sceneManifest,
             focusedFrameIndex: focusedFrameIndex,
+            onionSkinOn: false,
             onionSkinConfig: AppConfig.onionSkinConfig,
             selectedTool: .paint)
         
@@ -140,6 +141,8 @@ class AnimEditorVC: UIViewController {
             projectState: state.projectState)
         toolbarVC.update(
             selectedTool: state.selectedTool)
+        toolbarVC.update(
+            onionSkinOn: state.onionSkinOn)
         
         timelineVC.update(
             timelineModel: state.timelineModel)
@@ -170,6 +173,10 @@ class AnimEditorVC: UIViewController {
             toolbarVC.update(
                 selectedTool: state.selectedTool)
         }
+        if changes.onionSkin {
+            toolbarVC.update(
+                onionSkinOn: state.onionSkinOn)
+        }
         
         if !fromTimeline, changes.timelineModel {
             timelineVC.update(
@@ -188,7 +195,7 @@ class AnimEditorVC: UIViewController {
         if !fromFrameEditor,
             changes.projectState ||
             changes.focusedFrameIndex ||
-            changes.onionSkinConfig ||
+            changes.onionSkin ||
             changes.selectedTool
         {
             updateFrameEditor()
@@ -229,13 +236,16 @@ class AnimEditorVC: UIViewController {
         frameEditor.delegate = self
         self.frameEditor = frameEditor
         
+        let onionSkinConfig: AnimEditorOnionSkinConfig? =
+            state.onionSkinOn ? state.onionSkinConfig : nil
+        
         frameEditor.begin(
             projectManifest: state.projectState.projectManifest,
             sceneManifest: state.sceneManifest,
             layer: state.layer,
             layerContent: state.layerContent,
             frameIndex: state.focusedFrameIndex,
-            onionSkinConfig: state.onionSkinConfig,
+            onionSkinConfig: onionSkinConfig,
             editorToolState: toolState)
     }
     
@@ -347,6 +357,12 @@ extension AnimEditorVC: AnimEditorToolbarVCDelegate {
     }
     func onSelectEraseTool(_ vc: AnimEditorToolbarVC) {
         let update = state.update(selectedTool: .erase)
+        applyStateUpdate(update: update)
+    }
+    
+    func onSelectToggleOnionSkin(_ vc: AnimEditorToolbarVC) {
+        let update = state.update(
+            onionSkinOn: !state.onionSkinOn)
         applyStateUpdate(update: update)
     }
     

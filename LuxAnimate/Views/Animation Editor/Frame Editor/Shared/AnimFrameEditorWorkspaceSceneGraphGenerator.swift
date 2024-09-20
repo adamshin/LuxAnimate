@@ -23,7 +23,7 @@ class AnimFrameEditorWorkspaceSceneGraphGenerator {
         frameSceneGraph: FrameSceneGraph,
         activeDrawingManifest: AnimFrameEditorHelper.ActiveDrawingManifest,
         activeDrawingTexture: MTLTexture?,
-        onionSkinConfig: AnimEditorOnionSkinConfig
+        onionSkinConfig: AnimEditorOnionSkinConfig?
     ) -> EditorWorkspaceSceneGraph {
         
         var outputLayers: [EditorWorkspaceSceneGraph.Layer] = []
@@ -56,7 +56,7 @@ class AnimFrameEditorWorkspaceSceneGraphGenerator {
         layer: FrameSceneGraph.Layer,
         activeDrawingManifest: AnimFrameEditorHelper.ActiveDrawingManifest,
         activeDrawingTexture: MTLTexture?,
-        onionSkinConfig: AnimEditorOnionSkinConfig
+        onionSkinConfig: AnimEditorOnionSkinConfig?
     ) -> [EditorWorkspaceSceneGraph.Layer] {
         
         switch layer.content {
@@ -75,7 +75,7 @@ class AnimFrameEditorWorkspaceSceneGraphGenerator {
         drawingLayerContent: FrameSceneGraph.DrawingLayerContent,
         activeDrawingManifest: AnimFrameEditorHelper.ActiveDrawingManifest,
         activeDrawingTexture: MTLTexture?,
-        onionSkinConfig: AnimEditorOnionSkinConfig
+        onionSkinConfig: AnimEditorOnionSkinConfig?
     ) -> [EditorWorkspaceSceneGraph.Layer] {
         
         if drawingLayerContent.drawing.id == activeDrawingManifest.activeDrawing?.id {
@@ -98,7 +98,7 @@ class AnimFrameEditorWorkspaceSceneGraphGenerator {
         drawingLayerContent: FrameSceneGraph.DrawingLayerContent,
         activeDrawingManifest: AnimFrameEditorHelper.ActiveDrawingManifest,
         activeDrawingTexture: MTLTexture?,
-        onionSkinConfig: AnimEditorOnionSkinConfig
+        onionSkinConfig: AnimEditorOnionSkinConfig?
     ) -> [EditorWorkspaceSceneGraph.Layer] {
         
         var outputLayers: [EditorWorkspaceSceneGraph.Layer] = []

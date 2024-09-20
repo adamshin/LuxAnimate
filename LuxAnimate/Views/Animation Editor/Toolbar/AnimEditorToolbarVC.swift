@@ -11,6 +11,8 @@ protocol AnimEditorToolbarVCDelegate: AnyObject {
     func onSelectPaintTool(_ vc: AnimEditorToolbarVC)
     func onSelectEraseTool(_ vc: AnimEditorToolbarVC)
     
+    func onSelectToggleOnionSkin(_ vc: AnimEditorToolbarVC)
+    
     func onSelectUndo(_ vc: AnimEditorToolbarVC)
     func onSelectRedo(_ vc: AnimEditorToolbarVC)
 }
@@ -42,6 +44,10 @@ class AnimEditorToolbarVC: UIViewController {
             self.delegate?.onSelectEraseTool(self)
         }
         
+        bodyView.onionSkinButton.addHandler { [weak self] in
+            guard let self else { return }
+            self.delegate?.onSelectToggleOnionSkin(self)
+        }
         bodyView.undoButton.addHandler { [weak self] in
             guard let self else { return }
             self.delegate?.onSelectUndo(self)
@@ -67,6 +73,10 @@ class AnimEditorToolbarVC: UIViewController {
         case .paint: bodyView.selectPaintTool()
         case .erase: bodyView.selectEraseTool()
         }
+    }
+    
+    func update(onionSkinOn: Bool) {
+        bodyView.setOnionSkinOn(onionSkinOn)
     }
     
 }

@@ -17,7 +17,7 @@ struct AnimFrameEditorHelper {
     static func activeDrawingManifest(
         layerContent: Scene.AnimationLayerContent,
         frameIndex: Int,
-        onionSkinConfig: AnimEditorOnionSkinConfig
+        onionSkinConfig: AnimEditorOnionSkinConfig?
     ) -> ActiveDrawingManifest {
         
         let drawings = layerContent.drawings
@@ -36,21 +36,23 @@ struct AnimFrameEditorHelper {
         if let activeDrawingIndex {
             activeDrawing = sortedDrawings[activeDrawingIndex]
             
-            var prevDrawingIndex = activeDrawingIndex
-            for _ in 0 ..< onionSkinConfig.prevCount {
-                prevDrawingIndex -= 1
-                if sortedDrawings.indices.contains(prevDrawingIndex) {
-                    let drawing = sortedDrawings[prevDrawingIndex]
-                    prevOnionSkinDrawings.append(drawing)
+            if let onionSkinConfig {
+                var prevDrawingIndex = activeDrawingIndex
+                for _ in 0 ..< onionSkinConfig.prevCount {
+                    prevDrawingIndex -= 1
+                    if sortedDrawings.indices.contains(prevDrawingIndex) {
+                        let drawing = sortedDrawings[prevDrawingIndex]
+                        prevOnionSkinDrawings.append(drawing)
+                    }
                 }
-            }
-            
-            var nextDrawingIndex = activeDrawingIndex
-            for _ in 0 ..< onionSkinConfig.nextCount {
-                nextDrawingIndex += 1
-                if sortedDrawings.indices.contains(nextDrawingIndex) {
-                    let drawing = sortedDrawings[nextDrawingIndex]
-                    nextOnionSkinDrawings.append(drawing)
+                
+                var nextDrawingIndex = activeDrawingIndex
+                for _ in 0 ..< onionSkinConfig.nextCount {
+                    nextDrawingIndex += 1
+                    if sortedDrawings.indices.contains(nextDrawingIndex) {
+                        let drawing = sortedDrawings[nextDrawingIndex]
+                        nextOnionSkinDrawings.append(drawing)
+                    }
                 }
             }
         }

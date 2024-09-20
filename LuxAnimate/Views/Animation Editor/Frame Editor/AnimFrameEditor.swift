@@ -67,7 +67,7 @@ class AnimFrameEditor {
         layer: Scene.Layer,
         layerContent: Scene.AnimationLayerContent,
         frameIndex: Int,
-        onionSkinConfig: AnimEditorOnionSkinConfig,
+        onionSkinConfig: AnimEditorOnionSkinConfig?,
         editorToolState: AnimEditorToolState
     ) {
 //        print("AnimFrameEditor began")

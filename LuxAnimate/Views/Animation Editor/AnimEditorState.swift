@@ -20,6 +20,8 @@ struct AnimEditorState {
     var layerContent: Scene.AnimationLayerContent
     
     var focusedFrameIndex: Int
+    
+    var onionSkinOn: Bool
     var onionSkinConfig: AnimEditorOnionSkinConfig
     
     var selectedTool: Tool
@@ -38,7 +40,7 @@ extension AnimEditorState {
     struct Changes {
         var projectState: Bool = false
         var focusedFrameIndex: Bool = false
-        var onionSkinConfig: Bool = false
+        var onionSkin: Bool = false
         var selectedTool: Bool = false
         var timelineModel: Bool = false
     }
@@ -55,12 +57,13 @@ extension AnimEditorState {
         projectState: ProjectEditManager.State,
         sceneManifest: Scene.Manifest,
         focusedFrameIndex: Int,
+        onionSkinOn: Bool,
         onionSkinConfig: AnimEditorOnionSkinConfig,
         selectedTool: Tool
     ) throws {
         
         let (layer, layerContent) =
-            try LayerReader.layerData(
+            try Self.layerData(
                 sceneManifest: sceneManifest,
                 layerID: layerID)
         
@@ -81,6 +84,7 @@ extension AnimEditorState {
         self.layer = layer
         self.layerContent = layerContent
         self.focusedFrameIndex = focusedFrameIndex
+        self.onionSkinOn = onionSkinOn
         self.onionSkinConfig = onionSkinConfig
         self.timelineModel = timelineModel
         self.selectedTool = selectedTool
@@ -105,7 +109,7 @@ extension AnimEditorState {
     ) throws -> Update {
         
         let (layer, layerContent) =
-            try LayerReader.layerData(
+            try Self.layerData(
                 sceneManifest: sceneManifest,
                 layerID: layerID)
         
@@ -156,6 +160,19 @@ extension AnimEditorState {
     }
     
     func update(
+        onionSkinOn: Bool
+    ) -> Update {
+        
+        var state = self
+        state.onionSkinOn = onionSkinOn
+        
+        let changes = Changes(
+            onionSkin: true)
+        
+        return Update(state: state, changes: changes)
+    }
+    
+    func update(
         onionSkinConfig: AnimEditorOnionSkinConfig
     ) -> Update {
         
@@ -163,7 +180,7 @@ extension AnimEditorState {
         state.onionSkinConfig = onionSkinConfig
         
         let changes = Changes(
-            onionSkinConfig: true)
+            onionSkin: true)
         
         return Update(state: state, changes: changes)
     }
@@ -185,9 +202,9 @@ extension AnimEditorState {
 
 // MARK: - Layer Reader
 
-private struct LayerReader {
+extension AnimEditorState {
     
-    enum Error: Swift.Error {
+    enum LayerDataError: Swift.Error {
         case invalidLayerID
         case invalidLayerContent
     }
@@ -203,13 +220,13 @@ private struct LayerReader {
         guard let layer = sceneManifest.layers.first(
             where: { $0.id == layerID })
         else {
-            throw Error.invalidLayerID
+            throw LayerDataError.invalidLayerID
         }
         
         guard case .animation(let content)
             = layer.content
         else {
-            throw Error.invalidLayerContent
+            throw LayerDataError.invalidLayerContent
         }
         
         return (layer, content)
