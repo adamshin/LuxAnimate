@@ -44,6 +44,11 @@ extension AnimEditorTimelineTrackCell {
         func onSelect(_ cell: AnimEditorTimelineTrackCell)
         func onLongPress(_ cell: AnimEditorTimelineTrackCell)
         
+        func assetData(
+            _ cell: AnimEditorTimelineTrackCell,
+            assetID: String
+        ) -> Data?
+        
     }
     
 }
@@ -119,9 +124,10 @@ class AnimEditorTimelineTrackCell: UICollectionViewCell {
             imageView.alpha = noDrawingImageAlpha
         }
         
-        if let thumbnailURL = frame.thumbnailURL {
-            let imageData = try? Data(contentsOf: thumbnailURL)
-            imageView.image = UIImage(data: imageData ?? Data())
+        if let assetID = frame.assetID {
+            let assetData = delegate?.assetData(
+                self, assetID: assetID)
+            imageView.image = UIImage(data: assetData ?? Data())
         } else {
             imageView.image = nil
         }

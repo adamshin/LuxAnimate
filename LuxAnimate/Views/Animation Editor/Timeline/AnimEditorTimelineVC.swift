@@ -35,6 +35,11 @@ extension AnimEditorTimelineVC {
             _ vc: AnimEditorTimelineVC,
             frameIndex: Int)
         
+        func pendingAssetData(
+            _ vc: AnimEditorTimelineVC,
+            assetID: String
+        ) -> Data?
+        
     }
     
 }
@@ -48,8 +53,20 @@ class AnimEditorTimelineVC: UIViewController {
     private let toolbarVC = AnimEditorTimelineToolbarVC()
     private let trackVC = AnimEditorTimelineTrackVC()
     
+    private let projectID: String
+    
     private var timelineModel: AnimEditorTimelineModel = .empty
     private var focusedFrameIndex = 0
+    
+    // MARK: - Init
+    
+    init(projectID: String) {
+        self.projectID = projectID
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) { fatalError() }
     
     // MARK: - Lifecycle
     
@@ -217,6 +234,26 @@ extension AnimEditorTimelineVC:
         frameIndex: Int
     ) {
         showFrameMenu(frameIndex: frameIndex)
+    }
+    
+    func assetData(
+        _ vc: AnimEditorTimelineTrackVC,
+        assetID: String
+    ) -> Data? {
+        
+        if let data = delegate?.pendingAssetData(
+            self, assetID: assetID)
+        {
+            print("Used pending asset data for timeline thumbnail!")
+            return data
+            
+        } else {
+            let assetURL = FileHelper.shared
+                .projectAssetURL(
+                    projectID: projectID,
+                    assetID: assetID)
+            return try? Data(contentsOf: assetURL)
+        }
     }
     
 }

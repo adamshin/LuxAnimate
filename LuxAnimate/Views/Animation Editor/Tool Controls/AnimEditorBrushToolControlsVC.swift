@@ -34,6 +34,7 @@ class AnimEditorBrushToolControlsVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // Testing
         let colorTestView1 = UIView()
         view.addSubview(colorTestView1)
         colorTestView1.backgroundColor = AppConfig.paintBrushColor.uiColor

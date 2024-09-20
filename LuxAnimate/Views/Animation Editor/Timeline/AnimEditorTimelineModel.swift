@@ -8,7 +8,7 @@ struct AnimEditorTimelineModel {
     
     struct Frame {
         var hasDrawing: Bool
-        var thumbnailURL: URL?
+        var assetID: String?
     }
     
     var frames: [Frame]
@@ -27,7 +27,7 @@ extension AnimEditorTimelineModel {
         
         let emptyFrame = Frame(
             hasDrawing: false,
-            thumbnailURL: nil)
+            assetID: nil)
         
         var frames = Array(
             repeating: emptyFrame,
@@ -39,18 +39,9 @@ extension AnimEditorTimelineModel {
             guard frames.indices.contains(drawing.frameIndex)
             else { continue }
             
-            let thumbnailURL: URL?
-            if let thumbnailAssetID = drawing.thumbnailAssetID {
-                thumbnailURL = FileHelper.shared.projectAssetURL(
-                    projectID: projectID,
-                    assetID: thumbnailAssetID)
-            } else {
-                thumbnailURL = nil
-            }
-            
             let frame = Frame(
                 hasDrawing: true,
-                thumbnailURL: thumbnailURL)
+                assetID: drawing.thumbnailAssetID)
             
             frames[drawing.frameIndex] = frame
         }

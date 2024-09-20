@@ -36,7 +36,7 @@ class AnimEditorVC: UIViewController {
     private let toolbarVC = AnimEditorToolbarVC()
     private let toolControlsVC = AnimEditorToolControlsVC()
     
-    private let timelineVC = AnimEditorTimelineVC()
+    private let timelineVC: AnimEditorTimelineVC
     
     // MARK: - State
     
@@ -74,6 +74,9 @@ class AnimEditorVC: UIViewController {
         self.sceneID = sceneID
         self.layerID = layerID
         
+        timelineVC = AnimEditorTimelineVC(
+            projectID: projectID)
+        
         state = try AnimEditorState(
             projectID: projectID,
             layerID: layerID,
@@ -89,6 +92,10 @@ class AnimEditorVC: UIViewController {
         
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
+        
+        workspaceVC.delegate = self
+        toolbarVC.delegate = self
+        timelineVC.delegate = self
         
         assetLoader.delegate = self
         editBuilder.delegate = self
@@ -116,10 +123,6 @@ class AnimEditorVC: UIViewController {
     // MARK: - Setup
     
     private func setupUI() {
-        workspaceVC.delegate = self
-        toolbarVC.delegate = self
-        timelineVC.delegate = self
-        
         addChild(workspaceVC, to: bodyView.workspaceContainer)
         addChild(toolbarVC, to: bodyView.toolbarContainer)
         addChild(toolControlsVC, to: bodyView.toolControlsContainer)
@@ -431,6 +434,19 @@ extension AnimEditorVC: AnimEditorTimelineVC.Delegate {
         try? editBuilder.removeSpacing(
             state: state,
             frameIndex: frameIndex)
+    }
+    
+    func pendingAssetData(
+        _ vc: AnimEditorTimelineVC,
+        assetID: String
+    ) -> Data? {
+        
+        if let pendingAsset = delegate?
+            .pendingEditAsset(assetID: assetID)
+        {
+            return pendingAsset.data
+        }
+        return nil
     }
     
 }

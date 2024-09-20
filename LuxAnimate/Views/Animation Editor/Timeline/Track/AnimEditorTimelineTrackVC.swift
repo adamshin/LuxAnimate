@@ -40,6 +40,11 @@ extension AnimEditorTimelineTrackVC {
             _ vc: AnimEditorTimelineTrackVC,
             frameIndex: Int)
         
+        func assetData(
+            _ vc: AnimEditorTimelineTrackVC,
+            assetID: String
+        ) -> Data?
+        
     }
     
 }
@@ -467,6 +472,13 @@ extension AnimEditorTimelineTrackVC:
         
         let frameIndex = indexPath.item
         delegate?.onLongPressFrame(self, frameIndex: frameIndex)
+    }
+    
+    func assetData(
+        _ cell: AnimEditorTimelineTrackCell,
+        assetID: String
+    ) -> Data? {
+        delegate?.assetData(self, assetID: assetID)
     }
     
 }
