@@ -352,6 +352,7 @@
 				66099BB82BDB32F500243D9F /* Renderer */,
 				660ABA3C2BF9BA5A00B5C668 /* Noise */,
 				66099BBA2BDB32F500243D9F /* BrushEngine.swift */,
+				66099BD62BDB642300243D9F /* BrushEngineGestureAdapter.swift */,
 			);
 			path = "Brush Engine";
 			sourceTree = "<group>";
@@ -611,7 +612,6 @@
 				664B59402BC5A9D1003FA90E /* BrushGestureRecognizer.swift */,
 				664B59412BC5A9D1003FA90E /* BrushGestureRecognizerState.swift */,
 				664B59422BC5A9D1003FA90E /* BrushGestureRecognizerStroke.swift */,
-				66099BD62BDB642300243D9F /* BrushEngineGestureAdapter.swift */,
 			);
 			path = "Brush Gesture";
 			sourceTree = "<group>";
