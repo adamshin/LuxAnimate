@@ -40,8 +40,15 @@ extension BrushGestureRecognizer2 {
             isAltitudeEstimated ||
             isAzimuthEstimated
         }
-        var isFinalized: Bool {
-            !isPredicted && !hasEstimatedValues
+        
+        func applying(
+            sampleUpdate u: SampleUpdate
+        ) -> Sample {
+            var s = self
+            s.force = u.force ?? s.force
+            s.altitude = u.altitude ?? s.altitude
+            s.azimuth = u.azimuth ?? s.azimuth
+            return s
         }
     }
     
@@ -53,15 +60,9 @@ extension BrushGestureRecognizer2 {
         var azimuth: CGVector?
     }
     
-    @MainActor
-    struct Update {
-        var newSamples: [Sample]?
-        var newPredictedSamples: [Sample]?
-        
-        var sampleUpdates: [SampleUpdate]
-    }
-    
 }
+
+// MARK: - BrushGestureRecognizer Gesture Delegate
 
 extension BrushGestureRecognizer2 {
     
@@ -90,6 +91,8 @@ extension BrushGestureRecognizer2 {
     }
     
 }
+
+// MARK: - BrushGestureRecognizer
 
 @MainActor
 class BrushGestureRecognizer2: UIGestureRecognizer {

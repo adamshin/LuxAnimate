@@ -128,9 +128,11 @@ class BrushGestureRecognizer2WaitingState:
 // MARK: - Pre Active
 
 @MainActor
-class BrushGestureRecognizer2PreActiveState: BrushGestureRecognizer2InternalState {
+class BrushGestureRecognizer2PreActiveState:
+    BrushGestureRecognizer2InternalState {
     
-    weak var delegate: BrushGestureRecognizer2InternalStateDelegate?
+    weak var delegate:
+        BrushGestureRecognizer2InternalStateDelegate?
     
     private let touch: UITouch
     private let startTime: TimeInterval
@@ -235,7 +237,23 @@ class BrushGestureRecognizer2PreActiveState: BrushGestureRecognizer2InternalStat
     func touchesEstimatedPropertiesUpdated(
         touches: Set<UITouch>
     ) {
-        // TODO: Apply updates to queued samples!
+        let view = delegate?.view(self)
+        
+        let sampleUpdates = BrushGestureHelper
+            .extractSampleUpdates(
+                touches: touches,
+                view: view)
+        
+        for sampleUpdate in sampleUpdates {
+            if let index = queuedSamples.firstIndex(where: {
+                $0.updateID == sampleUpdate.updateID
+            }) {
+                let sample = queuedSamples[index]
+                    .applying(sampleUpdate: sampleUpdate)
+                
+                queuedSamples[index] = sample
+            }
+        }
     }
     
     private func checkActivationThreshold() {
@@ -271,9 +289,11 @@ class BrushGestureRecognizer2PreActiveState: BrushGestureRecognizer2InternalStat
 
 // MARK: - Active
 
-class BrushGestureRecognizer2ActiveState: BrushGestureRecognizer2InternalState {
+class BrushGestureRecognizer2ActiveState:
+    BrushGestureRecognizer2InternalState {
     
-    weak var delegate: BrushGestureRecognizer2InternalStateDelegate?
+    weak var delegate:
+        BrushGestureRecognizer2InternalStateDelegate?
     
     private let touch: UITouch
     private let startTime: TimeInterval
@@ -363,28 +383,37 @@ class BrushGestureRecognizer2ActiveState: BrushGestureRecognizer2InternalState {
     func touchesEstimatedPropertiesUpdated(
         touches: Set<UITouch>
     ) {
-        // TODO: Extract update data from touches, send to delegate
-        delegate?.onUpdateStroke(self, sampleUpdates: [])
+        let view = delegate?.view(self)
         
-//        stroke.updateEstimated(touches: touches, view: delegate?.view)
-//        delegate?.onUpdateBrushStroke(stroke)
+        let sampleUpdates = BrushGestureHelper
+            .extractSampleUpdates(
+                touches: touches,
+                view: view)
+        
+        delegate?.onUpdateStroke(
+            self, sampleUpdates: sampleUpdates)
     }
     
 }
 
 // MARK: - Post Active
 
-class BrushGestureRecognizer2PostActiveState: BrushGestureRecognizer2InternalState {
+class BrushGestureRecognizer2PostActiveState:
+    BrushGestureRecognizer2InternalState {
     
-    weak var delegate: BrushGestureRecognizer2InternalStateDelegate?
+    weak var delegate:
+        BrushGestureRecognizer2InternalStateDelegate?
     
     private var finalizationTimer: Timer?
     
     func onStateBegin() {
         delegate?.setGestureRecognizerState(self, .ended)
         
+        let timerInterval = BrushStrokeGestureConfig
+            .estimateFinalizationDelay
+        
         finalizationTimer = Timer.scheduledTimer(
-            withTimeInterval: BrushStrokeGestureConfig.estimateFinalizationDelay,
+            withTimeInterval: timerInterval,
             repeats: false)
         { [weak self] _ in
             Task { @MainActor in
@@ -409,8 +438,15 @@ class BrushGestureRecognizer2PostActiveState: BrushGestureRecognizer2InternalSta
     func touchesEstimatedPropertiesUpdated(
         touches: Set<UITouch>
     ) {
-        // TODO: Extract update data from touches, send to delegate
-        delegate?.onUpdateStroke(self, sampleUpdates: [])
+        let view = delegate?.view(self)
+        
+        let sampleUpdates = BrushGestureHelper
+            .extractSampleUpdates(
+                touches: touches,
+                view: view)
+        
+        delegate?.onUpdateStroke(
+            self, sampleUpdates: sampleUpdates)
     }
     
     private func finalizeStroke() {
@@ -422,9 +458,11 @@ class BrushGestureRecognizer2PostActiveState: BrushGestureRecognizer2InternalSta
 
 // MARK: - Invalid
 
-class BrushGestureRecognizer2InvalidState: BrushGestureRecognizer2InternalState {
+class BrushGestureRecognizer2InvalidState:
+    BrushGestureRecognizer2InternalState {
     
-    weak var delegate: BrushGestureRecognizer2InternalStateDelegate?
+    weak var delegate:
+        BrushGestureRecognizer2InternalStateDelegate?
     
     func resetGesture() {
         delegate?.setInternalState(self,

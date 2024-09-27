@@ -52,9 +52,7 @@ struct BrushGestureHelper {
         
         let timeOffset = touch.timestamp - startTime
         
-        let updateID = touch
-            .estimationUpdateIndex
-            .map { Int(truncating: $0) }
+        let updateID = touch.estimationUpdateIndex?.intValue
         
         return BrushGestureRecognizer2.Sample(
             timeOffset: timeOffset,
@@ -74,6 +72,43 @@ struct BrushGestureHelper {
             isAzimuthEstimated: touch
                 .estimatedPropertiesExpectingUpdates
                 .contains(.azimuth))
+    }
+    
+    static func extractSampleUpdates(
+        touches: Set<UITouch>,
+        view: UIView?
+    ) -> [BrushGestureRecognizer2.SampleUpdate] {
+        
+        return touches.compactMap { touch in
+            guard let updateID =
+                touch.estimationUpdateIndex?.intValue
+            else { return nil }
+            
+            var sampleUpdate = BrushGestureRecognizer2
+                .SampleUpdate(updateID: updateID)
+            
+            if !touch
+                .estimatedPropertiesExpectingUpdates
+                .contains(.force)
+            {
+                sampleUpdate.force = touch.force
+            }
+            if !touch
+                .estimatedPropertiesExpectingUpdates
+                .contains(.altitude)
+            {
+                sampleUpdate.altitude = touch.altitudeAngle
+            }
+            if !touch
+                .estimatedPropertiesExpectingUpdates
+                .contains(.azimuth)
+            {
+                sampleUpdate.azimuth = touch
+                    .azimuthUnitVector(in: view)
+            }
+            
+            return sampleUpdate
+        }
     }
     
 }
