@@ -1,5 +1,5 @@
 //
-//  BrushGestureRecognizerInternalState.swift
+//  BrushGestureRecognizer+State.swift
 //
 
 import UIKit
@@ -109,7 +109,7 @@ class BrushGestureRecognizerWaitingState:
         let view = delegate?.view(self)
         let startTime = touch.timestamp
         
-        let (samples, _) = BrushGestureHelper
+        let (samples, _) = BrushGestureRecognizer
             .extractSamples(
                 touch: touch,
                 event: event,
@@ -196,7 +196,7 @@ class BrushGestureRecognizerPreActiveState:
         
         let view = delegate?.view(self)
         
-        let (samples, predictedSamples) = BrushGestureHelper
+        let (samples, predictedSamples) = BrushGestureRecognizer
             .extractSamples(
                 touch: touch,
                 event: event,
@@ -239,7 +239,7 @@ class BrushGestureRecognizerPreActiveState:
     ) {
         let view = delegate?.view(self)
         
-        let sampleUpdates = BrushGestureHelper
+        let sampleUpdates = BrushGestureRecognizer
             .extractSampleUpdates(
                 touches: touches,
                 view: view)
@@ -342,7 +342,7 @@ class BrushGestureRecognizerActiveState:
         
         let view = delegate?.view(self)
         
-        let (samples, predictedSamples) = BrushGestureHelper
+        let (samples, predictedSamples) = BrushGestureRecognizer
             .extractSamples(
                 touch: touch,
                 event: event,
@@ -387,7 +387,7 @@ class BrushGestureRecognizerActiveState:
     ) {
         let view = delegate?.view(self)
         
-        let sampleUpdates = BrushGestureHelper
+        let sampleUpdates = BrushGestureRecognizer
             .extractSampleUpdates(
                 touches: touches,
                 view: view)
@@ -442,7 +442,7 @@ class BrushGestureRecognizerPostActiveState:
     ) {
         let view = delegate?.view(self)
         
-        let sampleUpdates = BrushGestureHelper
+        let sampleUpdates = BrushGestureRecognizer
             .extractSampleUpdates(
                 touches: touches,
                 view: view)

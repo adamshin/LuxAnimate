@@ -1,11 +1,61 @@
 //
-//  BrushGestureHelper.swift
+//  BrushGestureRecognizer+Sample.swift
 //
 
 import UIKit
 
-@MainActor
-struct BrushGestureHelper {
+// MARK: - Sample
+
+extension BrushGestureRecognizer {
+    
+    @MainActor
+    struct Sample {
+        var timeOffset: TimeInterval
+        var isPredicted: Bool
+        var updateID: Int?
+        
+        var position: CGPoint
+        
+        var maximumPossibleForce: Double
+        
+        var force: Double
+        var altitude: Double
+        var azimuth: CGVector
+        
+        var isForceEstimated: Bool
+        var isAltitudeEstimated: Bool
+        var isAzimuthEstimated: Bool
+        
+        var hasEstimatedValues: Bool {
+            isForceEstimated ||
+            isAltitudeEstimated ||
+            isAzimuthEstimated
+        }
+        
+        func applying(
+            sampleUpdate u: SampleUpdate
+        ) -> Sample {
+            var s = self
+            s.force = u.force ?? s.force
+            s.altitude = u.altitude ?? s.altitude
+            s.azimuth = u.azimuth ?? s.azimuth
+            return s
+        }
+    }
+    
+    struct SampleUpdate {
+        var updateID: Int
+        
+        var force: Double?
+        var altitude: Double?
+        var azimuth: CGVector?
+    }
+    
+}
+
+// MARK: - Sample Extraction
+
+extension BrushGestureRecognizer {
     
     static func extractSamples(
         touch: UITouch,
@@ -51,7 +101,6 @@ struct BrushGestureHelper {
     ) -> BrushGestureRecognizer.Sample {
         
         let timeOffset = touch.timestamp - startTime
-        
         let updateID = touch.estimationUpdateIndex?.intValue
         
         return BrushGestureRecognizer.Sample(
@@ -87,20 +136,17 @@ struct BrushGestureHelper {
             var sampleUpdate = BrushGestureRecognizer
                 .SampleUpdate(updateID: updateID)
             
-            if !touch
-                .estimatedPropertiesExpectingUpdates
+            if !touch.estimatedPropertiesExpectingUpdates
                 .contains(.force)
             {
                 sampleUpdate.force = touch.force
             }
-            if !touch
-                .estimatedPropertiesExpectingUpdates
+            if !touch.estimatedPropertiesExpectingUpdates
                 .contains(.altitude)
             {
                 sampleUpdate.altitude = touch.altitudeAngle
             }
-            if !touch
-                .estimatedPropertiesExpectingUpdates
+            if !touch.estimatedPropertiesExpectingUpdates
                 .contains(.azimuth)
             {
                 sampleUpdate.azimuth = touch

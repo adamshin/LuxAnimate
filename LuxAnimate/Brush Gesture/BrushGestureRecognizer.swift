@@ -17,49 +17,6 @@ extension BrushGestureRecognizer {
         static let strokeFinalizationDelay: TimeInterval = 0.1
     }
     
-    @MainActor
-    struct Sample {
-        var timeOffset: TimeInterval
-        var isPredicted: Bool
-        var updateID: Int?
-        
-        var position: CGPoint
-        
-        var maximumPossibleForce: Double
-        
-        var force: Double
-        var altitude: Double
-        var azimuth: CGVector
-        
-        var isForceEstimated: Bool
-        var isAltitudeEstimated: Bool
-        var isAzimuthEstimated: Bool
-        
-        var hasEstimatedValues: Bool {
-            isForceEstimated ||
-            isAltitudeEstimated ||
-            isAzimuthEstimated
-        }
-        
-        func applying(
-            sampleUpdate u: SampleUpdate
-        ) -> Sample {
-            var s = self
-            s.force = u.force ?? s.force
-            s.altitude = u.altitude ?? s.altitude
-            s.azimuth = u.azimuth ?? s.azimuth
-            return s
-        }
-    }
-    
-    struct SampleUpdate {
-        var updateID: Int
-        
-        var force: Double?
-        var altitude: Double?
-        var azimuth: CGVector?
-    }
-    
 }
 
 // MARK: - BrushGestureRecognizer Gesture Delegate
