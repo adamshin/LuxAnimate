@@ -4,6 +4,7 @@
 
 import Foundation
 
+/*
 @MainActor
 struct AnimEditorBrushStrokeAdapter {
     
@@ -93,3 +94,4 @@ struct AnimEditorBrushStrokeAdapter {
     }
     
 }
+*/

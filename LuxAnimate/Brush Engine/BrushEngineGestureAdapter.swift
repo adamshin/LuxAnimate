@@ -4,6 +4,7 @@
 
 import Foundation
 
+/*
 @MainActor
 struct BrushEngineGestureAdapter {
     
@@ -50,3 +51,4 @@ struct BrushEngineGestureAdapter {
     }
     
 }
+*/

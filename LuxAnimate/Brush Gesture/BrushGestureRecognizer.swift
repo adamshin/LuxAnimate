@@ -4,37 +4,100 @@
 
 import UIKit
 
-struct BrushStrokeGestureConfig {
+extension BrushGestureRecognizer {
     
-    static let pencilOnly = false
-    static let usePredictedTouches = true
+    struct Config {
+        static let pencilOnly = false
+        static let usePredictedTouches = true
+        
+        static let fingerActivationDelay: TimeInterval = 0.25
+        static let fingerActivationDistance: CGFloat = 20
+        static let fingerSecondTouchCancellationThreshold: TimeInterval = 0.25
+        
+        static let strokeFinalizationDelay: TimeInterval = 0.1
+    }
     
-    static let fingerActivationDelay: TimeInterval = 0.25
-    static let fingerActivationDistance: CGFloat = 20
-    static let fingerSecondTouchCancellationThreshold: TimeInterval = 0.25
+    @MainActor
+    struct Sample {
+        var timeOffset: TimeInterval
+        var isPredicted: Bool
+        var updateID: Int?
+        
+        var position: CGPoint
+        
+        var maximumPossibleForce: Double
+        
+        var force: Double
+        var altitude: Double
+        var azimuth: CGVector
+        
+        var isForceEstimated: Bool
+        var isAltitudeEstimated: Bool
+        var isAzimuthEstimated: Bool
+        
+        var hasEstimatedValues: Bool {
+            isForceEstimated ||
+            isAltitudeEstimated ||
+            isAzimuthEstimated
+        }
+        
+        func applying(
+            sampleUpdate u: SampleUpdate
+        ) -> Sample {
+            var s = self
+            s.force = u.force ?? s.force
+            s.altitude = u.altitude ?? s.altitude
+            s.azimuth = u.azimuth ?? s.azimuth
+            return s
+        }
+    }
     
-    static let estimateFinalizationDelay: TimeInterval = 0.1
+    struct SampleUpdate {
+        var updateID: Int
+        
+        var force: Double?
+        var altitude: Double?
+        var azimuth: CGVector?
+    }
     
 }
 
-@MainActor
-protocol BrushGestureRecognizerGestureDelegate: AnyObject {
+// MARK: - BrushGestureRecognizer Gesture Delegate
+
+extension BrushGestureRecognizer {
     
-    func onBeginBrushStroke(quickTap: Bool)
-    
-    func onUpdateBrushStroke(
-        _ stroke: BrushGestureRecognizer.Stroke)
-    
-    func onEndBrushStroke()
-    
-    func onCancelBrushStroke()
+    @MainActor
+    protocol GestureDelegate: AnyObject {
+        
+        func onBeginStroke(
+            _ g: BrushGestureRecognizer,
+            quickTap: Bool)
+        
+        func onUpdateStroke(
+            _ g: BrushGestureRecognizer,
+            addedSamples: [Sample],
+            predictedSamples: [Sample])
+        
+        func onUpdateStroke(
+            _ g: BrushGestureRecognizer,
+            sampleUpdates: [SampleUpdate])
+        
+        func onEndStroke(
+            _ g: BrushGestureRecognizer)
+        
+        func onCancelStroke(
+            _ g: BrushGestureRecognizer)
+        
+    }
     
 }
+
+// MARK: - BrushGestureRecognizer
 
 @MainActor
 class BrushGestureRecognizer: UIGestureRecognizer {
     
-    weak var gestureDelegate: BrushGestureRecognizerGestureDelegate?
+    weak var gestureDelegate: GestureDelegate?
     
     private var internalState: BrushGestureRecognizerInternalState?
     
@@ -100,32 +163,76 @@ class BrushGestureRecognizer: UIGestureRecognizer {
     
 }
 
-// MARK: - State Delegate
+// MARK: - Delegates
 
-extension BrushGestureRecognizer: BrushGestureRecognizerInternalStateDelegate {
+extension BrushGestureRecognizer:
+    BrushGestureRecognizerInternalStateDelegate {
     
-    func setState(_ newState: BrushGestureRecognizerInternalState) {
+    func view(
+        _ s: any BrushGestureRecognizerInternalState
+    ) -> UIView? {
+        view
+    }
+    
+    func numberOfTouches(
+        _ s: any BrushGestureRecognizerInternalState
+    ) -> Int {
+        numberOfTouches
+    }
+    
+    func setInternalState(
+        _ s: any BrushGestureRecognizerInternalState,
+        _ newState: BrushGestureRecognizerInternalState
+    ) {
         setInternalState(newState)
     }
     
-    func setGestureRecognizerState(_ newState: UIGestureRecognizer.State) {
+    func setGestureRecognizerState(
+        _ s: any BrushGestureRecognizerInternalState,
+        _ newState: UIGestureRecognizer.State
+    ) {
         state = newState
     }
     
-    func onBeginBrushStroke(quickTap: Bool) {
-        gestureDelegate?.onBeginBrushStroke(quickTap: quickTap)
+    func onBeginStroke(
+        _ s: any BrushGestureRecognizerInternalState,
+        quickTap: Bool
+    ) {
+        gestureDelegate?.onBeginStroke(
+            self, quickTap: quickTap)
     }
     
-    func onUpdateBrushStroke(_ stroke: BrushGestureRecognizer.Stroke) {
-        gestureDelegate?.onUpdateBrushStroke(stroke)
+    func onUpdateStroke(
+        _ s: BrushGestureRecognizerInternalState,
+        addedSamples: [Sample],
+        predictedSamples: [Sample]
+    ) {
+        gestureDelegate?.onUpdateStroke(
+            self,
+            addedSamples: addedSamples,
+            predictedSamples: predictedSamples)
     }
     
-    func onEndBrushStroke() {
-        gestureDelegate?.onEndBrushStroke()
+    func onUpdateStroke(
+        _ s: BrushGestureRecognizerInternalState,
+        sampleUpdates: [SampleUpdate]
+    ) {
+        gestureDelegate?.onUpdateStroke(
+            self,
+            sampleUpdates: sampleUpdates)
     }
     
-    func onCancelBrushStroke() {
-        gestureDelegate?.onCancelBrushStroke()
+    func onEndStroke(
+        _ s: any BrushGestureRecognizerInternalState
+    ) {
+        gestureDelegate?.onEndStroke(self)
+    }
+    
+    func onCancelStroke(
+        _ s: any BrushGestureRecognizerInternalState
+    ) {
+        gestureDelegate?.onCancelStroke(self)
     }
     
 }
+

@@ -115,12 +115,14 @@ extension AnimFrameEditorEraseToolState: AnimEditorEraseToolStateDelegate {
         internalState.beginBrushStroke(quickTap: quickTap)
     }
     
+    /*
     func onUpdateBrushStroke(
         _ s: AnimEditorEraseToolState,
         stroke: BrushGestureRecognizer.Stroke
     ) {
         internalState.updateBrushStroke(stroke: stroke)
     }
+     */
 
     func onEndBrushStroke(
         _ s: AnimEditorEraseToolState

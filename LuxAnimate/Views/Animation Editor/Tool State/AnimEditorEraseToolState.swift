@@ -11,9 +11,9 @@ protocol AnimEditorEraseToolStateDelegate: AnyObject {
         _ s: AnimEditorEraseToolState,
         quickTap: Bool)
 
-    func onUpdateBrushStroke(
-        _ s: AnimEditorEraseToolState,
-        stroke: BrushGestureRecognizer.Stroke)
+//    func onUpdateBrushStroke(
+//        _ s: AnimEditorEraseToolState,
+//        stroke: BrushGestureRecognizer.Stroke)
 
     func onEndBrushStroke(
         _ s: AnimEditorEraseToolState)
@@ -45,7 +45,7 @@ class AnimEditorEraseToolState: AnimEditorToolState {
         smoothing = AnimEditorToolSettingsStore
             .eraseToolSmoothing
         
-        brushGestureRecognizer.gestureDelegate = self
+//        brushGestureRecognizer.gestureDelegate = self
         
         controlsVC.delegate = self
         controlsVC.scale = scale
@@ -92,24 +92,24 @@ extension AnimEditorEraseToolState: AnimEditorEraseToolControlsVCDelegate {
     
 }
 
-extension AnimEditorEraseToolState: BrushGestureRecognizerGestureDelegate {
-    
-    func onBeginBrushStroke(quickTap: Bool) {
-        delegate?.onBeginBrushStroke(self, quickTap: quickTap)
-    }
-    
-    func onUpdateBrushStroke(
-        _ stroke: BrushGestureRecognizer.Stroke
-    ) {
-        delegate?.onUpdateBrushStroke(self, stroke: stroke)
-    }
-    
-    func onEndBrushStroke() {
-        delegate?.onEndBrushStroke(self)
-    }
-    
-    func onCancelBrushStroke() {
-        delegate?.onCancelBrushStroke(self)
-    }
-    
-}
+//extension AnimEditorEraseToolState: BrushGestureRecognizerGestureDelegate {
+//    
+//    func onBeginBrushStroke(quickTap: Bool) {
+//        delegate?.onBeginBrushStroke(self, quickTap: quickTap)
+//    }
+//    
+//    func onUpdateBrushStroke(
+//        _ stroke: BrushGestureRecognizer.Stroke
+//    ) {
+//        delegate?.onUpdateBrushStroke(self, stroke: stroke)
+//    }
+//    
+//    func onEndBrushStroke() {
+//        delegate?.onEndBrushStroke(self)
+//    }
+//    
+//    func onCancelBrushStroke() {
+//        delegate?.onCancelBrushStroke(self)
+//    }
+//    
+//}

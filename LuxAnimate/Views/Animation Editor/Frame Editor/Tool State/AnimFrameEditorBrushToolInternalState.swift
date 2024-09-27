@@ -98,6 +98,7 @@ class AnimFrameEditorBrushToolInternalState {
             quickTap: quickTap)
     }
     
+    /*
     func updateBrushStroke(
         stroke: BrushGestureRecognizer.Stroke
     ) {
@@ -117,6 +118,7 @@ class AnimFrameEditorBrushToolInternalState {
         
         brushEngine.updateStroke(inputStroke: inputStroke)
     }
+     */
     
     func endBrushStroke() {
         brushEngine.endStroke()

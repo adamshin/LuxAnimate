@@ -13,8 +13,8 @@ struct BrushGestureHelper {
         startTime: TimeInterval,
         view: UIView?
     ) -> (
-        [BrushGestureRecognizer2.Sample],
-        [BrushGestureRecognizer2.Sample]
+        [BrushGestureRecognizer.Sample],
+        [BrushGestureRecognizer.Sample]
     ) {
         let touches = event
             .coalescedTouches(for: touch) ?? []
@@ -36,7 +36,7 @@ struct BrushGestureHelper {
                 isPredicted: true)
         }
         
-        if BrushGestureRecognizer2.Config.usePredictedTouches {
+        if BrushGestureRecognizer.Config.usePredictedTouches {
             return (samples, predictedSamples)
         } else {
             return (samples, [])
@@ -48,13 +48,13 @@ struct BrushGestureHelper {
         view: UIView?,
         startTime: TimeInterval,
         isPredicted: Bool
-    ) -> BrushGestureRecognizer2.Sample {
+    ) -> BrushGestureRecognizer.Sample {
         
         let timeOffset = touch.timestamp - startTime
         
         let updateID = touch.estimationUpdateIndex?.intValue
         
-        return BrushGestureRecognizer2.Sample(
+        return BrushGestureRecognizer.Sample(
             timeOffset: timeOffset,
             isPredicted: isPredicted,
             updateID: updateID,
@@ -77,14 +77,14 @@ struct BrushGestureHelper {
     static func extractSampleUpdates(
         touches: Set<UITouch>,
         view: UIView?
-    ) -> [BrushGestureRecognizer2.SampleUpdate] {
+    ) -> [BrushGestureRecognizer.SampleUpdate] {
         
         return touches.compactMap { touch in
             guard let updateID =
                 touch.estimationUpdateIndex?.intValue
             else { return nil }
             
-            var sampleUpdate = BrushGestureRecognizer2
+            var sampleUpdate = BrushGestureRecognizer
                 .SampleUpdate(updateID: updateID)
             
             if !touch
