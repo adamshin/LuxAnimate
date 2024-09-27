@@ -234,28 +234,6 @@ class BrushGestureRecognizerPreActiveState:
         delegate?.setGestureRecognizerState(self, .failed)
     }
     
-    func touchesEstimatedPropertiesUpdated(
-        touches: Set<UITouch>
-    ) {
-        let view = delegate?.view(self)
-        
-        let sampleUpdates = BrushGestureRecognizer
-            .extractSampleUpdates(
-                touches: touches,
-                view: view)
-        
-        for sampleUpdate in sampleUpdates {
-            if let index = queuedSamples.firstIndex(where: {
-                $0.updateID == sampleUpdate.updateID
-            }) {
-                let sample = queuedSamples[index]
-                    .applying(sampleUpdate: sampleUpdate)
-                
-                queuedSamples[index] = sample
-            }
-        }
-    }
-    
     private func checkActivationThreshold() {
         guard let s1 = queuedSamples.first,
             let s2 = queuedSamples.last
