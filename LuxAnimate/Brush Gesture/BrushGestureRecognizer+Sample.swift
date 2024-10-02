@@ -25,22 +25,6 @@ extension BrushGestureRecognizer {
         var isForceEstimated: Bool
         var isAltitudeEstimated: Bool
         var isAzimuthEstimated: Bool
-        
-        var hasEstimatedValues: Bool {
-            isForceEstimated ||
-            isAltitudeEstimated ||
-            isAzimuthEstimated
-        }
-        
-        func applying(
-            sampleUpdate u: SampleUpdate
-        ) -> Sample {
-            var s = self
-            s.force = u.force ?? s.force
-            s.altitude = u.altitude ?? s.altitude
-            s.azimuth = u.azimuth ?? s.azimuth
-            return s
-        }
     }
     
     struct SampleUpdate {
