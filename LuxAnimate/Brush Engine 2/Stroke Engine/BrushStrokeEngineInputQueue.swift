@@ -4,9 +4,9 @@
 
 import Foundation
 
-private let maxInputSampleCount = 100
-
 class BrushStrokeEngineInputQueue {
+    
+    static let maxInputSampleCount = 100
     
     private var inputSamples:
         [BrushStrokeEngine2.InputSample] = []
@@ -52,37 +52,32 @@ class BrushStrokeEngineInputQueue {
     func process()
     -> BrushStrokeEngine2.ProcessorOutput {
         
-        var finalizedSamples: [BrushStrokeEngine2.Sample] = []
-        var unfinalizedSamples: [BrushStrokeEngine2.Sample] = []
+        var output = BrushStrokeEngine2.ProcessorOutput()
         
         let finalizedPrefixCount = inputSamples
             .prefix { $0.isFinalized }.count
         
-        let prefixCount = min(
+        let prefixCount = max(
             finalizedPrefixCount,
-            finalizedSamples.count - maxInputSampleCount)
+            inputSamples.count - Self.maxInputSampleCount)
         
-        finalizedSamples = inputSamples.prefix(prefixCount).map {
-            Self.convert(inputSample: $0, isFinalized: true)
-        }
+        output.finalizedSamples = inputSamples
+            .prefix(prefixCount)
+            .map { Self.convert(inputSample: $0) }
         
         inputSamples.removeFirst(prefixCount)
         
-        unfinalizedSamples = inputSamples.map {
-            Self.convert(inputSample: $0, isFinalized: false)
-        }
-        unfinalizedSamples += predictedInputSamples.map {
-            Self.convert(inputSample: $0, isFinalized: false)
-        }
+        output.unfinalizedSamples = inputSamples
+            .map { Self.convert(inputSample: $0) }
         
-        return BrushStrokeEngine2.ProcessorOutput(
-            finalizedSamples: finalizedSamples,
-            unfinalizedSamples: unfinalizedSamples)
+        output.unfinalizedSamples += predictedInputSamples
+            .map { Self.convert(inputSample: $0) }
+        
+        return output
     }
     
     private static func convert(
-        inputSample s: BrushStrokeEngine2.InputSample,
-        isFinalized: Bool
+        inputSample s: BrushStrokeEngine2.InputSample
     ) -> BrushStrokeEngine2.Sample {
         
         BrushStrokeEngine2.Sample(
@@ -90,8 +85,7 @@ class BrushStrokeEngineInputQueue {
             position: s.position,
             pressure: s.pressure,
             altitude: s.altitude,
-            azimuth: s.azimuth,
-            isFinalized: isFinalized)
+            azimuth: s.azimuth)
     }
     
 }

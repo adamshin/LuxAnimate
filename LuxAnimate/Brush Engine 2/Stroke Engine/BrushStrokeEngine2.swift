@@ -44,8 +44,6 @@ extension BrushStrokeEngine2 {
         var pressure: Double
         var altitude: Double
         var azimuth: Vector
-        
-        var isFinalized: Bool
     }
     
     struct Stamp {
@@ -56,13 +54,11 @@ extension BrushStrokeEngine2 {
         
         var offset: Vector
         var strokeDistance: Double
-        
-        var isFinalized: Bool
     }
     
     struct ProcessorOutput {
-        var finalizedSamples: [Sample]
-        var unfinalizedSamples: [Sample]
+        var finalizedSamples: [Sample] = []
+        var unfinalizedSamples: [Sample] = []
     }
     
 }
