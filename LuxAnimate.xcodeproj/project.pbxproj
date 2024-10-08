@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 70;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -128,6 +128,7 @@
 		66BC14CB2C89105700749C7A /* AnimFrameEditorHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BC14CA2C89105700749C7A /* AnimFrameEditorHelper.swift */; };
 		66BC14CF2C8924E300749C7A /* AnimFrameEditorWorkspaceSceneGraphGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BC14CE2C8924E300749C7A /* AnimFrameEditorWorkspaceSceneGraphGenerator.swift */; };
 		66BD7A332C8FB5E500A91913 /* DrawingAssetProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BD7A322C8FB5E500A91913 /* DrawingAssetProcessor.swift */; };
+		66C7E9402CB104F900173C44 /* BrushEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C7E93E2CB104F900173C44 /* BrushEngineTests.swift */; };
 		66C8D5912C767C910013B999 /* AnimEditorBrushStrokeAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C8D5902C767C910013B999 /* AnimEditorBrushStrokeAdapter.swift */; };
 		66CE19012C1BA8BC0078AA68 /* RenderCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66CE19002C1BA8BC0078AA68 /* RenderCacheManager.swift */; };
 		66D0843D2BA3840C00EB8556 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0843C2BA3840C00EB8556 /* AppDelegate.swift */; };
@@ -295,6 +296,7 @@
 		66BC14CA2C89105700749C7A /* AnimFrameEditorHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimFrameEditorHelper.swift; sourceTree = "<group>"; };
 		66BC14CE2C8924E300749C7A /* AnimFrameEditorWorkspaceSceneGraphGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimFrameEditorWorkspaceSceneGraphGenerator.swift; sourceTree = "<group>"; };
 		66BD7A322C8FB5E500A91913 /* DrawingAssetProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingAssetProcessor.swift; sourceTree = "<group>"; };
+		66C7E93E2CB104F900173C44 /* BrushEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrushEngineTests.swift; sourceTree = "<group>"; };
 		66C8D5902C767C910013B999 /* AnimEditorBrushStrokeAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorBrushStrokeAdapter.swift; sourceTree = "<group>"; };
 		66CE19002C1BA8BC0078AA68 /* RenderCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderCacheManager.swift; sourceTree = "<group>"; };
 		66D084392BA3840C00EB8556 /* LuxAnimate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LuxAnimate.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -327,10 +329,6 @@
 		66FE7A2B2C21035D00464A82 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
 		66FE7A2D2C25E05100464A82 /* Sequence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sequence.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		6678EAA02CACE9D600767021 /* LuxAnimateTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = LuxAnimateTests; sourceTree = "<group>"; };
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		6678EA9C2CACE9D600767021 /* Frameworks */ = {
@@ -933,11 +931,19 @@
 			path = "Drawing Asset Processor";
 			sourceTree = "<group>";
 		};
+		66C7E93F2CB104F900173C44 /* LuxAnimateTests */ = {
+			isa = PBXGroup;
+			children = (
+				66C7E93E2CB104F900173C44 /* BrushEngineTests.swift */,
+			);
+			path = LuxAnimateTests;
+			sourceTree = "<group>";
+		};
 		66D084302BA3840B00EB8556 = {
 			isa = PBXGroup;
 			children = (
 				66D0843B2BA3840C00EB8556 /* LuxAnimate */,
-				6678EAA02CACE9D600767021 /* LuxAnimateTests */,
+				66C7E93F2CB104F900173C44 /* LuxAnimateTests */,
 				66D0843A2BA3840C00EB8556 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -1121,9 +1127,6 @@
 			dependencies = (
 				6678EAA42CACE9D600767021 /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				6678EAA02CACE9D600767021 /* LuxAnimateTests */,
-			);
 			name = LuxAnimateTests;
 			packageProductDependencies = (
 			);
@@ -1216,6 +1219,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				66C7E9402CB104F900173C44 /* BrushEngineTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

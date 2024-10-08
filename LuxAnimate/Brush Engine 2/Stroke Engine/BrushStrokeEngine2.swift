@@ -40,25 +40,25 @@ extension BrushStrokeEngine2 {
     
     struct Sample {
         var timeOffset: TimeInterval
+        
         var position: Vector
         var pressure: Double
         var altitude: Double
         var azimuth: Vector
+        
+        var isFinalized: Bool
     }
     
     struct Stamp {
-        var size: Double
         var position: Vector
+        var size: Double
         var rotation: Double
         var alpha: Double
         
         var offset: Vector
         var strokeDistance: Double
-    }
-    
-    struct ProcessorOutput {
-        var finalizedSamples: [Sample] = []
-        var unfinalizedSamples: [Sample] = []
+        
+        var isFinalized: Bool
     }
     
 }

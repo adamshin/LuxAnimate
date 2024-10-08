@@ -29,7 +29,7 @@ private func createInputSample(
 
 struct BrushEngineTests {
 
-    @Test func testInputQueue1() {
+    @Test func testInputQueue1() throws {
         let queue = BrushStrokeEngineInputQueue()
         
         queue.handleInputUpdate(
@@ -39,15 +39,14 @@ struct BrushEngineTests {
             predictedSamples: [])
         
         let output1 = queue.process()
-        #expect(output1.finalizedSamples.count == 5)
-        #expect(output1.unfinalizedSamples.count == 0)
+        try #require(output1.count == 5)
+        try #require(output1.allSatisfy { $0.isFinalized })
         
         let output2 = queue.process()
-        #expect(output2.finalizedSamples.count == 0)
-        #expect(output2.unfinalizedSamples.count == 0)
+        try #require(output2.count == 0)
     }
     
-    @Test func testInputQueue2() {
+    @Test func testInputQueue2() throws {
         let queue = BrushStrokeEngineInputQueue()
         
         queue.handleInputUpdate(
@@ -60,8 +59,9 @@ struct BrushEngineTests {
             })
         
         let output1 = queue.process()
-        #expect(output1.finalizedSamples.count == 5)
-        #expect(output1.unfinalizedSamples.count == 3)
+        try #require(output1.count == 8)
+        try #require(output1[0..<5].allSatisfy { $0.isFinalized })
+        try #require(output1[5..<8].allSatisfy { !$0.isFinalized })
         
         queue.handleInputUpdate(
             addedSamples: (0..<6).map { _ in
@@ -73,15 +73,16 @@ struct BrushEngineTests {
             })
         
         let output2 = queue.process()
-        #expect(output2.finalizedSamples.count == 6)
-        #expect(output2.unfinalizedSamples.count == 4)
+        try #require(output2.count == 10)
+        try #require(output2[0..<6].allSatisfy { $0.isFinalized })
+        try #require(output2[6..<10].allSatisfy { !$0.isFinalized })
         
         let output3 = queue.process()
-        #expect(output3.finalizedSamples.count == 0)
-        #expect(output3.unfinalizedSamples.count == 4)
+        try #require(output3.count == 4)
+        try #require(output3.allSatisfy { !$0.isFinalized })
     }
     
-    @Test func testInputQueue3() {
+    @Test func testInputQueue3() throws {
         let queue = BrushStrokeEngineInputQueue()
         
         queue.handleInputUpdate(
@@ -98,8 +99,9 @@ struct BrushEngineTests {
         
         let output1 = queue.process()
         // x|EEEEPPPPP
-        #expect(output1.finalizedSamples.count == 1)
-        #expect(output1.unfinalizedSamples.count == 9)
+        try #require(output1.count == 10)
+        try #require(output1[0..<1].allSatisfy { $0.isFinalized })
+        try #require(output1[1..<10].allSatisfy { !$0.isFinalized })
         
         queue.handleInputUpdate(sampleUpdates: [
             BrushStrokeEngine2.InputSampleUpdate(
@@ -110,8 +112,9 @@ struct BrushEngineTests {
         
         let output2 = queue.process()
         // x|EEEPPPPP
-        #expect(output2.finalizedSamples.count == 1)
-        #expect(output2.unfinalizedSamples.count == 8)
+        try #require(output2.count == 9)
+        try #require(output2[0..<1].allSatisfy { $0.isFinalized })
+        try #require(output2[1..<9].allSatisfy { !$0.isFinalized })
         
         queue.handleInputUpdate(
             addedSamples: (0..<1).map { _ in
@@ -135,8 +138,8 @@ struct BrushEngineTests {
         
         let output3 = queue.process()
         // |ExxxPPP
-        #expect(output3.finalizedSamples.count == 0)
-        #expect(output3.unfinalizedSamples.count == 7)
+        try #require(output3.count == 7)
+        try #require(output3.allSatisfy { !$0.isFinalized })
         
         queue.handleInputUpdate(sampleUpdates: [
             BrushStrokeEngine2.InputSampleUpdate(
@@ -147,15 +150,16 @@ struct BrushEngineTests {
         
         let output4 = queue.process()
         // xxxx|PPP
-        #expect(output4.finalizedSamples.count == 4)
-        #expect(output4.unfinalizedSamples.count == 3)
+        try #require(output4.count == 7)
+        try #require(output4[0..<4].allSatisfy { $0.isFinalized })
+        try #require(output4[4..<7].allSatisfy { !$0.isFinalized })
         
         let output5 = queue.process()
-        #expect(output5.finalizedSamples.count == 0)
-        #expect(output5.unfinalizedSamples.count == 3)
+        try #require(output5.count == 3)
+        try #require(output5.allSatisfy { !$0.isFinalized })
     }
     
-    @Test func testInputQueue4() {
+    @Test func testInputQueue4() throws {
         let queue = BrushStrokeEngineInputQueue()
         
         let maxCount = BrushStrokeEngineInputQueue.maxInputSampleCount
@@ -170,12 +174,13 @@ struct BrushEngineTests {
             })
         
         let output1 = queue.process()
-        #expect(output1.finalizedSamples.count == 10)
-        #expect(output1.unfinalizedSamples.count == maxCount + 3)
+        try #require(output1.count == 10 + maxCount + 3)
+        try #require(output1[0..<10].allSatisfy { $0.isFinalized })
+        try #require(output1[10..<10 + maxCount + 3].allSatisfy { !$0.isFinalized })
         
         let output2 = queue.process()
-        #expect(output2.finalizedSamples.count == 0)
-        #expect(output2.unfinalizedSamples.count == maxCount + 3)
+        try #require(output2.count == maxCount + 3)
+        try #require(output2.allSatisfy { !$0.isFinalized })
         
         queue.handleInputUpdate(
             addedSamples: (0..<5).map { _ in
@@ -184,8 +189,9 @@ struct BrushEngineTests {
             predictedSamples: [])
         
         let output3 = queue.process()
-        #expect(output3.finalizedSamples.count == 5)
-        #expect(output3.unfinalizedSamples.count == maxCount)
+        try #require(output3.count == 5 + maxCount)
+        try #require(output3[0..<5].allSatisfy { $0.isFinalized })
+        try #require(output3[5..<5 + maxCount].allSatisfy { !$0.isFinalized })
     }
     
 }

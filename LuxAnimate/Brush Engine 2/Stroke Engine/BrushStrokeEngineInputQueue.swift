@@ -49,10 +49,8 @@ class BrushStrokeEngineInputQueue {
         }
     }
     
-    func process()
-    -> BrushStrokeEngine2.ProcessorOutput {
-        
-        var output = BrushStrokeEngine2.ProcessorOutput()
+    func process() -> [BrushStrokeEngine2.Sample] {
+        var output: [BrushStrokeEngine2.Sample] = []
         
         let finalizedPrefixCount = inputSamples
             .prefix { $0.isFinalized }.count
@@ -61,23 +59,36 @@ class BrushStrokeEngineInputQueue {
             finalizedPrefixCount,
             inputSamples.count - Self.maxInputSampleCount)
         
-        output.finalizedSamples = inputSamples
+        output += inputSamples
             .prefix(prefixCount)
-            .map { Self.convert(inputSample: $0) }
+            .map {
+                Self.convert(
+                    inputSample: $0,
+                    isFinalized: true)
+            }
         
         inputSamples.removeFirst(prefixCount)
         
-        output.unfinalizedSamples = inputSamples
-            .map { Self.convert(inputSample: $0) }
+        output += inputSamples
+            .map {
+                Self.convert(
+                    inputSample: $0,
+                    isFinalized: false)
+            }
         
-        output.unfinalizedSamples += predictedInputSamples
-            .map { Self.convert(inputSample: $0) }
+        output += predictedInputSamples
+            .map {
+                Self.convert(
+                    inputSample: $0,
+                    isFinalized: false)
+            }
         
         return output
     }
     
     private static func convert(
-        inputSample s: BrushStrokeEngine2.InputSample
+        inputSample s: BrushStrokeEngine2.InputSample,
+        isFinalized: Bool
     ) -> BrushStrokeEngine2.Sample {
         
         BrushStrokeEngine2.Sample(
@@ -85,7 +96,8 @@ class BrushStrokeEngineInputQueue {
             position: s.position,
             pressure: s.pressure,
             altitude: s.altitude,
-            azimuth: s.azimuth)
+            azimuth: s.azimuth,
+            isFinalized: isFinalized)
     }
     
 }
