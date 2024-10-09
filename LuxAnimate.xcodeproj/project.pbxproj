@@ -106,7 +106,7 @@
 		66789AC02C29E90B0020EACE /* RenderPreviewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66789ABF2C29E90B0020EACE /* RenderPreviewManager.swift */; };
 		66789AC92C332D710020EACE /* IDGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66789AC82C332D710020EACE /* IDGenerator.swift */; };
 		6678A9BE2C8131E700838EA3 /* AnimFrameEditorEraseToolState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6678A9BD2C8131E700838EA3 /* AnimFrameEditorEraseToolState.swift */; };
-		6678EAA92CACF66800767021 /* BrushStrokeEngineResampleProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6678EAA82CACF66800767021 /* BrushStrokeEngineResampleProcessor.swift */; };
+		6678EAA92CACF66800767021 /* BrushStrokeEngineGapFillProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6678EAA82CACF66800767021 /* BrushStrokeEngineGapFillProcessor.swift */; };
 		667BF74B2BA655CB003E3430 /* FileHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667BF74A2BA655CB003E3430 /* FileHelper.swift */; };
 		668A14CC2C7D1E2000D73D36 /* AnimEditorEraseToolControlsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668A14CB2C7D1E2000D73D36 /* AnimEditorEraseToolControlsVC.swift */; };
 		668A14D72C7D3EBE00D73D36 /* AnimFrameEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668A14D62C7D3EBE00D73D36 /* AnimFrameEditor.swift */; };
@@ -128,7 +128,7 @@
 		66BC14CB2C89105700749C7A /* AnimFrameEditorHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BC14CA2C89105700749C7A /* AnimFrameEditorHelper.swift */; };
 		66BC14CF2C8924E300749C7A /* AnimFrameEditorWorkspaceSceneGraphGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BC14CE2C8924E300749C7A /* AnimFrameEditorWorkspaceSceneGraphGenerator.swift */; };
 		66BD7A332C8FB5E500A91913 /* DrawingAssetProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BD7A322C8FB5E500A91913 /* DrawingAssetProcessor.swift */; };
-		66C7E9402CB104F900173C44 /* BrushEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C7E93E2CB104F900173C44 /* BrushEngineTests.swift */; };
+		66C7E9402CB104F900173C44 /* BrushStrokeEngineInputQueueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C7E93E2CB104F900173C44 /* BrushStrokeEngineInputQueueTests.swift */; };
 		66C8D5912C767C910013B999 /* AnimEditorBrushStrokeAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C8D5902C767C910013B999 /* AnimEditorBrushStrokeAdapter.swift */; };
 		66CE19012C1BA8BC0078AA68 /* RenderCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66CE19002C1BA8BC0078AA68 /* RenderCacheManager.swift */; };
 		66D0843D2BA3840C00EB8556 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0843C2BA3840C00EB8556 /* AppDelegate.swift */; };
@@ -155,6 +155,7 @@
 		66E3E4382C7ADEC90086D388 /* AnimEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E3E4372C7ADEC90086D388 /* AnimEditorView.swift */; };
 		66E3E43C2C7AE24B0086D388 /* AnimEditorToolContainerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E3E43B2C7AE24B0086D388 /* AnimEditorToolContainerVC.swift */; };
 		66E523562BD37D8B00794751 /* MetalLayerTextureRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E523552BD37D8B00794751 /* MetalLayerTextureRenderer.swift */; };
+		66F09D592CB63BDE00FF5BAC /* BrushStrokeEngineGapFillProcessorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F09D582CB63BDE00FF5BAC /* BrushStrokeEngineGapFillProcessorTests.swift */; };
 		66F138322C4854350078BFDA /* SceneEditorContentVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F138312C4854350078BFDA /* SceneEditorContentVC.swift */; };
 		66FE7A2C2C21035D00464A82 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FE7A2B2C21035D00464A82 /* Data.swift */; };
 		66FE7A2E2C25E05100464A82 /* Sequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FE7A2D2C25E05100464A82 /* Sequence.swift */; };
@@ -273,7 +274,7 @@
 		66789AC82C332D710020EACE /* IDGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IDGenerator.swift; sourceTree = "<group>"; };
 		6678A9BD2C8131E700838EA3 /* AnimFrameEditorEraseToolState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimFrameEditorEraseToolState.swift; sourceTree = "<group>"; };
 		6678EA9F2CACE9D600767021 /* LuxAnimateTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LuxAnimateTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		6678EAA82CACF66800767021 /* BrushStrokeEngineResampleProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrushStrokeEngineResampleProcessor.swift; sourceTree = "<group>"; };
+		6678EAA82CACF66800767021 /* BrushStrokeEngineGapFillProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrushStrokeEngineGapFillProcessor.swift; sourceTree = "<group>"; };
 		667BF74A2BA655CB003E3430 /* FileHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileHelper.swift; sourceTree = "<group>"; };
 		668A14CB2C7D1E2000D73D36 /* AnimEditorEraseToolControlsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorEraseToolControlsVC.swift; sourceTree = "<group>"; };
 		668A14D62C7D3EBE00D73D36 /* AnimFrameEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimFrameEditor.swift; sourceTree = "<group>"; };
@@ -296,7 +297,7 @@
 		66BC14CA2C89105700749C7A /* AnimFrameEditorHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimFrameEditorHelper.swift; sourceTree = "<group>"; };
 		66BC14CE2C8924E300749C7A /* AnimFrameEditorWorkspaceSceneGraphGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimFrameEditorWorkspaceSceneGraphGenerator.swift; sourceTree = "<group>"; };
 		66BD7A322C8FB5E500A91913 /* DrawingAssetProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingAssetProcessor.swift; sourceTree = "<group>"; };
-		66C7E93E2CB104F900173C44 /* BrushEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrushEngineTests.swift; sourceTree = "<group>"; };
+		66C7E93E2CB104F900173C44 /* BrushStrokeEngineInputQueueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrushStrokeEngineInputQueueTests.swift; sourceTree = "<group>"; };
 		66C8D5902C767C910013B999 /* AnimEditorBrushStrokeAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorBrushStrokeAdapter.swift; sourceTree = "<group>"; };
 		66CE19002C1BA8BC0078AA68 /* RenderCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderCacheManager.swift; sourceTree = "<group>"; };
 		66D084392BA3840C00EB8556 /* LuxAnimate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LuxAnimate.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -325,6 +326,7 @@
 		66E3E4372C7ADEC90086D388 /* AnimEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorView.swift; sourceTree = "<group>"; };
 		66E3E43B2C7AE24B0086D388 /* AnimEditorToolContainerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorToolContainerVC.swift; sourceTree = "<group>"; };
 		66E523552BD37D8B00794751 /* MetalLayerTextureRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalLayerTextureRenderer.swift; sourceTree = "<group>"; };
+		66F09D582CB63BDE00FF5BAC /* BrushStrokeEngineGapFillProcessorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrushStrokeEngineGapFillProcessorTests.swift; sourceTree = "<group>"; };
 		66F138312C4854350078BFDA /* SceneEditorContentVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneEditorContentVC.swift; sourceTree = "<group>"; };
 		66FE7A2B2C21035D00464A82 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
 		66FE7A2D2C25E05100464A82 /* Sequence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sequence.swift; sourceTree = "<group>"; };
@@ -681,7 +683,7 @@
 			children = (
 				664C3A672CA763B500AEAC90 /* BrushStrokeEngine2.swift */,
 				664C3A6F2CA76AEA00AEAC90 /* BrushStrokeEngineInputQueue.swift */,
-				6678EAA82CACF66800767021 /* BrushStrokeEngineResampleProcessor.swift */,
+				6678EAA82CACF66800767021 /* BrushStrokeEngineGapFillProcessor.swift */,
 			);
 			path = "Stroke Engine";
 			sourceTree = "<group>";
@@ -934,7 +936,7 @@
 		66C7E93F2CB104F900173C44 /* LuxAnimateTests */ = {
 			isa = PBXGroup;
 			children = (
-				66C7E93E2CB104F900173C44 /* BrushEngineTests.swift */,
+				66F09D572CB63BC600FF5BAC /* Brush Engine */,
 			);
 			path = LuxAnimateTests;
 			sourceTree = "<group>";
@@ -1111,6 +1113,15 @@
 			path = Library;
 			sourceTree = "<group>";
 		};
+		66F09D572CB63BC600FF5BAC /* Brush Engine */ = {
+			isa = PBXGroup;
+			children = (
+				66C7E93E2CB104F900173C44 /* BrushStrokeEngineInputQueueTests.swift */,
+				66F09D582CB63BDE00FF5BAC /* BrushStrokeEngineGapFillProcessorTests.swift */,
+			);
+			path = "Brush Engine";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1219,7 +1230,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				66C7E9402CB104F900173C44 /* BrushEngineTests.swift in Sources */,
+				66C7E9402CB104F900173C44 /* BrushStrokeEngineInputQueueTests.swift in Sources */,
+				66F09D592CB63BDE00FF5BAC /* BrushStrokeEngineGapFillProcessorTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1277,7 +1289,7 @@
 				668A14D92C7D7BCD00D73D36 /* AnimEditorToolState.swift in Sources */,
 				66AD3A8C2BEC900C002B294A /* MultiFingerTapGestureRecognizer.swift in Sources */,
 				664C28272C758B99002166D6 /* EditorWorkspaceTransform.swift in Sources */,
-				6678EAA92CACF66800767021 /* BrushStrokeEngineResampleProcessor.swift in Sources */,
+				6678EAA92CACF66800767021 /* BrushStrokeEngineGapFillProcessor.swift in Sources */,
 				66637A962CA23E3D00EA88ED /* BrushGestureRecognizer+State.swift in Sources */,
 				662232712BE1B79300C8813F /* AnimEditorToolSidebarSlider.swift in Sources */,
 				664C28232C755402002166D6 /* EditorWorkspaceOverlayView.swift in Sources */,

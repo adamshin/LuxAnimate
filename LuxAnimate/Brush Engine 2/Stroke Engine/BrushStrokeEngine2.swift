@@ -47,6 +47,8 @@ extension BrushStrokeEngine2 {
         var azimuth: Vector
         
         var isFinalized: Bool
+        
+        // TODO: Index?
     }
     
     struct Stamp {

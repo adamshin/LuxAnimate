@@ -1,5 +1,5 @@
 //
-//  BrushEngineTests.swift
+//  BrushStrokeEngineInputQueueTests.swift
 //
 
 import Testing
@@ -27,9 +27,9 @@ private func createInputSample(
         isAzimuthEstimated: false)
 }
 
-struct BrushEngineTests {
+struct BrushStrokeEngineInputQueueTests {
 
-    @Test func testInputQueue1() throws {
+    @Test func test1() throws {
         let queue = BrushStrokeEngineInputQueue()
         
         queue.handleInputUpdate(
@@ -46,7 +46,7 @@ struct BrushEngineTests {
         try #require(output2.count == 0)
     }
     
-    @Test func testInputQueue2() throws {
+    @Test func test2() throws {
         let queue = BrushStrokeEngineInputQueue()
         
         queue.handleInputUpdate(
@@ -82,7 +82,7 @@ struct BrushEngineTests {
         try #require(output3.allSatisfy { !$0.isFinalized })
     }
     
-    @Test func testInputQueue3() throws {
+    @Test func test3() throws {
         let queue = BrushStrokeEngineInputQueue()
         
         queue.handleInputUpdate(
@@ -159,7 +159,7 @@ struct BrushEngineTests {
         try #require(output5.allSatisfy { !$0.isFinalized })
     }
     
-    @Test func testInputQueue4() throws {
+    @Test func test4() throws {
         let queue = BrushStrokeEngineInputQueue()
         
         let maxCount = BrushStrokeEngineInputQueue.maxInputSampleCount

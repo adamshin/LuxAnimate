@@ -1,0 +1,141 @@
+//
+//  BrushStrokeEngineGapFillProcessorTests.swift
+//
+
+import Testing
+import Foundation
+
+@testable import LuxAnimate
+
+private func createSample(
+    timeOffset: TimeInterval,
+    isFinalized: Bool
+) -> BrushStrokeEngine2.Sample {
+    
+    BrushStrokeEngine2.Sample(
+        timeOffset: timeOffset,
+        position: .zero,
+        pressure: 0,
+        altitude: 0,
+        azimuth: .zero,
+        isFinalized: isFinalized)
+}
+
+struct BrushStrokeEngineGapFillProcessorTests {
+
+    @Test func test1() throws {
+        let step = BrushStrokeEngineGapFillProcessor.fillTimeInterval
+        let p = BrushStrokeEngineGapFillProcessor()
+        
+        let input1 = (0..<5).map {
+            createSample(
+                timeOffset: Double($0) * step,
+                isFinalized: true)
+        }
+        let output1 = p.process(input: input1)
+        try #require(output1.count == 5)
+        try #require(output1.allSatisfy { $0.isFinalized })
+        
+        let output2 = p.process(input: [])
+        try #require(output2.count == 0)
+        
+        let input3 = (0..<10).map {
+            createSample(
+                timeOffset: Double($0) * step,
+                isFinalized: $0 < 3)
+        }
+        let output3 = p.process(input: input3)
+        try #require(output3.count == 10)
+        try #require(output3[0..<3].allSatisfy { $0.isFinalized })
+        try #require(output3[3..<10].allSatisfy { !$0.isFinalized })
+    }
+    
+    @Test func test2() throws {
+        let step1 =
+            BrushStrokeEngineGapFillProcessor.fillTimeInterval
+            * 1.4
+        
+        let step2 =
+            BrushStrokeEngineGapFillProcessor.fillTimeInterval
+            * 1.6
+        
+        let p = BrushStrokeEngineGapFillProcessor()
+        
+        let input1 = (0..<5).map {
+            createSample(
+                timeOffset: Double($0) * step1,
+                isFinalized: true)
+        }
+        let output1 = p.process(input: input1)
+        try #require(output1.count == 5)
+        
+        let input2 = (0..<5).map {
+            createSample(
+                timeOffset: Double($0) * step2,
+                isFinalized: true)
+        }
+        let output2 = p.process(input: input2)
+        try #require(output2.count == 9)
+    }
+    
+    @Test func test3() throws {
+        let step = BrushStrokeEngineGapFillProcessor.fillTimeInterval
+        
+        let p1 = BrushStrokeEngineGapFillProcessor()
+        let output1 = p1.process(input: [])
+        try #require(output1.count == 0)
+        
+        let p2 = BrushStrokeEngineGapFillProcessor()
+        let input2 = (0..<1).map {
+            createSample(
+                timeOffset: Double($0) * step,
+                isFinalized: true)
+        }
+        let output2 = p2.process(input: input2)
+        try #require(output2.count == 1)
+        
+        let p3 = BrushStrokeEngineGapFillProcessor()
+        let input3 = (0..<2).map {
+            createSample(
+                timeOffset: Double($0) * step,
+                isFinalized: true)
+        }
+        let output3 = p3.process(input: input3)
+        try #require(output3.count == 2)
+    }
+    
+    @Test func test4() throws {
+        let step = BrushStrokeEngineGapFillProcessor.fillTimeInterval
+        let p = BrushStrokeEngineGapFillProcessor()
+        
+        let input1 = [
+            createSample(timeOffset: 0*step, isFinalized: true),
+            createSample(timeOffset: 1*step, isFinalized: true),
+            createSample(timeOffset: 4*step, isFinalized: true),
+        ]
+        let output1 = p.process(input: input1)
+        try #require(output1.count == 5)
+        try #require(output1.allSatisfy { $0.isFinalized })
+        
+        let input2 = [
+            createSample(timeOffset: 0*step, isFinalized: true),
+            createSample(timeOffset: 1*step, isFinalized: true),
+            createSample(timeOffset: 4*step, isFinalized: false),
+        ]
+        let output2 = p.process(input: input2)
+        try #require(output2.count == 5)
+        try #require(output2[0..<2].allSatisfy { $0.isFinalized })
+        try #require(output2[2..<4].allSatisfy { !$0.isFinalized })
+        
+        let input3 = [
+            createSample(timeOffset: 0*step, isFinalized: true),
+            createSample(timeOffset: 1*step, isFinalized: false),
+            createSample(timeOffset: 4*step, isFinalized: false),
+        ]
+        let output3 = p.process(input: input3)
+        try #require(output3.count == 5)
+        try #require(output3[0..<1].allSatisfy { $0.isFinalized })
+        try #require(output3[1..<4].allSatisfy { !$0.isFinalized })
+    }
+    
+}
