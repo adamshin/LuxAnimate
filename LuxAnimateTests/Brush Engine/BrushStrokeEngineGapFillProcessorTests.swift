@@ -111,31 +111,47 @@ struct BrushStrokeEngineGapFillProcessorTests {
         let input1 = [
             createSample(timeOffset: 0*step, isFinalized: true),
             createSample(timeOffset: 1*step, isFinalized: true),
-            createSample(timeOffset: 4*step, isFinalized: true),
+            createSample(timeOffset: 9*step, isFinalized: true),
         ]
         let output1 = p.process(input: input1)
-        try #require(output1.count == 5)
+        try #require(output1.count == 10)
         try #require(output1.allSatisfy { $0.isFinalized })
         
         let input2 = [
-            createSample(timeOffset: 0*step, isFinalized: true),
-            createSample(timeOffset: 1*step, isFinalized: true),
-            createSample(timeOffset: 4*step, isFinalized: false),
+            createSample(timeOffset: 10*step, isFinalized: true),
+            createSample(timeOffset: 15*step, isFinalized: true),
+            createSample(timeOffset: 19*step, isFinalized: false),
         ]
         let output2 = p.process(input: input2)
-        try #require(output2.count == 5)
-        try #require(output2[0..<2].allSatisfy { $0.isFinalized })
-        try #require(output2[2..<4].allSatisfy { !$0.isFinalized })
+        try #require(output2.count == 10)
+        try #require(output2[0..<6].allSatisfy { $0.isFinalized })
+        try #require(output2[6..<10].allSatisfy { !$0.isFinalized })
         
         let input3 = [
-            createSample(timeOffset: 0*step, isFinalized: true),
-            createSample(timeOffset: 1*step, isFinalized: false),
-            createSample(timeOffset: 4*step, isFinalized: false),
+            createSample(timeOffset: 20*step, isFinalized: true),
+            createSample(timeOffset: 21*step, isFinalized: false),
+            createSample(timeOffset: 25*step, isFinalized: false),
         ]
         let output3 = p.process(input: input3)
-        try #require(output3.count == 5)
-        try #require(output3[0..<1].allSatisfy { $0.isFinalized })
-        try #require(output3[1..<4].allSatisfy { !$0.isFinalized })
+        try #require(output3.count == 10)
+        try #require(output3[0..<5].allSatisfy { $0.isFinalized })
+        try #require(output3[5..<10].allSatisfy { !$0.isFinalized })
+        
+        let input4 = [
+            createSample(timeOffset: 30*step, isFinalized: true),
+            createSample(timeOffset: 35*step, isFinalized: false),
+        ]
+        let output4 = p.process(input: input4)
+        try #require(output4.count == 15)
+        try #require(output4[0..<10].allSatisfy { $0.isFinalized })
+        try #require(output4[10..<15].allSatisfy { !$0.isFinalized })
+        
+        let input5 = [
+            createSample(timeOffset: 35*step, isFinalized: true),
+        ]
+        let output5 = p.process(input: input5)
+        try #require(output5.count == 5)
+        try #require(output5.allSatisfy { $0.isFinalized })
     }
     
 }
