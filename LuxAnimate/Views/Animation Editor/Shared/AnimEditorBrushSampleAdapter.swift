@@ -34,6 +34,7 @@ struct AnimEditorBrushSampleAdapter {
         
         return BrushEngine2.InputSample(
             isPredicted: s.isPredicted,
+            updateID: s.updateID,
             timeOffset: s.timeOffset,
             position: position,
             pressure: pressure,

@@ -6,7 +6,7 @@ import Foundation
 
 class BrushStrokeEngineInputQueue {
     
-    static let maxInputSampleCount = 100
+    static let maxInputSampleCount = 50
     
     private var inputSamples:
         [BrushEngine2.InputSample] = []
@@ -25,26 +25,30 @@ class BrushStrokeEngineInputQueue {
     func handleInputUpdate(
         sampleUpdates: [BrushEngine2.InputSampleUpdate]
     ) {
-        for update in sampleUpdates {
+        for u in sampleUpdates {
             if let index = inputSamples.firstIndex(
-                where: { $0.updateID == update.updateID })
+                where: { $0.updateID == u.updateID })
             {
-                var sample = inputSamples[index]
+                var s = inputSamples[index]
                 
-                if let pressure = update.pressure {
-                    sample.pressure = pressure
-                    sample.isPressureEstimated = false
+                if let pressure = u.pressure {
+                    s.pressure = pressure
+                    s.isPressureEstimated = false
                 }
-                if let altitude = update.altitude {
-                    sample.altitude = altitude
-                    sample.isAltitudeEstimated = false
+                if let altitude = u.altitude {
+                    s.altitude = altitude
+                    s.isAltitudeEstimated = false
                 }
-                if let pressure = update.pressure {
-                    sample.pressure = pressure
-                    sample.isPressureEstimated = false
+                if let azimuth = u.azimuth {
+                    s.azimuth = azimuth
+                    s.isAzimuthEstimated = false
+                }
+                if let roll = u.roll {
+                    s.roll = roll
+                    s.isRollEstimated = false
                 }
                 
-                inputSamples[index] = sample
+                inputSamples[index] = s
             }
         }
     }
