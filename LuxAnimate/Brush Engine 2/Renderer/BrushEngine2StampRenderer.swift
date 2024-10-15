@@ -1,40 +1,35 @@
 //
-//  BrushEngineStampRenderer.swift
+//  BrushEngine2StampRenderer.swift
 //
 
 import Metal
 
 private let paddingSizeThreshold: Double = 20
 
-struct BrushEngineStampRenderer {
+struct BrushEngine2StampRenderer {
     
     private let spriteRenderer = SpriteRenderer()
     
     func drawStamps(
         target: MTLTexture,
         viewportSize: Size,
-        stamps: [BrushStrokeEngine.Stamp],
-        startIndex: Int,
-        endIndex: Int,
-        brush: Brush,
-        color: Color
-    ) { 
-        let stampsToDraw = stamps[startIndex ..< endIndex]
-        
-        let sprites = stampsToDraw.map { stamp in
-            let offsetPosition = stamp.position
-                + stamp.offset * stamp.size
+        stamps: any Sequence<BrushStrokeEngine2.Stamp>,
+        brush: Brush
+    ) {
+        let sprites = stamps.map { s in
+            let offsetPosition =
+                s.position + s.offset * s.size
             
             let paddingScale: Double =
-                stamp.size < paddingSizeThreshold ?
+                s.size < paddingSizeThreshold ?
                 3 : 1
             
             return SpriteRenderer.Sprite(
                 position: offsetPosition,
-                size: Size(stamp.size, stamp.size),
-                rotation: stamp.rotation,
-                color: color,
-                alpha: stamp.alpha,
+                size: Size(s.size, s.size),
+                rotation: s.rotation,
+                color: s.color,
+                alpha: s.alpha,
                 paddingScale: paddingScale)
         }
         

@@ -10,7 +10,7 @@ extension BrushEngine2 {
     @MainActor
     protocol Delegate: AnyObject {
         
-        func onUpdateActiveCanvasTexture(
+        func onUpdateCanvasTexture(
             _ e: BrushEngine2)
         
         func onFinalizeStroke(
@@ -31,9 +31,9 @@ class BrushEngine2 {
     
     weak var delegate: Delegate?
     
-    private let canvasTexture: MTLTexture
+    private let baseCanvasTexture: MTLTexture
     
-//    private let renderer: BrushEngineRenderer
+    private let renderer: BrushEngine2Renderer
 //    private let strokeRenderer: BrushEngineStrokeRenderer
     
     private var strokeEngine: BrushStrokeEngine2?
@@ -44,14 +44,14 @@ class BrushEngine2 {
         canvasSize: PixelSize,
         brushMode: BrushEngine2.BrushMode
     ) {
-        canvasTexture = try! TextureCreator
+        baseCanvasTexture = try! TextureCreator
             .createEmptyTexture(
                 size: canvasSize,
                 mipMapped: false)
         
-//        renderer = BrushEngineRenderer(
-//            canvasSize: canvasSize,
-//            brushMode: brushMode)
+        renderer = BrushEngine2Renderer(
+            canvasSize: canvasSize,
+            brushMode: brushMode)
         
 //        strokeRenderer = BrushEngineStrokeRenderer(
 //            canvasSize: canvasSize)
@@ -61,24 +61,25 @@ class BrushEngine2 {
     
     private func draw() {
 //        renderer.draw(
-//            baseCanvasTexture: canvasTexture,
+//            baseCanvasTexture: baseCanvasTexture,
 //            strokeTexture: strokeRenderer.fullStrokeTexture)
     }
     
     // MARK: - Interface
     
-//    func setCanvasTexture(_ texture: MTLTexture) {
-//        endStroke()
-//        
-//        try? TextureBlitter.blit(
-//            from: texture,
-//            to: canvasTexture)
-//        draw()
-//    }
+    func setCanvasTexture(_ texture: MTLTexture) {
+        endStroke()
+        
+        try? TextureBlitter.blit(
+            from: texture,
+            to: baseCanvasTexture)
+        
+        draw()
+    }
     
-//    var activeCanvasTexture: MTLTexture {
-//        renderer.renderTarget
-//    }
+    var canvasTexture: MTLTexture {
+        renderer.renderTarget
+    }
     
     func beginStroke(
         brush: Brush,

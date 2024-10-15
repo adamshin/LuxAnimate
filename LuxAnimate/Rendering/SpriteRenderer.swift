@@ -12,6 +12,7 @@ struct SpriteRenderer {
         var size: Size
         var anchor: Vector
         var transform: Matrix3
+        var color: Color
         var alpha: Double
         var paddingScale: Double
         
@@ -20,6 +21,7 @@ struct SpriteRenderer {
             size: Size,
             anchor: Vector = .init(0.5, 0.5),
             transform: Matrix3,
+            color: Color = .white,
             alpha: Double = 1,
             paddingScale: Double = 1
         ) {
@@ -27,6 +29,7 @@ struct SpriteRenderer {
             self.size = size
             self.anchor = anchor
             self.transform = transform
+            self.color = color
             self.alpha = alpha
             self.paddingScale = paddingScale
         }
@@ -37,12 +40,14 @@ struct SpriteRenderer {
             anchor: Vector = .init(0.5, 0.5),
             rotation: Scalar = 0,
             scale: Scalar = 1,
+            color: Color = .white,
             alpha: Double = 1,
             paddingScale: Double = 1
         ) {
             self.position = position
             self.size = size
             self.anchor = anchor
+            self.color = color
             self.alpha = alpha
             self.paddingScale = paddingScale
             
@@ -85,8 +90,7 @@ struct SpriteRenderer {
         sprites: [Sprite],
         blendMode: BlendMode = .normal,
         sampleMode: SampleMode = .linear,
-        colorMode: ColorMode = .none,
-        color: Color = .white
+        colorMode: ColorMode = .none
     ) {
         guard !sprites.isEmpty else { return }
         
@@ -130,7 +134,7 @@ struct SpriteRenderer {
                 return SpriteVertex(
                     position: tp,
                     texCoord: p,
-                    color: color,
+                    color: s.color,
                     alpha: s.alpha)
             }
             vertices += spriteVertices

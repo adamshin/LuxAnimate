@@ -98,11 +98,11 @@ struct EditorWorkspaceRenderer {
                     position: .zero,
                     size: layer.contentSize,
                     transform: transform,
+                    color: content.color,
                     alpha: layer.alpha)
             ],
             sampleMode: sampleMode,
-            colorMode: content.colorMode,
-            color: content.color)
+            colorMode: content.colorMode)
     }
     
     private func drawRectLayer(
@@ -125,10 +125,10 @@ struct EditorWorkspaceRenderer {
                     position: .zero,
                     size: layer.contentSize,
                     transform: transform,
+                    color: content.color,
                     alpha: layer.alpha)
             ],
-            colorMode: .stencil,
-            color: content.color)
+            colorMode: .stencil)
     }
     
 }

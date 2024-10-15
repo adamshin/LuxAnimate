@@ -4,6 +4,8 @@
 
 import Foundation
 
+// MARK: - Structs
+
 extension BrushStrokeEngine2 {
     
     struct InputSample {
@@ -56,6 +58,7 @@ extension BrushStrokeEngine2 {
         var size: Double
         var rotation: Double
         var alpha: Double
+        var color: Color
         
         var offset: Vector
         var strokeDistance: Double
@@ -63,7 +66,14 @@ extension BrushStrokeEngine2 {
         var isFinalized: Bool
     }
     
+    struct ProcessOutput {
+        var brush: Brush
+        var stamps: [Stamp]
+    }
+    
 }
+
+// MARK: - BrushStrokeEngine2
 
 class BrushStrokeEngine2 {
     
@@ -72,6 +82,8 @@ class BrushStrokeEngine2 {
     private let quickTap: Bool
     
     private let inputQueue = BrushStrokeEngineInputQueue()
+    private let gapFillProcessor = BrushStrokeEngineGapFillProcessor()
+    private let stampProcessor: BrushStrokeEngineStampProcessor
     
     init(
         brush: Brush,
@@ -83,31 +95,34 @@ class BrushStrokeEngine2 {
         self.brush = brush
         self.color = color
         self.quickTap = quickTap
+        
+        stampProcessor = .init(color: color)
     }
     
     func update(
-        addedSamples: [Int],
-        predictedSamples: [Int]
+        addedSamples: [InputSample],
+        predictedSamples: [InputSample]
     ) {
-        // TODO: Put new samples in state input queue
+        inputQueue.handleInputUpdate(
+            addedSamples: addedSamples,
+            predictedSamples: predictedSamples)
     }
     
     func update(
-        sampleUpdates: [Int]
+        sampleUpdates: [InputSampleUpdate]
     ) {
-        // TODO: Update existing samples in state input queue
+        inputQueue.handleInputUpdate(
+            sampleUpdates: sampleUpdates)
     }
     
-    func process() {
-        // Pull samples from input queue one by one.
+    func process() -> ProcessOutput {
+        let s1 = inputQueue.process()
+        let s2 = gapFillProcessor.process(input: s1)
+        let s3 = stampProcessor.process(input: s2)
         
-        // Feed them through the processors.
-        
-        // Take a state snapshot at the last point before
-        // we get unfinalized output stamps. Restart from
-        // this point next time.
-        
-        // Collect the output. Return it.
+        return ProcessOutput(
+            brush: brush,
+            stamps: s3)
     }
     
 }

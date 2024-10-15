@@ -68,8 +68,15 @@ class BrushStrokeEngineGapFillProcessor {
                 
             } else {
                 // TODO: Fill forwards till current time.
-                // Back off by one or two time intervals, to make sure
-                // we don't overrun real future data.
+                // Back off by one or two time intervals,
+                // to make sure we don't overrun real
+                // future data.
+                
+                // Maybe we can do this by taking a time
+                // sample when process is called. Then
+                // comparing in subsequent calls. I need to
+                // think this through.
+                
                 break
             }
         }

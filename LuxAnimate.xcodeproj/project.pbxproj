@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		66093E632CBEDC97006A00F4 /* BrushStrokeEngineStampProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66093E622CBEDC97006A00F4 /* BrushStrokeEngineStampProcessor.swift */; };
 		66099BA72BDB195500243D9F /* CircleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66099BA62BDB195500243D9F /* CircleView.swift */; };
 		66099BAB2BDB1D8F00243D9F /* ClearColorRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66099BAA2BDB1D8F00243D9F /* ClearColorRenderer.swift */; };
 		66099BBC2BDB32F500243D9F /* BrushStrokeEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66099BAF2BDB32F500243D9F /* BrushStrokeEngine.swift */; };
@@ -116,6 +117,9 @@
 		66A59EAA2C8B973900CF553E /* SceneRenderManifestGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A59EA92C8B973900CF553E /* SceneRenderManifestGenerator.swift */; };
 		66A653042C209DFB0060A216 /* XXHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A653032C209DFB0060A216 /* XXHash.swift */; };
 		66A653062C20AFE70060A216 /* xxhash.c in Sources */ = {isa = PBXBuildFile; fileRef = 66A653052C20AFE70060A216 /* xxhash.c */; };
+		66AD38972CB745DD005CC3FC /* BrushEngine2Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66AD38962CB745DD005CC3FC /* BrushEngine2Renderer.swift */; };
+		66AD38992CB74802005CC3FC /* BrushEngine2StrokeRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66AD38982CB74802005CC3FC /* BrushEngine2StrokeRenderer.swift */; };
+		66AD389B2CB7480B005CC3FC /* BrushEngine2StampRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66AD389A2CB7480B005CC3FC /* BrushEngine2StampRenderer.swift */; };
 		66AD3A8A2BEC46BD002B294A /* AnimEditorToolSidebarSliderContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66AD3A892BEC46BD002B294A /* AnimEditorToolSidebarSliderContainer.swift */; };
 		66AD3A8C2BEC900C002B294A /* MultiFingerTapGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66AD3A8B2BEC900C002B294A /* MultiFingerTapGestureRecognizer.swift */; };
 		66B2BE422BCB55FF0072AC1B /* SharedModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B2BE412BCB55FF0072AC1B /* SharedModels.swift */; };
@@ -172,6 +176,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		66093E622CBEDC97006A00F4 /* BrushStrokeEngineStampProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrushStrokeEngineStampProcessor.swift; sourceTree = "<group>"; };
 		66099BA62BDB195500243D9F /* CircleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CircleView.swift; sourceTree = "<group>"; };
 		66099BAA2BDB1D8F00243D9F /* ClearColorRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearColorRenderer.swift; sourceTree = "<group>"; };
 		66099BAF2BDB32F500243D9F /* BrushStrokeEngine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrushStrokeEngine.swift; sourceTree = "<group>"; };
@@ -285,6 +290,9 @@
 		66A653022C2099440060A216 /* xxhash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = xxhash.h; sourceTree = "<group>"; };
 		66A653032C209DFB0060A216 /* XXHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XXHash.swift; sourceTree = "<group>"; };
 		66A653052C20AFE70060A216 /* xxhash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = xxhash.c; sourceTree = "<group>"; };
+		66AD38962CB745DD005CC3FC /* BrushEngine2Renderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrushEngine2Renderer.swift; sourceTree = "<group>"; };
+		66AD38982CB74802005CC3FC /* BrushEngine2StrokeRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrushEngine2StrokeRenderer.swift; sourceTree = "<group>"; };
+		66AD389A2CB7480B005CC3FC /* BrushEngine2StampRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrushEngine2StampRenderer.swift; sourceTree = "<group>"; };
 		66AD3A892BEC46BD002B294A /* AnimEditorToolSidebarSliderContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorToolSidebarSliderContainer.swift; sourceTree = "<group>"; };
 		66AD3A8B2BEC900C002B294A /* MultiFingerTapGestureRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiFingerTapGestureRecognizer.swift; sourceTree = "<group>"; };
 		66B2BE412BCB55FF0072AC1B /* SharedModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedModels.swift; sourceTree = "<group>"; };
@@ -673,6 +681,7 @@
 			isa = PBXGroup;
 			children = (
 				664C3A662CA763A900AEAC90 /* Stroke Engine */,
+				66AD38952CB7456B005CC3FC /* Renderer */,
 				664C3A642CA7633900AEAC90 /* BrushEngine2.swift */,
 			);
 			path = "Brush Engine 2";
@@ -684,6 +693,7 @@
 				664C3A672CA763B500AEAC90 /* BrushStrokeEngine2.swift */,
 				664C3A6F2CA76AEA00AEAC90 /* BrushStrokeEngineInputQueue.swift */,
 				6678EAA82CACF66800767021 /* BrushStrokeEngineGapFillProcessor.swift */,
+				66093E622CBEDC97006A00F4 /* BrushStrokeEngineStampProcessor.swift */,
 			);
 			path = "Stroke Engine";
 			sourceTree = "<group>";
@@ -903,6 +913,16 @@
 				66A653052C20AFE70060A216 /* xxhash.c */,
 			);
 			path = XXHash;
+			sourceTree = "<group>";
+		};
+		66AD38952CB7456B005CC3FC /* Renderer */ = {
+			isa = PBXGroup;
+			children = (
+				66AD38962CB745DD005CC3FC /* BrushEngine2Renderer.swift */,
+				66AD38982CB74802005CC3FC /* BrushEngine2StrokeRenderer.swift */,
+				66AD389A2CB7480B005CC3FC /* BrushEngine2StampRenderer.swift */,
+			);
+			path = Renderer;
 			sourceTree = "<group>";
 		};
 		66BC01702C38A22200D2E2AD /* Project Editor */ = {
@@ -1299,6 +1319,7 @@
 				664175B52C7E557300205FEC /* AnimEditorPaintToolState.swift in Sources */,
 				66BC14C92C89086D00749C7A /* AnimFrameEditorEditingState.swift in Sources */,
 				661D9F672C943FB5008BB9E9 /* ConcurrencyLimiter.swift in Sources */,
+				66AD389B2CB7480B005CC3FC /* BrushEngine2StampRenderer.swift in Sources */,
 				66211E962BEF590F005490C4 /* AnimEditorTimelineToolbarFrameWidgetControlVC.swift in Sources */,
 				66D084712BA3CEC300EB8556 /* PassthroughView.swift in Sources */,
 				66A59EAA2C8B973900CF553E /* SceneRenderManifestGenerator.swift in Sources */,
@@ -1311,6 +1332,8 @@
 				6643CB082BE488800094B998 /* EditorMenuPositioningView.swift in Sources */,
 				661A24652C86974A0031FE82 /* FrameSceneGraph.swift in Sources */,
 				66D084842BA3FE2E00EB8556 /* LibraryContentVC.swift in Sources */,
+				66093E632CBEDC97006A00F4 /* BrushStrokeEngineStampProcessor.swift in Sources */,
+				66AD38972CB745DD005CC3FC /* BrushEngine2Renderer.swift in Sources */,
 				6651A9D72C9622E900E3520A /* AnimEditorTimelineToolbarVC.swift in Sources */,
 				664120532C7A727E00CF98B8 /* AnimEditorBrushToolControlsVC.swift in Sources */,
 				6643CAF52BE31CC00094B998 /* ChromeBlurView.swift in Sources */,
@@ -1341,6 +1364,7 @@
 				66BC01722C38A61100D2E2AD /* ProjectEditorVC.swift in Sources */,
 				66A59EA12C8A3F3400CF553E /* FrameRenderManifest.swift in Sources */,
 				66099BC72BDB33DF00243D9F /* TextureBlitter.swift in Sources */,
+				66AD38992CB74802005CC3FC /* BrushEngine2StrokeRenderer.swift in Sources */,
 				66311CDD2BD7403100D53489 /* SpriteRenderer.swift in Sources */,
 				661E9F332C9D392A00A75A2F /* AnimEditorOnionSkinConfig.swift in Sources */,
 				66099BBF2BDB32F500243D9F /* BrushStrokeSmoothingProcessor.swift in Sources */,
