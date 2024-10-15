@@ -5,6 +5,8 @@
 import Foundation
 import Metal
 
+// MARK: - Structs
+
 extension BrushEngine2 {
     
     @MainActor
@@ -28,18 +30,22 @@ extension BrushEngine2 {
         
         var timeOffset: TimeInterval
         var position: Vector
+        
         var pressure: Double
         var altitude: Double
-        var azimuth: Vector
+        var azimuth: Double
+        var roll: Double
         
         var isPressureEstimated: Bool
         var isAltitudeEstimated: Bool
         var isAzimuthEstimated: Bool
+        var isRollEstimated: Bool
         
         var hasEstimatedValues: Bool {
             isPressureEstimated ||
             isAltitudeEstimated ||
-            isAzimuthEstimated
+            isAzimuthEstimated ||
+            isRollEstimated
         }
         var isFinalized: Bool {
             !isPredicted && !hasEstimatedValues
@@ -51,7 +57,8 @@ extension BrushEngine2 {
         
         var pressure: Double?
         var altitude: Double?
-        var azimuth: Vector?
+        var azimuth: Double?
+        var roll: Double?
     }
     
     struct Sample {
@@ -60,7 +67,8 @@ extension BrushEngine2 {
         var position: Vector
         var pressure: Double
         var altitude: Double
-        var azimuth: Vector
+        var azimuth: Double
+        var roll: Double
         
         var isFinalized: Bool
         
@@ -81,6 +89,8 @@ extension BrushEngine2 {
     }
     
 }
+
+// MARK: - BrushEngine2
 
 @MainActor
 class BrushEngine2 {

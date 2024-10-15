@@ -32,11 +32,11 @@ class AnimFrameEditorPaintToolState: AnimFrameEditorToolState {
     }
     
     func drawingCanvasTexture() -> MTLTexture {
-        internalState.activeCanvasTexture
+        internalState.canvasTexture
     }
     
-    func setDrawingCanvasTexture(_ texture: MTLTexture) {
-        internalState.setCanvasTexture(texture)
+    func setDrawingCanvasTextureContents(_ texture: MTLTexture) {
+        internalState.setCanvasTextureContents(texture)
     }
     
 }
@@ -95,7 +95,7 @@ extension AnimFrameEditorPaintToolState:
         delegate?.layerTransform(self) ?? .identity
     }
     
-    func onUpdateActiveCanvasTexture(
+    func onUpdateCanvasTexture(
         _ s: AnimFrameEditorBrushToolInternalState
     ) { }
     
@@ -118,12 +118,23 @@ extension AnimFrameEditorPaintToolState: AnimEditorPaintToolStateDelegate {
         internalState.beginBrushStroke(quickTap: quickTap)
     }
     
-//    func onUpdateBrushStroke(
-//        _ s: AnimEditorPaintToolState,
-//        stroke: BrushGestureRecognizer.Stroke
-//    ) {
-//        internalState.updateBrushStroke(stroke: stroke)
-//    }
+    func onUpdateBrushStroke(
+        _ s: AnimEditorPaintToolState,
+        addedSamples: [BrushGestureRecognizer.Sample],
+        predictedSamples: [BrushGestureRecognizer.Sample]
+    ) {
+        internalState.updateBrushStroke(
+            addedSamples: addedSamples,
+            predictedSamples: predictedSamples)
+    }
+    
+    func onUpdateBrushStroke(
+        _ s: AnimEditorPaintToolState,
+        sampleUpdates: [BrushGestureRecognizer.SampleUpdate]
+    ) {
+        internalState.updateBrushStroke(
+            sampleUpdates: sampleUpdates)
+    }
 
     func onEndBrushStroke(
         _ s: AnimEditorPaintToolState

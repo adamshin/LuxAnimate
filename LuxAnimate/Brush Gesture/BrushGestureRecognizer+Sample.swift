@@ -20,19 +20,24 @@ extension BrushGestureRecognizer {
         
         var force: Double
         var altitude: Double
-        var azimuth: CGVector
+        var azimuth: Double
+        var roll: Double
         
         var isForceEstimated: Bool
         var isAltitudeEstimated: Bool
         var isAzimuthEstimated: Bool
+        var isRollEstimated: Bool
     }
     
     struct SampleUpdate {
         var updateID: Int
         
+        var maximumPossibleForce: Double
+        
         var force: Double?
         var altitude: Double?
-        var azimuth: CGVector?
+        var azimuth: Double?
+        var roll: Double?
     }
     
 }
@@ -82,7 +87,7 @@ extension BrushGestureRecognizer {
         view: UIView?,
         startTime: TimeInterval,
         isPredicted: Bool
-    ) -> BrushGestureRecognizer.Sample {
+    ) -> Sample {
         
         let timeOffset = touch.timestamp - startTime
         let updateID = touch.estimationUpdateIndex?.intValue
@@ -95,7 +100,8 @@ extension BrushGestureRecognizer {
             maximumPossibleForce: touch.maximumPossibleForce,
             force: touch.force,
             altitude: touch.altitudeAngle,
-            azimuth: touch.azimuthUnitVector(in: view),
+            azimuth: touch.azimuthAngle(in: view),
+            roll: touch.rollAngle,
             isForceEstimated: touch
                 .estimatedPropertiesExpectingUpdates
                 .contains(.force),
@@ -104,21 +110,25 @@ extension BrushGestureRecognizer {
                 .contains(.altitude),
             isAzimuthEstimated: touch
                 .estimatedPropertiesExpectingUpdates
-                .contains(.azimuth))
+                .contains(.azimuth),
+            isRollEstimated: touch
+                .estimatedPropertiesExpectingUpdates
+                .contains(.roll))
     }
     
     static func extractSampleUpdates(
         touches: Set<UITouch>,
         view: UIView?
-    ) -> [BrushGestureRecognizer.SampleUpdate] {
+    ) -> [SampleUpdate] {
         
         return touches.compactMap { touch in
             guard let updateID =
                 touch.estimationUpdateIndex?.intValue
             else { return nil }
             
-            var sampleUpdate = BrushGestureRecognizer
-                .SampleUpdate(updateID: updateID)
+            var sampleUpdate = SampleUpdate(
+                updateID: updateID,
+                maximumPossibleForce: touch.maximumPossibleForce)
             
             if !touch.estimatedPropertiesExpectingUpdates
                 .contains(.force)
@@ -133,8 +143,12 @@ extension BrushGestureRecognizer {
             if !touch.estimatedPropertiesExpectingUpdates
                 .contains(.azimuth)
             {
-                sampleUpdate.azimuth = touch
-                    .azimuthUnitVector(in: view)
+                sampleUpdate.azimuth = touch.azimuthAngle(in: view)
+            }
+            if !touch.estimatedPropertiesExpectingUpdates
+                .contains(.roll)
+            {
+                sampleUpdate.roll = touch.rollAngle
             }
             
             return sampleUpdate

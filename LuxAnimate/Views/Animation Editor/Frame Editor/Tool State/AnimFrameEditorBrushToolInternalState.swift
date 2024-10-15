@@ -40,7 +40,7 @@ protocol AnimFrameEditorBrushToolInternalStateDelegate: AnyObject {
         _ s: AnimFrameEditorBrushToolInternalState
     ) -> Matrix3
     
-    func onUpdateActiveCanvasTexture(
+    func onUpdateCanvasTexture(
         _ s: AnimFrameEditorBrushToolInternalState)
     
     func onEdit(
@@ -54,15 +54,15 @@ class AnimFrameEditorBrushToolInternalState {
     
     weak var delegate: AnimFrameEditorBrushToolInternalStateDelegate?
     
-    private let brushEngine: BrushEngine
+    private let brushEngine: BrushEngine2
     
     private let drawingAssetProcessor = DrawingAssetProcessor()
     
     init(
         canvasSize: PixelSize,
-        brushMode: BrushEngine.BrushMode
+        brushMode: BrushEngine2.BrushMode
     ) {
-        brushEngine = BrushEngine(
+        brushEngine = BrushEngine2(
             canvasSize: canvasSize,
             brushMode: brushMode)
         
@@ -73,12 +73,12 @@ class AnimFrameEditorBrushToolInternalState {
         brushEngine.onFrame()
     }
     
-    var activeCanvasTexture: MTLTexture {
-        brushEngine.activeCanvasTexture
+    var canvasTexture: MTLTexture {
+        brushEngine.canvasTexture
     }
     
-    func setCanvasTexture(_ texture: MTLTexture) {
-        brushEngine.setCanvasTexture(texture)
+    func setCanvasTextureContents(_ texture: MTLTexture) {
+        brushEngine.setCanvasTextureContents(texture)
     }
     
     func beginBrushStroke(quickTap: Bool) {
@@ -98,27 +98,48 @@ class AnimFrameEditorBrushToolInternalState {
             quickTap: quickTap)
     }
     
-    /*
     func updateBrushStroke(
-        stroke: BrushGestureRecognizer.Stroke
+        addedSamples: [BrushGestureRecognizer.Sample],
+        predictedSamples: [BrushGestureRecognizer.Sample]
     ) {
         guard let delegate else { return }
         
-        let workspaceViewSize = delegate.workspaceViewSize(self)
-        let workspaceTransform = delegate.workspaceTransform(self)
-        let layerContentSize = delegate.layerContentSize(self)
-        let layerTransform = delegate.layerTransform(self)
+        let adapter = AnimEditorBrushSampleAdapter(
+            workspaceViewSize: delegate.workspaceViewSize(self),
+            workspaceTransform: delegate.workspaceTransform(self),
+            layerContentSize: delegate.layerContentSize(self),
+            layerTransform: delegate.layerTransform(self))
         
-        let inputStroke = AnimEditorBrushStrokeAdapter.convert(
-            stroke: stroke,
-            workspaceViewSize: workspaceViewSize,
-            workspaceTransform: workspaceTransform,
-            layerContentSize: layerContentSize,
-            layerTransform: layerTransform)
+        let addedSamples = addedSamples.map {
+            adapter.convert(sample: $0)
+        }
+        let predictedSamples = predictedSamples.map {
+            adapter.convert(sample: $0)
+        }
         
-        brushEngine.updateStroke(inputStroke: inputStroke)
+        brushEngine.updateStroke(
+            addedSamples: addedSamples,
+            predictedSamples: predictedSamples)
     }
-     */
+    
+    func updateBrushStroke(
+        sampleUpdates: [BrushGestureRecognizer.SampleUpdate]
+    ) {
+        guard let delegate else { return }
+        
+        let adapter = AnimEditorBrushSampleAdapter(
+            workspaceViewSize: delegate.workspaceViewSize(self),
+            workspaceTransform: delegate.workspaceTransform(self),
+            layerContentSize: delegate.layerContentSize(self),
+            layerTransform: delegate.layerTransform(self))
+        
+        let sampleUpdates = sampleUpdates.map {
+            adapter.convert(sampleUpdate: $0)
+        }
+        
+        brushEngine.updateStroke(
+            sampleUpdates: sampleUpdates)
+    }
     
     func endBrushStroke() {
         brushEngine.endStroke()
@@ -132,20 +153,21 @@ class AnimFrameEditorBrushToolInternalState {
 
 // MARK: - Delegates
 
-extension AnimFrameEditorBrushToolInternalState: BrushEngineDelegate {
+extension AnimFrameEditorBrushToolInternalState:
+    BrushEngine2.Delegate {
     
-    func onUpdateActiveCanvasTexture(
-        _ e: BrushEngine
-    ) { 
-        delegate?.onUpdateActiveCanvasTexture(self)
+    func onUpdateCanvasTexture(
+        _ e: BrushEngine2
+    ) {
+        delegate?.onUpdateCanvasTexture(self)
     }
 
     func onFinalizeStroke(
-        _ e: BrushEngine,
+        _ e: BrushEngine2,
         canvasTexture: MTLTexture
     ) {
         do {
-            // TODO: Do this on a background queue
+            // TODO: Do this on a background queue?
             let texture = try TextureCopier
                 .copy(canvasTexture)
             

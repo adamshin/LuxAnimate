@@ -112,7 +112,7 @@ class AnimFrameEditorEditingState: AnimFrameEditorState {
                 self, assetID: fullAssetID)
             
             if let texture = activeDrawingAsset?.texture {
-                toolState?.setDrawingCanvasTexture(texture)
+                toolState?.setDrawingCanvasTextureContents(texture)
             }
         }
         

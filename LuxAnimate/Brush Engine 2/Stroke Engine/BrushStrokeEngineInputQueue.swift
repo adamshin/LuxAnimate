@@ -98,6 +98,7 @@ class BrushStrokeEngineInputQueue {
             pressure: s.pressure,
             altitude: s.altitude,
             azimuth: s.azimuth,
+            roll: s.roll,
             isFinalized: isFinalized)
     }
     
