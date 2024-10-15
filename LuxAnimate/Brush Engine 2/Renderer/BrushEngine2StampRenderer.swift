@@ -13,7 +13,7 @@ struct BrushEngine2StampRenderer {
     func drawStamps(
         target: MTLTexture,
         viewportSize: Size,
-        stamps: any Sequence<BrushStrokeEngine2.Stamp>,
+        stamps: any Sequence<BrushEngine2.Stamp>,
         brush: Brush
     ) {
         let sprites = stamps.map { s in

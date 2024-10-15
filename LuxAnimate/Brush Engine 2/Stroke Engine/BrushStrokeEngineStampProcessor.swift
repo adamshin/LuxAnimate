@@ -13,11 +13,11 @@ class BrushStrokeEngineStampProcessor {
     }
     
     func process(
-        input: [BrushStrokeEngine2.Sample]
-    ) -> [BrushStrokeEngine2.Stamp] {
+        input: [BrushEngine2.Sample]
+    ) -> [BrushEngine2.Stamp] {
         
         return input.map { s in
-            BrushStrokeEngine2.Stamp(
+            BrushEngine2.Stamp(
                 position: s.position,
                 size: 1,
                 rotation: 0,

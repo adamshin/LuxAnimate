@@ -9,19 +9,75 @@ extension BrushEngine2 {
     
     @MainActor
     protocol Delegate: AnyObject {
-        
         func onUpdateCanvasTexture(
             _ e: BrushEngine2)
         
         func onFinalizeStroke(
             _ e: BrushEngine2,
             canvasTexture: MTLTexture)
-        
     }
     
     enum BrushMode {
         case paint
         case erase
+    }
+    
+    struct InputSample {
+        var isPredicted: Bool
+        var updateID: Int?
+        
+        var timeOffset: TimeInterval
+        var position: Vector
+        var pressure: Double
+        var altitude: Double
+        var azimuth: Vector
+        
+        var isPressureEstimated: Bool
+        var isAltitudeEstimated: Bool
+        var isAzimuthEstimated: Bool
+        
+        var hasEstimatedValues: Bool {
+            isPressureEstimated ||
+            isAltitudeEstimated ||
+            isAzimuthEstimated
+        }
+        var isFinalized: Bool {
+            !isPredicted && !hasEstimatedValues
+        }
+    }
+    
+    struct InputSampleUpdate {
+        var updateID: Int
+        
+        var pressure: Double?
+        var altitude: Double?
+        var azimuth: Vector?
+    }
+    
+    struct Sample {
+        var timeOffset: TimeInterval
+        
+        var position: Vector
+        var pressure: Double
+        var altitude: Double
+        var azimuth: Vector
+        
+        var isFinalized: Bool
+        
+        // TODO: Index?
+    }
+    
+    struct Stamp {
+        var position: Vector
+        var size: Double
+        var rotation: Double
+        var alpha: Double
+        var color: Color
+        
+        var offset: Vector
+        var strokeDistance: Double
+        
+        var isFinalized: Bool
     }
     
 }
@@ -34,7 +90,7 @@ class BrushEngine2 {
     private let baseCanvasTexture: MTLTexture
     
     private let renderer: BrushEngine2Renderer
-//    private let strokeRenderer: BrushEngineStrokeRenderer
+    private let strokeRenderer: BrushEngine2StrokeRenderer // TODO: move to stroke engine?
     
     private var strokeEngine: BrushStrokeEngine2?
     
@@ -53,32 +109,26 @@ class BrushEngine2 {
             canvasSize: canvasSize,
             brushMode: brushMode)
         
-//        strokeRenderer = BrushEngineStrokeRenderer(
-//            canvasSize: canvasSize)
-    }
-    
-    // MARK: - Rendering
-    
-    private func draw() {
-//        renderer.draw(
-//            baseCanvasTexture: baseCanvasTexture,
-//            strokeTexture: strokeRenderer.fullStrokeTexture)
+        strokeRenderer = BrushEngine2StrokeRenderer(
+            canvasSize: canvasSize)
     }
     
     // MARK: - Interface
     
-    func setCanvasTexture(_ texture: MTLTexture) {
+    var canvasTexture: MTLTexture {
+        renderer.renderTarget
+    }
+    
+    func setCanvasTextureContents(_ texture: MTLTexture) {
         endStroke()
         
         try? TextureBlitter.blit(
             from: texture,
             to: baseCanvasTexture)
         
-        draw()
-    }
-    
-    var canvasTexture: MTLTexture {
-        renderer.renderTarget
+        renderer.draw(
+            baseCanvasTexture: baseCanvasTexture,
+            strokeTexture: nil)
     }
     
     func beginStroke(
@@ -97,57 +147,79 @@ class BrushEngine2 {
     }
     
     func updateStroke(
-        inputStroke: BrushStrokeEngine.InputStroke
+        addedSamples: [InputSample],
+        predictedSamples: [InputSample]
     ) {
-//        strokeEngine?.update(inputStroke: inputStroke)
+        strokeEngine?.update(
+            addedSamples: addedSamples,
+            predictedSamples: predictedSamples)
+    }
+    
+    func updateStroke(
+        sampleUpdates: [InputSampleUpdate]
+    ) {
+        strokeEngine?.update(
+            sampleUpdates: sampleUpdates)
     }
     
     func endStroke() {
-//        guard let strokeEngine else { return }
-//        
-//        strokeEngine.processInput()
-//        
-//        strokeRenderer.drawIncrementalStroke(
-//            stroke: strokeEngine.outputStroke)
-//        
-//        draw()
-//        
-//        try? TextureBlitter.blit(
-//            from: renderer.renderTarget,
-//            to: canvasTexture,
-//            waitUntilCompleted: true)
-//        
-//        strokeRenderer.clearStroke()
-//        draw()
-//        
-//        self.strokeEngine = nil
-//        
-//        delegate?.onUpdateActiveCanvasTexture(self)
-//        
-//        delegate?.onFinalizeStroke(self,
-//            canvasTexture: canvasTexture)
+        guard let strokeEngine else { return }
+        
+        let strokeProcessOutput = strokeEngine.process()
+        
+        strokeRenderer.drawIncrementalStroke(
+            brush: strokeProcessOutput.brush,
+            stamps: strokeProcessOutput.stamps)
+        
+        renderer.draw(
+            baseCanvasTexture: baseCanvasTexture,
+            strokeTexture: strokeRenderer.fullStrokeTexture)
+        
+        try? TextureBlitter.blit(
+            from: renderer.renderTarget,
+            to: baseCanvasTexture,
+            waitUntilCompleted: true)
+        
+        strokeRenderer.clearStroke()
+        
+        renderer.draw(
+            baseCanvasTexture: baseCanvasTexture,
+            strokeTexture: nil)
+        
+        self.strokeEngine = nil
+        
+        delegate?.onUpdateCanvasTexture(self)
+        
+        delegate?.onFinalizeStroke(self,
+            canvasTexture: baseCanvasTexture)
     }
     
     func cancelStroke() {
-//        strokeRenderer.clearStroke()
-//        draw()
-//        
-//        self.strokeEngine = nil
-//        
-//        delegate?.onUpdateActiveCanvasTexture(self)
+        strokeRenderer.clearStroke()
+        
+        renderer.draw(
+            baseCanvasTexture: baseCanvasTexture,
+            strokeTexture: nil)
+        
+        self.strokeEngine = nil
+        
+        delegate?.onUpdateCanvasTexture(self)
     }
     
     func onFrame() {
-//        guard let strokeEngine else { return }
-//        
-//        strokeEngine.processInput()
-//        
-//        strokeRenderer.drawIncrementalStroke(
-//            stroke: strokeEngine.outputStroke)
-//        
-//        draw()
-//        
-//        delegate?.onUpdateActiveCanvasTexture(self)
+        guard let strokeEngine else { return }
+        
+        let strokeProcessOutput = strokeEngine.process()
+        
+        strokeRenderer.drawIncrementalStroke(
+            brush: strokeProcessOutput.brush,
+            stamps: strokeProcessOutput.stamps)
+        
+        renderer.draw(
+            baseCanvasTexture: baseCanvasTexture,
+            strokeTexture: strokeRenderer.fullStrokeTexture)
+        
+        delegate?.onUpdateCanvasTexture(self)
     }
     
 }

@@ -55,7 +55,7 @@ class BrushEngine2StrokeRenderer {
     
     func drawIncrementalStroke(
         brush: Brush,
-        stamps: [BrushStrokeEngine2.Stamp]
+        stamps: [BrushEngine2.Stamp]
     ) {
         let finalizedPrefixCount = stamps
             .prefix { $0.isFinalized }
@@ -64,9 +64,16 @@ class BrushEngine2StrokeRenderer {
         let finalizedStamps = stamps[
             0 ..< finalizedPrefixCount
         ]
+        
         let nonFinalizedStamps = stamps[
             finalizedPrefixCount ..< stamps.count
-        ]
+        ].map {
+            var s = $0
+            if AppConfig.brushRenderDebug {
+                s.color = Color.debugRed
+            }
+            return s
+        }
         
         let viewportSize = Size(
             Scalar(canvasSize.width),
@@ -85,13 +92,7 @@ class BrushEngine2StrokeRenderer {
         stampRenderer.drawStamps(
             target: fullStrokeTexture,
             viewportSize: viewportSize,
-            stamps: nonFinalizedStamps.map {
-                var s = $0
-                if AppConfig.brushRenderDebug {
-                    s.color = Color.debugRed
-                }
-                return s
-            },
+            stamps: nonFinalizedStamps,
             brush: brush)
     }
     

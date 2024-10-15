@@ -9,23 +9,23 @@ class BrushStrokeEngineGapFillProcessor {
     static let fillTimeInterval: TimeInterval = 1/60
     
     struct State {
-        var inputQueue: [BrushStrokeEngine2.Sample] = []
+        var inputQueue: [BrushEngine2.Sample] = []
         
-        var cursorSample: BrushStrokeEngine2.Sample?
+        var cursorSample: BrushEngine2.Sample?
         var cursorTimeOffset: TimeInterval = 0
     }
     
     private var lastFinalizedState = State()
     
     func process(
-        input: [BrushStrokeEngine2.Sample]
-    ) -> [BrushStrokeEngine2.Sample] {
+        input: [BrushEngine2.Sample]
+    ) -> [BrushEngine2.Sample] {
         
         var state = lastFinalizedState
         state.inputQueue.removeAll { !$0.isFinalized }
         state.inputQueue += input
         
-        var output: [BrushStrokeEngine2.Sample] = []
+        var output: [BrushEngine2.Sample] = []
         
         while true {
             if output.allSatisfy({ $0.isFinalized }) {

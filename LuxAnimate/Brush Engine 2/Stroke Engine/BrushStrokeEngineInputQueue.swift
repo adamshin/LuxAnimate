@@ -9,21 +9,21 @@ class BrushStrokeEngineInputQueue {
     static let maxInputSampleCount = 100
     
     private var inputSamples:
-        [BrushStrokeEngine2.InputSample] = []
+        [BrushEngine2.InputSample] = []
     
     private var predictedInputSamples:
-        [BrushStrokeEngine2.InputSample] = []
+        [BrushEngine2.InputSample] = []
     
     func handleInputUpdate(
-        addedSamples: [BrushStrokeEngine2.InputSample],
-        predictedSamples: [BrushStrokeEngine2.InputSample]
+        addedSamples: [BrushEngine2.InputSample],
+        predictedSamples: [BrushEngine2.InputSample]
     ) {
         self.inputSamples += addedSamples
         self.predictedInputSamples = predictedSamples
     }
     
     func handleInputUpdate(
-        sampleUpdates: [BrushStrokeEngine2.InputSampleUpdate]
+        sampleUpdates: [BrushEngine2.InputSampleUpdate]
     ) {
         for update in sampleUpdates {
             if let index = inputSamples.firstIndex(
@@ -49,8 +49,8 @@ class BrushStrokeEngineInputQueue {
         }
     }
     
-    func process() -> [BrushStrokeEngine2.Sample] {
-        var output: [BrushStrokeEngine2.Sample] = []
+    func process() -> [BrushEngine2.Sample] {
+        var output: [BrushEngine2.Sample] = []
         
         let finalizedPrefixCount = inputSamples
             .prefix { $0.isFinalized }
@@ -88,11 +88,11 @@ class BrushStrokeEngineInputQueue {
     }
     
     private static func convert(
-        inputSample s: BrushStrokeEngine2.InputSample,
+        inputSample s: BrushEngine2.InputSample,
         isFinalized: Bool
-    ) -> BrushStrokeEngine2.Sample {
+    ) -> BrushEngine2.Sample {
         
-        BrushStrokeEngine2.Sample(
+        BrushEngine2.Sample(
             timeOffset: s.timeOffset,
             position: s.position,
             pressure: s.pressure,

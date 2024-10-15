@@ -8,67 +8,9 @@ import Foundation
 
 extension BrushStrokeEngine2 {
     
-    struct InputSample {
-        var isPredicted: Bool
-        var updateID: Int?
-        
-        var timeOffset: TimeInterval
-        var position: Vector
-        var pressure: Double
-        var altitude: Double
-        var azimuth: Vector
-        
-        var isPressureEstimated: Bool
-        var isAltitudeEstimated: Bool
-        var isAzimuthEstimated: Bool
-        
-        var hasEstimatedValues: Bool {
-            isPressureEstimated ||
-            isAltitudeEstimated ||
-            isAzimuthEstimated
-        }
-        var isFinalized: Bool {
-            !isPredicted && !hasEstimatedValues
-        }
-    }
-    
-    struct InputSampleUpdate {
-        var updateID: Int
-        
-        var pressure: Double?
-        var altitude: Double?
-        var azimuth: Vector?
-    }
-    
-    struct Sample {
-        var timeOffset: TimeInterval
-        
-        var position: Vector
-        var pressure: Double
-        var altitude: Double
-        var azimuth: Vector
-        
-        var isFinalized: Bool
-        
-        // TODO: Index?
-    }
-    
-    struct Stamp {
-        var position: Vector
-        var size: Double
-        var rotation: Double
-        var alpha: Double
-        var color: Color
-        
-        var offset: Vector
-        var strokeDistance: Double
-        
-        var isFinalized: Bool
-    }
-    
     struct ProcessOutput {
         var brush: Brush
-        var stamps: [Stamp]
+        var stamps: [BrushEngine2.Stamp]
     }
     
 }
@@ -100,8 +42,8 @@ class BrushStrokeEngine2 {
     }
     
     func update(
-        addedSamples: [InputSample],
-        predictedSamples: [InputSample]
+        addedSamples: [BrushEngine2.InputSample],
+        predictedSamples: [BrushEngine2.InputSample]
     ) {
         inputQueue.handleInputUpdate(
             addedSamples: addedSamples,
@@ -109,7 +51,7 @@ class BrushStrokeEngine2 {
     }
     
     func update(
-        sampleUpdates: [InputSampleUpdate]
+        sampleUpdates: [BrushEngine2.InputSampleUpdate]
     ) {
         inputQueue.handleInputUpdate(
             sampleUpdates: sampleUpdates)
