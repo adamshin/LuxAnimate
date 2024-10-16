@@ -22,6 +22,7 @@ class BrushStrokeEngine2 {
     private let brush: Brush
     private let color: Color
     private let quickTap: Bool
+    private let startTime: TimeInterval
     
     private let inputQueue = BrushStrokeEngineInputQueue()
     private let gapFillProcessor = BrushStrokeEngineGapFillProcessor()
@@ -32,11 +33,13 @@ class BrushStrokeEngine2 {
         color: Color,
         scale: Double,
         smoothing: Double,
-        quickTap: Bool
+        quickTap: Bool,
+        startTime: TimeInterval
     ) {
         self.brush = brush
         self.color = color
         self.quickTap = quickTap
+        self.startTime = startTime
         
         stampProcessor = .init(
             brush: brush,
@@ -61,8 +64,14 @@ class BrushStrokeEngine2 {
     }
     
     func process() -> ProcessOutput {
+        let currentTime = ProcessInfo.processInfo.systemUptime
+        let currentTimeOffset = currentTime - startTime
+        
         let s1 = inputQueue.process()
-        let s2 = gapFillProcessor.process(input: s1)
+        
+        let s2 = gapFillProcessor.process(
+            input: s1,
+            currentTimeOffset: currentTimeOffset)
         
         let stamps = stampProcessor.process(input: s2)
         

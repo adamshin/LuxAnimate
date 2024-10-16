@@ -146,14 +146,16 @@ class BrushEngine2 {
         color: Color,
         scale: Double,
         smoothing: Double,
-        quickTap: Bool
+        quickTap: Bool,
+        startTime: TimeInterval
     ) {
         strokeEngine = BrushStrokeEngine2(
             brush: brush,
             color: color,
             scale: scale,
             smoothing: smoothing,
-            quickTap: quickTap)
+            quickTap: quickTap,
+            startTime: startTime)
     }
     
     func updateStroke(

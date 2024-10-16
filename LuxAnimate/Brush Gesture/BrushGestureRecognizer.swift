@@ -28,7 +28,8 @@ extension BrushGestureRecognizer {
         
         func onBeginStroke(
             _ g: BrushGestureRecognizer,
-            quickTap: Bool)
+            quickTap: Bool,
+            startTime: TimeInterval)
         
         func onUpdateStroke(
             _ g: BrushGestureRecognizer,
@@ -153,10 +154,13 @@ extension BrushGestureRecognizer:
     
     func onBeginStroke(
         _ s: any BrushGestureRecognizerInternalState,
-        quickTap: Bool
+        quickTap: Bool,
+        startTime: TimeInterval
     ) {
         gestureDelegate?.onBeginStroke(
-            self, quickTap: quickTap)
+            self,
+            quickTap: quickTap,
+            startTime: startTime)
     }
     
     func onUpdateStroke(

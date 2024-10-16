@@ -106,43 +106,47 @@ extension AnimFrameEditorEraseToolState:
     
 }
 
-extension AnimFrameEditorEraseToolState: AnimEditorEraseToolStateDelegate {
+extension AnimFrameEditorEraseToolState:
+    AnimEditorEraseToolStateDelegate {
     
-    func onBeginBrushStroke(
-        _ s: AnimEditorEraseToolState,
-        quickTap: Bool
+    func onBeginStroke(
+        _ g: BrushGestureRecognizer,
+        quickTap: Bool,
+        startTime: TimeInterval
     ) {
-        internalState.beginBrushStroke(quickTap: quickTap)
+        internalState.beginStroke(
+            quickTap: quickTap,
+            startTime: startTime)
     }
     
-    func onUpdateBrushStroke(
-        _ s: AnimEditorPaintToolState,
+    func onUpdateStroke(
+        _ g: BrushGestureRecognizer,
         addedSamples: [BrushGestureRecognizer.Sample],
         predictedSamples: [BrushGestureRecognizer.Sample]
     ) {
-        internalState.updateBrushStroke(
+        internalState.updateStroke(
             addedSamples: addedSamples,
             predictedSamples: predictedSamples)
     }
     
-    func onUpdateBrushStroke(
-        _ s: AnimEditorPaintToolState,
+    func onUpdateStroke(
+        _ g: BrushGestureRecognizer,
         sampleUpdates: [BrushGestureRecognizer.SampleUpdate]
     ) {
-        internalState.updateBrushStroke(
+        internalState.updateStroke(
             sampleUpdates: sampleUpdates)
     }
 
-    func onEndBrushStroke(
-        _ s: AnimEditorEraseToolState
+    func onEndStroke(
+        _ g: BrushGestureRecognizer
     ) {
-        internalState.endBrushStroke()
+        internalState.endStroke()
     }
 
-    func onCancelBrushStroke(
-        _ s: AnimEditorEraseToolState
+    func onCancelStroke(
+        _ g: BrushGestureRecognizer
     ) {
-        internalState.cancelBrushStroke()
+        internalState.cancelStroke()
     }
     
 }

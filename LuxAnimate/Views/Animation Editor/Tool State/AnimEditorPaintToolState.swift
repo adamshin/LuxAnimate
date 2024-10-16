@@ -5,34 +5,16 @@
 import UIKit
 
 @MainActor
-protocol AnimEditorPaintToolStateDelegate: AnyObject {
-    
-    func onBeginBrushStroke(
-        _ s: AnimEditorPaintToolState,
-        quickTap: Bool)
-
-    func onUpdateBrushStroke(
-        _ s: AnimEditorPaintToolState,
-        addedSamples: [BrushGestureRecognizer.Sample],
-        predictedSamples: [BrushGestureRecognizer.Sample]
-    )
-    
-    func onUpdateBrushStroke(
-        _ s: AnimEditorPaintToolState,
-        sampleUpdates: [BrushGestureRecognizer.SampleUpdate]
-    )
-
-    func onEndBrushStroke(
-        _ s: AnimEditorPaintToolState)
-
-    func onCancelBrushStroke(
-        _ s: AnimEditorPaintToolState)
-    
-}
+protocol AnimEditorPaintToolStateDelegate:
+    BrushGestureRecognizer.GestureDelegate { }
 
 class AnimEditorPaintToolState: AnimEditorToolState {
     
-    weak var delegate: AnimEditorPaintToolStateDelegate?
+    weak var delegate: AnimEditorPaintToolStateDelegate? {
+        didSet {
+            brushGestureRecognizer.gestureDelegate = delegate
+        }
+    }
     
     private let brushGestureRecognizer = BrushGestureRecognizer()
     private let controlsVC = AnimEditorBrushToolControlsVC()
@@ -51,8 +33,6 @@ class AnimEditorPaintToolState: AnimEditorToolState {
             .brushToolScale
         smoothing = AnimEditorToolSettingsStore
             .brushToolSmoothing
-        
-        brushGestureRecognizer.gestureDelegate = self
         
         controlsVC.delegate = self
         controlsVC.scale = scale
@@ -95,52 +75,6 @@ extension AnimEditorPaintToolState: AnimEditorBrushToolControlsVCDelegate {
     func onChangeSmoothing(_ vc: AnimEditorBrushToolControlsVC) {
         smoothing = controlsVC.smoothing
         AnimEditorToolSettingsStore.brushToolSmoothing = smoothing
-    }
-    
-}
-
-extension AnimEditorPaintToolState:
-    BrushGestureRecognizer.GestureDelegate {
-    
-    func onBeginStroke(
-        _ g: BrushGestureRecognizer,
-        quickTap: Bool
-    ) {
-        delegate?.onBeginBrushStroke(
-            self,
-            quickTap: quickTap)
-    }
-    
-    func onUpdateStroke(
-        _ g: BrushGestureRecognizer,
-        addedSamples: [BrushGestureRecognizer.Sample],
-        predictedSamples: [BrushGestureRecognizer.Sample]
-    ) {
-        delegate?.onUpdateBrushStroke(
-            self,
-            addedSamples: addedSamples,
-            predictedSamples: predictedSamples)
-    }
-    
-    func onUpdateStroke(
-        _ g: BrushGestureRecognizer,
-        sampleUpdates: [BrushGestureRecognizer.SampleUpdate]
-    ) {
-        delegate?.onUpdateBrushStroke(
-            self,
-            sampleUpdates: sampleUpdates)
-    }
-    
-    func onEndStroke(
-        _ g: BrushGestureRecognizer
-    ) {
-        delegate?.onEndBrushStroke(self)
-    }
-    
-    func onCancelStroke(
-        _ g: BrushGestureRecognizer
-    ) {
-        delegate?.onCancelBrushStroke(self)
     }
     
 }

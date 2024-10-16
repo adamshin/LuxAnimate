@@ -81,7 +81,10 @@ class AnimFrameEditorBrushToolInternalState {
         brushEngine.setCanvasTextureContents(texture)
     }
     
-    func beginBrushStroke(quickTap: Bool) {
+    func beginStroke(
+        quickTap: Bool,
+        startTime: TimeInterval
+    ) {
         guard let delegate,
             let brush = delegate.brush(self)
         else { return }
@@ -95,10 +98,11 @@ class AnimFrameEditorBrushToolInternalState {
             color: color,
             scale: scale,
             smoothing: smoothing,
-            quickTap: quickTap)
+            quickTap: quickTap,
+            startTime: startTime)
     }
     
-    func updateBrushStroke(
+    func updateStroke(
         addedSamples: [BrushGestureRecognizer.Sample],
         predictedSamples: [BrushGestureRecognizer.Sample]
     ) {
@@ -122,7 +126,7 @@ class AnimFrameEditorBrushToolInternalState {
             predictedSamples: predictedSamples)
     }
     
-    func updateBrushStroke(
+    func updateStroke(
         sampleUpdates: [BrushGestureRecognizer.SampleUpdate]
     ) {
         guard let delegate else { return }
@@ -141,11 +145,11 @@ class AnimFrameEditorBrushToolInternalState {
             sampleUpdates: sampleUpdates)
     }
     
-    func endBrushStroke() {
+    func endStroke() {
         brushEngine.endStroke()
     }
 
-    func cancelBrushStroke() {
+    func cancelStroke() {
         brushEngine.cancelStroke()
     }
     

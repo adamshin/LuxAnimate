@@ -12,19 +12,21 @@ private func createInputSample(
     timeOffset: TimeInterval = 0,
     isPredicted: Bool = false,
     isPressureEstimated: Bool = false
-) -> BrushStrokeEngine2.InputSample {
+) -> BrushEngine2.InputSample {
     
-    BrushStrokeEngine2.InputSample(
+    BrushEngine2.InputSample(
         isPredicted: isPredicted,
         updateID: updateID,
         timeOffset: timeOffset,
         position: .zero,
         pressure: 0,
         altitude: 0,
-        azimuth: .zero,
+        azimuth: 0,
+        roll: 0,
         isPressureEstimated: isPressureEstimated,
         isAltitudeEstimated: false,
-        isAzimuthEstimated: false)
+        isAzimuthEstimated: false,
+        isRollEstimated: false)
 }
 
 struct BrushStrokeEngineInputQueueTests {
@@ -104,7 +106,7 @@ struct BrushStrokeEngineInputQueueTests {
         try #require(output1[1..<10].allSatisfy { !$0.isFinalized })
         
         queue.handleInputUpdate(sampleUpdates: [
-            BrushStrokeEngine2.InputSampleUpdate(
+            BrushEngine2.InputSampleUpdate(
                 updateID: 1,
                 pressure: 0),
         ])
@@ -127,10 +129,10 @@ struct BrushStrokeEngineInputQueueTests {
         // EEExPPP
         
         queue.handleInputUpdate(sampleUpdates: [
-            BrushStrokeEngine2.InputSampleUpdate(
+            BrushEngine2.InputSampleUpdate(
                 updateID: 3,
                 pressure: 0),
-            BrushStrokeEngine2.InputSampleUpdate(
+            BrushEngine2.InputSampleUpdate(
                 updateID: 4,
                 pressure: 0),
         ])
@@ -142,7 +144,7 @@ struct BrushStrokeEngineInputQueueTests {
         try #require(output3.allSatisfy { !$0.isFinalized })
         
         queue.handleInputUpdate(sampleUpdates: [
-            BrushStrokeEngine2.InputSampleUpdate(
+            BrushEngine2.InputSampleUpdate(
                 updateID: 2,
                 pressure: 0),
         ])

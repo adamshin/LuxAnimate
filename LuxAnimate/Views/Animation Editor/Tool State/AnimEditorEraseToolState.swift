@@ -5,27 +5,16 @@
 import UIKit
 
 @MainActor
-protocol AnimEditorEraseToolStateDelegate: AnyObject {
-    
-    func onBeginBrushStroke(
-        _ s: AnimEditorEraseToolState,
-        quickTap: Bool)
-
-//    func onUpdateBrushStroke(
-//        _ s: AnimEditorEraseToolState,
-//        stroke: BrushGestureRecognizer.Stroke)
-
-    func onEndBrushStroke(
-        _ s: AnimEditorEraseToolState)
-
-    func onCancelBrushStroke(
-        _ s: AnimEditorEraseToolState)
-    
-}
+protocol AnimEditorEraseToolStateDelegate:
+    BrushGestureRecognizer.GestureDelegate { }
 
 class AnimEditorEraseToolState: AnimEditorToolState {
     
-    weak var delegate: AnimEditorEraseToolStateDelegate?
+    weak var delegate: AnimEditorEraseToolStateDelegate? {
+        didSet {
+            brushGestureRecognizer.gestureDelegate = delegate
+        }
+    }
     
     private let brushGestureRecognizer = BrushGestureRecognizer()
     private let controlsVC = AnimEditorEraseToolControlsVC()
@@ -44,8 +33,6 @@ class AnimEditorEraseToolState: AnimEditorToolState {
             .eraseToolScale
         smoothing = AnimEditorToolSettingsStore
             .eraseToolSmoothing
-        
-//        brushGestureRecognizer.gestureDelegate = self
         
         controlsVC.delegate = self
         controlsVC.scale = scale
@@ -91,25 +78,3 @@ extension AnimEditorEraseToolState: AnimEditorEraseToolControlsVCDelegate {
     }
     
 }
-
-//extension AnimEditorEraseToolState: BrushGestureRecognizerGestureDelegate {
-//    
-//    func onBeginBrushStroke(quickTap: Bool) {
-//        delegate?.onBeginBrushStroke(self, quickTap: quickTap)
-//    }
-//    
-//    func onUpdateBrushStroke(
-//        _ stroke: BrushGestureRecognizer.Stroke
-//    ) {
-//        delegate?.onUpdateBrushStroke(self, stroke: stroke)
-//    }
-//    
-//    func onEndBrushStroke() {
-//        delegate?.onEndBrushStroke(self)
-//    }
-//    
-//    func onCancelBrushStroke() {
-//        delegate?.onCancelBrushStroke(self)
-//    }
-//    
-//}
