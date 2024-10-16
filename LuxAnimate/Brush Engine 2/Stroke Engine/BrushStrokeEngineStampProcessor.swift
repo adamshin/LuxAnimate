@@ -36,7 +36,7 @@ class BrushStrokeEngineStampProcessor {
                 position: s.position,
                 size: scaledBrushSize,
                 rotation: 0,
-                alpha: 1,
+                alpha: 0.2,
                 color: color,
                 offset: .zero,
                 strokeDistance: 0,

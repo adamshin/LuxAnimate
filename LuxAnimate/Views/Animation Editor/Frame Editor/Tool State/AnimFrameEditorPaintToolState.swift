@@ -115,7 +115,8 @@ extension AnimFrameEditorPaintToolState: AnimEditorPaintToolStateDelegate {
         _ s: AnimEditorPaintToolState,
         quickTap: Bool
     ) {
-        internalState.beginBrushStroke(quickTap: quickTap)
+        internalState.beginBrushStroke(
+            quickTap: quickTap)
     }
     
     func onUpdateBrushStroke(
