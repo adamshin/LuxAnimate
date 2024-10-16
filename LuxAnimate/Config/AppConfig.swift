@@ -12,10 +12,10 @@ struct AppConfig {
     
     static let drawingThumbnailSize = 300
     
-    static let brushRenderDebug = true
+    static let brushRenderDebug = false
     
     static let paintBrushConfig = roundBrushConfig
-    static let paintBrushColor = Color.brushBlack
+    static let paintBrushColor = Color.black
     
     static let wobbleBrushConfig = Brush.Configuration(
         stampTextureName: "brush1.png",

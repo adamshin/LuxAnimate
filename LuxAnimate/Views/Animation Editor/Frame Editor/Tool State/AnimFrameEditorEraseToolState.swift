@@ -111,12 +111,10 @@ extension AnimFrameEditorEraseToolState:
     
     func onBeginStroke(
         _ g: BrushGestureRecognizer,
-        quickTap: Bool,
-        startTime: TimeInterval
+        quickTap: Bool
     ) {
         internalState.beginStroke(
-            quickTap: quickTap,
-            startTime: startTime)
+            quickTap: quickTap)
     }
     
     func onUpdateStroke(

@@ -82,8 +82,7 @@ class AnimFrameEditorBrushToolInternalState {
     }
     
     func beginStroke(
-        quickTap: Bool,
-        startTime: TimeInterval
+        quickTap: Bool
     ) {
         guard let delegate,
             let brush = delegate.brush(self)
@@ -98,8 +97,7 @@ class AnimFrameEditorBrushToolInternalState {
             color: color,
             scale: scale,
             smoothing: smoothing,
-            quickTap: quickTap,
-            startTime: startTime)
+            quickTap: quickTap)
     }
     
     func updateStroke(

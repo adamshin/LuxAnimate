@@ -26,8 +26,7 @@ protocol BrushGestureRecognizerInternalStateDelegate:
     
     func onBeginStroke(
         _ s: BrushGestureRecognizerInternalState,
-        quickTap: Bool,
-        startTime: TimeInterval)
+        quickTap: Bool)
     
     func onUpdateStroke(
         _ s: BrushGestureRecognizerInternalState,
@@ -217,8 +216,7 @@ class BrushGestureRecognizerPreActiveState:
         
         delegate?.onBeginStroke(
             self,
-            quickTap: true,
-            startTime: startTime)
+            quickTap: true)
         
         delegate?.onUpdateStroke(
             self,
@@ -254,8 +252,7 @@ class BrushGestureRecognizerPreActiveState:
     private func activateStroke() {
         delegate?.onBeginStroke(
             self,
-            quickTap: false,
-            startTime: startTime)
+            quickTap: false)
         
         delegate?.onUpdateStroke(
             self,
