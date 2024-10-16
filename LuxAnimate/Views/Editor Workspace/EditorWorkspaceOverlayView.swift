@@ -37,8 +37,6 @@ class EditorWorkspaceOverlayView: UIView {
     private let undoGesture = MultiFingerTapGestureRecognizer(touchCount: 2)
     private let redoGesture = MultiFingerTapGestureRecognizer(touchCount: 3)
     
-    private let brushGesture = BrushGestureRecognizer()
-    
     private var toolGestureRecognizers: [UIGestureRecognizer] = []
     
     // MARK: - Init

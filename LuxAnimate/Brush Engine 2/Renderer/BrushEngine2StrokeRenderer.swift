@@ -57,7 +57,7 @@ class BrushEngine2StrokeRenderer {
         brush: Brush,
         stamps: [BrushEngine2.Stamp]
     ) {
-//        print("Drawing \(stamps.count) stamps")
+        print("Drawing \(stamps.count) stamps")
         
         let finalizedPrefixCount = stamps
             .prefix { $0.isFinalized }

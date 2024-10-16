@@ -58,8 +58,6 @@ class BrushGestureRecognizer: UIGestureRecognizer {
     
     private var internalState: BrushGestureRecognizerInternalState?
     
-    private var startTime: TimeInterval = 0
-    
     init() {
         super.init(target: nil, action: nil)
         
@@ -71,49 +69,36 @@ class BrushGestureRecognizer: UIGestureRecognizer {
     override func touchesBegan(
         _ touches: Set<UITouch>, with event: UIEvent
     ) {
-        startTime = ProcessInfo.processInfo.systemUptime
-        print("Touches began")
-        
-//        internalState?.touchesBegan(
-//            touches: touches, event: event)
+        internalState?.touchesBegan(
+            touches: touches, event: event)
     }
     
     override func touchesMoved(
         _ touches: Set<UITouch>, with event: UIEvent
     ) {
-        let currentTime = ProcessInfo.processInfo.systemUptime
-        let elapsedTime = currentTime - startTime
-        let elapsedTimeMs = Int(elapsedTime * 1000)
-        print("Touches moved. \(elapsedTimeMs) ms")
-        
-//        internalState?.touchesMoved(
-//            touches: touches, event: event)
+        internalState?.touchesMoved(
+            touches: touches, event: event)
     }
     
     override func touchesEnded(
         _ touches: Set<UITouch>, with event: UIEvent
     ) {
-        let currentTime = ProcessInfo.processInfo.systemUptime
-        let elapsedTime = currentTime - startTime
-        let elapsedTimeMs = Int(elapsedTime * 1000)
-        print("Touches ended. \(elapsedTimeMs) ms")
-        
-//        internalState?.touchesEnded(
-//            touches: touches, event: event)
+        internalState?.touchesEnded(
+            touches: touches, event: event)
     }
     
     override func touchesCancelled(
         _ touches: Set<UITouch>, with event: UIEvent
     ) {
-//        internalState?.touchesCancelled(
-//            touches: touches, event: event)
+        internalState?.touchesCancelled(
+            touches: touches, event: event)
     }
     
     override func touchesEstimatedPropertiesUpdated(
         _ touches: Set<UITouch>
     ) {
-//        internalState?.touchesEstimatedPropertiesUpdated(
-//            touches: touches)
+        internalState?.touchesEstimatedPropertiesUpdated(
+            touches: touches)
     }
     
     override func reset() {
