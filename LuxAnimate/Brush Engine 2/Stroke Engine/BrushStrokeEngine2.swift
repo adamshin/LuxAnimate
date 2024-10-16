@@ -63,7 +63,6 @@ class BrushStrokeEngine2 {
     func process() -> ProcessOutput {
         let s1 = inputQueue.process()
 //        let s2 = gapFillProcessor.process(input: s1)
-//        let s3 = stampProcessor.process(input: s2)
         
         let stamps = stampProcessor.process(input: s1)
         

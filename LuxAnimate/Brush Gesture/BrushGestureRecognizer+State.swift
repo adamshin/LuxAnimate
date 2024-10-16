@@ -116,26 +116,11 @@ class BrushGestureRecognizerWaitingState:
                 startTime: startTime,
                 view: view)
         
-//        delegate?.setInternalState(self,
-//            BrushGestureRecognizerPreActiveState(
-//                touch: touch,
-//                startTime: startTime,
-//                queuedSamples: samples))
-        
-        delegate?.onBeginStroke(
-            self, quickTap: false)
-        
-        delegate?.onUpdateStroke(
-            self,
-            addedSamples: samples,
-            predictedSamples: [])
-        
-        delegate?.setGestureRecognizerState(self, .began)
-        
         delegate?.setInternalState(self,
-            BrushGestureRecognizerActiveState(
+            BrushGestureRecognizerPreActiveState(
                 touch: touch,
-                startTime: startTime))
+                startTime: startTime,
+                queuedSamples: samples))
     }
     
 }
@@ -171,21 +156,21 @@ class BrushGestureRecognizerPreActiveState:
     }
     
     func onStateBegin() {
-//        if touch.type == .direct {
-//            let timeInterval = BrushGestureRecognizer
-//                .Config.fingerActivationDelay
-//            
-//            activationTimer = Timer.scheduledTimer(
-//                withTimeInterval: timeInterval,
-//                repeats: false)
-//            { [weak self] _ in
-//                Task { @MainActor in
-//                    self?.activateStroke()
-//                }
-//            }
-//        } else {
+        if touch.type == .direct {
+            let timeInterval = BrushGestureRecognizer
+                .Config.fingerActivationDelay
+            
+            activationTimer = Timer.scheduledTimer(
+                withTimeInterval: timeInterval,
+                repeats: false)
+            { [weak self] _ in
+                Task { @MainActor in
+                    self?.activateStroke()
+                }
+            }
+        } else {
             activateStroke()
-//        }
+        }
     }
     
     func onStateEnd() {

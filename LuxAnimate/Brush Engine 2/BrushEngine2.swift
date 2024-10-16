@@ -202,8 +202,6 @@ class BrushEngine2 {
         
         delegate?.onFinalizeStroke(self,
             canvasTexture: baseCanvasTexture)
-        
-//        print("Ended stroke")
     }
     
     func cancelStroke() {
