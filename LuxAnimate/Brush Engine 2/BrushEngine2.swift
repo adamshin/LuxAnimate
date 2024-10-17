@@ -104,6 +104,9 @@ class BrushEngine2 {
     
     private var strokeEngine: BrushStrokeEngine2?
     
+    // TESTING
+    private var lastTimeOffset: TimeInterval = 0
+    
     // MARK: - Initializer
     
     init(
@@ -154,12 +157,24 @@ class BrushEngine2 {
             scale: scale,
             smoothing: smoothing,
             quickTap: quickTap)
+        
+        lastTimeOffset = -1
     }
     
     func updateStroke(
         addedSamples: [InputSample],
         predictedSamples: [InputSample]
     ) {
+        // TESTING
+        for sample in addedSamples {
+            let timeOffset = sample.timeOffset
+//            print(String(format: "%.3f", timeOffset))
+            if timeOffset < lastTimeOffset {
+                print("Time inversion!")
+            }
+            lastTimeOffset = timeOffset
+        }
+        
         strokeEngine?.update(
             addedSamples: addedSamples,
             predictedSamples: predictedSamples)

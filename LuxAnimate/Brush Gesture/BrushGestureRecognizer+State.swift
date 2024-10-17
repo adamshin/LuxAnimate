@@ -264,7 +264,8 @@ class BrushGestureRecognizerPreActiveState:
         delegate?.setInternalState(self,
             BrushGestureRecognizerActiveState(
                 touch: touch,
-                startTime: startTime))
+                startTime: startTime,
+                lastSample: queuedSamples.last))
     }
     
 }
@@ -280,12 +281,24 @@ class BrushGestureRecognizerActiveState:
     private let touch: UITouch
     private let startTime: TimeInterval
     
+    private var lastSample: BrushGestureRecognizer.Sample?
+    
+    private let displayLink = WrappedDisplayLink()
+    
     init(
         touch: UITouch,
-        startTime: TimeInterval
+        startTime: TimeInterval,
+        lastSample: BrushGestureRecognizer.Sample?
     ) {
         self.touch = touch
         self.startTime = startTime
+        self.lastSample = lastSample
+    }
+    
+    func onStateBegin() {
+        displayLink.setCallback { [weak self] _ in
+            self?.onDisplayLink()
+        }
     }
     
     func resetGesture() {
@@ -328,6 +341,16 @@ class BrushGestureRecognizerActiveState:
                 event: event,
                 startTime: startTime,
                 view: view)
+        
+        lastSample = samples.last
+        
+        // Testing
+//        let currentTime = ProcessInfo.processInfo.systemUptime
+//        let currentTimeOffset = currentTime - startTime
+//        if let lastSample {
+//            let processDelta = currentTimeOffset - lastSample.timeOffset
+//            print("Process delta: \(String(format: "%.3f", processDelta))")
+//        }
         
         delegate?.onUpdateStroke(
             self,
@@ -374,6 +397,28 @@ class BrushGestureRecognizerActiveState:
         
         delegate?.onUpdateStroke(
             self, sampleUpdates: sampleUpdates)
+    }
+    
+    private func onDisplayLink() {
+        guard let lastSample else { return }
+        
+        let currentTime = ProcessInfo.processInfo.systemUptime
+        let currentTimeOffset = currentTime - startTime
+        
+        let nextSampleTimeOffset = lastSample.timeOffset + 1/60
+        
+        if nextSampleTimeOffset < currentTimeOffset - 1/60 {
+//            print("Repeating sample.")
+            
+            var sample = lastSample
+            sample.timeOffset = nextSampleTimeOffset
+            self.lastSample = sample
+            
+            delegate?.onUpdateStroke(
+                self,
+                addedSamples: [sample],
+                predictedSamples: [])
+        }
     }
     
 }
