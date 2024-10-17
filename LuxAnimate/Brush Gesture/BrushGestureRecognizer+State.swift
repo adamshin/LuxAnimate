@@ -344,14 +344,6 @@ class BrushGestureRecognizerActiveState:
         
         lastSample = samples.last
         
-        // Testing
-//        let currentTime = ProcessInfo.processInfo.systemUptime
-//        let currentTimeOffset = currentTime - startTime
-//        if let lastSample {
-//            let processDelta = currentTimeOffset - lastSample.timeOffset
-//            print("Process delta: \(String(format: "%.3f", processDelta))")
-//        }
-        
         delegate?.onUpdateStroke(
             self,
             addedSamples: samples,
@@ -405,11 +397,16 @@ class BrushGestureRecognizerActiveState:
         let currentTime = ProcessInfo.processInfo.systemUptime
         let currentTimeOffset = currentTime - startTime
         
-        let nextSampleTimeOffset = lastSample.timeOffset + 1/60
+        let gapFillTimeOffset = BrushGestureRecognizer.Config
+            .gapFillTimeOffset
         
-        if nextSampleTimeOffset < currentTimeOffset - 1/60 {
-//            print("Repeating sample.")
-            
+        let nextSampleTimeOffset =
+            lastSample.timeOffset +
+            gapFillTimeOffset
+        
+        if nextSampleTimeOffset <
+            currentTimeOffset - gapFillTimeOffset
+        {   
             var sample = lastSample
             sample.timeOffset = nextSampleTimeOffset
             self.lastSample = sample
