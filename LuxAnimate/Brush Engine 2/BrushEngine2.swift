@@ -83,7 +83,6 @@ extension BrushEngine2 {
         var color: Color
         
         var offset: Vector
-        var strokeDistance: Double
         
         var isFinalized: Bool
     }

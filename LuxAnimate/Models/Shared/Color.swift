@@ -1,5 +1,5 @@
 //
-//  SharedModels.swift
+//  Color.swift
 //
 
 import Foundation
@@ -9,12 +9,6 @@ import Metal
 struct Color: Codable {
     var r, g, b, a: UInt8
 }
-
-struct PixelSize: Codable {
-    var width, height: Int
-}
-
-// MARK: - Extensions
 
 extension Color {
     
@@ -33,6 +27,7 @@ extension Color {
     static let brushBlue = Color(hex: "61A3BA")
     
     static let debugRed = Color(hex: "FF3B30")
+    static let debugOrange = Color(hex: "FF6B30")
     
     static let halfGray = Color(hex: "808080")
     
@@ -111,54 +106,6 @@ extension Color {
             Double(g) / 255,
             Double(b) / 255,
             Double(a) / 255)
-    }
-    
-}
-
-extension PixelSize {
-    
-    static let zero = PixelSize(0, 0)
-    
-    init(_ width: Int, _ height: Int) {
-        self.init(width: width, height: height)
-    }
-    
-    init(
-        filling containerSize: PixelSize,
-        aspectRatio: Double
-    ) {
-        let containerAspectRatio =
-            Double(containerSize.width) /
-            Double(containerSize.height)
-        
-        if aspectRatio > containerAspectRatio {
-            self = PixelSize(
-                width: Int(Double(containerSize.height) * aspectRatio),
-                height: containerSize.height)
-        } else {
-            self = PixelSize(
-                width: containerSize.width,
-                height: Int(Double(containerSize.width) / aspectRatio))
-        }
-    }
-
-    init(
-        fitting containerSize: PixelSize,
-        aspectRatio: Double
-    ) {
-        let containerAspectRatio =
-            Double(containerSize.width) /
-            Double(containerSize.height)
-        
-        if aspectRatio > containerAspectRatio {
-            self = PixelSize(
-                width: containerSize.width,
-                height: Int(Double(containerSize.width) / aspectRatio))
-        } else {
-            self = PixelSize(
-                width: Int(Double(containerSize.height) * aspectRatio),
-                height: containerSize.height)
-        }
     }
     
 }

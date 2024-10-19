@@ -69,13 +69,7 @@ class BrushEngine2StrokeRenderer {
         
         let nonFinalizedStamps = stamps[
             finalizedPrefixCount ..< stamps.count
-        ].map {
-            var s = $0
-            if AppConfig.brushRenderDebug {
-                s.color = Color.debugRed
-            }
-            return s
-        }
+        ]
         
         let viewportSize = Size(
             Scalar(canvasSize.width),

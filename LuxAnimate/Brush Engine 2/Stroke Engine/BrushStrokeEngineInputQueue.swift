@@ -6,7 +6,7 @@ import Foundation
 
 class BrushStrokeEngineInputQueue {
     
-    static let maxInputSampleCount = 100
+    static let maxInputSampleCount = 1000//100
     
     private var inputSamples:
         [BrushEngine2.InputSample] = []
