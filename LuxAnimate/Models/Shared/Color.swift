@@ -28,6 +28,7 @@ extension Color {
     
     static let debugRed = Color(hex: "FF3B30")
     static let debugOrange = Color(hex: "FF6B30")
+    static let strokeDebug = Color(hex: "00FF80")
     
     static let halfGray = Color(hex: "808080")
     

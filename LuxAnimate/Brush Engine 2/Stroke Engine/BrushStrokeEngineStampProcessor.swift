@@ -5,6 +5,30 @@
 import Foundation
 
 private let minStampSize: Double = 0.5
+private let segmentInterpolationCount = 100
+
+// I think I know what the issue with stroke finalization is.
+
+// Samples are going into the segment control points list
+// and once they've been "consumed", they never get updated.
+// Or is this the issue? Does that make sense? If a non-
+// finalized sample is consumed, the output should always
+// be non-finalized. Meaning we don't save state at that
+// point. Maybe I'm mixed up.
+
+// Update: I fixed the issue with pencil input by NOT
+// saving finalized state immediately after updating the
+// input queue. But this makes quick tap finger input
+// disappear. I think I need to think this through better.
+
+// We need to treat input and output as "progressing"
+// independently. Samples get added to the queue, stamps
+// get output. The processor eats its way through its
+// input stack. But should the input queue be part of the
+// stored state?
+
+// Maybe I need a different mental model. I'm not clear on
+// how I want this to all work yet.
 
 extension BrushStrokeEngineStampProcessor {
     
@@ -15,10 +39,6 @@ extension BrushStrokeEngineStampProcessor {
         
         // TODO: Last stamp position?
         // Total stroke distance?
-        
-        // Segment timing estimate data?
-        // We may need to break the segment into a series
-        // of line segments to properly calculate distance.
     }
     
 }
@@ -45,22 +65,12 @@ class BrushStrokeEngineStampProcessor {
         input: [BrushEngine2.Sample]
     ) -> [BrushEngine2.Stamp] {
         
-        print("""
-            Processing samples. \
-            \(input.count { $0.isFinalized }) finalized, \
-            \(input.count { !$0.isFinalized }) nonfinalized
-            """)
-        
         var state: State
         
         if let lastFinalizedState {
             state = lastFinalizedState
             state.inputQueue.removeAll { !$0.isFinalized }
             state.inputQueue += input
-            
-            self.lastFinalizedState = state
-            
-            print("Updating state. Input queue size: \(state.inputQueue.count)")
             
         } else {
             guard let firstSample = input.first
@@ -75,13 +85,10 @@ class BrushStrokeEngineStampProcessor {
             state = State(
                 inputQueue: inputQueue,
                 segmentControlPoints: segmentControlPoints)
-            
-            lastFinalizedState = state
-            
-            print("Setting initial state. Input queue size: \(state.inputQueue.count)")
         }
         
         var output: [BrushEngine2.Stamp] = []
+        var isCumulativeOutputFinalized = true
         
         while let sample = state.inputQueue.first {
             state.inputQueue.removeFirst()
@@ -94,15 +101,37 @@ class BrushStrokeEngineStampProcessor {
             
             output += segmentOutput
             
-            if segmentOutput.allSatisfy({ $0.isFinalized }) {
+            let outputFinalized = segmentOutput
+                .allSatisfy { $0.isFinalized }
+            
+            if outputFinalized {
+                if !isCumulativeOutputFinalized {
+                    print("Output finalization inversion!")
+                }
+            } else {
+                isCumulativeOutputFinalized = false
+            }
+            if isCumulativeOutputFinalized {
                 lastFinalizedState = state
             }
         }
         
-        // TODO: Finish the tail of the curve.
-        // Repeat the final sample 2 more times and process
-        // these segments. This ensures the curve passes
-        // through the end point.
+        var endSample = state.segmentControlPoints.last!
+        endSample.isFinalized = false
+        
+        for _ in 0 ..< 2 {
+            state.segmentControlPoints.removeFirst()
+            state.segmentControlPoints.append(endSample)
+            
+            let segmentOutput = processSegment(
+                controlPoints: state.segmentControlPoints)
+            
+            output += segmentOutput
+            
+            if segmentOutput.allSatisfy({ $0.isFinalized }) {
+                lastFinalizedState = state
+            }
+        }
         
         return output
     }
@@ -111,8 +140,12 @@ class BrushStrokeEngineStampProcessor {
         controlPoints: [BrushEngine2.Sample]
     ) -> [BrushEngine2.Stamp] {
         
-        guard controlPoints.count == 4
-        else { return [] }
+        guard controlPoints.count == 4 else {
+            fatalError("""
+                BrushStrokeEngineStampProcessor: \
+                Wrong number of control points!
+                """)
+        }
         
         let s0 = controlPoints[0]
         let s1 = controlPoints[1]
@@ -121,10 +154,9 @@ class BrushStrokeEngineStampProcessor {
         
         var output: [BrushEngine2.Stamp] = []
         
-        let interpolationCount = 10
-        
-        for i in 0 ..< interpolationCount {
-            let t = Double(i) / Double(interpolationCount)
+        let count = segmentInterpolationCount
+        for i in 0 ..< count {
+            let t = Double(i) / Double(count)
             
             let (b0, b1, b2, b3) =
                 UniformCubicBSpline.basisValues(t: t)
@@ -142,8 +174,19 @@ class BrushStrokeEngineStampProcessor {
             let stamp = Self.stamp(
                 sample: sample,
                 brush: brush,
-                scale: i == 0 ? scale*2.5 : scale,
-                color: i == 0 ? .brushGreen : color)
+                scale: scale,
+                color: color)
+            
+            output.append(stamp)
+        }
+        
+        // TESTING
+        for s in controlPoints {
+            let stamp = Self.stamp(
+                sample: s,
+                brush: brush,
+                scale: scale * 2,
+                color: .debugRed.withAlpha(0.2))
             
             output.append(stamp)
         }
@@ -175,7 +218,7 @@ class BrushStrokeEngineStampProcessor {
         if AppConfig.brushRenderDebug,
             !s.isFinalized
         {
-            s.color = Color.debugRed
+            s.color = Color.strokeDebug
         }
         
         return s

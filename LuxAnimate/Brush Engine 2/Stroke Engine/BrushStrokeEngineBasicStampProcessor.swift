@@ -59,7 +59,7 @@ class BrushStrokeEngineBasicStampProcessor {
         if AppConfig.brushRenderDebug,
             !s.isFinalized
         {
-            s.color = Color.debugRed
+            s.color = Color.strokeDebug
         }
         
         return s

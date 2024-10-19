@@ -24,7 +24,7 @@ class BrushStrokeEngine2 {
     private let quickTap: Bool
     
     private let inputQueue = BrushStrokeEngineInputQueue()
-    private let stampProcessor: BrushStrokeEngineBasicStampProcessor
+    private let stampProcessor: BrushStrokeEngineStampProcessor
     
     init(
         brush: Brush,
