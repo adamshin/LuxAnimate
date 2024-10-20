@@ -4,6 +4,18 @@
 
 import Foundation
 
+// I think there's a problem with the logic here.
+
+// We can get finalized output out of order with
+// non-finalized output. This can happen if we get an input
+// update out of order.
+
+// I need to make sure this never happens. If there's a
+// non-finalized sample in the queue, it needs to force all
+// subsequent samples to be output as non-finalized, even
+// if these subsequent samples have been updated with final
+// values.
+
 struct NewBrushStrokeEngineInputQueue {
     
     static let finalizationThreshold = 30

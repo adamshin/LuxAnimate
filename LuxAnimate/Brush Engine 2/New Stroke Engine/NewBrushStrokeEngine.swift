@@ -62,13 +62,18 @@ class NewBrushStrokeEngine {
         var state = savedState
         var stamps: [BrushEngine2.Stamp] = []
         
+        var isCumulativeResultFinalized = true
+        
         while let processResult = state.processNextSample() {
             stamps += processResult.stamps
             
             let isResultFinalized = processResult.stamps
                 .allSatisfy { $0.isFinalized }
             
-            if isResultFinalized {
+            if !isResultFinalized {
+                isCumulativeResultFinalized = false
+            }
+            if isCumulativeResultFinalized {
                 savedState = state
             }
         }

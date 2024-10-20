@@ -108,9 +108,10 @@
 		6676F5212CC32F44009724D6 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6676F5202CC32F44009724D6 /* Color.swift */; };
 		6676F5232CC33AAE009724D6 /* BrushStrokeEngineBasicStampProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6676F5222CC33AAE009724D6 /* BrushStrokeEngineBasicStampProcessor.swift */; };
 		6676F5262CC495BF009724D6 /* NewBrushStrokeEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6676F5252CC495BF009724D6 /* NewBrushStrokeEngine.swift */; };
-		6676F5282CC49631009724D6 /* NewBrushStrokeEngineStampProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6676F5272CC49631009724D6 /* NewBrushStrokeEngineStampProcessor.swift */; };
+		6676F5282CC49631009724D6 /* NewBrushStrokeEngineBasicStampProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6676F5272CC49631009724D6 /* NewBrushStrokeEngineBasicStampProcessor.swift */; };
 		6676F52B2CC496A3009724D6 /* NewBrushStrokeEngineInputQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6676F52A2CC496A3009724D6 /* NewBrushStrokeEngineInputQueue.swift */; };
 		6676F52D2CC49A60009724D6 /* NewBrushStrokeEngineState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6676F52C2CC49A60009724D6 /* NewBrushStrokeEngineState.swift */; };
+		6676F52F2CC4C734009724D6 /* NewBrushStrokeEngineStampProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6676F52E2CC4C734009724D6 /* NewBrushStrokeEngineStampProcessor.swift */; };
 		66789AC02C29E90B0020EACE /* RenderPreviewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66789ABF2C29E90B0020EACE /* RenderPreviewManager.swift */; };
 		66789AC92C332D710020EACE /* IDGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66789AC82C332D710020EACE /* IDGenerator.swift */; };
 		6678A9BE2C8131E700838EA3 /* AnimFrameEditorEraseToolState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6678A9BD2C8131E700838EA3 /* AnimFrameEditorEraseToolState.swift */; };
@@ -284,9 +285,10 @@
 		6676F5202CC32F44009724D6 /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
 		6676F5222CC33AAE009724D6 /* BrushStrokeEngineBasicStampProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrushStrokeEngineBasicStampProcessor.swift; sourceTree = "<group>"; };
 		6676F5252CC495BF009724D6 /* NewBrushStrokeEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewBrushStrokeEngine.swift; sourceTree = "<group>"; };
-		6676F5272CC49631009724D6 /* NewBrushStrokeEngineStampProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewBrushStrokeEngineStampProcessor.swift; sourceTree = "<group>"; };
+		6676F5272CC49631009724D6 /* NewBrushStrokeEngineBasicStampProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewBrushStrokeEngineBasicStampProcessor.swift; sourceTree = "<group>"; };
 		6676F52A2CC496A3009724D6 /* NewBrushStrokeEngineInputQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewBrushStrokeEngineInputQueue.swift; sourceTree = "<group>"; };
 		6676F52C2CC49A60009724D6 /* NewBrushStrokeEngineState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewBrushStrokeEngineState.swift; sourceTree = "<group>"; };
+		6676F52E2CC4C734009724D6 /* NewBrushStrokeEngineStampProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewBrushStrokeEngineStampProcessor.swift; sourceTree = "<group>"; };
 		66789ABF2C29E90B0020EACE /* RenderPreviewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderPreviewManager.swift; sourceTree = "<group>"; };
 		66789AC82C332D710020EACE /* IDGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IDGenerator.swift; sourceTree = "<group>"; };
 		6678A9BD2C8131E700838EA3 /* AnimFrameEditorEraseToolState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimFrameEditorEraseToolState.swift; sourceTree = "<group>"; };
@@ -705,8 +707,8 @@
 			children = (
 				664C3A672CA763B500AEAC90 /* BrushStrokeEngine2.swift */,
 				664C3A6F2CA76AEA00AEAC90 /* BrushStrokeEngineInputQueue.swift */,
-				66093E622CBEDC97006A00F4 /* BrushStrokeEngineStampProcessor.swift */,
 				6676F5222CC33AAE009724D6 /* BrushStrokeEngineBasicStampProcessor.swift */,
+				66093E622CBEDC97006A00F4 /* BrushStrokeEngineStampProcessor.swift */,
 			);
 			path = "Stroke Engine";
 			sourceTree = "<group>";
@@ -779,7 +781,8 @@
 				6676F5252CC495BF009724D6 /* NewBrushStrokeEngine.swift */,
 				6676F52C2CC49A60009724D6 /* NewBrushStrokeEngineState.swift */,
 				6676F52A2CC496A3009724D6 /* NewBrushStrokeEngineInputQueue.swift */,
-				6676F5272CC49631009724D6 /* NewBrushStrokeEngineStampProcessor.swift */,
+				6676F5272CC49631009724D6 /* NewBrushStrokeEngineBasicStampProcessor.swift */,
+				6676F52E2CC4C734009724D6 /* NewBrushStrokeEngineStampProcessor.swift */,
 			);
 			path = "New Stroke Engine";
 			sourceTree = "<group>";
@@ -1313,7 +1316,7 @@
 				66D084822BA3FDFC00EB8556 /* LibraryManager.swift in Sources */,
 				664C281D2C741011002166D6 /* EditorWorkspaceVC.swift in Sources */,
 				667BF74B2BA655CB003E3430 /* FileHelper.swift in Sources */,
-				6676F5282CC49631009724D6 /* NewBrushStrokeEngineStampProcessor.swift in Sources */,
+				6676F5282CC49631009724D6 /* NewBrushStrokeEngineBasicStampProcessor.swift in Sources */,
 				664175B72C7E558500205FEC /* AnimEditorEraseToolState.swift in Sources */,
 				66D0846D2BA3CEC300EB8556 /* CGGeometry.swift in Sources */,
 				66099BBD2BDB32F500243D9F /* BrushStrokeInputInterpolationProcessor.swift in Sources */,
@@ -1345,6 +1348,7 @@
 				662232712BE1B79300C8813F /* AnimEditorToolSidebarSlider.swift in Sources */,
 				664C28232C755402002166D6 /* EditorWorkspaceOverlayView.swift in Sources */,
 				6651A9E22C962B6F00E3520A /* AnimEditorTimelineModel.swift in Sources */,
+				6676F52F2CC4C734009724D6 /* NewBrushStrokeEngineStampProcessor.swift in Sources */,
 				664C28252C757E95002166D6 /* EditorWorkspaceTransformManager.swift in Sources */,
 				6625429F2C8BB6BF007D3DFB /* ThreadSafeDictionary.swift in Sources */,
 				664175B52C7E557300205FEC /* AnimEditorPaintToolState.swift in Sources */,
