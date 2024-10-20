@@ -1,10 +1,10 @@
 //
-//  BrushStrokeEngineSampleInterpolator.swift
+//  BrushEngineSampleInterpolator.swift
 //
 
 import Foundation
 
-struct BrushStrokeEngineSampleInterpolator {
+struct BrushEngineSampleInterpolator {
     
     static func interpolate(
         _ samplesAndWeights:
@@ -29,7 +29,8 @@ struct BrushStrokeEngineSampleInterpolator {
             altitude: 0,
             azimuth: 0,
             roll: 0,
-            isFinalized: true)
+            isFinalized: true,
+            isLastSample: false)
         
         for (s, w) in samplesAndWeights {
             let c = w / totalWeight

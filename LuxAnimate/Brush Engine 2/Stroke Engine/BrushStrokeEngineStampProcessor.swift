@@ -161,7 +161,7 @@ class BrushStrokeEngineStampProcessor {
             let (b0, b1, b2, b3) =
                 UniformCubicBSpline.basisValues(t: t)
             
-            let sample = BrushStrokeEngineSampleInterpolator
+            let sample = BrushEngineSampleInterpolator
                 .interpolate([
                     (s0, b0),
                     (s1, b1),
@@ -218,7 +218,7 @@ class BrushStrokeEngineStampProcessor {
         if AppConfig.brushRenderDebug,
             !s.isFinalized
         {
-            s.color = Color.strokeDebug
+            s.color = AppConfig.strokeDebugColor
         }
         
         return s

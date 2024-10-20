@@ -1,12 +1,12 @@
 //
-//  BrushStrokeEngineBasicStampProcessor.swift
+//  NewBrushStrokeEngineStampProcessor.swift
 //
 
 import Foundation
 
 private let minStampSize: Double = 0.5
 
-class BrushStrokeEngineBasicStampProcessor {
+struct NewBrushStrokeEngineStampProcessor {
     
     private let brush: Brush
     private let scale: Double
@@ -22,17 +22,17 @@ class BrushStrokeEngineBasicStampProcessor {
         self.color = color
     }
     
-    func process(
-        input: [BrushEngine2.Sample]
+    mutating func process(
+        sample: BrushEngine2.Sample
     ) -> [BrushEngine2.Stamp] {
         
-        return input.map { s in
-            Self.stamp(
-                sample: s,
-                brush: brush,
-                scale: scale,
-                color: color)
-        }
+        let stamp = Self.stamp(
+            sample: sample,
+            brush: brush,
+            scale: scale,
+            color: color)
+        
+        return [stamp]
     }
     
     private static func stamp(

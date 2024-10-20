@@ -71,8 +71,7 @@ extension BrushEngine2 {
         var roll: Double
         
         var isFinalized: Bool
-        
-        // TODO: Index?
+        var isLastSample: Bool
     }
     
     struct Stamp {
@@ -101,7 +100,7 @@ class BrushEngine2 {
     private let renderer: BrushEngine2Renderer
     private let strokeRenderer: BrushEngine2StrokeRenderer // TODO: move to stroke engine?
     
-    private var strokeEngine: BrushStrokeEngine2?
+    private var strokeEngine: NewBrushStrokeEngine?
     
     // MARK: - Initializer
     
@@ -147,7 +146,7 @@ class BrushEngine2 {
         smoothing: Double,
         quickTap: Bool
     ) {
-        strokeEngine = BrushStrokeEngine2(
+        strokeEngine = .init(
             brush: brush,
             color: color,
             scale: scale,

@@ -104,7 +104,8 @@ class BrushStrokeEngineInputQueue {
             altitude: s.altitude,
             azimuth: s.azimuth,
             roll: s.roll,
-            isFinalized: isFinalized)
+            isFinalized: isFinalized,
+            isLastSample: false)
     }
     
 }
