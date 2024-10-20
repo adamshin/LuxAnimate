@@ -14,6 +14,8 @@ struct NewBrushStrokeEngineInputQueue {
     private var predictedSamples:
         [BrushEngine2.InputSample] = []
     
+    // MARK: - Interface
+    
     mutating func handleInputUpdate(
         addedSamples: [BrushEngine2.InputSample],
         predictedSamples: [BrushEngine2.InputSample]
@@ -43,24 +45,9 @@ struct NewBrushStrokeEngineInputQueue {
                 guard s.updateID == u.updateID
                 else { return s }
                 
-                var s = s
-                if let pressure = u.pressure {
-                    s.pressure = pressure
-                    s.isPressureEstimated = false
-                }
-                if let altitude = u.altitude {
-                    s.altitude = altitude
-                    s.isAltitudeEstimated = false
-                }
-                if let azimuth = u.azimuth {
-                    s.azimuth = azimuth
-                    s.isAzimuthEstimated = false
-                }
-                if let roll = u.roll {
-                    s.roll = roll
-                    s.isRollEstimated = false
-                }
-                return s
+                return Self.applySampleUpdate(
+                    sample: s,
+                    update: u)
             }
         }
     }
@@ -94,6 +81,8 @@ struct NewBrushStrokeEngineInputQueue {
         return nil
     }
     
+    // MARK: - Internal Logic
+    
     private static func convert(
         inputSample s: BrushEngine2.InputSample,
         isFinalized: Bool,
@@ -109,6 +98,41 @@ struct NewBrushStrokeEngineInputQueue {
             roll: s.roll,
             isFinalized: isFinalized,
             isLastSample: isLastSample)
+    }
+    
+    private static func applySampleUpdate(
+        sample s: BrushEngine2.InputSample,
+        update u: BrushEngine2.InputSampleUpdate
+    ) -> BrushEngine2.InputSample {
+        
+        var s = s
+        
+        if let pressure = u.pressure,
+            s.isPressureEstimated
+        {
+            s.pressure = pressure
+            s.isPressureEstimated = false
+        }
+        if let altitude = u.altitude,
+            s.isAltitudeEstimated
+        {
+            s.altitude = altitude
+            s.isAltitudeEstimated = false
+        }
+        if let azimuth = u.azimuth,
+            s.isAzimuthEstimated
+        {
+            s.azimuth = azimuth
+            s.isAzimuthEstimated = false
+        }
+        if let roll = u.roll,
+            s.isRollEstimated
+        {
+            s.roll = roll
+            s.isRollEstimated = false
+        }
+        
+        return s
     }
     
 }

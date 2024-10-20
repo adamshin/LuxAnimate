@@ -65,13 +65,10 @@ class NewBrushStrokeEngine {
         while let processResult = state.processNextSample() {
             stamps += processResult.stamps
             
-            let isFinalized = processResult.stamps
+            let isResultFinalized = processResult.stamps
                 .allSatisfy { $0.isFinalized }
             
-            if isFinalized {
-                // I should be able to remove this line and
-                // still have the stroke render correctly.
-                // It'll just draw over itself multiple times.
+            if isResultFinalized {
                 savedState = state
             }
         }
