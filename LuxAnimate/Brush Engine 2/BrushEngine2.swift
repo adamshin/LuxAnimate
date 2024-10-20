@@ -25,7 +25,6 @@ extension BrushEngine2 {
     }
     
     struct InputSample {
-        var isPredicted: Bool
         var updateID: Int?
         
         var timeOffset: TimeInterval
@@ -46,9 +45,6 @@ extension BrushEngine2 {
             isAltitudeEstimated ||
             isAzimuthEstimated ||
             isRollEstimated
-        }
-        var isFinalized: Bool {
-            !isPredicted && !hasEstimatedValues
         }
     }
     

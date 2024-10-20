@@ -33,7 +33,6 @@ struct AnimEditorBrushSampleAdapter {
             maxForce: s.maximumPossibleForce)
         
         return BrushEngine2.InputSample(
-            isPredicted: s.isPredicted,
             updateID: s.updateID,
             timeOffset: s.timeOffset,
             position: position,

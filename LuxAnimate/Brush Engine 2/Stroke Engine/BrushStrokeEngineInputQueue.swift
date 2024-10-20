@@ -58,7 +58,7 @@ class BrushStrokeEngineInputQueue {
         var output: [BrushEngine2.Sample] = []
         
         let finalizedPrefixCount = inputSamples
-            .prefix { $0.isFinalized }
+            .prefix { !$0.hasEstimatedValues }
             .count
         
         let prefixCount = max(

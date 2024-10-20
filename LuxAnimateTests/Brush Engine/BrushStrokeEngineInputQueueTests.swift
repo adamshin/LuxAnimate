@@ -10,12 +10,10 @@ import Foundation
 private func createInputSample(
     updateID: Int? = nil,
     timeOffset: TimeInterval = 0,
-    isPredicted: Bool = false,
     isPressureEstimated: Bool = false
 ) -> BrushEngine2.InputSample {
     
     BrushEngine2.InputSample(
-        isPredicted: isPredicted,
         updateID: updateID,
         timeOffset: timeOffset,
         position: .zero,
@@ -56,8 +54,7 @@ struct BrushStrokeEngineInputQueueTests {
                 createInputSample()
             },
             predictedSamples: (0..<3).map { _ in
-                createInputSample(
-                    isPredicted: true)
+                createInputSample()
             })
         
         let output1 = queue.process()
@@ -70,8 +67,7 @@ struct BrushStrokeEngineInputQueueTests {
                 createInputSample()
             },
             predictedSamples: (0..<4).map { _ in
-                createInputSample(
-                    isPredicted: true)
+                createInputSample()
             })
         
         let output2 = queue.process()
@@ -94,8 +90,7 @@ struct BrushStrokeEngineInputQueueTests {
                     isPressureEstimated: $0 >= 1)
             },
             predictedSamples: (0..<5).map { _ in
-                createInputSample(
-                    isPredicted: true)
+                createInputSample()
             })
         // xEEEEPPPPP
         
@@ -123,8 +118,7 @@ struct BrushStrokeEngineInputQueueTests {
                 createInputSample()
             },
             predictedSamples: (0..<3).map { _ in
-                createInputSample(
-                    isPredicted: true)
+                createInputSample()
             })
         // EEExPPP
         
@@ -172,7 +166,7 @@ struct BrushStrokeEngineInputQueueTests {
                 createInputSample(isPressureEstimated: true)
             },
             predictedSamples: (0..<3).map { _ in
-                createInputSample(isPredicted: true)
+                createInputSample()
             })
         
         let output1 = queue.process()

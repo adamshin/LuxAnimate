@@ -69,13 +69,15 @@ struct NewBrushStrokeEngineInputQueue {
         if let s = samples.first {
             samples.removeFirst()
             
+            let isFinalized = !s.hasEstimatedValues
+            
             let isLastSample =
                 samples.isEmpty &&
                 predictedSamples.isEmpty
             
             return Self.convert(
                 inputSample: s,
-                isFinalized: s.isFinalized,
+                isFinalized: isFinalized,
                 isLastSample: isLastSample)
             
         } else if let s = predictedSamples.first {

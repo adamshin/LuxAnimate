@@ -11,7 +11,6 @@ extension BrushGestureRecognizer {
     @MainActor
     struct Sample {
         var timeOffset: TimeInterval
-        var isPredicted: Bool
         var updateID: Int?
         
         var position: CGPoint
@@ -64,15 +63,13 @@ extension BrushGestureRecognizer {
             extractSample(
                 touch: $0,
                 view: view,
-                startTime: startTime,
-                isPredicted: false)
+                startTime: startTime)
         }
         let predictedSamples = predictedTouches.map {
             extractSample(
                 touch: $0,
                 view: view,
-                startTime: startTime,
-                isPredicted: true)
+                startTime: startTime)
         }
         
         if BrushGestureRecognizer.Config.usePredictedTouches {
@@ -85,8 +82,7 @@ extension BrushGestureRecognizer {
     private static func extractSample(
         touch: UITouch,
         view: UIView?,
-        startTime: TimeInterval,
-        isPredicted: Bool
+        startTime: TimeInterval
     ) -> Sample {
         
         let timeOffset = touch.timestamp - startTime
@@ -94,7 +90,6 @@ extension BrushGestureRecognizer {
         
         return BrushGestureRecognizer.Sample(
             timeOffset: timeOffset,
-            isPredicted: isPredicted,
             updateID: updateID,
             position: touch.preciseLocation(in: view),
             maximumPossibleForce: touch.maximumPossibleForce,
