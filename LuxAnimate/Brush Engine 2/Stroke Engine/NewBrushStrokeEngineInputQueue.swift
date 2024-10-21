@@ -8,11 +8,10 @@ struct NewBrushStrokeEngineInputQueue {
     
     static let finalizationThreshold = 30
     
-    private var samples:
-        [BrushEngine2.InputSample] = []
+    private var samples: [BrushEngine2.InputSample] = []
+    private var predictedSamples: [BrushEngine2.InputSample] = []
     
-    private var predictedSamples:
-        [BrushEngine2.InputSample] = []
+    private var lastSampleTimeOffset: TimeInterval = 0
     
     private var isOutputFinalized = true
     
@@ -26,8 +25,7 @@ struct NewBrushStrokeEngineInputQueue {
         self.predictedSamples = predictedSamples
         
         let finalizationOverflow =
-            samples.count -
-            Self.finalizationThreshold
+            samples.count - Self.finalizationThreshold
         
         if finalizationOverflow > 0 {
             for i in 0 ..< finalizationOverflow {
@@ -36,6 +34,12 @@ struct NewBrushStrokeEngineInputQueue {
                 samples[i].isAzimuthEstimated = false
                 samples[i].isRollEstimated = false
             }
+        }
+        
+        if let lastSample =
+            predictedSamples.last ?? samples.last
+        {
+            lastSampleTimeOffset = lastSample.timeOffset
         }
     }
     
@@ -68,7 +72,8 @@ struct NewBrushStrokeEngineInputQueue {
             return NewBrushStrokeEngine.ProcessorOutput(
                 samples: [sample],
                 isFinalized: isOutputFinalized,
-                isStrokeEnd: false)
+                isStrokeEnd: false,
+                strokeEndTimeOffset: lastSampleTimeOffset)
             
         } else if let s = predictedSamples.first {
             predictedSamples.removeFirst()
@@ -77,13 +82,15 @@ struct NewBrushStrokeEngineInputQueue {
             return NewBrushStrokeEngine.ProcessorOutput(
                 samples: [sample],
                 isFinalized: false,
-                isStrokeEnd: false)
+                isStrokeEnd: false,
+                strokeEndTimeOffset: lastSampleTimeOffset)
         }
         
         return NewBrushStrokeEngine.ProcessorOutput(
             samples: [],
             isFinalized: false,
-            isStrokeEnd: true)
+            isStrokeEnd: true,
+            strokeEndTimeOffset: lastSampleTimeOffset)
     }
     
     // MARK: - Internal Logic

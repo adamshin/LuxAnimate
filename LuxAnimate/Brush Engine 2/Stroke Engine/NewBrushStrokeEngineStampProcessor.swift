@@ -14,9 +14,13 @@ struct NewBrushStrokeEngineStampProcessor {
     private let scale: Double
     private let color: Color
     
+    private var isOutputFinalized = true
+    
     private var segmentControlPoints: [BrushEngine2.Sample] = []
     // TODO: Last stamp position?
     // Total stroke distance?
+    
+    private var totalSampleCount = 0
     
     init(
         brush: Brush,
@@ -32,7 +36,10 @@ struct NewBrushStrokeEngineStampProcessor {
         input: NewBrushStrokeEngine.ProcessorOutput
     ) -> NewBrushStrokeEngine.StampProcessorOutput {
         
-        var isFinalized = input.isFinalized
+        if !input.isFinalized {
+            isOutputFinalized = false
+        }
+        
         var outputStamps: [BrushEngine2.Stamp] = []
         
         for sample in input.samples {
@@ -40,13 +47,13 @@ struct NewBrushStrokeEngineStampProcessor {
         }
         
         if input.isStrokeEnd {
-            isFinalized = false
+            isOutputFinalized = false
             outputStamps += processStrokeEnd()
         }
         
         return NewBrushStrokeEngine.StampProcessorOutput(
             stamps: outputStamps,
-            isFinalized: isFinalized,
+            isFinalized: isOutputFinalized,
             isStrokeEnd: input.isStrokeEnd)
     }
     
