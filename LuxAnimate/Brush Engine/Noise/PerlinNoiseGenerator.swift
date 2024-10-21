@@ -69,7 +69,9 @@ private func grad(_ hash: UInt64, _ x: Double) -> Double {
     return (hash & 1 == 0) ? x : -x
 }
 
-private func perlin1D(x: Double, seed: UInt64) -> Double {
+private func perlin1D(x xUnclamped: Double, seed: UInt64) -> Double {
+    let x = abs(xUnclamped)
+    
     // Determine grid cell coordinates
     let cellX = UInt64(floor(x))
     
