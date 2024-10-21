@@ -73,7 +73,6 @@ extension BrushEngine2 {
         var rotation: Double
         var alpha: Double
         var color: Color
-        
         var offset: Vector
     }
     

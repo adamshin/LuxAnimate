@@ -34,8 +34,6 @@ extension NewBrushStrokeEngine {
 class NewBrushStrokeEngine {
     
     private let brush: Brush
-    private let color: Color
-    private let quickTap: Bool
     
     private var savedState: NewBrushStrokeEngineState
     
@@ -47,13 +45,12 @@ class NewBrushStrokeEngine {
         quickTap: Bool
     ) {
         self.brush = brush
-        self.color = color
-        self.quickTap = quickTap
         
         savedState = .init(
             brush: brush,
             scale: scale,
-            color: color)
+            color: color,
+            applyTaper: !quickTap)
     }
     
     func update(

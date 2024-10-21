@@ -12,14 +12,16 @@ struct NewBrushStrokeEngineState {
     init(
         brush: Brush,
         scale: Double,
-        color: Color
+        color: Color,
+        applyTaper: Bool
     ) {
         inputQueue = .init()
         
         stampProcessor = .init(
             brush: brush,
             scale: scale,
-            color: color)
+            color: color,
+            applyTaper: applyTaper)
     }
     
     mutating func handleInputUpdate(

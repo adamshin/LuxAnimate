@@ -4,33 +4,65 @@
 
 import Foundation
 
+// MARK: - Config
+
+private let minStampDistance: Double = 1.0
 private let minStampSize: Double = 0.5
-private let segmentInterpolationCount = 10
-private let stampAlpha: Double = 1
+
+private let segmentSubdivisionCount = 1
+
+// MARK: - Helpers
+
+extension NewBrushStrokeEngineStampProcessor {
+    
+    struct StrokeConfig {
+        var brush: Brush
+        var scale: Double
+        var color: Color
+        var applyTaper: Bool
+    }
+    
+    struct LastStampData {
+        var stamp: BrushEngine2.Stamp
+        var strokeDistance: TimeInterval
+    }
+    
+    struct ProcessSegmentOutput {
+        var stamps: [BrushEngine2.Stamp]
+        var lastStampData: LastStampData?
+        
+        var hasUnfinalizedStamps: Bool
+    }
+    
+}
+
+// MARK: - NewBrushStrokeEngineStampProcessor
 
 struct NewBrushStrokeEngineStampProcessor {
     
-    private let brush: Brush
-    private let scale: Double
-    private let color: Color
+    private let strokeConfig: StrokeConfig
+    
+    private var segmentControlPointSamples: [BrushEngine2.Sample] = []
+    private var lastStampData: LastStampData?
     
     private var isOutputFinalized = true
     
-    private var segmentControlPoints: [BrushEngine2.Sample] = []
-    // TODO: Last stamp position?
-    // Total stroke distance?
-    
-    private var totalSampleCount = 0
+    // MARK: - Init
     
     init(
         brush: Brush,
         scale: Double,
-        color: Color
+        color: Color,
+        applyTaper: Bool
     ) {
-        self.brush = brush
-        self.scale = scale
-        self.color = color
+        strokeConfig = StrokeConfig(
+            brush: brush,
+            scale: scale,
+            color: color,
+            applyTaper: applyTaper)
     }
+    
+    // MARK: - Interface
     
     mutating func process(
         input: NewBrushStrokeEngine.ProcessorOutput
@@ -46,9 +78,13 @@ struct NewBrushStrokeEngineStampProcessor {
             outputStamps += processSample(sample: sample)
         }
         
-        if input.isStrokeEnd {
+        if input.isStrokeEnd,
+            let lastSample = segmentControlPointSamples.last
+        {
             isOutputFinalized = false
-            outputStamps += processStrokeEnd()
+            for _ in 0 ..< 2 {
+                outputStamps += processSample(sample: lastSample)
+            }
         }
         
         return NewBrushStrokeEngine.StampProcessorOutput(
@@ -57,70 +93,57 @@ struct NewBrushStrokeEngineStampProcessor {
             isStrokeEnd: input.isStrokeEnd)
     }
     
+    // MARK: - Internal Logic
+    
     private mutating func processSample(
         sample: BrushEngine2.Sample
     ) -> [BrushEngine2.Stamp] {
         
-        if segmentControlPoints.isEmpty {
-            segmentControlPoints = Array(
+        if segmentControlPointSamples.isEmpty {
+            segmentControlPointSamples = Array(
                 repeating: sample,
                 count: 4)
             
             return []
             
         } else {
-            segmentControlPoints.removeFirst()
-            segmentControlPoints.append(sample)
+            segmentControlPointSamples.removeFirst()
+            segmentControlPointSamples.append(sample)
             
-            return processSegment(
-                controlPoints: segmentControlPoints)
+            let output = Self.processSegment(
+                strokeConfig: strokeConfig,
+                controlPointSamples: segmentControlPointSamples,
+                lastStampData: lastStampData)
+            
+            lastStampData = output.lastStampData
+            
+            if output.hasUnfinalizedStamps {
+                isOutputFinalized = false
+            }
+            
+            return output.stamps
         }
     }
     
-    private mutating func processStrokeEnd()
-    -> [BrushEngine2.Stamp] {
+    private static func processSegment(
+        strokeConfig: StrokeConfig,
+        controlPointSamples: [BrushEngine2.Sample],
+        lastStampData: LastStampData?
+    ) -> ProcessSegmentOutput {
         
-        guard let lastSample = segmentControlPoints.last
-        else { return [] }
-        
-        var stamps: [BrushEngine2.Stamp] = []
-        
-        for _ in 0 ..< 2 {
-            segmentControlPoints.removeFirst()
-            segmentControlPoints.append(lastSample)
-            
-            stamps += processSegment(
-                controlPoints: segmentControlPoints)
+        guard controlPointSamples.count == 4 else {
+            fatalError()
         }
         
-        let lastStamp = createStamp(sample: lastSample)
-        stamps.append(lastStamp)
+        let s0 = controlPointSamples[0]
+        let s1 = controlPointSamples[1]
+        let s2 = controlPointSamples[2]
+        let s3 = controlPointSamples[3]
         
-        return stamps
-    }
-    
-    private func processSegment(
-        controlPoints: [BrushEngine2.Sample]
-    ) -> [BrushEngine2.Stamp] {
+        var subSegmentSamples: [BrushEngine2.Sample] = []
         
-        guard controlPoints.count == 4 else {
-            fatalError("""
-                BrushStrokeEngineStampProcessor: \
-                Expected 4 control points, \
-                got \(controlPoints.count)
-                """)
-        }
-        
-        let s0 = controlPoints[0]
-        let s1 = controlPoints[1]
-        let s2 = controlPoints[2]
-        let s3 = controlPoints[3]
-        
-        var output: [BrushEngine2.Stamp] = []
-        
-        let count = segmentInterpolationCount
-        for i in 0 ..< count {
-            let t = Double(i) / Double(count)
+        for i in 0 ... segmentSubdivisionCount {
+            let t = Double(i) / Double(segmentSubdivisionCount)
             
             let (b0, b1, b2, b3) =
                 UniformCubicBSpline.basisValues(t: t)
@@ -133,31 +156,99 @@ struct NewBrushStrokeEngineStampProcessor {
                     (s3, b3),
                 ])
             
-            guard let sample else { continue }
-            
-            let stamp = createStamp(sample: sample)
-            
-            output.append(stamp)
+            if let sample {
+                subSegmentSamples.append(sample)
+            }
         }
         
-        return output
+        return Self.processSegment(
+            strokeConfig: strokeConfig,
+            subSegmentSamples: subSegmentSamples,
+            lastStampData: lastStampData)
     }
     
-    private func createStamp(
+    private static func processSegment(
+        strokeConfig: StrokeConfig,
+        subSegmentSamples: [BrushEngine2.Sample],
+        lastStampData: LastStampData?
+    ) -> ProcessSegmentOutput {
+        
+        var stamps: [BrushEngine2.Stamp] = []
+        var lastStampData = lastStampData
+        var hasUnfinalizedStamps = false
+        
+        guard subSegmentSamples.count >= 2 else {
+            fatalError()
+        }
+        
+        for i in 0 ..< subSegmentSamples.count - 1 {
+            let startSample = subSegmentSamples[i]
+            let endSample = subSegmentSamples[i + 1]
+            
+            let subSegmentOutput = Self.processSubSegment(
+                strokeConfig: strokeConfig,
+                startSample: startSample,
+                endSample: endSample,
+                lastStampData: lastStampData)
+            
+            stamps += subSegmentOutput.stamps
+            
+            if let d = subSegmentOutput.lastStampData {
+                lastStampData = d
+            }
+            if subSegmentOutput.hasUnfinalizedStamps {
+                hasUnfinalizedStamps = true
+            }
+        }
+        
+        return ProcessSegmentOutput(
+            stamps: stamps,
+            lastStampData: lastStampData,
+            hasUnfinalizedStamps: hasUnfinalizedStamps)
+    }
+    
+    private static func processSubSegment(
+        strokeConfig: StrokeConfig,
+        startSample: BrushEngine2.Sample,
+        endSample: BrushEngine2.Sample,
+        lastStampData: LastStampData?
+    ) -> ProcessSegmentOutput {
+        
+        // TODO: Actually interpolate between samples
+        
+        let stamp1 = Self.createStamp(
+            strokeConfig: strokeConfig,
+            sample: startSample)
+        
+        let stamp2 = Self.createStamp(
+            strokeConfig: strokeConfig,
+            sample: endSample)
+        
+        return ProcessSegmentOutput(
+            stamps: [stamp1, stamp2],
+            lastStampData: nil,
+            hasUnfinalizedStamps: false)
+    }
+    
+    private static func createStamp(
+        strokeConfig: StrokeConfig,
         sample s: BrushEngine2.Sample
     ) -> BrushEngine2.Stamp {
         
         let scaledBrushSize = map(
-            scale,
+            strokeConfig.scale,
             in: (0, 1),
-            to: (minStampSize, brush.config.stampSize))
+            to: (
+                minStampSize,
+                strokeConfig.brush.config.stampSize
+            ))
         
         return BrushEngine2.Stamp(
             position: s.position,
             size: scaledBrushSize,
             rotation: 0,
-            alpha: stampAlpha,
-            color: color,
+            alpha: 1,
+            color: strokeConfig.color,
             offset: .zero)
     }
     
