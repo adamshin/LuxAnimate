@@ -23,7 +23,7 @@ struct BrushEngineSampleInterpolator {
         guard totalWeight != 0 else { return nil }
         
         var o = BrushEngine2.Sample(
-            timeOffset: 0,
+            time: 0,
             position: .zero,
             pressure: 0,
             altitude: 0,
@@ -33,12 +33,12 @@ struct BrushEngineSampleInterpolator {
         for (s, w) in samplesAndWeights {
             let c = w / totalWeight
             
-            o.timeOffset += c * s.timeOffset
-            o.position   += c * s.position
-            o.pressure   += c * s.pressure
-            o.altitude   += c * s.altitude
-            o.azimuth    += c * s.azimuth
-            o.roll       += c * s.roll
+            o.time     += c * s.time
+            o.position += c * s.position
+            o.pressure += c * s.pressure
+            o.altitude += c * s.altitude
+            o.azimuth  += c * s.azimuth
+            o.roll     += c * s.roll
         }
         return o
     }

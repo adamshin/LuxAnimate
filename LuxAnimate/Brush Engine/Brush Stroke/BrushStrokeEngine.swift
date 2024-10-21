@@ -7,7 +7,7 @@ import Foundation
 extension BrushStrokeEngine {
     
     struct Sample {
-        var timeOffset: TimeInterval
+        var time: TimeInterval
         var position: Vector
         var pressure: Double
         var altitude: Double

@@ -12,7 +12,7 @@ extension NewBrushStrokeEngine {
         var samples: [BrushEngine2.Sample]
         var isFinalized: Bool
         var isStrokeEnd: Bool
-        var strokeEndTimeOffset: TimeInterval
+        var strokeEndTime: TimeInterval
     }
     
     struct StampProcessorOutput {

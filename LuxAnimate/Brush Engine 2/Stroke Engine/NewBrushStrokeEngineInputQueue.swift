@@ -11,7 +11,7 @@ struct NewBrushStrokeEngineInputQueue {
     private var samples: [BrushEngine2.InputSample] = []
     private var predictedSamples: [BrushEngine2.InputSample] = []
     
-    private var lastSampleTimeOffset: TimeInterval = 0
+    private var lastSampleTime: TimeInterval = 0
     
     private var isOutputFinalized = true
     
@@ -39,7 +39,7 @@ struct NewBrushStrokeEngineInputQueue {
         if let lastSample =
             predictedSamples.last ?? samples.last
         {
-            lastSampleTimeOffset = lastSample.timeOffset
+            lastSampleTime = lastSample.time
         }
         
 //        print("Input queue sample count: \(samples.count)")
@@ -75,7 +75,7 @@ struct NewBrushStrokeEngineInputQueue {
                 samples: [sample],
                 isFinalized: isOutputFinalized,
                 isStrokeEnd: false,
-                strokeEndTimeOffset: lastSampleTimeOffset)
+                strokeEndTime: lastSampleTime)
             
         } else if let s = predictedSamples.first {
             predictedSamples.removeFirst()
@@ -85,14 +85,14 @@ struct NewBrushStrokeEngineInputQueue {
                 samples: [sample],
                 isFinalized: false,
                 isStrokeEnd: false,
-                strokeEndTimeOffset: lastSampleTimeOffset)
+                strokeEndTime: lastSampleTime)
         }
         
         return NewBrushStrokeEngine.ProcessorOutput(
             samples: [],
             isFinalized: false,
             isStrokeEnd: true,
-            strokeEndTimeOffset: lastSampleTimeOffset)
+            strokeEndTime: lastSampleTime)
     }
     
     // MARK: - Internal Logic
@@ -102,7 +102,7 @@ struct NewBrushStrokeEngineInputQueue {
     ) -> BrushEngine2.Sample {
         
         BrushEngine2.Sample(
-            timeOffset: s.timeOffset,
+            time: s.time,
             position: s.position,
             pressure: s.pressure,
             altitude: s.altitude,

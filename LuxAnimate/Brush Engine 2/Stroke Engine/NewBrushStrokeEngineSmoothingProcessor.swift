@@ -42,14 +42,14 @@ struct NewBrushStrokeEngineSmoothingProcessor {
         
         Self.processSamples(
             samples: input.samples,
-            strokeEndTimeOffset: input.strokeEndTimeOffset,
+            strokeEndTime: input.strokeEndTime,
             sampleBuffer: &sampleBuffer,
             isOutputFinalized: &isOutputFinalized,
             outputSamples: &outputSamples)
         
         if input.isStrokeEnd {
             Self.processStrokeEnd(
-                strokeEndTimeOffset: input.strokeEndTimeOffset,
+                strokeEndTime: input.strokeEndTime,
                 sampleBuffer: &sampleBuffer,
                 isOutputFinalized: &isOutputFinalized,
                 outputSamples: &outputSamples)
@@ -59,14 +59,14 @@ struct NewBrushStrokeEngineSmoothingProcessor {
             samples: outputSamples,
             isFinalized: isOutputFinalized,
             isStrokeEnd: input.isStrokeEnd,
-            strokeEndTimeOffset: input.strokeEndTimeOffset)
+            strokeEndTime: input.strokeEndTime)
     }
     
     // MARK: - Internal Logic
     
     private static func processSamples(
         samples: [BrushEngine2.Sample],
-        strokeEndTimeOffset: TimeInterval,
+        strokeEndTime: TimeInterval,
         sampleBuffer: inout [BrushEngine2.Sample],
         isOutputFinalized: inout Bool,
         outputSamples: inout [BrushEngine2.Sample]
@@ -74,7 +74,7 @@ struct NewBrushStrokeEngineSmoothingProcessor {
         for sample in samples {
             Self.processSample(
                 sample: sample,
-                strokeEndTimeOffset: strokeEndTimeOffset,
+                strokeEndTime: strokeEndTime,
                 sampleBuffer: &sampleBuffer,
                 isOutputFinalized: &isOutputFinalized,
                 outputSamples: &outputSamples)
@@ -82,7 +82,7 @@ struct NewBrushStrokeEngineSmoothingProcessor {
     }
     
     private static func processStrokeEnd(
-        strokeEndTimeOffset: TimeInterval,
+        strokeEndTime: TimeInterval,
         sampleBuffer: inout [BrushEngine2.Sample],
         isOutputFinalized: inout Bool,
         outputSamples: inout [BrushEngine2.Sample]
@@ -101,7 +101,7 @@ struct NewBrushStrokeEngineSmoothingProcessor {
     
     private static func processSample(
         sample: BrushEngine2.Sample,
-        strokeEndTimeOffset: TimeInterval,
+        strokeEndTime: TimeInterval,
         sampleBuffer: inout [BrushEngine2.Sample],
         isOutputFinalized: inout Bool,
         outputSamples: inout [BrushEngine2.Sample]

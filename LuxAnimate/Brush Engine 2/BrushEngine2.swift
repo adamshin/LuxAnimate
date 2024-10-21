@@ -27,7 +27,7 @@ extension BrushEngine2 {
     struct InputSample {
         var updateID: Int?
         
-        var timeOffset: TimeInterval
+        var time: TimeInterval
         var position: Vector
         
         var pressure: Double
@@ -58,7 +58,7 @@ extension BrushEngine2 {
     }
     
     struct Sample {
-        var timeOffset: TimeInterval
+        var time: TimeInterval
         
         var position: Vector
         var pressure: Double

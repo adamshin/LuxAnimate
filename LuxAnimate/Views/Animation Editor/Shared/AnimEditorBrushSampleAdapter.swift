@@ -36,7 +36,7 @@ struct AnimEditorBrushSampleAdapter {
         
         return BrushEngine2.InputSample(
             updateID: s.updateID,
-            timeOffset: s.timeOffset,
+            time: s.time,
             position: position,
             pressure: pressure,
             altitude: s.altitude,

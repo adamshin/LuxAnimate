@@ -93,7 +93,7 @@ struct NewBrushStrokeEngineStampProcessor {
         
         Self.processSamples(
             samples: input.samples,
-            strokeEndTimeOffset: input.strokeEndTimeOffset,
+            strokeEndTime: input.strokeEndTime,
             stampGenerator: stampGenerator,
             lastSegment: &lastSegment,
             lastStampData: &lastStampData,
@@ -102,7 +102,7 @@ struct NewBrushStrokeEngineStampProcessor {
         
         if input.isStrokeEnd {
             Self.processStrokeEnd(
-                strokeEndTimeOffset: input.strokeEndTimeOffset,
+                strokeEndTime: input.strokeEndTime,
                 stampGenerator: stampGenerator,
                 lastSegment: &lastSegment,
                 lastStampData: &lastStampData,
@@ -120,7 +120,7 @@ struct NewBrushStrokeEngineStampProcessor {
     
     private static func processSamples(
         samples: [BrushEngine2.Sample],
-        strokeEndTimeOffset: TimeInterval,
+        strokeEndTime: TimeInterval,
         stampGenerator: NewBrushStrokeEngineStampGenerator,
         lastSegment: inout Segment?,
         lastStampData: inout LastStampData?,
@@ -130,7 +130,7 @@ struct NewBrushStrokeEngineStampProcessor {
         for sample in samples {
             Self.processSample(
                 sample: sample,
-                strokeEndTimeOffset: strokeEndTimeOffset,
+                strokeEndTime: strokeEndTime,
                 stampGenerator: stampGenerator,
                 lastSegment: &lastSegment,
                 lastStampData: &lastStampData,
@@ -140,7 +140,7 @@ struct NewBrushStrokeEngineStampProcessor {
     }
     
     private static func processStrokeEnd(
-        strokeEndTimeOffset: TimeInterval,
+        strokeEndTime: TimeInterval,
         stampGenerator: NewBrushStrokeEngineStampGenerator,
         lastSegment: inout Segment?,
         lastStampData: inout LastStampData?,
@@ -156,7 +156,7 @@ struct NewBrushStrokeEngineStampProcessor {
         for _ in 0 ..< 2 {
             Self.processSample(
                 sample: lastSample,
-                strokeEndTimeOffset: strokeEndTimeOffset,
+                strokeEndTime: strokeEndTime,
                 stampGenerator: stampGenerator,
                 lastSegment: &lastSegment,
                 lastStampData: &lastStampData,
@@ -167,7 +167,7 @@ struct NewBrushStrokeEngineStampProcessor {
     
     private static func processSample(
         sample: BrushEngine2.Sample,
-        strokeEndTimeOffset: TimeInterval,
+        strokeEndTime: TimeInterval,
         stampGenerator: NewBrushStrokeEngineStampGenerator,
         lastSegment: inout Segment?,
         lastStampData: inout LastStampData?,
@@ -176,7 +176,7 @@ struct NewBrushStrokeEngineStampProcessor {
     ) {
         let sampleOutput = Self.processSample(
             sample: sample,
-            strokeEndTimeOffset: strokeEndTimeOffset,
+            strokeEndTime: strokeEndTime,
             stampGenerator: stampGenerator,
             lastSegment: lastSegment,
             lastStampData: lastStampData)
@@ -193,7 +193,7 @@ struct NewBrushStrokeEngineStampProcessor {
     
     private static func processSample(
         sample: BrushEngine2.Sample,
-        strokeEndTimeOffset: TimeInterval,
+        strokeEndTime: TimeInterval,
         stampGenerator: NewBrushStrokeEngineStampGenerator,
         lastSegment: Segment?,
         lastStampData: LastStampData?
@@ -228,7 +228,7 @@ struct NewBrushStrokeEngineStampProcessor {
             
         let segmentOutput = Self.processSegment(
             segment: segment,
-            strokeEndTimeOffset: strokeEndTimeOffset,
+            strokeEndTime: strokeEndTime,
             stampGenerator: stampGenerator,
             lastStampData: lastStampData)
         
@@ -241,7 +241,7 @@ struct NewBrushStrokeEngineStampProcessor {
     
     private static func processSegment(
         segment: Segment,
-        strokeEndTimeOffset: TimeInterval,
+        strokeEndTime: TimeInterval,
         stampGenerator: NewBrushStrokeEngineStampGenerator,
         lastStampData: LastStampData?
     ) -> ProcessSegmentOutput {
@@ -253,7 +253,7 @@ struct NewBrushStrokeEngineStampProcessor {
         for subSegment in segment.subSegments {
             let subSegmentOutput = Self.processSubSegment(
                 subSegment: subSegment,
-                strokeEndTimeOffset: strokeEndTimeOffset,
+                strokeEndTime: strokeEndTime,
                 stampGenerator: stampGenerator,
                 lastStampData: lastStampData)
             
@@ -273,7 +273,7 @@ struct NewBrushStrokeEngineStampProcessor {
     
     private static func processSubSegment(
         subSegment: SubSegment,
-        strokeEndTimeOffset: TimeInterval,
+        strokeEndTime: TimeInterval,
         stampGenerator: NewBrushStrokeEngineStampGenerator,
         lastStampData inputLastStampData: LastStampData?
     ) -> ProcessSegmentOutput {
@@ -331,7 +331,7 @@ struct NewBrushStrokeEngineStampProcessor {
                 stampGenerator.stamp(
                     sample: sample,
                     strokeDistance: nextStampStrokeDistance,
-                    strokeEndTimeOffset: strokeEndTimeOffset)
+                    strokeEndTime: strokeEndTime)
             
             let stamp = stampOutput.stamp
             stamps.append(stamp)

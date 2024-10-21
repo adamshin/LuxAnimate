@@ -71,7 +71,7 @@ struct NewBrushStrokeEngineStampGenerator {
     func stamp(
         sample s: BrushEngine2.Sample,
         strokeDistance: Double,
-        strokeEndTimeOffset: TimeInterval
+        strokeEndTime: TimeInterval
     ) -> Output {
         
         let scaledBrushSize = map(
@@ -89,8 +89,8 @@ struct NewBrushStrokeEngineStampGenerator {
         
         let (taperScaleFactor, isInTaperEnd) =
             combinedTaper(
-                sampleTimeOffset: s.timeOffset,
-                strokeEndTimeOffset: strokeEndTimeOffset)
+                sampleTime: s.time,
+                strokeEndTime: strokeEndTime)
         
         let wobbleDistance = strokeDistance / scaledBrushSize
         let wobbleIntensity = 1
@@ -148,8 +148,8 @@ struct NewBrushStrokeEngineStampGenerator {
     }
     
     private func combinedTaper(
-        sampleTimeOffset: TimeInterval,
-        strokeEndTimeOffset: TimeInterval
+        sampleTime: TimeInterval,
+        strokeEndTime: TimeInterval
     ) -> (Double, Bool) {
         
         let taperTime: TimeInterval
@@ -164,10 +164,10 @@ struct NewBrushStrokeEngineStampGenerator {
         }
         
         let normalizedDistanceToStart =
-            sampleTimeOffset / taperTime
+            sampleTime / taperTime
         
         let normalizedDistanceToEnd =
-            (strokeEndTimeOffset - sampleTimeOffset)
+            (strokeEndTime - sampleTime)
             / taperTime
         
         let taperStartScale: Double

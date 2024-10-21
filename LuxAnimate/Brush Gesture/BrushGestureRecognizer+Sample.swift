@@ -10,7 +10,7 @@ extension BrushGestureRecognizer {
     
     @MainActor
     struct Sample {
-        var timeOffset: TimeInterval
+        var time: TimeInterval
         var updateID: Int?
         
         var position: CGPoint
@@ -48,7 +48,7 @@ extension BrushGestureRecognizer {
     static func extractSamples(
         touch: UITouch,
         event: UIEvent,
-        startTime: TimeInterval,
+        startTimestamp: TimeInterval,
         view: UIView?
     ) -> (
         [BrushGestureRecognizer.Sample],
@@ -63,13 +63,13 @@ extension BrushGestureRecognizer {
             extractSample(
                 touch: $0,
                 view: view,
-                startTime: startTime)
+                startTimestamp: startTimestamp)
         }
         let predictedSamples = predictedTouches.map {
             extractSample(
                 touch: $0,
                 view: view,
-                startTime: startTime)
+                startTimestamp: startTimestamp)
         }
         
         if BrushGestureRecognizer.Config.usePredictedTouches {
@@ -82,14 +82,14 @@ extension BrushGestureRecognizer {
     private static func extractSample(
         touch: UITouch,
         view: UIView?,
-        startTime: TimeInterval
+        startTimestamp: TimeInterval
     ) -> Sample {
         
-        let timeOffset = touch.timestamp - startTime
+        let time = touch.timestamp - startTimestamp
         let updateID = touch.estimationUpdateIndex?.intValue
         
         return BrushGestureRecognizer.Sample(
-            timeOffset: timeOffset,
+            time: time,
             updateID: updateID,
             position: touch.preciseLocation(in: view),
             maximumPossibleForce: touch.maximumPossibleForce,

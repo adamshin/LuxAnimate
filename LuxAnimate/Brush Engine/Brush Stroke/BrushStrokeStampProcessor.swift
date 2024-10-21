@@ -76,7 +76,7 @@ class BrushStrokeStampProcessor {
         
         let firstSample = samples.first!
         let lastSample = samples.last!
-        let endTimeOffset = lastSample.timeOffset
+        let endTime = lastSample.time
         
         var state = lastFinalizedState
         
@@ -84,7 +84,7 @@ class BrushStrokeStampProcessor {
             let firstStamp = stamp(
                 strokeDistance: 0,
                 sample: firstSample,
-                endTimeOffset: endTimeOffset)
+                endTime: endTime)
             
             state.stamps.append(firstStamp)
         }
@@ -130,7 +130,7 @@ class BrushStrokeStampProcessor {
                 let stamp = stamp(
                     strokeDistance: strokeDistance,
                     sample: interpolatedSample,
-                    endTimeOffset: endTimeOffset)
+                    endTime: endTime)
                 
                 state.stamps.append(stamp)
                 state.lastStampDistanceAlongSegment = nextStampDistanceAlongSegment
@@ -163,7 +163,7 @@ class BrushStrokeStampProcessor {
         let c1 = 1 - progressBetweenSamples
         let c2 = progressBetweenSamples
         
-        let timeOffset = c1 * s1.timeOffset + c2 * s2.timeOffset
+        let time = c1 * s1.time + c2 * s2.time
         let position = c1 * s1.position + c2 * s2.position
         let pressure = c1 * s1.pressure + c2 * s2.pressure
         let altitude = c1 * s1.altitude + c2 * s2.altitude
@@ -172,7 +172,7 @@ class BrushStrokeStampProcessor {
         let isFinalized = s1.isFinalized && s2.isFinalized
         
         return BrushStrokeEngine.Sample(
-            timeOffset: timeOffset,
+            time: time,
             position: position,
             pressure: pressure,
             altitude: altitude,
@@ -183,7 +183,7 @@ class BrushStrokeStampProcessor {
     private func stamp(
         strokeDistance: Double,
         sample: BrushStrokeEngine.Sample,
-        endTimeOffset: TimeInterval
+        endTime: TimeInterval
     ) -> BrushStrokeEngine.Stamp {
         
         let scaledBrushSize = map(
@@ -200,8 +200,8 @@ class BrushStrokeStampProcessor {
             * 2 * (pressure - 0.5)
         
         let (taperScale, isInTaperEnd) = combinedTaper(
-            sampleTimeOffset: sample.timeOffset,
-            endTimeOffset: endTimeOffset)
+            sampleTime: sample.time,
+            endTime: endTime)
         
         let wobbleDistance = strokeDistance / scaledBrushSize
         let wobbleIntensity = 1
@@ -261,8 +261,8 @@ class BrushStrokeStampProcessor {
     }
     
     private func combinedTaper(
-        sampleTimeOffset: TimeInterval,
-        endTimeOffset: TimeInterval
+        sampleTime: TimeInterval,
+        endTime: TimeInterval
     ) -> (Double, Bool) {
         
         let taperTime: TimeInterval
@@ -275,8 +275,8 @@ class BrushStrokeStampProcessor {
                 * maxTaperTime
         }
         
-        let normalizedDistanceToStart = sampleTimeOffset / taperTime
-        let normalizedDistanceToEnd = (endTimeOffset - sampleTimeOffset) / taperTime
+        let normalizedDistanceToStart = sampleTime / taperTime
+        let normalizedDistanceToEnd = (endTime - sampleTime) / taperTime
         
         let taperStartScale: Double
         let taperEndScale: Double

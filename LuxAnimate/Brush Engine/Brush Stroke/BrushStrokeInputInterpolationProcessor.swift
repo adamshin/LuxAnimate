@@ -52,7 +52,7 @@ class BrushStrokeInputInterpolationProcessor {
             let s2 = sampleAtIndex(state.inputSampleIndex + 2)
             let s3 = sampleAtIndex(state.inputSampleIndex + 3)
             
-            let timeDifference = s2.timeOffset - s1.timeOffset
+            let timeDifference = s2.time - s1.time
             
             let interpolatedSampleCount = max(1,
                 Int((timeDifference / targetSampleTimeGap).rounded()))
@@ -91,7 +91,7 @@ class BrushStrokeInputInterpolationProcessor {
         let samples = [s0, s1, s2, s3]
         
         var o = BrushStrokeEngine.Sample(
-            timeOffset: 0,
+            time: 0,
             position: .zero,
             pressure: 0,
             altitude: 0,
@@ -100,7 +100,7 @@ class BrushStrokeInputInterpolationProcessor {
         
         for (b, s) in zip(basisValues, samples) {
             o.position += b * s.position
-            o.timeOffset += b * s.timeOffset
+            o.time += b * s.time
             o.pressure += b * s.pressure
             o.altitude += b * s.altitude
             o.azimuth += b * s.azimuth

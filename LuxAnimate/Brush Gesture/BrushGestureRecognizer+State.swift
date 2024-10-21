@@ -107,19 +107,19 @@ class BrushGestureRecognizerWaitingState:
         }
         
         let view = delegate?.view(self)
-        let startTime = touch.timestamp
+        let startTimestamp = touch.timestamp
         
         let (samples, _) = BrushGestureRecognizer
             .extractSamples(
                 touch: touch,
                 event: event,
-                startTime: startTime,
+                startTimestamp: startTimestamp,
                 view: view)
         
         delegate?.setInternalState(self,
             BrushGestureRecognizerPreActiveState(
                 touch: touch,
-                startTime: startTime,
+                startTimestamp: startTimestamp,
                 queuedSamples: samples))
     }
     
@@ -135,7 +135,7 @@ class BrushGestureRecognizerPreActiveState:
         BrushGestureRecognizerInternalStateDelegate?
     
     private let touch: UITouch
-    private let startTime: TimeInterval
+    private let startTimestamp: TimeInterval
     
     private var queuedSamples: [BrushGestureRecognizer.Sample]
     private var predictedSamples: [BrushGestureRecognizer.Sample]
@@ -144,11 +144,11 @@ class BrushGestureRecognizerPreActiveState:
     
     init(
         touch: UITouch,
-        startTime: TimeInterval,
+        startTimestamp: TimeInterval,
         queuedSamples: [BrushGestureRecognizer.Sample]
     ) {
         self.touch = touch
-        self.startTime = startTime
+        self.startTimestamp = startTimestamp
         self.queuedSamples = queuedSamples
         self.predictedSamples = []
         
@@ -200,7 +200,7 @@ class BrushGestureRecognizerPreActiveState:
             .extractSamples(
                 touch: touch,
                 event: event,
-                startTime: startTime,
+                startTimestamp: startTimestamp,
                 view: view)
         
         self.queuedSamples += samples
@@ -264,7 +264,7 @@ class BrushGestureRecognizerPreActiveState:
         delegate?.setInternalState(self,
             BrushGestureRecognizerActiveState(
                 touch: touch,
-                startTime: startTime,
+                startTimestamp: startTimestamp,
                 lastSample: queuedSamples.last))
     }
     
@@ -279,7 +279,7 @@ class BrushGestureRecognizerActiveState:
         BrushGestureRecognizerInternalStateDelegate?
     
     private let touch: UITouch
-    private let startTime: TimeInterval
+    private let startTimestamp: TimeInterval
     
     private var lastSample: BrushGestureRecognizer.Sample?
     
@@ -287,11 +287,11 @@ class BrushGestureRecognizerActiveState:
     
     init(
         touch: UITouch,
-        startTime: TimeInterval,
+        startTimestamp: TimeInterval,
         lastSample: BrushGestureRecognizer.Sample?
     ) {
         self.touch = touch
-        self.startTime = startTime
+        self.startTimestamp = startTimestamp
         self.lastSample = lastSample
     }
     
@@ -311,13 +311,13 @@ class BrushGestureRecognizerActiveState:
         touches: Set<UITouch>, event: UIEvent
     ) {
         if touch.type == .direct {
-            let cancellationThreshold = startTime +
+            let cancellationThreshold = startTimestamp +
                 BrushGestureRecognizer.Config
                     .fingerSecondTouchCancellationThreshold
             
-            if touches.contains(
-                where: { $0.timestamp < cancellationThreshold })
-            {
+            if touches.contains(where: {
+                $0.timestamp < cancellationThreshold
+            }) {
                 delegate?.onCancelStroke(self)
                 
                 delegate?.setInternalState(self,
@@ -339,7 +339,7 @@ class BrushGestureRecognizerActiveState:
             .extractSamples(
                 touch: touch,
                 event: event,
-                startTime: startTime,
+                startTimestamp: startTimestamp,
                 view: view)
         
         lastSample = samples.last
@@ -394,21 +394,21 @@ class BrushGestureRecognizerActiveState:
     private func onDisplayLink() {
         guard let lastSample else { return }
         
-        let currentTime = ProcessInfo.processInfo.systemUptime
-        let currentTimeOffset = currentTime - startTime
+        let currentTimestamp = ProcessInfo
+            .processInfo.systemUptime
+        let currentTime = currentTimestamp - startTimestamp
         
-        let gapFillTimeOffset = BrushGestureRecognizer.Config
-            .gapFillTimeOffset
+        let gapFillTimeOffset = BrushGestureRecognizer
+            .Config.gapFillTimeOffset
         
-        let nextSampleTimeOffset =
-            lastSample.timeOffset +
-            gapFillTimeOffset
+        let nextSampleTime =
+            lastSample.time + gapFillTimeOffset
         
-        if nextSampleTimeOffset <
-            currentTimeOffset - gapFillTimeOffset
-        {   
+        if nextSampleTime <
+            currentTime - gapFillTimeOffset
+        {
             var sample = lastSample
-            sample.timeOffset = nextSampleTimeOffset
+            sample.time = nextSampleTime
             self.lastSample = sample
             
             delegate?.onUpdateStroke(

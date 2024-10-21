@@ -85,7 +85,7 @@ class BrushStrokeSmoothingProcessor {
             windowRangeStart + windowSize > samples.count
         
         var position = Vector.zero
-        var timeOffset: TimeInterval = 0
+        var time: TimeInterval = 0
         var pressure: Double = 0
         var altitude: Double = 0
         var azimuth: Vector = .zero
@@ -106,7 +106,7 @@ class BrushStrokeSmoothingProcessor {
             let s = samples[clampedSampleIndex]
             
             position += s.position * weight
-            timeOffset += s.timeOffset * weight
+            time += s.time * weight
             pressure += s.pressure * weight
             altitude += s.altitude * weight
             azimuth += s.azimuth * weight
@@ -114,7 +114,7 @@ class BrushStrokeSmoothingProcessor {
             
             allFinalized = allFinalized && s.isFinalized
         }
-        timeOffset /= totalWeight
+        time /= totalWeight
         position /= totalWeight
         pressure /= totalWeight
         altitude /= totalWeight
@@ -123,7 +123,7 @@ class BrushStrokeSmoothingProcessor {
         let isFinalized = allFinalized && !isWindowPastEnd
         
         return BrushStrokeEngine.Sample(
-            timeOffset: timeOffset,
+            time: time,
             position: position,
             pressure: pressure,
             altitude: altitude,
