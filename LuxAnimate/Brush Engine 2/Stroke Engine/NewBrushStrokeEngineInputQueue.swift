@@ -41,6 +41,8 @@ struct NewBrushStrokeEngineInputQueue {
         {
             lastSampleTimeOffset = lastSample.timeOffset
         }
+        
+//        print("Input queue sample count: \(samples.count)")
     }
     
     mutating func handleInputUpdate(

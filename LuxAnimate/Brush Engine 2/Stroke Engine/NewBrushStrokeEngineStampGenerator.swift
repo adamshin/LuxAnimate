@@ -87,60 +87,59 @@ struct NewBrushStrokeEngineStampGenerator {
             + brush.config.pressureScaling
             * 2 * (pressure - 0.5)
         
-//        let (taperScaleFactor, isInTaperEnd) =
-//            combinedTaper(
-//                sampleTimeOffset: s.timeOffset,
-//                strokeEndTimeOffset: strokeEndTimeOffset)
-//        
-//        let wobbleDistance = strokeDistance / scaledBrushSize
-//        let wobbleIntensity = 1
-//            - brush.config.wobblePressureAttenuation
-//            * pow(pressure, 3)
-//        
-//        let sizeWobbleValue = sizeWobbleGenerator
-//            .value(at: wobbleDistance)
-//        let wobbleScaleFactor = 1
-//            + brush.config.sizeWobble
-//            * sizeWobbleValue
-//            * wobbleIntensity
+        let (taperScaleFactor, isInTaperEnd) =
+            combinedTaper(
+                sampleTimeOffset: s.timeOffset,
+                strokeEndTimeOffset: strokeEndTimeOffset)
+        
+        let wobbleDistance = strokeDistance / scaledBrushSize
+        let wobbleIntensity = 1
+            - brush.config.wobblePressureAttenuation
+            * pow(pressure, 3)
+        
+        let sizeWobbleValue = sizeWobbleGenerator
+            .value(at: wobbleDistance)
+        let wobbleScaleFactor = 1
+            + brush.config.sizeWobble
+            * sizeWobbleValue
+            * wobbleIntensity
         
         let sizeUnclamped = scaledBrushSize
             * pressureScaleFactor
-//            * taperScaleFactor
-//            * wobbleScaleFactor
+            * taperScaleFactor
+            * wobbleScaleFactor
         
         let size = max(sizeUnclamped, minStampSize)
         
-//        let rotation = s.azimuth + s.roll
+        let rotation = s.azimuth + s.roll
         
         let alpha = brush.config.stampAlpha
         
-//        let offsetX = offsetXWobbleGenerator.value(at: wobbleDistance)
-//            * brush.config.offsetWobble
-//            * wobbleIntensity
-//        let offsetY = offsetYWobbleGenerator.value(at: wobbleDistance)
-//            * brush.config.offsetWobble
-//            * wobbleIntensity
+        let offsetX = offsetXWobbleGenerator.value(at: wobbleDistance)
+            * brush.config.offsetWobble
+            * wobbleIntensity
+        let offsetY = offsetYWobbleGenerator.value(at: wobbleDistance)
+            * brush.config.offsetWobble
+            * wobbleIntensity
         
-//        var offset = Vector(offsetX, offsetY)
-//        if offset.lengthSquared() > 1.0 {
-//            offset = offset.normalized()
-//        }
+        var offset = Vector(offsetX, offsetY)
+        if offset.lengthSquared() > 1.0 {
+            offset = offset.normalized()
+        }
         
         let stamp = BrushEngine2.Stamp(
             position: s.position,
             size: size,
-            rotation: 0,//rotation,
+            rotation: rotation,
             alpha: alpha,
             color: color,
-            offset: .zero)//offset)
+            offset: offset)
         
         let distanceToNextStamp = max(
             size * brush.config.stampSpacing,
             minStampDistance)
         
-//        let isNonFinalized = isInTaperEnd
-        let isNonFinalized = false
+        let isNonFinalized = isInTaperEnd
         
         return Output(
             stamp: stamp,

@@ -250,7 +250,7 @@ struct NewBrushStrokeEngineStampProcessor {
             lastStampData = inputLastStampData
         } else {
             lastStampData = LastStampData(
-                strokeDistance: -0.001,
+                strokeDistance: 0,
                 distanceToNextStamp: 0)
         }
         
@@ -264,7 +264,7 @@ struct NewBrushStrokeEngineStampProcessor {
                 subSegment.startStrokeDistance
             
             if nextStampDistanceInSubSegment
-                > subSegment.length
+                > subSegment.length + 0.001
             { break }
             
             let normalizedSubSegmentDistance: Double
