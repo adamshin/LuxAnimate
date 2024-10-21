@@ -56,11 +56,10 @@ class BrushEngine2StrokeRenderer {
     func drawIncrementalStroke(
         strokeProcessOutput s: NewBrushStrokeEngine.ProcessOutput
     ) {
-        let totalStampCount =
-            s.finalizedStamps.count +
-            s.nonFinalizedStamps.count
-        
-        print("Drawing \(totalStampCount) stamps")
+//        let totalStampCount =
+//            s.finalizedStamps.count +
+//            s.nonFinalizedStamps.count
+//        print("Drawing \(totalStampCount) stamps")
         
         let viewportSize = Size(
             Scalar(canvasSize.width),

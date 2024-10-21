@@ -107,11 +107,10 @@ class AnimFrameEditorLoadingState: AnimFrameEditorState {
         if delegate.assetLoaderHasLoadedAssets(
             self, assetIDs: assetIDsToLoad)
         {
-            let loadEndTime = ProcessInfo.processInfo.systemUptime
-            let loadTime = loadEndTime - loadStartTime
-            let loadTimeMs = Int(loadTime * 1000)
-            
-            print("Loaded assets. \(loadTimeMs) ms")
+//            let loadEndTime = ProcessInfo.processInfo.systemUptime
+//            let loadTime = loadEndTime - loadStartTime
+//            let loadTimeMs = Int(loadTime * 1000)
+//            print("Loaded assets. \(loadTimeMs) ms")
             
             enterEditingState()
         }
