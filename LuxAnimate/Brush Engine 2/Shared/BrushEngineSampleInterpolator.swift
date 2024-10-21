@@ -28,9 +28,7 @@ struct BrushEngineSampleInterpolator {
             pressure: 0,
             altitude: 0,
             azimuth: 0,
-            roll: 0,
-            isFinalized: true,
-            isLastSample: false)
+            roll: 0)
         
         for (s, w) in samplesAndWeights {
             let c = w / totalWeight
@@ -41,8 +39,6 @@ struct BrushEngineSampleInterpolator {
             o.altitude   += c * s.altitude
             o.azimuth    += c * s.azimuth
             o.roll       += c * s.roll
-            
-            o.isFinalized = o.isFinalized && s.isFinalized
         }
         return o
     }

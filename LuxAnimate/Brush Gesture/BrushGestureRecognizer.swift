@@ -8,7 +8,7 @@ extension BrushGestureRecognizer {
     
     struct Config {
         static let pencilOnly = false
-        static let usePredictedTouches = false//true
+        static let usePredictedTouches = true
         
         static let fingerActivationDelay: TimeInterval = 0.25
         static let fingerActivationDistance: CGFloat = 20

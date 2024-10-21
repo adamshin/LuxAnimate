@@ -4,18 +4,6 @@
 
 import Foundation
 
-// I think there's a problem with the logic here.
-
-// We can get finalized output out of order with
-// non-finalized output. This can happen if we get an input
-// update out of order.
-
-// I need to make sure this never happens. If there's a
-// non-finalized sample in the queue, it needs to force all
-// subsequent samples to be output as non-finalized, even
-// if these subsequent samples have been updated with final
-// values.
-
 struct NewBrushStrokeEngineInputQueue {
     
     static let finalizationThreshold = 30
@@ -25,6 +13,8 @@ struct NewBrushStrokeEngineInputQueue {
     
     private var predictedSamples:
         [BrushEngine2.InputSample] = []
+    
+    private var isOutputFinalized = true
     
     // MARK: - Interface
     
@@ -64,41 +54,42 @@ struct NewBrushStrokeEngineInputQueue {
         }
     }
     
-    mutating func popNextSample() -> BrushEngine2.Sample? {
+    mutating func processNextSample()
+    -> NewBrushStrokeEngine.ProcessorOutput {
+        
         if let s = samples.first {
             samples.removeFirst()
             
-            let isFinalized = !s.hasEstimatedValues
+            if s.hasEstimatedValues {
+                isOutputFinalized = false
+            }
             
-            let isLastSample =
-                samples.isEmpty &&
-                predictedSamples.isEmpty
-            
-            return Self.convert(
-                inputSample: s,
-                isFinalized: isFinalized,
-                isLastSample: isLastSample)
+            let sample = Self.convert(inputSample: s)
+            return NewBrushStrokeEngine.ProcessorOutput(
+                samples: [sample],
+                isFinalized: isOutputFinalized,
+                isStrokeEnd: false)
             
         } else if let s = predictedSamples.first {
             predictedSamples.removeFirst()
             
-            let isLastSample = predictedSamples.isEmpty
-            
-            return Self.convert(
-                inputSample: s,
+            let sample = Self.convert(inputSample: s)
+            return NewBrushStrokeEngine.ProcessorOutput(
+                samples: [sample],
                 isFinalized: false,
-                isLastSample: isLastSample)
+                isStrokeEnd: false)
         }
         
-        return nil
+        return NewBrushStrokeEngine.ProcessorOutput(
+            samples: [],
+            isFinalized: false,
+            isStrokeEnd: true)
     }
     
     // MARK: - Internal Logic
     
     private static func convert(
-        inputSample s: BrushEngine2.InputSample,
-        isFinalized: Bool,
-        isLastSample: Bool
+        inputSample s: BrushEngine2.InputSample
     ) -> BrushEngine2.Sample {
         
         BrushEngine2.Sample(
@@ -107,9 +98,7 @@ struct NewBrushStrokeEngineInputQueue {
             pressure: s.pressure,
             altitude: s.altitude,
             azimuth: s.azimuth,
-            roll: s.roll,
-            isFinalized: isFinalized,
-            isLastSample: isLastSample)
+            roll: s.roll)
     }
     
     private static func applySampleUpdate(

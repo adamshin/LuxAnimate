@@ -14,7 +14,8 @@ struct BrushEngine2StampRenderer {
         target: MTLTexture,
         viewportSize: Size,
         stamps: any Sequence<BrushEngine2.Stamp>,
-        brush: Brush
+        brush: Brush,
+        finalized: Bool
     ) {
         let sprites = stamps.map { s in
             let offsetPosition =
@@ -24,11 +25,18 @@ struct BrushEngine2StampRenderer {
                 s.size < paddingSizeThreshold ?
                 3 : 1
             
+            let color: Color
+            if !finalized, AppConfig.brushRenderDebug {
+                color = .debugRed
+            } else {
+                color = s.color
+            }
+            
             return SpriteRenderer.Sprite(
                 position: offsetPosition,
                 size: Size(s.size, s.size),
                 rotation: s.rotation,
-                color: s.color,
+                color: color,
                 alpha: s.alpha,
                 paddingScale: paddingScale)
         }

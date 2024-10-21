@@ -54,23 +54,8 @@ class BrushEngine2StrokeRenderer {
     }
     
     func drawIncrementalStroke(
-        brush: Brush,
-        stamps: [BrushEngine2.Stamp]
+        strokeProcessOutput s: NewBrushStrokeEngine.ProcessOutput
     ) {
-//        print("Drawing \(stamps.count) stamps")
-        
-        let finalizedPrefixCount = stamps
-            .prefix { $0.isFinalized }
-            .count
-        
-        let finalizedStamps = stamps[
-            0 ..< finalizedPrefixCount
-        ]
-        
-        let nonFinalizedStamps = stamps[
-            finalizedPrefixCount ..< stamps.count
-        ]
-        
         let viewportSize = Size(
             Scalar(canvasSize.width),
             Scalar(canvasSize.height))
@@ -78,8 +63,9 @@ class BrushEngine2StrokeRenderer {
         stampRenderer.drawStamps(
             target: finalizedStrokeTexture,
             viewportSize: viewportSize,
-            stamps: finalizedStamps,
-            brush: brush)
+            stamps: s.finalizedStamps,
+            brush: s.brush,
+            finalized: true)
         
         try? TextureBlitter.blit(
             from: finalizedStrokeTexture,
@@ -88,8 +74,9 @@ class BrushEngine2StrokeRenderer {
         stampRenderer.drawStamps(
             target: fullStrokeTexture,
             viewportSize: viewportSize,
-            stamps: nonFinalizedStamps,
-            brush: brush)
+            stamps: s.nonFinalizedStamps,
+            brush: s.brush,
+            finalized: false)
     }
     
 }

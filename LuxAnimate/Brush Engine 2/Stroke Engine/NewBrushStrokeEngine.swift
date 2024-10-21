@@ -8,9 +8,22 @@ import Foundation
 
 extension NewBrushStrokeEngine {
     
-    struct ProcessResult {
-        var brush: Brush
+    struct ProcessorOutput {
+        var samples: [BrushEngine2.Sample]
+        var isFinalized: Bool
+        var isStrokeEnd: Bool
+    }
+    
+    struct StampProcessorOutput {
         var stamps: [BrushEngine2.Stamp]
+        var isFinalized: Bool
+        var isStrokeEnd: Bool
+    }
+    
+    struct ProcessOutput {
+        var brush: Brush
+        var finalizedStamps: [BrushEngine2.Stamp]
+        var nonFinalizedStamps: [BrushEngine2.Stamp]
     }
     
 }
@@ -58,29 +71,30 @@ class NewBrushStrokeEngine {
             sampleUpdates: sampleUpdates)
     }
     
-    func process() -> ProcessResult {
+    func process() -> ProcessOutput {
         var state = savedState
-        var stamps: [BrushEngine2.Stamp] = []
         
-        var isCumulativeResultFinalized = true
+        var output = ProcessOutput(
+            brush: brush,
+            finalizedStamps: [],
+            nonFinalizedStamps: [])
         
-        while let processResult = state.processNextSample() {
-            stamps += processResult.stamps
+        while true {
+            let stepOutput = state.processStep()
             
-            let isResultFinalized = processResult.stamps
-                .allSatisfy { $0.isFinalized }
-            
-            if !isResultFinalized {
-                isCumulativeResultFinalized = false
-            }
-            if isCumulativeResultFinalized {
+            if stepOutput.isFinalized {
                 savedState = state
+                output.finalizedStamps += stepOutput.stamps
+            } else {
+                output.nonFinalizedStamps += stepOutput.stamps
+            }
+            
+            if stepOutput.isStrokeEnd {
+                break
             }
         }
         
-        return ProcessResult(
-            brush: brush,
-            stamps: stamps)
+        return output
     }
     
 }

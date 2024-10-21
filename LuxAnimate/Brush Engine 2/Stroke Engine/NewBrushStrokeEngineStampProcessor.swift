@@ -5,7 +5,8 @@
 import Foundation
 
 private let minStampSize: Double = 0.5
-private let segmentInterpolationCount = 100
+private let segmentInterpolationCount = 10
+private let stampAlpha: Double = 1
 
 struct NewBrushStrokeEngineStampProcessor {
     
@@ -28,49 +29,67 @@ struct NewBrushStrokeEngineStampProcessor {
     }
     
     mutating func process(
+        input: NewBrushStrokeEngine.ProcessorOutput
+    ) -> NewBrushStrokeEngine.StampProcessorOutput {
+        
+        var isFinalized = input.isFinalized
+        var outputStamps: [BrushEngine2.Stamp] = []
+        
+        for sample in input.samples {
+            outputStamps += processSample(sample: sample)
+        }
+        
+        if input.isStrokeEnd {
+            isFinalized = false
+            outputStamps += processStrokeEnd()
+        }
+        
+        return NewBrushStrokeEngine.StampProcessorOutput(
+            stamps: outputStamps,
+            isFinalized: isFinalized,
+            isStrokeEnd: input.isStrokeEnd)
+    }
+    
+    private mutating func processSample(
         sample: BrushEngine2.Sample
     ) -> [BrushEngine2.Stamp] {
-        
-        var output: [BrushEngine2.Stamp] = []
         
         if segmentControlPoints.isEmpty {
             segmentControlPoints = Array(
                 repeating: sample,
                 count: 4)
             
-            // Here's a problem. At this point, we don't
-            // return any stamps. If the first sample is
-            // non-finalized, we don't want the stroke
-            // engine to treat our output as finalized.
-            // But there's no way to signal that, since
-            // we're not returning anything.
+            return []
             
         } else {
             segmentControlPoints.removeFirst()
             segmentControlPoints.append(sample)
             
-            let segmentStamps = processSegment(
+            return processSegment(
                 controlPoints: segmentControlPoints)
+        }
+    }
+    
+    private mutating func processStrokeEnd()
+    -> [BrushEngine2.Stamp] {
+        
+        guard let lastSample = segmentControlPoints.last
+        else { return [] }
+        
+        var stamps: [BrushEngine2.Stamp] = []
+        
+        for _ in 0 ..< 2 {
+            segmentControlPoints.removeFirst()
+            segmentControlPoints.append(lastSample)
             
-            output += segmentStamps
+            stamps += processSegment(
+                controlPoints: segmentControlPoints)
         }
         
-        if sample.isLastSample {
-            var endSample = sample
-            endSample.isFinalized = false
-            
-            for _ in 0 ..< 2 {
-                segmentControlPoints.removeFirst()
-                segmentControlPoints.append(endSample)
-                
-                let segmentOutput = processSegment(
-                    controlPoints: segmentControlPoints)
-                
-                output += segmentOutput
-            }
-        }
+        let lastStamp = createStamp(sample: lastSample)
+        stamps.append(lastStamp)
         
-        return output
+        return stamps
     }
     
     private func processSegment(
@@ -80,7 +99,8 @@ struct NewBrushStrokeEngineStampProcessor {
         guard controlPoints.count == 4 else {
             fatalError("""
                 BrushStrokeEngineStampProcessor: \
-                Wrong number of control points!
+                Expected 4 control points, \
+                got \(controlPoints.count)
                 """)
         }
         
@@ -108,34 +128,16 @@ struct NewBrushStrokeEngineStampProcessor {
             
             guard let sample else { continue }
             
-            let stamp = Self.stamp(
-                sample: sample,
-                brush: brush,
-                scale: scale,
-                color: color)
+            let stamp = createStamp(sample: sample)
             
             output.append(stamp)
         }
         
-        // TESTING
-//        for s in controlPoints {
-//            let stamp = Self.stamp(
-//                sample: s,
-//                brush: brush,
-//                scale: scale * 2,
-//                color: .debugGreen.withAlpha(0.5))
-//            
-//            output.append(stamp)
-//        }
-        
         return output
     }
     
-    private static func stamp(
-        sample s: BrushEngine2.Sample,
-        brush: Brush,
-        scale: Double,
-        color: Color
+    private func createStamp(
+        sample s: BrushEngine2.Sample
     ) -> BrushEngine2.Stamp {
         
         let scaledBrushSize = map(
@@ -143,22 +145,13 @@ struct NewBrushStrokeEngineStampProcessor {
             in: (0, 1),
             to: (minStampSize, brush.config.stampSize))
         
-        var s = BrushEngine2.Stamp(
+        return BrushEngine2.Stamp(
             position: s.position,
             size: scaledBrushSize,
             rotation: 0,
-            alpha: 1,
+            alpha: stampAlpha,
             color: color,
-            offset: .zero,
-            isFinalized: s.isFinalized)
-        
-        if AppConfig.brushRenderDebug,
-            !s.isFinalized
-        {
-            s.color = AppConfig.strokeDebugColor
-        }
-        
-        return s
+            offset: .zero)
     }
     
 }

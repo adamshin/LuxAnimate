@@ -4,14 +4,6 @@
 
 import Foundation
 
-extension NewBrushStrokeEngineState {
-    
-    struct ProcessResult {
-        var stamps: [BrushEngine2.Stamp]
-    }
-    
-}
-
 struct NewBrushStrokeEngineState {
     
     var inputQueue: NewBrushStrokeEngineInputQueue
@@ -46,19 +38,12 @@ struct NewBrushStrokeEngineState {
             sampleUpdates: sampleUpdates)
     }
     
-    mutating func processNextSample()
-    -> ProcessResult? {
+    mutating func processStep()
+    -> NewBrushStrokeEngine.StampProcessorOutput {
         
-        guard let sample = inputQueue.popNextSample()
-        else { return nil }
+        let o1 = inputQueue.processNextSample()
         
-        // TODO: I need to allow processing multiple samples
-        // in each processor step. And handle the end of the stroke.
-        
-        let stamps = stampProcessor.process(
-            sample: sample)
-        
-        return ProcessResult(stamps: stamps)
+        return stampProcessor.process(input: o1)
     }
     
 }

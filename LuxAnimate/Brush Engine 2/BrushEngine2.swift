@@ -65,9 +65,6 @@ extension BrushEngine2 {
         var altitude: Double
         var azimuth: Double
         var roll: Double
-        
-        var isFinalized: Bool
-        var isLastSample: Bool
     }
     
     struct Stamp {
@@ -78,8 +75,6 @@ extension BrushEngine2 {
         var color: Color
         
         var offset: Vector
-        
-        var isFinalized: Bool
     }
     
 }
@@ -172,8 +167,7 @@ class BrushEngine2 {
         let strokeProcessOutput = strokeEngine.process()
         
         strokeRenderer.drawIncrementalStroke(
-            brush: strokeProcessOutput.brush,
-            stamps: strokeProcessOutput.stamps)
+            strokeProcessOutput: strokeProcessOutput)
         
         renderer.draw(
             baseCanvasTexture: baseCanvasTexture,
@@ -216,8 +210,7 @@ class BrushEngine2 {
         let strokeProcessOutput = strokeEngine.process()
         
         strokeRenderer.drawIncrementalStroke(
-            brush: strokeProcessOutput.brush,
-            stamps: strokeProcessOutput.stamps)
+            strokeProcessOutput: strokeProcessOutput)
         
         renderer.draw(
             baseCanvasTexture: baseCanvasTexture,
