@@ -4,6 +4,8 @@
 
 import Foundation
 
+private let fingerPressure = 0.2
+
 @MainActor
 struct AnimEditorBrushSampleAdapter {
     
@@ -71,7 +73,7 @@ struct AnimEditorBrushSampleAdapter {
         
         let normalizedForce: Double
         if maxForce < 0.001 {
-            normalizedForce = 0
+            normalizedForce = fingerPressure
         } else {
             normalizedForce = force / maxForce
         }
