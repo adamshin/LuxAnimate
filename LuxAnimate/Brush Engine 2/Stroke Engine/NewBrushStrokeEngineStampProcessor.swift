@@ -91,33 +91,23 @@ struct NewBrushStrokeEngineStampProcessor {
         
         var outputStamps: [BrushEngine2.Stamp] = []
         
-        for sample in input.samples {
-            Self.processSample(
-                sample: sample,
+        Self.processSamples(
+            samples: input.samples,
+            strokeEndTimeOffset: input.strokeEndTimeOffset,
+            stampGenerator: stampGenerator,
+            lastSegment: &lastSegment,
+            lastStampData: &lastStampData,
+            isOutputFinalized: &isOutputFinalized,
+            outputStamps: &outputStamps)
+        
+        if input.isStrokeEnd {
+            Self.processStrokeEnd(
                 strokeEndTimeOffset: input.strokeEndTimeOffset,
                 stampGenerator: stampGenerator,
                 lastSegment: &lastSegment,
                 lastStampData: &lastStampData,
                 isOutputFinalized: &isOutputFinalized,
                 outputStamps: &outputStamps)
-        }
-        
-        if input.isStrokeEnd,
-            let lastSample = lastSegment?
-                .controlPointSamples.last
-        {
-            isOutputFinalized = false
-            
-            for _ in 0 ..< 2 {
-                Self.processSample(
-                    sample: lastSample,
-                    strokeEndTimeOffset: input.strokeEndTimeOffset,
-                    stampGenerator: stampGenerator,
-                    lastSegment: &lastSegment,
-                    lastStampData: &lastStampData,
-                    isOutputFinalized: &isOutputFinalized,
-                    outputStamps: &outputStamps)
-            }
         }
         
         return NewBrushStrokeEngine.StampProcessorOutput(
@@ -127,6 +117,53 @@ struct NewBrushStrokeEngineStampProcessor {
     }
     
     // MARK: - Internal Logic
+    
+    private static func processSamples(
+        samples: [BrushEngine2.Sample],
+        strokeEndTimeOffset: TimeInterval,
+        stampGenerator: NewBrushStrokeEngineStampGenerator,
+        lastSegment: inout Segment?,
+        lastStampData: inout LastStampData?,
+        isOutputFinalized: inout Bool,
+        outputStamps: inout [BrushEngine2.Stamp]
+    ) {
+        for sample in samples {
+            Self.processSample(
+                sample: sample,
+                strokeEndTimeOffset: strokeEndTimeOffset,
+                stampGenerator: stampGenerator,
+                lastSegment: &lastSegment,
+                lastStampData: &lastStampData,
+                isOutputFinalized: &isOutputFinalized,
+                outputStamps: &outputStamps)
+        }
+    }
+    
+    private static func processStrokeEnd(
+        strokeEndTimeOffset: TimeInterval,
+        stampGenerator: NewBrushStrokeEngineStampGenerator,
+        lastSegment: inout Segment?,
+        lastStampData: inout LastStampData?,
+        isOutputFinalized: inout Bool,
+        outputStamps: inout [BrushEngine2.Stamp]
+    ) {
+        guard let lastSample = lastSegment?
+            .controlPointSamples.last
+        else { return }
+        
+        isOutputFinalized = false
+        
+        for _ in 0 ..< 2 {
+            Self.processSample(
+                sample: lastSample,
+                strokeEndTimeOffset: strokeEndTimeOffset,
+                stampGenerator: stampGenerator,
+                lastSegment: &lastSegment,
+                lastStampData: &lastStampData,
+                isOutputFinalized: &isOutputFinalized,
+                outputStamps: &outputStamps)
+        }
+    }
     
     private static func processSample(
         sample: BrushEngine2.Sample,

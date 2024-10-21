@@ -50,6 +50,7 @@ class NewBrushStrokeEngine {
             brush: brush,
             scale: scale,
             color: color,
+            smoothing: smoothing,
             applyTaper: !quickTap)
     }
     

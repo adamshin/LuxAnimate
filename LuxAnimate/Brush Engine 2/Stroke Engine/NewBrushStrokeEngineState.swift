@@ -7,15 +7,20 @@ import Foundation
 struct NewBrushStrokeEngineState {
     
     var inputQueue: NewBrushStrokeEngineInputQueue
+    var smoothingProcessor: NewBrushStrokeEngineSmoothingProcessor
     var stampProcessor: NewBrushStrokeEngineStampProcessor
     
     init(
         brush: Brush,
         scale: Double,
         color: Color,
+        smoothing: Double,
         applyTaper: Bool
     ) {
         inputQueue = .init()
+        
+        smoothingProcessor = .init(
+            smoothing: smoothing)
         
         stampProcessor = .init(
             brush: brush,
@@ -44,8 +49,9 @@ struct NewBrushStrokeEngineState {
     -> NewBrushStrokeEngine.StampProcessorOutput {
         
         let o1 = inputQueue.processNextSample()
+        let o2 = smoothingProcessor.process(input: o1)
         
-        return stampProcessor.process(input: o1)
+        return stampProcessor.process(input: o2)
     }
     
 }
