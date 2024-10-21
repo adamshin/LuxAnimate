@@ -9,7 +9,7 @@ import Foundation
 private let minStampDistance: Double = 1.0
 private let minStampSize: Double = 0.5
 
-private let segmentSubdivisionCount = 1
+private let segmentSubdivisionCount = 10
 
 // MARK: - Helpers
 
@@ -24,7 +24,16 @@ extension NewBrushStrokeEngineStampProcessor {
     
     struct Segment {
         var controlPointSamples: [BrushEngine2.Sample]
+        var subSegments: [SubSegment]
         var startStrokeDistance: Double
+        var length: Double
+    }
+    
+    struct SubSegment {
+        var startSample: BrushEngine2.Sample
+        var endSample: BrushEngine2.Sample
+        var startStrokeDistance: Double
+        var length: Double
     }
     
     struct LastStampData {
@@ -32,18 +41,22 @@ extension NewBrushStrokeEngineStampProcessor {
         var distanceToNextStamp: Double
     }
     
-    struct ProcessSegmentOutput {
-        var segmentLength: Double
+    struct ProcessSampleOutput {
+        var segment: Segment
         var stamps: [BrushEngine2.Stamp]
         var lastStampData: LastStampData?
-        var hasUnfinalizedStamps: Bool
+        var hasNonFinalizedStamps: Bool
     }
     
-    struct ProcessSubSegmentOutput {
-        var subSegmentLength: Double
+    struct ProcessSegmentOutput {
         var stamps: [BrushEngine2.Stamp]
         var lastStampData: LastStampData?
-        var hasUnfinalizedStamps: Bool
+        var hasNonFinalizedStamps: Bool
+    }
+    
+    struct CreateStampOutput {
+        var stamp: BrushEngine2.Stamp
+        var isNonFinalized: Bool
     }
     
 }
@@ -54,7 +67,7 @@ struct NewBrushStrokeEngineStampProcessor {
     
     private let strokeConfig: StrokeConfig
     
-    private var currentSegment: Segment?
+    private var lastSegment: Segment?
     private var lastStampData: LastStampData?
     
     private var isOutputFinalized = true
@@ -87,16 +100,31 @@ struct NewBrushStrokeEngineStampProcessor {
         var outputStamps: [BrushEngine2.Stamp] = []
         
         for sample in input.samples {
-            outputStamps += processSample(sample: sample)
+            Self.processSample(
+                sample: sample,
+                strokeEndTimeOffset: input.strokeEndTimeOffset,
+                strokeConfig: strokeConfig,
+                lastSegment: &lastSegment,
+                lastStampData: &lastStampData,
+                isOutputFinalized: &isOutputFinalized,
+                outputStamps: &outputStamps)
         }
         
         if input.isStrokeEnd,
-            let segmentData = currentSegment,
-            let lastSample = segmentData.controlPointSamples.last
+            let lastSample = lastSegment?
+                .controlPointSamples.last
         {
             isOutputFinalized = false
+            
             for _ in 0 ..< 2 {
-                outputStamps += processSample(sample: lastSample)
+                Self.processSample(
+                    sample: lastSample,
+                    strokeEndTimeOffset: input.strokeEndTimeOffset,
+                    strokeConfig: strokeConfig,
+                    lastSegment: &lastSegment,
+                    lastStampData: &lastStampData,
+                    isOutputFinalized: &isOutputFinalized,
+                    outputStamps: &outputStamps)
             }
         }
         
@@ -108,69 +136,237 @@ struct NewBrushStrokeEngineStampProcessor {
     
     // MARK: - Internal Logic
     
-    private mutating func processSample(
-        sample: BrushEngine2.Sample
-    ) -> [BrushEngine2.Stamp] {
+    private static func processSample(
+        sample: BrushEngine2.Sample,
+        strokeEndTimeOffset: TimeInterval,
+        strokeConfig: StrokeConfig,
+        lastSegment: inout Segment?,
+        lastStampData: inout LastStampData?,
+        isOutputFinalized: inout Bool,
+        outputStamps: inout [BrushEngine2.Stamp]
+    ) {
+        let sampleOutput = Self.processSample(
+            sample: sample,
+            strokeEndTimeOffset: strokeEndTimeOffset,
+            lastSegment: lastSegment,
+            lastStampData: lastStampData,
+            strokeConfig: strokeConfig)
         
-        // TODO: Make this static, and have it return a
-        // result object, instead of mutating?
+        outputStamps += sampleOutput.stamps
         
-        // When do we calculate segment length?
-        // Are we storing the "active segment", or the "next segment"?
-        // I'm unclear what my thoughts are here.
+        lastSegment = sampleOutput.segment
+        lastStampData = sampleOutput.lastStampData
         
-        if var currentSegment {
-            currentSegment.controlPointSamples.removeFirst()
-            currentSegment.controlPointSamples.append(sample)
-            self.currentSegment = currentSegment
+        if sampleOutput.hasNonFinalizedStamps {
+            isOutputFinalized = false
+        }
+    }
+    
+    private static func processSample(
+        sample: BrushEngine2.Sample,
+        strokeEndTimeOffset: TimeInterval,
+        lastSegment: Segment?,
+        lastStampData: LastStampData?,
+        strokeConfig: StrokeConfig
+    ) -> ProcessSampleOutput {
+        
+        let segment: Segment
+        
+        if let lastSegment {
+            var controlPointSamples =
+                lastSegment.controlPointSamples
             
-            let output = Self.processSegment(
-                segment: currentSegment,
-                lastStampData: lastStampData,
-                strokeConfig: strokeConfig)
+            controlPointSamples.removeFirst()
+            controlPointSamples.append(sample)
             
-            lastStampData = output.lastStampData
+            let startStrokeDistance =
+                lastSegment.startStrokeDistance +
+                lastSegment.length
             
-            if output.hasUnfinalizedStamps {
-                isOutputFinalized = false
-            }
-            
-            return output.stamps
+            segment = Self.createSegment(
+                controlPointSamples: controlPointSamples,
+                startStrokeDistance: startStrokeDistance)
             
         } else {
             let controlPointSamples = Array(
                 repeating: sample,
                 count: 4)
             
-            currentSegment = Segment(
+            segment = Self.createSegment(
                 controlPointSamples: controlPointSamples,
                 startStrokeDistance: 0)
         }
+            
+        let segmentOutput = Self.processSegment(
+            segment: segment,
+            strokeEndTimeOffset: strokeEndTimeOffset,
+            lastStampData: lastStampData,
+            strokeConfig: strokeConfig)
+        
+        return ProcessSampleOutput(
+            segment: segment,
+            stamps: segmentOutput.stamps,
+            lastStampData: segmentOutput.lastStampData,
+            hasNonFinalizedStamps: segmentOutput.hasNonFinalizedStamps)
     }
     
     private static func processSegment(
         segment: Segment,
+        strokeEndTimeOffset: TimeInterval,
         lastStampData: LastStampData?,
         strokeConfig: StrokeConfig
     ) -> ProcessSegmentOutput {
         
-        let controlPointSamples = segment.controlPointSamples
+        var stamps: [BrushEngine2.Stamp] = []
+        var lastStampData = lastStampData
+        var hasNonFinalizedStamps = false
+        
+        for subSegment in segment.subSegments {
+            let subSegmentOutput = Self.processSubSegment(
+                subSegment: subSegment,
+                strokeEndTimeOffset: strokeEndTimeOffset,
+                lastStampData: lastStampData,
+                strokeConfig: strokeConfig)
+            
+            stamps += subSegmentOutput.stamps
+            lastStampData = subSegmentOutput.lastStampData
+            
+            if subSegmentOutput.hasNonFinalizedStamps {
+                hasNonFinalizedStamps = true
+            }
+        }
+        
+        return ProcessSegmentOutput(
+            stamps: stamps,
+            lastStampData: lastStampData,
+            hasNonFinalizedStamps: hasNonFinalizedStamps)
+    }
+    
+    private static func processSubSegment(
+        subSegment: SubSegment,
+        strokeEndTimeOffset: TimeInterval,
+        lastStampData inputLastStampData: LastStampData?,
+        strokeConfig: StrokeConfig
+    ) -> ProcessSegmentOutput {
+        
+        var stamps: [BrushEngine2.Stamp] = []
+        var hasNonFinalizedStamps = false
+        
+        var lastStampData: LastStampData
+        
+        if let inputLastStampData {
+            lastStampData = inputLastStampData
+        } else {
+            lastStampData = LastStampData(
+                strokeDistance: 0,
+                distanceToNextStamp: 0)
+        }
+        
+        while true {
+            let nextStampStrokeDistance =
+                lastStampData.strokeDistance +
+                lastStampData.distanceToNextStamp
+            
+            let nextStampDistanceInSubSegment =
+                nextStampStrokeDistance -
+                subSegment.startStrokeDistance
+            
+            guard nextStampDistanceInSubSegment
+                <= subSegment.length
+            else { break }
+            
+            let normalizedSubSegmentDistance =
+                nextStampDistanceInSubSegment /
+                subSegment.length
+            
+            let w2 = normalizedSubSegmentDistance
+            let w1 = 1 - w2
+            
+            let s1 = subSegment.startSample
+            let s2 = subSegment.endSample
+            
+            let sample = BrushEngineSampleInterpolator
+                .interpolate([
+                    (s1, w1),
+                    (s2, w2),
+                ])
+            guard let sample else { fatalError() }
+            
+            let createStampOutput =
+                Self.createStamp(
+                    sample: sample,
+                    strokeDistance: nextStampStrokeDistance,
+                    strokeEndTimeOffset: strokeEndTimeOffset,
+                    strokeConfig: strokeConfig)
+            
+            let stamp = createStampOutput.stamp
+            stamps.append(stamp)
+            
+            if createStampOutput.isNonFinalized {
+                hasNonFinalizedStamps = true
+            }
+            
+            let distanceToNextStamp = Self
+                .distanceToNextStamp(
+                    stamp: stamp,
+                    brush: strokeConfig.brush)
+            
+            lastStampData = LastStampData(
+                strokeDistance: nextStampStrokeDistance,
+                distanceToNextStamp: distanceToNextStamp)
+        }
+        
+        return ProcessSegmentOutput(
+            stamps: stamps,
+            lastStampData: lastStampData,
+            hasNonFinalizedStamps: hasNonFinalizedStamps)
+    }
+    
+    // MARK: - Segment
+    
+    private static func createSegment(
+        controlPointSamples: [BrushEngine2.Sample],
+        startStrokeDistance: Double
+    ) -> Segment {
+        
+        let subSegmentSamples = Self.subSegmentSamples(
+            controlPointSamples: controlPointSamples)
+        
+        let subSegments = Self.subSegments(
+            subSegmentSamples: subSegmentSamples,
+            segmentStartStrokeDistance: startStrokeDistance)
+        
+        let length = subSegments
+            .map { $0.length }
+            .reduce(0, +)
+        
+        return Segment(
+            controlPointSamples: controlPointSamples,
+            subSegments: subSegments,
+            startStrokeDistance: startStrokeDistance,
+            length: length)
+    }
+    
+    private static func subSegmentSamples(
+        controlPointSamples: [BrushEngine2.Sample]
+    ) -> [BrushEngine2.Sample] {
+        
         guard controlPointSamples.count == 4 else {
             fatalError()
         }
-        
         let s0 = controlPointSamples[0]
         let s1 = controlPointSamples[1]
         let s2 = controlPointSamples[2]
         let s3 = controlPointSamples[3]
         
-        var subSegmentSamples: [BrushEngine2.Sample] = []
+        var output: [BrushEngine2.Sample] = []
         
-        for i in 0 ... segmentSubdivisionCount {
-            let t = Double(i) / Double(segmentSubdivisionCount)
+        let count = segmentSubdivisionCount
+        for i in 0 ... count {
+            let t = Double(i) / Double(count)
             
-            let (b0, b1, b2, b3) =
-                UniformCubicBSpline.basisValues(t: t)
+            let (b0, b1, b2, b3) = UniformCubicBSpline
+                .basisValues(t: t)
             
             let sample = BrushEngineSampleInterpolator
                 .interpolate([
@@ -180,112 +376,54 @@ struct NewBrushStrokeEngineStampProcessor {
                     (s3, b3),
                 ])
             
-            if let sample {
-                subSegmentSamples.append(sample)
-            }
+            guard let sample else { fatalError() }
+            output.append(sample)
         }
-        
-        return Self.processSegment(
-            segmentStartStrokeDistance: segment.startStrokeDistance,
-            subSegmentSamples: subSegmentSamples,
-            lastStampData: lastStampData,
-            strokeConfig: strokeConfig)
+        return output
     }
     
-    private static func processSegment(
-        segmentStartStrokeDistance: Double,
+    private static func subSegments(
         subSegmentSamples: [BrushEngine2.Sample],
-        lastStampData: LastStampData?,
-        strokeConfig: StrokeConfig
-    ) -> ProcessSegmentOutput {
-        
-        var segmentLength: Double = 0
-        var stamps: [BrushEngine2.Stamp] = []
-        var lastStampData = lastStampData
-        var hasUnfinalizedStamps = false
+        segmentStartStrokeDistance: Double
+    ) -> [SubSegment] {
         
         guard subSegmentSamples.count >= 2 else {
             fatalError()
         }
         
+        var output: [SubSegment] = []
+        var startStrokeDistance = segmentStartStrokeDistance
+        
         for i in 0 ..< subSegmentSamples.count - 1 {
             let startSample = subSegmentSamples[i]
             let endSample = subSegmentSamples[i + 1]
             
-            let subSegmentOutput = Self.processSubSegment(
+            let positionDifference =
+                endSample.position -
+                startSample.position
+            
+            let length = positionDifference.length()
+            
+            let subSegment = SubSegment(
                 startSample: startSample,
                 endSample: endSample,
-                startSampleStrokeDistance: 0,
-                endSampleStrokeDistance: 0,
-                lastStampData: lastStampData,
-                strokeConfig: strokeConfig)
+                startStrokeDistance: startStrokeDistance,
+                length: length)
             
-            stamps += subSegmentOutput.stamps
-            
-            if let d = subSegmentOutput.lastStampData {
-                lastStampData = d
-            }
-            if subSegmentOutput.hasUnfinalizedStamps {
-                hasUnfinalizedStamps = true
-            }
+            output.append(subSegment)
+            startStrokeDistance += length
         }
-        
-        return ProcessSegmentOutput(
-            segmentLength: segmentLength,
-            stamps: stamps,
-            lastStampData: lastStampData,
-            hasUnfinalizedStamps: hasUnfinalizedStamps)
+        return output
     }
     
-    private static func processSubSegment(
-        startSample: BrushEngine2.Sample,
-        endSample: BrushEngine2.Sample,
-        startSampleStrokeDistance: Double,
-        endSampleStrokeDistance: Double,
-        lastStampData inputLastStampData: LastStampData?,
-        strokeConfig: StrokeConfig
-    ) -> ProcessSegmentOutput {
-        
-        var stamps: [BrushEngine2.Stamp] = []
-        var hasUnfinalizedStamps = false
-        
-        var lastStampData: LastStampData
-        if let inputLastStampData {
-            lastStampData = inputLastStampData
-            
-        } else {
-            let stamp = Self.createStamp(
-                strokeConfig: strokeConfig,
-                sample: startSample,
-                strokeDistance: 0)
-            
-            stamps.append(stamp)
-            
-            let distanceToNextStamp = Self
-                .distanceToNextStamp(
-                    stamp: stamp,
-                    brush: strokeConfig.brush)
-            
-            lastStampData = LastStampData(
-                strokeDistance: 0,
-                distanceToNextStamp: distanceToNextStamp)
-        }
-        
-        while true {
-            // Do stuff
-        }
-        
-        return ProcessSubSegmentOutput(
-            stamps: stamps,
-            lastStampData: lastStampData,
-            hasUnfinalizedStamps: hasUnfinalizedStamps)
-    }
+    // MARK: - Stamp
     
     private static func createStamp(
-        strokeConfig: StrokeConfig,
         sample s: BrushEngine2.Sample,
-        strokeDistance: Double
-    ) -> BrushEngine2.Stamp {
+        strokeDistance: Double,
+        strokeEndTimeOffset: TimeInterval,
+        strokeConfig: StrokeConfig
+    ) -> CreateStampOutput {
         
         let scaledBrushSize = map(
             strokeConfig.scale,
@@ -295,13 +433,22 @@ struct NewBrushStrokeEngineStampProcessor {
                 strokeConfig.brush.config.stampSize
             ))
         
-        return BrushEngine2.Stamp(
+        let stamp = BrushEngine2.Stamp(
             position: s.position,
             size: scaledBrushSize,
             rotation: 0,
             alpha: 1,
             color: strokeConfig.color,
             offset: .zero)
+        
+        // TODO: Test different values.
+        // E.g, set this true if we're close to the end
+        // of the stroke wrt timeOffset.
+        let isNonFinalized = false
+        
+        return CreateStampOutput(
+            stamp: stamp,
+            isNonFinalized: isNonFinalized)
     }
     
     private static func distanceToNextStamp(
