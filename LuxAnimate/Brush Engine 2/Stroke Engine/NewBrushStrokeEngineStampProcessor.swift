@@ -441,9 +441,7 @@ struct NewBrushStrokeEngineStampProcessor {
             color: strokeConfig.color,
             offset: .zero)
         
-        // TODO: Test different values.
-        // E.g, set this true if we're close to the end
-        // of the stroke wrt timeOffset.
+        // TODO: Set this to true if we're in the taper end.
         let isNonFinalized = false
         
         return CreateStampOutput(

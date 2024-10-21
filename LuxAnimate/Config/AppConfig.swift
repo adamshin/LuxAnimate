@@ -18,18 +18,18 @@ struct AppConfig {
     static let paintBrushColor = Color.black
     static let strokeDebugColor = Color.debugRed
     
-    static let wobbleBrushConfig = Brush.Configuration(
+    static let roundBrushConfig = Brush.Configuration(
         stampTextureName: "brush1.png",
-        stampSize: 100,
-        stampSpacing: 0.0,
+        stampSize: 200,
+        stampSpacing: 0,
         stampAlpha: 1,
         pressureScaling: 0.5,
-        taperLength: 0.1,
-        taperRoundness: 1.0,
-        sizeWobble: 0.4,
-        offsetWobble: 0.1,
-        wobbleFrequency: 0.25,
-        wobblePressureAttenuation: 0.5,
+        taperLength: 0,
+        taperRoundness: 0,
+        sizeWobble: 0,
+        offsetWobble: 0,
+        wobbleFrequency: 0,
+        wobblePressureAttenuation: 0,
         baseSmoothing: 0)
     
     static let penBrushConfig = Brush.Configuration(
@@ -46,18 +46,18 @@ struct AppConfig {
         wobblePressureAttenuation: 0.6,
         baseSmoothing: 0.1)
     
-    static let roundBrushConfig = Brush.Configuration(
+    static let wobbleBrushConfig = Brush.Configuration(
         stampTextureName: "brush1.png",
-        stampSize: 300,
-        stampSpacing: 0,
+        stampSize: 100,
+        stampSpacing: 0.0,
         stampAlpha: 1,
         pressureScaling: 0.5,
-        taperLength: 0,
-        taperRoundness: 0,
-        sizeWobble: 0,
-        offsetWobble: 0,
-        wobbleFrequency: 0,
-        wobblePressureAttenuation: 0,
+        taperLength: 0.1,
+        taperRoundness: 1.0,
+        sizeWobble: 0.4,
+        offsetWobble: 0.1,
+        wobbleFrequency: 0.25,
+        wobblePressureAttenuation: 0.5,
         baseSmoothing: 0)
     
     static let eraseBrushConfig = Brush.Configuration(
