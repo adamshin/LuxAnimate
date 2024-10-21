@@ -303,9 +303,12 @@ struct NewBrushStrokeEngineStampProcessor {
                 hasNonFinalizedStamps = true
             }
             
+            let distanceToNextStamp =
+                max(1.0, stampOutput.distanceToNextStamp)
+            
             lastStampData = LastStampData(
                 strokeDistance: nextStampStrokeDistance,
-                distanceToNextStamp: stampOutput.distanceToNextStamp)
+                distanceToNextStamp: distanceToNextStamp)
         }
         
         return ProcessSegmentOutput(
