@@ -34,12 +34,6 @@ struct NewBrushStrokeEngineSampleResampler {
         guard !samples.isEmpty, !resampleTimes.isEmpty
         else { throw Error.emptyInput }
         
-//        guard samples.isSorted(by: { $0.time <= $1.time })
-//        else { throw Error.samplesNotSorted }
-//        
-//        guard resampleTimes.isSorted(by: <=)
-//        else { throw Error.resampleTimesNotSorted }
-        
         var result = [BrushEngine2.Sample]()
         result.reserveCapacity(resampleTimes.count)
         
@@ -74,8 +68,7 @@ struct NewBrushStrokeEngineSampleResampler {
                     BrushEngineSampleInterpolator
                         .interpolate(
                             samples: [s1, s2],
-                            weights: [1-t, t]
-                        )
+                            weights: [1-t, t])
                 
                 result.append(sample)
                 
