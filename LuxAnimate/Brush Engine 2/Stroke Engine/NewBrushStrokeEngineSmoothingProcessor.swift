@@ -6,10 +6,11 @@ import Foundation
 
 // MARK: - Config
 
-private let maxWindowSize: TimeInterval = 0.4
+private let maxWindowSize: TimeInterval = 0.5
 
 private let resampleInterval: TimeInterval = 1/240
 private let minResampleCount = 10
+private let maxResampleCount = 60
 
 private let strokeTailSampleInterval: TimeInterval = 1/60
 
@@ -164,9 +165,10 @@ struct NewBrushStrokeEngineSmoothingProcessor {
             return [windowEndTime]
         }
         
-        let timeCount = max(
-            minResampleCount,
-            Int(windowSize / resampleInterval))
+        let timeCount = clamp(
+            Int(windowSize / resampleInterval),
+            min: minResampleCount,
+            max: maxResampleCount)
         
         let times = (0 ..< timeCount).map { i in
             let c = Double(i) / Double(timeCount - 1)

@@ -264,7 +264,8 @@ class BrushGestureRecognizerPreActiveState:
         delegate?.setInternalState(self,
             BrushGestureRecognizerActiveState(
                 touch: touch,
-                startTimestamp: startTimestamp))
+                startTimestamp: startTimestamp,
+                lastNonPredictedSample: queuedSamples.last))
     }
     
 }
@@ -280,12 +281,24 @@ class BrushGestureRecognizerActiveState:
     private let touch: UITouch
     private let startTimestamp: TimeInterval
     
+    private var lastNonPredictedSample: BrushGestureRecognizer.Sample?
+    
+    private let displayLink = WrappedDisplayLink()
+    
     init(
         touch: UITouch,
-        startTimestamp: TimeInterval
+        startTimestamp: TimeInterval,
+        lastNonPredictedSample: BrushGestureRecognizer.Sample?
     ) {
         self.touch = touch
         self.startTimestamp = startTimestamp
+        self.lastNonPredictedSample = lastNonPredictedSample
+    }
+    
+    func onStateBegin() {
+        displayLink.setCallback { [weak self] _ in
+            self?.onDisplayLink()
+        }
     }
     
     func resetGesture() {
@@ -322,12 +335,48 @@ class BrushGestureRecognizerActiveState:
         
         let view = delegate?.view(self)
         
-        let (samples, predictedSamples) = BrushGestureRecognizer
+        var (samples, predictedSamples) = BrushGestureRecognizer
             .extractSamples(
                 touch: touch,
                 event: event,
                 startTimestamp: startTimestamp,
                 view: view)
+        
+        if let lastNonPredictedSample {
+            // Remove any out-of-order samples, just in case
+            samples = samples.filter {
+                $0.time > lastNonPredictedSample.time
+            }
+            predictedSamples = predictedSamples.filter {
+                $0.time > lastNonPredictedSample.time
+            }
+            
+            // Fill gaps if necessary
+            if let firstSample = samples.first,
+                firstSample.time - lastNonPredictedSample.time >
+                BrushGestureRecognizer.Config.gapFillTimeOffset * 2
+            {
+                var gapFillSamples: [BrushGestureRecognizer.Sample] = []
+                
+                var time = lastNonPredictedSample.time
+                time += BrushGestureRecognizer.Config.gapFillTimeOffset
+                
+                while time < firstSample.time {
+                    var sample = lastNonPredictedSample
+                    sample.time = time
+                    
+                    gapFillSamples.append(sample)
+                    
+                    time += BrushGestureRecognizer.Config.gapFillTimeOffset
+                }
+                
+                samples = gapFillSamples + samples
+            }
+        }
+        
+        if let s = samples.last {
+            lastNonPredictedSample = s
+        }
         
         delegate?.onUpdateStroke(
             self,
@@ -374,6 +423,34 @@ class BrushGestureRecognizerActiveState:
         
         delegate?.onUpdateStroke(
             self, sampleUpdates: sampleUpdates)
+    }
+    
+    private func onDisplayLink() {
+        guard let lastNonPredictedSample else { return }
+        
+        let currentTimestamp = ProcessInfo
+            .processInfo.systemUptime
+        let currentTime = currentTimestamp - startTimestamp
+        
+        let gapFillTimeOffset = BrushGestureRecognizer
+            .Config.gapFillTimeOffset
+        
+        let nextSampleTime =
+            lastNonPredictedSample.time
+            + gapFillTimeOffset
+        
+        let safetyBackoff = gapFillTimeOffset * 3
+        
+        if nextSampleTime < currentTime - safetyBackoff {
+            var sample = lastNonPredictedSample
+            sample.time = nextSampleTime
+            self.lastNonPredictedSample = sample
+            
+            delegate?.onUpdateStroke(
+                self,
+                addedSamples: [sample],
+                predictedSamples: [])
+        }
     }
     
 }
