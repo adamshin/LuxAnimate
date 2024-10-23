@@ -24,8 +24,7 @@ struct BrushEngineSampleInterpolator {
         }
         
         let totalWeight = samplesAndWeights
-            .map { $0.weight }
-            .reduce(0, +)
+            .reduce(0, { $0 + $1.weight })
         
         guard totalWeight != 0 else {
             throw Error.zeroTotalWeight

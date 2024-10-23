@@ -31,6 +31,8 @@ extension NewBrushStrokeEngineStampProcessor {
         var distanceToNextStamp: Double
     }
     
+    // TODO: Pass output by reference instead of creating
+    // these objects? For performance
     struct ProcessSampleOutput {
         var segment: Segment
         var stamps: [BrushEngine2.Stamp]
@@ -390,9 +392,11 @@ struct NewBrushStrokeEngineStampProcessor {
         let s2 = controlPointSamples[2]
         let s3 = controlPointSamples[3]
         
-        var output: [BrushEngine2.Sample] = []
-        
         let count = segmentSubdivisionCount
+        
+        var output: [BrushEngine2.Sample] = []
+        output.reserveCapacity(count)
+        
         for i in 0 ... count {
             let t = Double(i) / Double(count)
             

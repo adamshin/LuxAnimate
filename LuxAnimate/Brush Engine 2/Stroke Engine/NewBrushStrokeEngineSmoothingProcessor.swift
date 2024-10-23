@@ -6,7 +6,7 @@ import Foundation
 
 // MARK: - Config
 
-private let maxWindowSize: TimeInterval = 0.5
+private let maxWindowSize: TimeInterval = 0.4
 
 private let resampleInterval: TimeInterval = 1/240
 private let minResampleCount = 10
