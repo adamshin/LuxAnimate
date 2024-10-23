@@ -165,7 +165,7 @@
 		66E523562BD37D8B00794751 /* MetalLayerTextureRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E523552BD37D8B00794751 /* MetalLayerTextureRenderer.swift */; };
 		66F138322C4854350078BFDA /* SceneEditorContentVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F138312C4854350078BFDA /* SceneEditorContentVC.swift */; };
 		66FE7A2C2C21035D00464A82 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FE7A2B2C21035D00464A82 /* Data.swift */; };
-		66FE7A2E2C25E05100464A82 /* Sequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FE7A2D2C25E05100464A82 /* Sequence.swift */; };
+		66FE7A2E2C25E05100464A82 /* Array.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FE7A2D2C25E05100464A82 /* Array.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -343,7 +343,7 @@
 		66E523552BD37D8B00794751 /* MetalLayerTextureRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalLayerTextureRenderer.swift; sourceTree = "<group>"; };
 		66F138312C4854350078BFDA /* SceneEditorContentVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneEditorContentVC.swift; sourceTree = "<group>"; };
 		66FE7A2B2C21035D00464A82 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
-		66FE7A2D2C25E05100464A82 /* Sequence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sequence.swift; sourceTree = "<group>"; };
+		66FE7A2D2C25E05100464A82 /* Array.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Array.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -741,8 +741,8 @@
 			isa = PBXGroup;
 			children = (
 				66637A932CA23D9300EA88ED /* BrushGestureRecognizer.swift */,
-				664C3A612CA75D0C00AEAC90 /* BrushGestureRecognizer+Sample.swift */,
 				66637A952CA23E3D00EA88ED /* BrushGestureRecognizer+State.swift */,
+				664C3A612CA75D0C00AEAC90 /* BrushGestureRecognizer+Sample.swift */,
 			);
 			path = "Brush Gesture";
 			sourceTree = "<group>";
@@ -1070,8 +1070,8 @@
 			isa = PBXGroup;
 			children = (
 				66D0845D2BA3CEC300EB8556 /* Math.swift */,
+				66FE7A2D2C25E05100464A82 /* Array.swift */,
 				66FE7A2B2C21035D00464A82 /* Data.swift */,
-				66FE7A2D2C25E05100464A82 /* Sequence.swift */,
 				66D0845C2BA3CEC300EB8556 /* Indirect.swift */,
 				6625429E2C8BB6BF007D3DFB /* ThreadSafeDictionary.swift */,
 				66D0845A2BA3CEC300EB8556 /* CGGeometry.swift */,
@@ -1363,7 +1363,7 @@
 				6662D8982BBDBFFC00B4C1D4 /* Spline.swift in Sources */,
 				66789AC92C332D710020EACE /* IDGenerator.swift in Sources */,
 				662542A32C8BDDFB007D3DFB /* SceneEditBuilder.swift in Sources */,
-				66FE7A2E2C25E05100464A82 /* Sequence.swift in Sources */,
+				66FE7A2E2C25E05100464A82 /* Array.swift in Sources */,
 				6651A9DE2C962A3200E3520A /* AnimEditorTimelineTrackCell.swift in Sources */,
 				6662D88D2BBD0F3900B4C1D4 /* CanvasMultiGestureRecognizer.swift in Sources */,
 				66E04CDB2C59829D00BD91F4 /* AnimationLayerContentEditBuilder.swift in Sources */,

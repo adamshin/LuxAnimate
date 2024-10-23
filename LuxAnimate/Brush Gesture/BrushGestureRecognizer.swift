@@ -14,8 +14,6 @@ extension BrushGestureRecognizer {
         static let fingerActivationDistance: CGFloat = 20
         static let fingerSecondTouchCancellationThreshold: TimeInterval = 0.25
         
-        static let gapFillTimeOffset: TimeInterval = 1/60
-        
         static let strokeFinalizationDelay: TimeInterval = 0.1
     }
     

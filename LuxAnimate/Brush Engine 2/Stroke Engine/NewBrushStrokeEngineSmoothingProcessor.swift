@@ -168,10 +168,11 @@ struct NewBrushStrokeEngineSmoothingProcessor {
             minResampleCount,
             Int(windowSize / resampleInterval))
         
-        return (0 ..< timeCount).map { i in
+        let times = (0 ..< timeCount).map { i in
             let c = Double(i) / Double(timeCount - 1)
             return windowEndTime - c * windowSize
         }
+        return times.reversed()
     }
     
     private static func weightedAverageSample(

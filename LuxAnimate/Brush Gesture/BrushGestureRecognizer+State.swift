@@ -264,8 +264,7 @@ class BrushGestureRecognizerPreActiveState:
         delegate?.setInternalState(self,
             BrushGestureRecognizerActiveState(
                 touch: touch,
-                startTimestamp: startTimestamp,
-                lastSample: queuedSamples.last))
+                startTimestamp: startTimestamp))
     }
     
 }
@@ -281,24 +280,12 @@ class BrushGestureRecognizerActiveState:
     private let touch: UITouch
     private let startTimestamp: TimeInterval
     
-    private var lastSample: BrushGestureRecognizer.Sample?
-    
-    private let displayLink = WrappedDisplayLink()
-    
     init(
         touch: UITouch,
-        startTimestamp: TimeInterval,
-        lastSample: BrushGestureRecognizer.Sample?
+        startTimestamp: TimeInterval
     ) {
         self.touch = touch
         self.startTimestamp = startTimestamp
-        self.lastSample = lastSample
-    }
-    
-    func onStateBegin() {
-        displayLink.setCallback { [weak self] _ in
-            self?.onDisplayLink()
-        }
     }
     
     func resetGesture() {
@@ -341,8 +328,6 @@ class BrushGestureRecognizerActiveState:
                 event: event,
                 startTimestamp: startTimestamp,
                 view: view)
-        
-        lastSample = samples.last
         
         delegate?.onUpdateStroke(
             self,
@@ -389,33 +374,6 @@ class BrushGestureRecognizerActiveState:
         
         delegate?.onUpdateStroke(
             self, sampleUpdates: sampleUpdates)
-    }
-    
-    private func onDisplayLink() {
-        guard let lastSample else { return }
-        
-        let currentTimestamp = ProcessInfo
-            .processInfo.systemUptime
-        let currentTime = currentTimestamp - startTimestamp
-        
-        let gapFillTimeOffset = BrushGestureRecognizer
-            .Config.gapFillTimeOffset
-        
-        let nextSampleTime =
-            lastSample.time + gapFillTimeOffset
-        
-        if nextSampleTime <
-            currentTime - gapFillTimeOffset
-        {
-            var sample = lastSample
-            sample.time = nextSampleTime
-            self.lastSample = sample
-            
-            delegate?.onUpdateStroke(
-                self,
-                addedSamples: [sample],
-                predictedSamples: [])
-        }
     }
     
 }

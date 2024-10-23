@@ -12,7 +12,7 @@ struct AppConfig {
     
     static let drawingThumbnailSize = 300
     
-    static let brushRenderDebug = false
+    static let brushRenderDebug = true
     
     static let paintBrushConfig = testBrushConfig
     static let paintBrushColor = Color.brushBlack

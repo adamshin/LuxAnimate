@@ -6,9 +6,9 @@ import Foundation
 
 struct NewBrushStrokeEngineState {
     
-    var inputQueue: NewBrushStrokeEngineInputQueue
-    var smoothingProcessor: NewBrushStrokeEngineSmoothingProcessor
-    var stampProcessor: NewBrushStrokeEngineStampProcessor
+    private var inputQueue: NewBrushStrokeEngineInputQueue
+    private var smoothingProcessor: NewBrushStrokeEngineSmoothingProcessor
+    private var stampProcessor: NewBrushStrokeEngineStampProcessor
     
     init(
         brush: Brush,
