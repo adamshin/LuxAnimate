@@ -36,10 +36,19 @@ struct NewBrushStrokeEngineSmoothingProcessor {
     // MARK: - Init
     
     init(
+        brush: Brush,
         smoothing: Double
     ) {
-        let s = clamp(smoothing, min: 0, max: 1)
-        let windowSize = s * maxWindowSize
+        let baseSmoothing = clamp(
+            brush.config.baseSmoothing,
+            min: 0, max: 1)
+        
+        let adjustedSmoothing = map(
+            clamp(smoothing, min: 0, max: 1),
+            in: (0, 1),
+            to: (baseSmoothing, 1))
+        
+        let windowSize = adjustedSmoothing * maxWindowSize
         
         let resampleTimeOffsets = Self
             .resampleTimeOffsets(windowSize: windowSize)

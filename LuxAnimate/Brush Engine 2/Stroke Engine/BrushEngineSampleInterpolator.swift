@@ -56,4 +56,39 @@ struct BrushEngineSampleInterpolator {
         return o
     }
     
+    static func interpolate(
+        noiseSamples samples: [BrushEngine2.NoiseSample],
+        weights: [Double]
+    ) throws -> BrushEngine2.NoiseSample {
+        
+        guard !samples.isEmpty else {
+            throw Error.emptyInput
+        }
+        guard samples.count == weights.count else {
+            throw Error.incorrectWeightCount
+        }
+        
+        let totalWeight = weights.reduce(0, +)
+        guard totalWeight != 0 else {
+            throw Error.zeroTotalWeight
+        }
+        
+        var o = BrushEngine2.NoiseSample(
+            sizeWobble: 0,
+            offsetXWobble: 0,
+            offsetYWobble: 0)
+        
+        for i in 0 ..< samples.count {
+            let s = samples[i]
+            let w = weights[i]
+            
+            let c = w / totalWeight
+            
+            o.sizeWobble    += c * s.sizeWobble
+            o.offsetXWobble += c * s.offsetXWobble
+            o.offsetYWobble += c * s.offsetYWobble
+        }
+        return o
+    }
+    
 }

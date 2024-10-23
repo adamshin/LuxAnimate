@@ -67,6 +67,12 @@ extension BrushEngine2 {
         var roll: Double
     }
     
+    struct NoiseSample {
+        var sizeWobble: Double
+        var offsetXWobble: Double
+        var offsetYWobble: Double
+    }
+    
     struct Stamp {
         var position: Vector
         var size: Double

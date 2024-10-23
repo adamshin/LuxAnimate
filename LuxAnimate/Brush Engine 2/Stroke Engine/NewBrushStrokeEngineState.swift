@@ -20,6 +20,7 @@ struct NewBrushStrokeEngineState {
         inputQueue = .init()
         
         smoothingProcessor = .init(
+            brush: brush,
             smoothing: smoothing)
         
         stampProcessor = .init(

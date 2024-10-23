@@ -6,6 +6,9 @@ import Foundation
 
 private let segmentSubdivisionCount = 10
 
+private let wobbleOctaveCount = 2
+private let wobblePersistence: Double = 0.5
+
 private let drawControlPoints = false
 
 // MARK: - Structs
@@ -14,6 +17,10 @@ extension NewBrushStrokeEngineStampProcessor {
     
     struct Config {
         var stampGenerator: NewBrushStrokeEngineStampGenerator
+        
+        let sizeWobbleGenerator: PerlinNoiseGenerator
+        let offsetXWobbleGenerator: PerlinNoiseGenerator
+        let offsetYWobbleGenerator: PerlinNoiseGenerator
     }
     
     struct State {
@@ -39,10 +46,15 @@ extension NewBrushStrokeEngineStampProcessor {
     }
     
     struct SubSegment {
-        var startSample: BrushEngine2.Sample
-        var endSample: BrushEngine2.Sample
+        var start: SubSegmentEndpoint
+        var end: SubSegmentEndpoint
         var startStrokeDistance: Double
         var length: Double
+    }
+    
+    struct SubSegmentEndpoint {
+        var sample: BrushEngine2.Sample
+        var noiseSample: BrushEngine2.NoiseSample
     }
     
 }
@@ -69,8 +81,26 @@ struct NewBrushStrokeEngineStampProcessor {
                 color: color,
                 applyTaper: applyTaper)
         
+        let sizeWobbleGenerator = PerlinNoiseGenerator(
+            frequency: brush.config.wobbleFrequency,
+            octaveCount: wobbleOctaveCount,
+            persistence: wobblePersistence)
+        
+        let offsetXWobbleGenerator = PerlinNoiseGenerator(
+            frequency: brush.config.wobbleFrequency,
+            octaveCount: wobbleOctaveCount,
+            persistence: wobblePersistence)
+        
+        let offsetYWobbleGenerator = PerlinNoiseGenerator(
+            frequency: brush.config.wobbleFrequency,
+            octaveCount: wobbleOctaveCount,
+            persistence: wobblePersistence)
+        
         config = Config(
-            stampGenerator: stampGenerator)
+            stampGenerator: stampGenerator,
+            sizeWobbleGenerator: sizeWobbleGenerator,
+            offsetXWobbleGenerator: offsetXWobbleGenerator,
+            offsetYWobbleGenerator: offsetYWobbleGenerator)
     }
     
     // MARK: - Interface
@@ -138,6 +168,7 @@ struct NewBrushStrokeEngineStampProcessor {
                 lastSegment.length
             
             segment = createSegment(
+                config: config,
                 controlPointSamples: controlPointSamples,
                 startStrokeDistance: startStrokeDistance)
             
@@ -147,6 +178,7 @@ struct NewBrushStrokeEngineStampProcessor {
                 count: 4)
             
             segment = createSegment(
+                config: config,
                 controlPointSamples: controlPointSamples,
                 startStrokeDistance: 0)
         }
@@ -220,18 +252,26 @@ struct NewBrushStrokeEngineStampProcessor {
                 t = 0
             }
             
-            let s1 = subSegment.startSample
-            let s2 = subSegment.endSample
+            let s1 = subSegment.start.sample
+            let s2 = subSegment.end.sample
+            
+            let ns1 = subSegment.start.noiseSample
+            let ns2 = subSegment.end.noiseSample
             
             let sample = try! BrushEngineSampleInterpolator
                 .interpolate(
                     samples: [s1, s2],
                     weights: [1-t, t])
             
+            let noiseSample = try! BrushEngineSampleInterpolator
+                .interpolate(
+                    noiseSamples: [ns1, ns2],
+                    weights: [1-t, t])
+            
             let stampOutput =
                 config.stampGenerator.stamp(
                     sample: sample,
-                    strokeDistance: nextStampStrokeDistance,
+                    noiseSample: noiseSample,
                     strokeEndTime: strokeEndTime)
             
             let stamp = stampOutput.stamp
@@ -253,11 +293,13 @@ struct NewBrushStrokeEngineStampProcessor {
     // MARK: - Segment
     
     private static func createSegment(
+        config: Config,
         controlPointSamples: [BrushEngine2.Sample],
         startStrokeDistance: Double
     ) -> Segment {
         
         let subSegments = subSegments(
+            config: config,
             controlPointSamples: controlPointSamples,
             segmentStartStrokeDistance: startStrokeDistance)
         
@@ -272,6 +314,7 @@ struct NewBrushStrokeEngineStampProcessor {
     }
     
     private static func subSegments(
+        config: Config,
         controlPointSamples: [BrushEngine2.Sample],
         segmentStartStrokeDistance: Double
     ) -> [SubSegment] {
@@ -296,9 +339,33 @@ struct NewBrushStrokeEngineStampProcessor {
             
             let length = positionDifference.length()
             
+            let endStrokeDistance =
+                startStrokeDistance + length
+            
+            let start: SubSegmentEndpoint
+            if let lastSubSegment = output.last {
+                start = lastSubSegment.end
+            } else {
+                let startNoiseSample = noiseSample(
+                    config: config,
+                    strokeDistance: startStrokeDistance)
+                
+                start = SubSegmentEndpoint(
+                    sample: startSample,
+                    noiseSample: startNoiseSample)
+            }
+            
+            let endNoiseSample = noiseSample(
+                config: config,
+                strokeDistance: endStrokeDistance)
+            
+            let end = SubSegmentEndpoint(
+                sample: endSample,
+                noiseSample: endNoiseSample)
+            
             let subSegment = SubSegment(
-                startSample: startSample,
-                endSample: endSample,
+                start: start,
+                end: end,
                 startStrokeDistance: startStrokeDistance,
                 length: length)
             
@@ -339,6 +406,29 @@ struct NewBrushStrokeEngineStampProcessor {
             output.append(sample)
         }
         return output
+    }
+    
+    // MARK: - Noise Sample
+    
+    private static func noiseSample(
+        config: Config,
+        strokeDistance: Double
+    ) -> BrushEngine2.NoiseSample {
+        
+        let wobbleDistance = strokeDistance
+            / config.stampGenerator.baseStampSize
+        
+        let sizeWobble = config.sizeWobbleGenerator
+            .value(at: wobbleDistance)
+        let offsetXWobble = config.offsetXWobbleGenerator
+            .value(at: wobbleDistance)
+        let offsetYWobble = config.offsetYWobbleGenerator
+            .value(at: wobbleDistance)
+        
+        return BrushEngine2.NoiseSample(
+            sizeWobble: sizeWobble,
+            offsetXWobble: offsetXWobble,
+            offsetYWobble: offsetYWobble)
     }
     
 }

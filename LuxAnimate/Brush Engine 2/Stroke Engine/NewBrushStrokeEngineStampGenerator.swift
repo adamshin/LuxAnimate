@@ -11,9 +11,6 @@ private let maxTaperTime: TimeInterval = 0.2
 
 private let pressureSensitivity: Double = 1.5
 
-private let wobbleOctaveCount = 2
-private let wobblePersistence: Double = 0.5
-
 // MARK: - Structs
 
 extension NewBrushStrokeEngineStampGenerator {
@@ -35,9 +32,7 @@ struct NewBrushStrokeEngineStampGenerator {
     let color: Color
     let applyTaper: Bool
     
-    let sizeWobbleGenerator: PerlinNoiseGenerator
-    let offsetXWobbleGenerator: PerlinNoiseGenerator
-    let offsetYWobbleGenerator: PerlinNoiseGenerator
+    let baseStampSize: Double
     
     init(
         brush: Brush,
@@ -50,35 +45,20 @@ struct NewBrushStrokeEngineStampGenerator {
         self.color = color
         self.applyTaper = applyTaper
         
-        sizeWobbleGenerator = PerlinNoiseGenerator(
-            frequency: brush.config.wobbleFrequency,
-            octaveCount: wobbleOctaveCount,
-            persistence: wobblePersistence)
-        
-        offsetXWobbleGenerator = PerlinNoiseGenerator(
-            frequency: brush.config.wobbleFrequency,
-            octaveCount: wobbleOctaveCount,
-            persistence: wobblePersistence)
-        
-        offsetYWobbleGenerator = PerlinNoiseGenerator(
-            frequency: brush.config.wobbleFrequency,
-            octaveCount: wobbleOctaveCount,
-            persistence: wobblePersistence)
-    }
-    
-    func stamp(
-        sample s: BrushEngine2.Sample,
-        strokeDistance: Double,
-        strokeEndTime: TimeInterval
-    ) -> Output {
-        
-        let scaledBrushSize = map(
+        baseStampSize = map(
             scale,
             in: (0, 1),
             to: (minStampSize, brush.config.stampSize))
+    }
+    
+    func stamp(
+        sample: BrushEngine2.Sample,
+        noiseSample: BrushEngine2.NoiseSample,
+        strokeEndTime: TimeInterval
+    ) -> Output {
         
         let pressure = clamp(
-            s.pressure * pressureSensitivity,
+            sample.pressure * pressureSensitivity,
             min: 0, max: 1)
         
         let pressureScaleFactor = 1
@@ -87,36 +67,36 @@ struct NewBrushStrokeEngineStampGenerator {
         
         let (taperScaleFactor, isInTaperEnd) =
             combinedTaper(
-                sampleTime: s.time,
+                sampleTime: sample.time,
                 strokeEndTime: strokeEndTime)
         
-        let wobbleDistance = strokeDistance / scaledBrushSize
         let wobbleIntensity = 1
             - brush.config.wobblePressureAttenuation
             * pow(pressure, 3)
         
-        let sizeWobbleValue = sizeWobbleGenerator
-            .value(at: wobbleDistance)
         let wobbleScaleFactor = 1
-            + brush.config.sizeWobble
-            * sizeWobbleValue
+            + noiseSample.sizeWobble
+            * brush.config.sizeWobble
             * wobbleIntensity
         
-        let sizeUnclamped = scaledBrushSize
+        let stampSizeUnclamped = baseStampSize
             * pressureScaleFactor
             * taperScaleFactor
             * wobbleScaleFactor
         
-        let size = max(sizeUnclamped, minStampSize)
+        let stampSize = max(
+            stampSizeUnclamped,
+            minStampSize)
         
-        let rotation = s.azimuth + s.roll
+        let rotation = sample.azimuth + sample.roll
         
         let alpha = brush.config.stampAlpha
         
-        let offsetX = offsetXWobbleGenerator.value(at: wobbleDistance)
+        let offsetX = noiseSample.offsetXWobble
             * brush.config.offsetWobble
             * wobbleIntensity
-        let offsetY = offsetYWobbleGenerator.value(at: wobbleDistance)
+        
+        let offsetY = noiseSample.offsetYWobble
             * brush.config.offsetWobble
             * wobbleIntensity
         
@@ -126,15 +106,15 @@ struct NewBrushStrokeEngineStampGenerator {
         }
         
         let stamp = BrushEngine2.Stamp(
-            position: s.position,
-            size: size,
+            position: sample.position,
+            size: stampSize,
             rotation: rotation,
             alpha: alpha,
             color: color,
             offset: offset)
         
         let distanceToNextStamp = max(
-            size * brush.config.stampSpacing,
+            stampSize * brush.config.stampSpacing,
             minStampDistance)
         
         let isNonFinalized = isInTaperEnd
