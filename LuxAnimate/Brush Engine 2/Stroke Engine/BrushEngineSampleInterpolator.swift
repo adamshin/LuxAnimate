@@ -8,24 +8,26 @@ struct BrushEngineSampleInterpolator {
     
     enum Error: Swift.Error {
         case emptyInput
+        case incorrectWeightCount
         case zeroTotalWeight
     }
     
     static func interpolate(
-        _ samplesAndWeights:
-        [(sample: BrushEngine2.Sample, weight: Double)]
+        samples: [BrushEngine2.Sample],
+        weights: [Double]
     ) throws -> BrushEngine2.Sample {
         
         // TODO: Interpolate angular values correctly!
         // (azimuth, roll)
         
-        guard !samplesAndWeights.isEmpty else {
+        guard !samples.isEmpty else {
             throw Error.emptyInput
         }
+        guard samples.count == weights.count else {
+            throw Error.incorrectWeightCount
+        }
         
-        let totalWeight = samplesAndWeights
-            .reduce(0, { $0 + $1.weight })
-        
+        let totalWeight = weights.reduce(0, +)
         guard totalWeight != 0 else {
             throw Error.zeroTotalWeight
         }
@@ -38,7 +40,10 @@ struct BrushEngineSampleInterpolator {
             azimuth: 0,
             roll: 0)
         
-        for (s, w) in samplesAndWeights {
+        for i in 0 ..< samples.count {
+            let s = samples[i]
+            let w = weights[i]
+            
             let c = w / totalWeight
             
             o.time     += c * s.time

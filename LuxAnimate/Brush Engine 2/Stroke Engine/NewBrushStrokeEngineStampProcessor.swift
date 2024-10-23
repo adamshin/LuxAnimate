@@ -323,10 +323,9 @@ struct NewBrushStrokeEngineStampProcessor {
             let s2 = subSegment.endSample
             
             let sample = try! BrushEngineSampleInterpolator
-                .interpolate([
-                    (s1, w1),
-                    (s2, w2),
-                ])
+                .interpolate(
+                    samples: [s1, s2],
+                    weights: [w1, w2])
             
             let stampOutput =
                 stampGenerator.stamp(
@@ -404,12 +403,9 @@ struct NewBrushStrokeEngineStampProcessor {
                 .basisValues(t: t)
             
             let sample = try! BrushEngineSampleInterpolator
-                .interpolate([
-                    (s0, b0),
-                    (s1, b1),
-                    (s2, b2),
-                    (s3, b3),
-                ])
+                .interpolate(
+                    samples: [s0, s1, s2, s3],
+                    weights: [b0, b1, b2, b3])
             
             output.append(sample)
         }

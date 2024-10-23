@@ -191,11 +191,10 @@ struct NewBrushStrokeEngineSmoothingProcessor {
             fatalError()
         }
         
-        let samplesAndWeights = Array(
-            zip(samples, weights))
-        
         return try! BrushEngineSampleInterpolator
-            .interpolate(samplesAndWeights)
+            .interpolate(
+                samples: samples,
+                weights: weights)
     }
     
     // MARK: - Setup

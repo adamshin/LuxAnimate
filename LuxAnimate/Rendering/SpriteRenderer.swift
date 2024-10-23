@@ -7,6 +7,11 @@ import Metal
 
 struct SpriteRenderer {
     
+    private static let quadPositions: [Vector] = [
+        .init(0, 0), .init(1, 0), .init(1, 1),
+        .init(0, 0), .init(1, 1), .init(0, 1),
+    ]
+    
     struct Sprite {
         var position: Vector
         var size: Size
@@ -95,7 +100,6 @@ struct SpriteRenderer {
         guard !sprites.isEmpty else { return }
         
         let renderPassDescriptor = MTLRenderPassDescriptor()
-        
         let attachment = renderPassDescriptor.colorAttachments[0]!
         attachment.texture = target
         attachment.storeAction = .store
@@ -117,27 +121,21 @@ struct SpriteRenderer {
             t = s.transform * t
             t = Matrix3(translation: s.position) * t
             
-            var quadPositions: [Vector] = [
-                .init(0, 0), .init(1, 0), .init(1, 1),
-                .init(0, 0), .init(1, 1), .init(0, 1),
-            ]
-            quadPositions = quadPositions.map { pos in
-                var pos = pos
-                pos -= Vector(0.5, 0.5)
-                pos *= s.paddingScale
-                pos += Vector(0.5, 0.5)
-                return pos
-            }
-            
-            let spriteVertices = quadPositions.map { p in
+            for qp in Self.quadPositions {
+                var p = qp
+                p -= Vector(0.5, 0.5)
+                p *= s.paddingScale
+                p += Vector(0.5, 0.5)
+                
                 let tp = t * p
-                return SpriteVertex(
+                let v = SpriteVertex(
                     position: tp,
                     texCoord: p,
                     color: s.color,
                     alpha: s.alpha)
+                
+                vertices.append(v)
             }
-            vertices += spriteVertices
         }
         
         let vertexBuffer = MetalInterface.shared.device.makeBuffer(

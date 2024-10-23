@@ -762,8 +762,8 @@
 				6676F52C2CC49A60009724D6 /* NewBrushStrokeEngineState.swift */,
 				6676F52A2CC496A3009724D6 /* NewBrushStrokeEngineInputQueue.swift */,
 				6676F5322CC65972009724D6 /* NewBrushStrokeEngineSmoothingProcessor.swift */,
-				6676F52E2CC4C734009724D6 /* NewBrushStrokeEngineStampProcessor.swift */,
 				665546962CC8158C0071FA9E /* NewBrushStrokeEngineSampleResampler.swift */,
+				6676F52E2CC4C734009724D6 /* NewBrushStrokeEngineStampProcessor.swift */,
 				6676F5302CC62094009724D6 /* NewBrushStrokeEngineStampGenerator.swift */,
 				6676F51C2CC321E8009724D6 /* BrushEngineSampleInterpolator.swift */,
 			);
