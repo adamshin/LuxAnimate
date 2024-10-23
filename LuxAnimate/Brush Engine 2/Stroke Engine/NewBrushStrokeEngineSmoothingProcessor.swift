@@ -127,7 +127,7 @@ struct NewBrushStrokeEngineSmoothingProcessor {
         let windowStartTime = sample.time - windowSize
         
         let outsideWindowCount = sampleBuffer
-            .prefix { $0.time > windowStartTime }
+            .prefix { $0.time < windowStartTime }
             .count
         
         let removeCount = max(0, outsideWindowCount - 1)

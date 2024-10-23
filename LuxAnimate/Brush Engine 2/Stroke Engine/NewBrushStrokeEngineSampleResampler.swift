@@ -32,19 +32,13 @@ struct NewBrushStrokeEngineSampleResampler {
     ) throws -> [BrushEngine2.Sample] {
 
         guard !samples.isEmpty, !resampleTimes.isEmpty
-        else {
-            throw Error.emptyInput
-        }
+        else { throw Error.emptyInput }
         
         guard samples.isSorted(by: { $0.time <= $1.time })
-        else {
-            throw Error.samplesNotSorted
-        }
+        else { throw Error.samplesNotSorted }
         
         guard resampleTimes.isSorted(by: <=)
-        else {
-            throw Error.resampleTimesNotSorted
-        }
+        else { throw Error.resampleTimesNotSorted }
         
         var result = [BrushEngine2.Sample]()
         result.reserveCapacity(resampleTimes.count)
