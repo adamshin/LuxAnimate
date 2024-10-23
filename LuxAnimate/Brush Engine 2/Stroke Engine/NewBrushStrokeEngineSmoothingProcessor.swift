@@ -14,11 +14,23 @@ private let maxResampleCount = 60
 
 private let strokeTailSampleInterval: TimeInterval = 1/60
 
+// MARK: - Structs
+
+extension NewBrushStrokeEngineSmoothingProcessor {
+    
+    struct Config {
+        var windowSize: TimeInterval
+        var resampleTimeOffsets: [Double]
+        var windowWeights: [Double]
+    }
+    
+}
+
 // MARK: - NewBrushStrokeEngineSmoothingProcessor
 
 struct NewBrushStrokeEngineSmoothingProcessor {
     
-    private let windowSize: TimeInterval
+    private let config: Config
     
     private var sampleBuffer: [BrushEngine2.Sample] = []
     private var isOutputFinalized = true
@@ -29,7 +41,18 @@ struct NewBrushStrokeEngineSmoothingProcessor {
         smoothing: Double
     ) {
         let s = clamp(smoothing, min: 0, max: 1)
-        windowSize = s * maxWindowSize
+        let windowSize = s * maxWindowSize
+        
+        let resampleTimeOffsets = Self
+            .resampleTimeOffsets(windowSize: windowSize)
+        
+        let windowWeights = Self.windowWeights(
+            count: resampleTimeOffsets.count)
+        
+        config = Config(
+            windowSize: windowSize,
+            resampleTimeOffsets: resampleTimeOffsets,
+            windowWeights: windowWeights)
     }
     
     // MARK: - Interface
@@ -47,7 +70,7 @@ struct NewBrushStrokeEngineSmoothingProcessor {
         Self.processSamples(
             samples: input.samples,
             strokeEndTime: input.strokeEndTime,
-            windowSize: windowSize,
+            config: config,
             sampleBuffer: &sampleBuffer,
             outputSamples: &outputSamples)
         
@@ -56,7 +79,7 @@ struct NewBrushStrokeEngineSmoothingProcessor {
             
             Self.processStrokeEnd(
                 strokeEndTime: input.strokeEndTime,
-                windowSize: windowSize,
+                config: config,
                 sampleBuffer: &sampleBuffer,
                 outputSamples: &outputSamples)
         }
@@ -73,18 +96,18 @@ struct NewBrushStrokeEngineSmoothingProcessor {
     private static func processSamples(
         samples: [BrushEngine2.Sample],
         strokeEndTime: TimeInterval,
-        windowSize: TimeInterval,
+        config: Config,
         sampleBuffer: inout [BrushEngine2.Sample],
         outputSamples: inout [BrushEngine2.Sample]
     ) {
         for sample in samples {
             addSampleToBuffer(
                 sample: sample,
-                windowSize: windowSize,
+                config: config,
                 sampleBuffer: &sampleBuffer)
             
             let newSample = Self.sample(
-                windowSize: windowSize,
+                config: config,
                 windowEndTime: sample.time,
                 sampleBuffer: sampleBuffer)
             
@@ -94,7 +117,7 @@ struct NewBrushStrokeEngineSmoothingProcessor {
     
     private static func processStrokeEnd(
         strokeEndTime: TimeInterval,
-        windowSize: TimeInterval,
+        config: Config,
         sampleBuffer: inout [BrushEngine2.Sample],
         outputSamples: inout [BrushEngine2.Sample]
     ) {
@@ -102,7 +125,7 @@ struct NewBrushStrokeEngineSmoothingProcessor {
         else { return }
         
         let windowEndTargetTime =
-            lastSample.time + windowSize
+            lastSample.time + config.windowSize
         
         var windowEndTime = lastSample.time
         
@@ -110,7 +133,7 @@ struct NewBrushStrokeEngineSmoothingProcessor {
             windowEndTime += strokeTailSampleInterval
             
             let newSample = Self.sample(
-                windowSize: windowSize,
+                config: config,
                 windowEndTime: windowEndTime,
                 sampleBuffer: sampleBuffer)
             
@@ -120,12 +143,13 @@ struct NewBrushStrokeEngineSmoothingProcessor {
     
     private static func addSampleToBuffer(
         sample: BrushEngine2.Sample,
-        windowSize: TimeInterval,
+        config: Config,
         sampleBuffer: inout [BrushEngine2.Sample]
     ) {
         sampleBuffer.append(sample)
         
-        let windowStartTime = sample.time - windowSize
+        let windowStartTime =
+            sample.time - config.windowSize
         
         let outsideWindowCount = sampleBuffer
             .prefix { $0.time < windowStartTime }
@@ -137,14 +161,13 @@ struct NewBrushStrokeEngineSmoothingProcessor {
     }
     
     private static func sample(
-        windowSize: TimeInterval,
+        config: Config,
         windowEndTime: TimeInterval,
         sampleBuffer: [BrushEngine2.Sample]
     ) -> BrushEngine2.Sample {
         
-        let resampleTimes = resampleTimes(
-            windowSize: windowSize,
-            windowEndTime: windowEndTime)
+        let resampleTimes = config.resampleTimeOffsets
+            .map { windowEndTime + $0 }
         
         let windowSamples =
             try! NewBrushStrokeEngineSampleResampler
@@ -153,16 +176,36 @@ struct NewBrushStrokeEngineSmoothingProcessor {
                     resampleTimes: resampleTimes)
         
         return weightedAverageSample(
-            windowSamples: windowSamples)
+            samples: windowSamples,
+            weights: config.windowWeights)
     }
     
-    private static func resampleTimes(
-        windowSize: TimeInterval,
-        windowEndTime: TimeInterval
+    private static func weightedAverageSample(
+        samples: [BrushEngine2.Sample],
+        weights: [Double]
+    ) -> BrushEngine2.Sample {
+        
+        guard !samples.isEmpty,
+            samples.count == weights.count
+        else {
+            fatalError()
+        }
+        
+        let samplesAndWeights = Array(
+            zip(samples, weights))
+        
+        return try! BrushEngineSampleInterpolator
+            .interpolate(samplesAndWeights)
+    }
+    
+    // MARK: - Setup
+    
+    private static func resampleTimeOffsets(
+        windowSize: TimeInterval
     ) -> [TimeInterval] {
         
         if windowSize < 0.001 {
-            return [windowEndTime]
+            return [0]
         }
         
         let timeCount = clamp(
@@ -172,39 +215,18 @@ struct NewBrushStrokeEngineSmoothingProcessor {
         
         let times = (0 ..< timeCount).map { i in
             let c = Double(i) / Double(timeCount - 1)
-            return windowEndTime - c * windowSize
+            return -c * windowSize
         }
         return times.reversed()
     }
     
-    private static func weightedAverageSample(
-        windowSamples: [BrushEngine2.Sample]
-    ) -> BrushEngine2.Sample {
-        
-        guard !windowSamples.isEmpty
-        else { fatalError() }
-        
-        var samplesAndWeights:
-            [(BrushEngine2.Sample, Double)] = []
-        
-        samplesAndWeights.reserveCapacity(
-            windowSamples.count)
-        
-        for i in 0 ..< windowSamples.count {
-            let sample = windowSamples[i]
-            
-            let weight = windowWeight(
-                index: i,
-                count: windowSamples.count)
-            
-            samplesAndWeights.append((sample, weight))
+    private static func windowWeights(
+        count: Int
+    ) -> [Double] {
+        (0 ..< count).map {
+            windowWeight(index: $0, count: count)
         }
-        
-        return try! BrushEngineSampleInterpolator
-            .interpolate(samplesAndWeights)
     }
-    
-    // MARK: - Window Weights
     
     private static func windowWeight(
         index: Int, count: Int
