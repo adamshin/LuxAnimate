@@ -6,15 +6,18 @@ import Foundation
 
 // MARK: - Config
 
-private let maxWindowTime: TimeInterval = 0.4
+private let maxWindowSize: TimeInterval = 0.4
 
-private let sampleFillInterval: TimeInterval = 1/60
+private let resampleInterval: TimeInterval = 1/240
+private let minResampleCount = 10
+
+private let strokeTailSampleInterval: TimeInterval = 1/60
 
 // MARK: - NewBrushStrokeEngineSmoothingProcessor
 
 struct NewBrushStrokeEngineSmoothingProcessor {
     
-    private let windowTime: TimeInterval
+    private let windowSize: TimeInterval
     
     private var sampleBuffer: [BrushEngine2.Sample] = []
     private var isOutputFinalized = true
@@ -25,7 +28,7 @@ struct NewBrushStrokeEngineSmoothingProcessor {
         smoothing: Double
     ) {
         let s = clamp(smoothing, min: 0, max: 1)
-        windowTime = s * maxWindowTime
+        windowSize = s * maxWindowSize
     }
     
     // MARK: - Interface
@@ -43,15 +46,17 @@ struct NewBrushStrokeEngineSmoothingProcessor {
         Self.processSamples(
             samples: input.samples,
             strokeEndTime: input.strokeEndTime,
+            windowSize: windowSize,
             sampleBuffer: &sampleBuffer,
-            isOutputFinalized: &isOutputFinalized,
             outputSamples: &outputSamples)
         
         if input.isStrokeEnd {
+            isOutputFinalized = false
+            
             Self.processStrokeEnd(
                 strokeEndTime: input.strokeEndTime,
+                windowSize: windowSize,
                 sampleBuffer: &sampleBuffer,
-                isOutputFinalized: &isOutputFinalized,
                 outputSamples: &outputSamples)
         }
         
@@ -67,59 +72,157 @@ struct NewBrushStrokeEngineSmoothingProcessor {
     private static func processSamples(
         samples: [BrushEngine2.Sample],
         strokeEndTime: TimeInterval,
+        windowSize: TimeInterval,
         sampleBuffer: inout [BrushEngine2.Sample],
-        isOutputFinalized: inout Bool,
         outputSamples: inout [BrushEngine2.Sample]
     ) {
         for sample in samples {
-            Self.processSample(
+            addSampleToBuffer(
                 sample: sample,
-                strokeEndTime: strokeEndTime,
-                sampleBuffer: &sampleBuffer,
-                isOutputFinalized: &isOutputFinalized,
-                outputSamples: &outputSamples)
+                windowSize: windowSize,
+                sampleBuffer: &sampleBuffer)
+            
+            let newSample = Self.sample(
+                windowSize: windowSize,
+                windowEndTime: sample.time,
+                sampleBuffer: sampleBuffer)
+            
+            outputSamples.append(newSample)
         }
     }
     
     private static func processStrokeEnd(
         strokeEndTime: TimeInterval,
+        windowSize: TimeInterval,
         sampleBuffer: inout [BrushEngine2.Sample],
-        isOutputFinalized: inout Bool,
         outputSamples: inout [BrushEngine2.Sample]
     ) {
-        isOutputFinalized = false
+        guard let lastSample = sampleBuffer.last
+        else { return }
         
-        // TODO: Generate stroke tail.
+        let windowEndTargetTime =
+            lastSample.time + windowSize
         
-        // Take the last sample from the sample buffer,
-        // repeat it and feed it through until it
-        // flushes out all other samples.
+        var windowEndTime = lastSample.time
         
-        // Advance the time offset by the fill interval
-        // each time.
+        while windowEndTime < windowEndTargetTime {
+            windowEndTime += strokeTailSampleInterval
+            
+            let newSample = Self.sample(
+                windowSize: windowSize,
+                windowEndTime: windowEndTime,
+                sampleBuffer: sampleBuffer)
+            
+            outputSamples.append(newSample)
+        }
     }
     
-    private static func processSample(
+    private static func addSampleToBuffer(
         sample: BrushEngine2.Sample,
-        strokeEndTime: TimeInterval,
-        sampleBuffer: inout [BrushEngine2.Sample],
-        isOutputFinalized: inout Bool,
-        outputSamples: inout [BrushEngine2.Sample]
+        windowSize: TimeInterval,
+        sampleBuffer: inout [BrushEngine2.Sample]
     ) {
-        // Append the sample to the sample buffer.
+        sampleBuffer.append(sample)
         
-        // Remove unneeded samples from the front of the
-        // sample buffer (anything outside the time window).
+        let windowStartTime = sample.time - windowSize
         
-        // Take a weighted average of the samples in the
-        // buffer using parabolic curve weights. Gonna have
-        // to figure out the math for this. Take a single
-        // weight per sample? Integrate the area under the
-        // parabola? It would be simpler to avoid calculus.
-        // How to elegantly handle this?
+        let outsideWindowCount = sampleBuffer
+            .prefix { $0.time > windowStartTime }
+            .count
         
-        // If we try to read a sample from before the start
-        // of the buffer, use the first sample instead.
+        let removeCount = max(0, outsideWindowCount - 1)
+        
+        sampleBuffer.removeFirst(removeCount)
+    }
+    
+    private static func sample(
+        windowSize: TimeInterval,
+        windowEndTime: TimeInterval,
+        sampleBuffer: [BrushEngine2.Sample]
+    ) -> BrushEngine2.Sample {
+        
+        let resampleTimes = resampleTimes(
+            windowSize: windowSize,
+            windowEndTime: windowEndTime)
+        
+        let windowSamples =
+            try! NewBrushStrokeEngineSampleResampler
+                .resample(
+                    samples: sampleBuffer,
+                    resampleTimes: resampleTimes)
+        
+        return weightedAverageSample(
+            windowSamples: windowSamples)
+    }
+    
+    private static func resampleTimes(
+        windowSize: TimeInterval,
+        windowEndTime: TimeInterval
+    ) -> [TimeInterval] {
+        
+        if windowSize < 0.001 {
+            return [windowEndTime]
+        }
+        
+        let timeCount = max(
+            minResampleCount,
+            Int(windowSize / resampleInterval))
+        
+        return (0 ..< timeCount).map { i in
+            let c = Double(i) / Double(timeCount - 1)
+            return windowEndTime - c * windowSize
+        }
+    }
+    
+    private static func weightedAverageSample(
+        windowSamples: [BrushEngine2.Sample]
+    ) -> BrushEngine2.Sample {
+        
+        guard !windowSamples.isEmpty
+        else { fatalError() }
+        
+        var samplesAndWeights:
+            [(BrushEngine2.Sample, Double)] = []
+        
+        samplesAndWeights.reserveCapacity(
+            windowSamples.count)
+        
+        for i in 0 ..< windowSamples.count {
+            let sample = windowSamples[i]
+            
+            let weight = windowWeight(
+                index: i,
+                count: windowSamples.count)
+            
+            samplesAndWeights.append((sample, weight))
+        }
+        
+        return try! BrushEngineSampleInterpolator
+            .interpolate(samplesAndWeights)
+    }
+    
+    // MARK: - Window Weights
+    
+    private static func windowWeight(
+        index: Int, count: Int
+    ) -> Double {
+        windowWeightParabola(index: index, count: count)
+    }
+    
+    private static func windowWeightFlat(
+        index: Int, count: Int
+    ) -> Double {
+        return 1
+    }
+    
+    private static func windowWeightParabola(
+        index: Int, count: Int
+    ) -> Double {
+        if count <= 3 { return 1 }
+        
+        let p = Double(index) / Double(count - 1)
+        let x = (p * 2) - 1
+        return 1 - (x * x)
     }
     
 }

@@ -6,21 +6,30 @@ import Foundation
 
 struct BrushEngineSampleInterpolator {
     
+    enum Error: Swift.Error {
+        case emptyInput
+        case zeroTotalWeight
+    }
+    
     static func interpolate(
         _ samplesAndWeights:
         [(sample: BrushEngine2.Sample, weight: Double)]
-    ) -> BrushEngine2.Sample? {
+    ) throws -> BrushEngine2.Sample {
         
         // TODO: Interpolate angular values correctly!
         // (azimuth, roll)
         
-        guard !samplesAndWeights.isEmpty else { return nil }
+        guard !samplesAndWeights.isEmpty else {
+            throw Error.emptyInput
+        }
         
         let totalWeight = samplesAndWeights
             .map { $0.weight }
             .reduce(0, +)
         
-        guard totalWeight != 0 else { return nil }
+        guard totalWeight != 0 else {
+            throw Error.zeroTotalWeight
+        }
         
         var o = BrushEngine2.Sample(
             time: 0,

@@ -101,6 +101,8 @@ struct NewBrushStrokeEngineStampProcessor {
             outputStamps: &outputStamps)
         
         if input.isStrokeEnd {
+            isOutputFinalized = false
+            
             Self.processStrokeEnd(
                 strokeEndTime: input.strokeEndTime,
                 stampGenerator: stampGenerator,
@@ -150,8 +152,6 @@ struct NewBrushStrokeEngineStampProcessor {
         guard let lastSample = lastSegment?
             .controlPointSamples.last
         else { return }
-        
-        isOutputFinalized = false
         
         for _ in 0 ..< 2 {
             Self.processSample(
@@ -320,12 +320,11 @@ struct NewBrushStrokeEngineStampProcessor {
             let s1 = subSegment.startSample
             let s2 = subSegment.endSample
             
-            let sample = BrushEngineSampleInterpolator
+            let sample = try! BrushEngineSampleInterpolator
                 .interpolate([
                     (s1, w1),
                     (s2, w2),
                 ])
-            guard let sample else { fatalError() }
             
             let stampOutput =
                 stampGenerator.stamp(
@@ -400,7 +399,7 @@ struct NewBrushStrokeEngineStampProcessor {
             let (b0, b1, b2, b3) = UniformCubicBSpline
                 .basisValues(t: t)
             
-            let sample = BrushEngineSampleInterpolator
+            let sample = try! BrushEngineSampleInterpolator
                 .interpolate([
                     (s0, b0),
                     (s1, b1),
@@ -408,7 +407,6 @@ struct NewBrushStrokeEngineStampProcessor {
                     (s3, b3),
                 ])
             
-            guard let sample else { fatalError() }
             output.append(sample)
         }
         return output

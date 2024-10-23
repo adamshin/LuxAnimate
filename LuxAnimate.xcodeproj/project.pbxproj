@@ -91,6 +91,7 @@
 		6651A9DE2C962A3200E3520A /* AnimEditorTimelineTrackCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6651A9DD2C962A3200E3520A /* AnimEditorTimelineTrackCell.swift */; };
 		6651A9E02C962B0F00E3520A /* AnimEditorTimelineVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6651A9DF2C962B0F00E3520A /* AnimEditorTimelineVC.swift */; };
 		6651A9E22C962B6F00E3520A /* AnimEditorTimelineModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6651A9E12C962B6F00E3520A /* AnimEditorTimelineModel.swift */; };
+		665546972CC8158C0071FA9E /* NewBrushStrokeEngineSampleResampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665546962CC8158C0071FA9E /* NewBrushStrokeEngineSampleResampler.swift */; };
 		6656A4BB2C8789930059C452 /* FrameSceneGraphGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6656A4BA2C8789930059C452 /* FrameSceneGraphGenerator.swift */; };
 		6661026D2BED697E0084099A /* EditorCollapsibleContentSwipeGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6661026C2BED697E0084099A /* EditorCollapsibleContentSwipeGestureRecognizer.swift */; };
 		6662D88D2BBD0F3900B4C1D4 /* CanvasMultiGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6662D88C2BBD0F3900B4C1D4 /* CanvasMultiGestureRecognizer.swift */; };
@@ -264,6 +265,7 @@
 		6651A9DD2C962A3200E3520A /* AnimEditorTimelineTrackCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorTimelineTrackCell.swift; sourceTree = "<group>"; };
 		6651A9DF2C962B0F00E3520A /* AnimEditorTimelineVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorTimelineVC.swift; sourceTree = "<group>"; };
 		6651A9E12C962B6F00E3520A /* AnimEditorTimelineModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorTimelineModel.swift; sourceTree = "<group>"; };
+		665546962CC8158C0071FA9E /* NewBrushStrokeEngineSampleResampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewBrushStrokeEngineSampleResampler.swift; sourceTree = "<group>"; };
 		6656A4BA2C8789930059C452 /* FrameSceneGraphGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameSceneGraphGenerator.swift; sourceTree = "<group>"; };
 		6661026C2BED697E0084099A /* EditorCollapsibleContentSwipeGestureRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorCollapsibleContentSwipeGestureRecognizer.swift; sourceTree = "<group>"; };
 		6662D88C2BBD0F3900B4C1D4 /* CanvasMultiGestureRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasMultiGestureRecognizer.swift; sourceTree = "<group>"; };
@@ -763,6 +765,7 @@
 				6676F52A2CC496A3009724D6 /* NewBrushStrokeEngineInputQueue.swift */,
 				6676F5322CC65972009724D6 /* NewBrushStrokeEngineSmoothingProcessor.swift */,
 				6676F52E2CC4C734009724D6 /* NewBrushStrokeEngineStampProcessor.swift */,
+				665546962CC8158C0071FA9E /* NewBrushStrokeEngineSampleResampler.swift */,
 				6676F5302CC62094009724D6 /* NewBrushStrokeEngineStampGenerator.swift */,
 			);
 			path = "Stroke Engine";
@@ -1380,6 +1383,7 @@
 				66D0847D2BA3D79300EB8556 /* LibraryVC.swift in Sources */,
 				66099BAB2BDB1D8F00243D9F /* ClearColorRenderer.swift in Sources */,
 				6643CB042BE4822E0094B998 /* EditorMenuAnimatorView.swift in Sources */,
+				665546972CC8158C0071FA9E /* NewBrushStrokeEngineSampleResampler.swift in Sources */,
 				66D084572BA3CDF700EB8556 /* AppVC.swift in Sources */,
 				6662D88F2BBD1F2200B4C1D4 /* CanvasMultiGestureRecognizerState.swift in Sources */,
 				664B597F2BC71B2F003FA90E /* MetalView.swift in Sources */,
