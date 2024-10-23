@@ -392,7 +392,6 @@
 				66099BC82BDB391000243D9F /* Brush */,
 				66099BB52BDB32F500243D9F /* Brush Stroke */,
 				66099BB82BDB32F500243D9F /* Renderer */,
-				660ABA3C2BF9BA5A00B5C668 /* Noise */,
 				66099BBA2BDB32F500243D9F /* BrushEngine.swift */,
 			);
 			path = "Brush Engine";
@@ -689,7 +688,6 @@
 			children = (
 				6676F5242CC495AD009724D6 /* Stroke Engine */,
 				66AD38952CB7456B005CC3FC /* Renderer */,
-				6676F5292CC4963B009724D6 /* Shared */,
 				664C3A642CA7633900AEAC90 /* BrushEngine2.swift */,
 			);
 			path = "Brush Engine 2";
@@ -767,16 +765,9 @@
 				6676F52E2CC4C734009724D6 /* NewBrushStrokeEngineStampProcessor.swift */,
 				665546962CC8158C0071FA9E /* NewBrushStrokeEngineSampleResampler.swift */,
 				6676F5302CC62094009724D6 /* NewBrushStrokeEngineStampGenerator.swift */,
-			);
-			path = "Stroke Engine";
-			sourceTree = "<group>";
-		};
-		6676F5292CC4963B009724D6 /* Shared */ = {
-			isa = PBXGroup;
-			children = (
 				6676F51C2CC321E8009724D6 /* BrushEngineSampleInterpolator.swift */,
 			);
-			path = Shared;
+			path = "Stroke Engine";
 			sourceTree = "<group>";
 		};
 		66789ABE2C29E8F20020EACE /* Render Preview */ = {
@@ -1100,6 +1091,7 @@
 				66D084652BA3CEC300EB8556 /* View */,
 				66D084592BA3CEC300EB8556 /* Layout */,
 				6662D8952BBDBFFC00B4C1D4 /* Geometry */,
+				660ABA3C2BF9BA5A00B5C668 /* Noise */,
 				661E9F2B2C9C959600A75A2F /* Concurrency */,
 				66A653012C2099330060A216 /* XXHash */,
 				66D0845E2BA3CEC300EB8556 /* Misc */,
