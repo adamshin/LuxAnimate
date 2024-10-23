@@ -4,8 +4,6 @@
 
 import Foundation
 
-// MARK: - Config
-
 private let minStampDistance: Double = 1.0
 private let minStampSize: Double = 0.5
 

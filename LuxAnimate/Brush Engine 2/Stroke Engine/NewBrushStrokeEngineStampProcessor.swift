@@ -4,9 +4,9 @@
 
 import Foundation
 
-// MARK: - Config
-
 private let segmentSubdivisionCount = 10
+
+private let drawControlPoints = false
 
 // MARK: - Structs
 
@@ -17,7 +17,6 @@ extension NewBrushStrokeEngineStampProcessor {
     }
     
     struct State {
-        var lastSample: BrushEngine2.Sample?
         var lastSegment: Segment?
         
         var lastStampData = LastStampData(
@@ -96,7 +95,8 @@ struct NewBrushStrokeEngineStampProcessor {
         }
         
         if input.isStrokeEnd,
-            let lastSample = state.lastSample
+            let lastSample = state.lastSegment?
+                .controlPointSamples.last
         {
             state.isOutputFinalized = false
             
@@ -137,7 +137,7 @@ struct NewBrushStrokeEngineStampProcessor {
                 lastSegment.startStrokeDistance +
                 lastSegment.length
             
-            segment = Self.createSegment(
+            segment = createSegment(
                 controlPointSamples: controlPointSamples,
                 startStrokeDistance: startStrokeDistance)
             
@@ -146,14 +146,14 @@ struct NewBrushStrokeEngineStampProcessor {
                 repeating: sample,
                 count: 4)
             
-            segment = Self.createSegment(
+            segment = createSegment(
                 controlPointSamples: controlPointSamples,
                 startStrokeDistance: 0)
         }
             
         state.lastSegment = segment
         
-        Self.processSegment(
+        processSegment(
             config: config,
             segment: segment,
             strokeEndTime: strokeEndTime,
@@ -168,8 +168,21 @@ struct NewBrushStrokeEngineStampProcessor {
         state: inout State,
         outputStamps: inout [BrushEngine2.Stamp]
     ) {
+        if drawControlPoints {
+            for s in segment.controlPointSamples {
+                let stamp = BrushEngine2.Stamp(
+                    position: s.position,
+                    size: 20,
+                    rotation: 0,
+                    alpha: 1,
+                    color: .debugRed,
+                    offset: .zero)
+                outputStamps.append(stamp)
+            }
+        }
+        
         for subSegment in segment.subSegments {
-            Self.processSubSegment(
+            processSubSegment(
                 config: config,
                 subSegment: subSegment,
                 strokeEndTime: strokeEndTime,
@@ -244,22 +257,55 @@ struct NewBrushStrokeEngineStampProcessor {
         startStrokeDistance: Double
     ) -> Segment {
         
-        let subSegmentSamples = Self.subSegmentSamples(
-            controlPointSamples: controlPointSamples)
-        
-        let subSegments = Self.subSegments(
-            subSegmentSamples: subSegmentSamples,
+        let subSegments = subSegments(
+            controlPointSamples: controlPointSamples,
             segmentStartStrokeDistance: startStrokeDistance)
         
         let length = subSegments
-            .map { $0.length }
-            .reduce(0, +)
+            .reduce(0, { $0 + $1.length })
         
         return Segment(
             controlPointSamples: controlPointSamples,
             subSegments: subSegments,
             startStrokeDistance: startStrokeDistance,
             length: length)
+    }
+    
+    private static func subSegments(
+        controlPointSamples: [BrushEngine2.Sample],
+        segmentStartStrokeDistance: Double
+    ) -> [SubSegment] {
+        
+        let subSegmentSamples = subSegmentSamples(
+            controlPointSamples: controlPointSamples)
+        
+        guard subSegmentSamples.count >= 2 else {
+            fatalError()
+        }
+        
+        var output: [SubSegment] = []
+        var startStrokeDistance = segmentStartStrokeDistance
+        
+        for i in 0 ..< subSegmentSamples.count - 1 {
+            let startSample = subSegmentSamples[i]
+            let endSample = subSegmentSamples[i + 1]
+            
+            let positionDifference =
+                endSample.position -
+                startSample.position
+            
+            let length = positionDifference.length()
+            
+            let subSegment = SubSegment(
+                startSample: startSample,
+                endSample: endSample,
+                startStrokeDistance: startStrokeDistance,
+                length: length)
+            
+            output.append(subSegment)
+            startStrokeDistance += length
+        }
+        return output
     }
     
     private static func subSegmentSamples(
@@ -291,40 +337,6 @@ struct NewBrushStrokeEngineStampProcessor {
                     weights: [b0, b1, b2, b3])
             
             output.append(sample)
-        }
-        return output
-    }
-    
-    private static func subSegments(
-        subSegmentSamples: [BrushEngine2.Sample],
-        segmentStartStrokeDistance: Double
-    ) -> [SubSegment] {
-        
-        guard subSegmentSamples.count >= 2 else {
-            fatalError()
-        }
-        
-        var output: [SubSegment] = []
-        var startStrokeDistance = segmentStartStrokeDistance
-        
-        for i in 0 ..< subSegmentSamples.count - 1 {
-            let startSample = subSegmentSamples[i]
-            let endSample = subSegmentSamples[i + 1]
-            
-            let positionDifference =
-                endSample.position -
-                startSample.position
-            
-            let length = positionDifference.length()
-            
-            let subSegment = SubSegment(
-                startSample: startSample,
-                endSample: endSample,
-                startStrokeDistance: startStrokeDistance,
-                length: length)
-            
-            output.append(subSegment)
-            startStrokeDistance += length
         }
         return output
     }
