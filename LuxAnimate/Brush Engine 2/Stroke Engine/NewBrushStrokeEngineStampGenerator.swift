@@ -70,9 +70,11 @@ struct NewBrushStrokeEngineStampGenerator {
                 sampleTime: sample.time,
                 strokeEndTime: strokeEndTime)
         
-        let wobbleIntensity = 1
-            - brush.config.wobblePressureAttenuation
-            * pow(pressure, 3)
+        // TESTING
+//        let wobbleIntensity = 1
+//            - brush.config.wobblePressureAttenuation
+//            * pow(pressure, 3)
+        let wobbleIntensity = 1.0
         
         let wobbleScaleFactor = 1
             + noiseSample.sizeWobble

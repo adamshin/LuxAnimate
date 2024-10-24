@@ -5,8 +5,6 @@
 import Foundation
 import Metal
 
-// MARK: - Structs
-
 extension BrushEngine2 {
     
     @MainActor
@@ -17,69 +15,6 @@ extension BrushEngine2 {
         func onFinalizeStroke(
             _ e: BrushEngine2,
             canvasTexture: MTLTexture)
-    }
-    
-    enum BrushMode {
-        case paint
-        case erase
-    }
-    
-    struct InputSample {
-        var updateID: Int?
-        
-        var time: TimeInterval
-        var position: Vector
-        
-        var pressure: Double
-        var altitude: Double
-        var azimuth: Double
-        var roll: Double
-        
-        var isPressureEstimated: Bool
-        var isAltitudeEstimated: Bool
-        var isAzimuthEstimated: Bool
-        var isRollEstimated: Bool
-        
-        var hasEstimatedValues: Bool {
-            isPressureEstimated ||
-            isAltitudeEstimated ||
-            isAzimuthEstimated ||
-            isRollEstimated
-        }
-    }
-    
-    struct InputSampleUpdate {
-        var updateID: Int
-        
-        var pressure: Double?
-        var altitude: Double?
-        var azimuth: Double?
-        var roll: Double?
-    }
-    
-    struct Sample {
-        var time: TimeInterval
-        
-        var position: Vector
-        var pressure: Double
-        var altitude: Double
-        var azimuth: Double
-        var roll: Double
-    }
-    
-    struct NoiseSample {
-        var sizeWobble: Double
-        var offsetXWobble: Double
-        var offsetYWobble: Double
-    }
-    
-    struct Stamp {
-        var position: Vector
-        var size: Double
-        var rotation: Double
-        var alpha: Double
-        var color: Color
-        var offset: Vector
     }
     
 }

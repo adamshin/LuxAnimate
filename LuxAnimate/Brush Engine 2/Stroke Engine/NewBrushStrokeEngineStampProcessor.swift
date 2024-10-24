@@ -322,14 +322,17 @@ struct NewBrushStrokeEngineStampProcessor {
         let subSegmentSamples = subSegmentSamples(
             controlPointSamples: controlPointSamples)
         
-        guard subSegmentSamples.count >= 2 else {
+        let subSegmentCount = subSegmentSamples.count - 1
+        guard subSegmentCount > 0 else {
             fatalError()
         }
         
         var output: [SubSegment] = []
+        output.reserveCapacity(subSegmentCount)
+        
         var startStrokeDistance = segmentStartStrokeDistance
         
-        for i in 0 ..< subSegmentSamples.count - 1 {
+        for i in 0 ..< subSegmentCount {
             let startSample = subSegmentSamples[i]
             let endSample = subSegmentSamples[i + 1]
             

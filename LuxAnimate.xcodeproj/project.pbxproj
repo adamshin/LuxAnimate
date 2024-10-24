@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		660572032CCAC46900D699BA /* BrushEngine2+Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660572022CCAC46900D699BA /* BrushEngine2+Types.swift */; };
 		66099BA72BDB195500243D9F /* CircleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66099BA62BDB195500243D9F /* CircleView.swift */; };
 		66099BAB2BDB1D8F00243D9F /* ClearColorRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66099BAA2BDB1D8F00243D9F /* ClearColorRenderer.swift */; };
 		66099BBC2BDB32F500243D9F /* BrushStrokeEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66099BAF2BDB32F500243D9F /* BrushStrokeEngine.swift */; };
@@ -179,6 +180,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		660572022CCAC46900D699BA /* BrushEngine2+Types.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrushEngine2+Types.swift"; sourceTree = "<group>"; };
 		66099BA62BDB195500243D9F /* CircleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CircleView.swift; sourceTree = "<group>"; };
 		66099BAA2BDB1D8F00243D9F /* ClearColorRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearColorRenderer.swift; sourceTree = "<group>"; };
 		66099BAF2BDB32F500243D9F /* BrushStrokeEngine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrushStrokeEngine.swift; sourceTree = "<group>"; };
@@ -689,6 +691,7 @@
 				6676F5242CC495AD009724D6 /* Stroke Engine */,
 				66AD38952CB7456B005CC3FC /* Renderer */,
 				664C3A642CA7633900AEAC90 /* BrushEngine2.swift */,
+				660572022CCAC46900D699BA /* BrushEngine2+Types.swift */,
 			);
 			path = "Brush Engine 2";
 			sourceTree = "<group>";
@@ -1390,6 +1393,7 @@
 				660CD1332BAE4D0E00C8C7B5 /* JSONFileCoders.swift in Sources */,
 				66E3E4362C7ADE7C0086D388 /* AnimEditorToolbarVC.swift in Sources */,
 				664C28212C75306D002166D6 /* EditorWorkspaceSceneGraph.swift in Sources */,
+				660572032CCAC46900D699BA /* BrushEngine2+Types.swift in Sources */,
 				6622325B2BE0750300C8813F /* EditorCollapsibleContentVC.swift in Sources */,
 				664175BE2C7E824700205FEC /* AnimFrameEditorPaintToolState.swift in Sources */,
 				661E9F2F2C9CF48B00A75A2F /* AnimEditorState.swift in Sources */,
