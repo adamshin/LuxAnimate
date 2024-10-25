@@ -5,6 +5,7 @@
 import UIKit
 import Metal
 import Geometry
+import Color
 
 @MainActor
 protocol AnimFrameEditorBrushToolInternalStateDelegate: AnyObject {
@@ -171,7 +172,7 @@ extension AnimFrameEditorBrushToolInternalState:
     ) {
         do {
             // TODO: Do this on a background queue?
-            let texture = try TextureCopier
+            let texture = try TextureCopier()
                 .copy(canvasTexture)
             
             let imageSet = try drawingAssetProcessor

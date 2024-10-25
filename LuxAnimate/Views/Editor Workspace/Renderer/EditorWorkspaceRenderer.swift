@@ -5,6 +5,8 @@
 import Metal
 import UIKit
 import Geometry
+import Color
+import Render
 
 private let backgroundColor = Color(UIColor.editorBackground)
 private let scalePixelateThreshold: Scalar = 1.0
@@ -17,7 +19,10 @@ struct EditorWorkspaceRenderer {
     init(
         pixelFormat: MTLPixelFormat = AppConfig.metalLayerPixelFormat
     ) {
-        spriteRenderer = SpriteRenderer(pixelFormat: pixelFormat)
+        spriteRenderer = SpriteRenderer(
+            pixelFormat: pixelFormat,
+            metalDevice: MetalInterface.shared.device)
+        
         blankTexture = createBlankTexture(color: .white)!
     }
     

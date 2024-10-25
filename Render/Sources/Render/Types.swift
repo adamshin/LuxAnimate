@@ -4,19 +4,19 @@ import Geometry
 import Color
 import ShaderTypes
 
-enum BlendMode {
+public enum BlendMode {
     case normal
     case erase
     case replace
 }
 
-enum SampleMode {
+public enum SampleMode {
     case nearest
     case linear
     case linearClampEdgeToBlack
 }
 
-enum ColorMode {
+public enum ColorMode {
     case none
     case multiply
     case stencil

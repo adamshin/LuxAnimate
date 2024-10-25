@@ -5,10 +5,13 @@
 import Foundation
 import Metal
 import Geometry
+import Render
 
 struct ImageResizer {
     
-    private let spriteRenderer = SpriteRenderer()
+    private let spriteRenderer = SpriteRenderer(
+        pixelFormat: AppConfig.pixelFormat,
+        metalDevice: MetalInterface.shared.device)
     
     func resize(
         pixelData: Data,

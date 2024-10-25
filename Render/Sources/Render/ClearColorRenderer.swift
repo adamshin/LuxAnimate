@@ -4,10 +4,11 @@
 
 import Foundation
 import Metal
+import Color
 
-struct ClearColorRenderer {
+public struct ClearColorRenderer {
     
-    static func drawClearColor(
+    public static func drawClearColor(
         commandBuffer: any MTLCommandBuffer,
         target: MTLTexture,
         color: Color

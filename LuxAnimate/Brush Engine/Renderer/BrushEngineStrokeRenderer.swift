@@ -4,10 +4,14 @@
 
 import Metal
 import Geometry
+import Render
 
 class BrushEngineStrokeRenderer {
     
     private let canvasSize: PixelSize
+    
+    private let textureBlitter = TextureBlitter(
+        commandQueue: MetalInterface.shared.commandQueue)
     
     private let stampRenderer = BrushEngineStampRenderer()
     
@@ -73,7 +77,7 @@ class BrushEngineStrokeRenderer {
             brush: s.brush,
             finalized: true)
         
-        try? TextureBlitter.blit(
+        try? textureBlitter.blit(
             from: finalizedStrokeTexture,
             to: fullStrokeTexture)
         

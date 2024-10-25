@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import Color
 
 struct BrushStrokeEngineState {
     

@@ -3,6 +3,7 @@
 //
 
 import Metal
+import Render
 
 struct TextureCopier {
     
@@ -10,7 +11,10 @@ struct TextureCopier {
         case unknown
     }
     
-    static func copy(
+    private let textureBlitter = TextureBlitter(
+        commandQueue: MetalInterface.shared.commandQueue)
+    
+    func copy(
         _ texture: MTLTexture,
         usage: MTLTextureUsage = .shaderRead
     ) throws -> MTLTexture {
@@ -28,7 +32,7 @@ struct TextureCopier {
         let newTexture = MetalInterface.shared.device
             .makeTexture(descriptor: desc)!
         
-        try TextureBlitter.blit(
+        try textureBlitter.blit(
             from: texture,
             to: newTexture,
             waitUntilCompleted: true)

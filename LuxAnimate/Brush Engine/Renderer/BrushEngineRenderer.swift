@@ -5,11 +5,18 @@
 import Foundation
 import Metal
 import Geometry
+import Render
 
 class BrushEngineRenderer {
     
     private let strokeBlendMode: BlendMode
-    private let spriteRenderer = SpriteRenderer()
+    
+    private let textureBlitter = TextureBlitter(
+        commandQueue: MetalInterface.shared.commandQueue)
+    
+    private let spriteRenderer = SpriteRenderer(
+        pixelFormat: AppConfig.pixelFormat,
+        metalDevice: MetalInterface.shared.device)
     
     let renderTarget: MTLTexture
     
@@ -37,7 +44,7 @@ class BrushEngineRenderer {
         baseCanvasTexture: MTLTexture,
         strokeTexture: MTLTexture?
     ) {
-        try? TextureBlitter.blit(
+        try? textureBlitter.blit(
             from: baseCanvasTexture,
             to: renderTarget)
         

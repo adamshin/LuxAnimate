@@ -4,6 +4,7 @@
 
 import Foundation
 import Geometry
+import Color
 
 struct FrameSceneGraph: Codable {
     

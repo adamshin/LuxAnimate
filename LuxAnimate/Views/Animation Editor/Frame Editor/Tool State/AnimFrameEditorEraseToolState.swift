@@ -4,6 +4,7 @@
 
 import UIKit
 import Geometry
+import Color
 
 class AnimFrameEditorEraseToolState: AnimFrameEditorToolState {
     

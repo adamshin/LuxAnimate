@@ -4,13 +4,19 @@
 
 import Metal
 
-struct TextureBlitter {
+public struct TextureBlitter {
     
     enum Error: Swift.Error {
         case differentTextureSizes
     }
     
-    static func blit(
+    private let commandQueue: MTLCommandQueue
+    
+    public init(commandQueue: MTLCommandQueue) {
+        self.commandQueue = commandQueue
+    }
+    
+    public func blit(
         from src: MTLTexture,
         to dst: MTLTexture,
         waitUntilCompleted: Bool = false
@@ -20,8 +26,8 @@ struct TextureBlitter {
             src.height == dst.height
         else { throw Error.differentTextureSizes }
         
-        let commandBuffer = MetalInterface.shared
-            .commandQueue.makeCommandBuffer()!
+        let commandBuffer = commandQueue
+            .makeCommandBuffer()!
         
         let blitEncoder = commandBuffer.makeBlitCommandEncoder()!
         blitEncoder.copy(from: src, to: dst)

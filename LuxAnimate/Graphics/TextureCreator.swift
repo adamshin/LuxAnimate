@@ -72,7 +72,9 @@ struct TextureCreator {
         usage: MTLTextureUsage = .shaderRead
     ) throws -> MTLTexture {
         
-        let pixelData = Self.emptyPixelData(size: size)
+        let pixelData = Self.emptyPixelData(
+            size: size)
+        
         return try createTexture(
             pixelData: pixelData,
             size: size,

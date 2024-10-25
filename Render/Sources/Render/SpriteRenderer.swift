@@ -1,28 +1,27 @@
-//
-//  SpriteRenderer.swift
-//
 
 import Foundation
 import Metal
 import Geometry
+import Color
+import ShaderTypes
 
-struct SpriteRenderer {
+extension SpriteRenderer {
     
     private static let quadPositions: [Vector] = [
         .init(0, 0), .init(1, 0), .init(1, 1),
         .init(0, 0), .init(1, 1), .init(0, 1),
     ]
     
-    struct Sprite {
-        var position: Vector
-        var size: Size
-        var anchor: Vector
-        var transform: Matrix3
-        var color: Color
-        var alpha: Double
-        var paddingScale: Double
+    public struct Sprite {
+        public var position: Vector
+        public var size: Size
+        public var anchor: Vector
+        public var transform: Matrix3
+        public var color: Color
+        public var alpha: Double
+        public var paddingScale: Double
         
-        init(
+        public init(
             position: Vector,
             size: Size,
             anchor: Vector = .init(0.5, 0.5),
@@ -40,7 +39,7 @@ struct SpriteRenderer {
             self.paddingScale = paddingScale
         }
         
-        init(
+        public init(
             position: Vector,
             size: Size,
             anchor: Vector = .init(0.5, 0.5),
@@ -64,13 +63,21 @@ struct SpriteRenderer {
         }
     }
     
+}
+
+public struct SpriteRenderer {
+    
+    private let metalDevice: MTLDevice
     private let pipelineState: MTLRenderPipelineState
     
-    init(
-        pixelFormat: MTLPixelFormat = AppConfig.pixelFormat
+    public init(
+        pixelFormat: MTLPixelFormat,
+        metalDevice: MTLDevice
     ) {
-        let library = MetalInterface.shared.device
-            .makeDefaultLibrary()!
+        self.metalDevice = metalDevice
+        
+        let library = try! metalDevice
+            .makeDefaultLibrary(bundle: Bundle.module)
         
         let vertexFunction = library.makeFunction(
             name: "spriteVertexShader")
@@ -84,11 +91,12 @@ struct SpriteRenderer {
         let attachment = pipelineDescriptor.colorAttachments[0]!
         attachment.pixelFormat = pixelFormat
         
-        pipelineState = try! MetalInterface.shared.device
-            .makeRenderPipelineState(descriptor: pipelineDescriptor)
+        pipelineState = try! metalDevice
+            .makeRenderPipelineState(
+                descriptor: pipelineDescriptor)
     }
     
-    func drawSprites(
+    public func drawSprites(
         commandBuffer: MTLCommandBuffer,
         target: MTLTexture,
         viewportSize: Size,
@@ -139,7 +147,7 @@ struct SpriteRenderer {
             }
         }
         
-        let vertexBuffer = MetalInterface.shared.device.makeBuffer(
+        let vertexBuffer = metalDevice.makeBuffer(
             bytes: vertices,
             length: vertices.count * MemoryLayout<SpriteVertex>.stride)
         

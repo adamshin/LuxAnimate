@@ -4,12 +4,16 @@
 
 import Metal
 import Geometry
+import Render
+import Color
 
 private let paddingSizeThreshold: Double = 20
 
 struct BrushEngineStampRenderer {
     
-    private let spriteRenderer = SpriteRenderer()
+    private let spriteRenderer = SpriteRenderer(
+        pixelFormat: AppConfig.pixelFormat,
+        metalDevice: MetalInterface.shared.device)
     
     func drawStamps(
         target: MTLTexture,

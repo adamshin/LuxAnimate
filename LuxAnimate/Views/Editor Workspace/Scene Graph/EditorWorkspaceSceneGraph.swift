@@ -5,6 +5,8 @@
 import Foundation
 import Metal
 import Geometry
+import Color
+import Render
 
 struct EditorWorkspaceSceneGraph {
     

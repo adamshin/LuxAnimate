@@ -3,6 +3,8 @@
 //
 
 import Metal
+import Render
+import Color
 
 @MainActor
 protocol AnimFrameEditorWorkspaceSceneGraphGeneratorDelegate: AnyObject {

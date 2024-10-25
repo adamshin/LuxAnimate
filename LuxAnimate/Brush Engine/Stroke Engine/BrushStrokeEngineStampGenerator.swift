@@ -4,6 +4,7 @@
 
 import Foundation
 import Geometry
+import Color
 
 private let minStampDistance: Double = 1.0
 private let minStampSize: Double = 0.5

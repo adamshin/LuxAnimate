@@ -4,6 +4,8 @@
 
 import Foundation
 import Metal
+import Color
+import Render
 
 extension BrushEngine {
     
@@ -33,6 +35,9 @@ class BrushEngine {
     
     private var strokeEngine: BrushStrokeEngine?
     
+    private let textureBlitter = TextureBlitter(
+        commandQueue: MetalInterface.shared.commandQueue)
+    
     // MARK: - Initializer
     
     init(
@@ -61,7 +66,7 @@ class BrushEngine {
     func setCanvasTextureContents(_ texture: MTLTexture) {
         endStroke()
         
-        try? TextureBlitter.blit(
+        try? textureBlitter.blit(
             from: texture,
             to: baseCanvasTexture)
         
@@ -113,7 +118,7 @@ class BrushEngine {
             baseCanvasTexture: baseCanvasTexture,
             strokeTexture: strokeRenderer.fullStrokeTexture)
         
-        try? TextureBlitter.blit(
+        try? textureBlitter.blit(
             from: renderer.renderTarget,
             to: baseCanvasTexture,
             waitUntilCompleted: true)

@@ -4,6 +4,7 @@
 
 import Foundation
 import Geometry
+import Color
 
 private let segmentSubdivisionCount = 10
 

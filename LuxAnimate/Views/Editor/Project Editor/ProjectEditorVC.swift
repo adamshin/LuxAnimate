@@ -3,6 +3,7 @@
 //
 
 import UIKit
+import Color
 
 class ProjectEditorVC: UIViewController {
     
