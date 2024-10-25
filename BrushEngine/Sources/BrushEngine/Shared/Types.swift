@@ -1,14 +1,10 @@
 
 import Foundation
 import Geometry
+import Color
     
 enum BrushMode {
     case paint
-    case erase
-}
-
-enum BlendMode {
-    case normal
     case erase
 }
 

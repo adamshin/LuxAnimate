@@ -1,18 +1,15 @@
 
 import Foundation
 import Metal
+import Color
 
 public extension Canvas {
     
     @MainActor
     protocol Delegate: AnyObject {
         
-        func onUpdateCanvasTexture(
-            _ c: Canvas)
-        
-        func onFinalizeStroke(
-            _ c: Canvas,
-            canvasTexture: MTLTexture)
+        func onUpdateTexture(_ c: Canvas)
+        func onFinalizeStroke(_ c: Canvas)
         
     }
     
@@ -32,10 +29,12 @@ public class Canvas {
     
     // MARK: - Initializer
     
-//    init(
-//        canvasSize: PixelSize,
-//        brushMode: BrushMode
-//    ) {
+    init(
+        width: Int,
+        height: Int,
+        brushMode: BrushMode,
+        metalDevice: MTLDevice
+    ) {
 //        baseCanvasTexture = try! TextureCreator
 //            .createEmptyTexture(
 //                size: canvasSize,
@@ -47,7 +46,7 @@ public class Canvas {
 //        
 //        strokeRenderer = BrushEngineStrokeRenderer(
 //            canvasSize: canvasSize)
-//    }
+    }
     
     // MARK: - Interface
     

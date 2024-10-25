@@ -1,12 +1,19 @@
 
-// TODO: Extract this into a package?
-
 import Foundation
 import UIKit
 import Metal
 
 public struct Color: Sendable, Codable {
+    
     public var r, g, b, a: UInt8
+    
+    public init(r: UInt8, g: UInt8, b: UInt8, a: UInt8) {
+        self.r = r
+        self.g = g
+        self.b = b
+        self.a = a
+    }
+    
 }
 
 public extension Color {
@@ -88,17 +95,17 @@ public extension Color {
         return c
     }
     
-//    var cgColor: CGColor {
-//        CGColor(
-//            srgbRed: CGFloat(r) / 255,
-//            green: CGFloat(g) / 255,
-//            blue: CGFloat(b) / 255,
-//            alpha: CGFloat(a) / 255)
-//    }
+    var cgColor: CGColor {
+        CGColor(
+            srgbRed: CGFloat(r) / 255,
+            green: CGFloat(g) / 255,
+            blue: CGFloat(b) / 255,
+            alpha: CGFloat(a) / 255)
+    }
     
-//    var uiColor: UIColor {
-//        UIColor(cgColor: cgColor)
-//    }
+    var uiColor: UIColor {
+        UIColor(cgColor: cgColor)
+    }
     
     var mtlClearColor: MTLClearColor {
         MTLClearColorMake(

@@ -149,6 +149,7 @@
 		66D084892BA4060E00EB8556 /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D084872BA4060E00EB8556 /* Project.swift */; };
 		66D0848C2BA55B4300EB8556 /* LibraryManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D0848B2BA55B4300EB8556 /* LibraryManifest.swift */; };
 		66DE6BA52C923CE900A687C4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 66DE6BA42C923CE900A687C4 /* Assets.xcassets */; };
+		66DFCC5A2CCB6301004A227A /* Color in Frameworks */ = {isa = PBXBuildFile; productRef = 66DFCC592CCB6301004A227A /* Color */; };
 		66E04CDB2C59829D00BD91F4 /* AnimationLayerContentEditBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E04CDA2C59829D00BD91F4 /* AnimationLayerContentEditBuilder.swift */; };
 		66E312B62C3A0001006BE399 /* ProjectEditorContentVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E312B52C3A0001006BE399 /* ProjectEditorContentVC.swift */; };
 		66E3E4362C7ADE7C0086D388 /* AnimEditorToolbarVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E3E4352C7ADE7C0086D388 /* AnimEditorToolbarVC.swift */; };
@@ -308,6 +309,7 @@
 		66D084872BA4060E00EB8556 /* Project.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Project.swift; sourceTree = "<group>"; };
 		66D0848B2BA55B4300EB8556 /* LibraryManifest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryManifest.swift; sourceTree = "<group>"; };
 		66DE6BA42C923CE900A687C4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		66DFCC572CCB62F5004A227A /* Color */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Color; sourceTree = "<group>"; };
 		66E04CDA2C59829D00BD91F4 /* AnimationLayerContentEditBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationLayerContentEditBuilder.swift; sourceTree = "<group>"; };
 		66E312B52C3A0001006BE399 /* ProjectEditorContentVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectEditorContentVC.swift; sourceTree = "<group>"; };
 		66E3E4352C7ADE7C0086D388 /* AnimEditorToolbarVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorToolbarVC.swift; sourceTree = "<group>"; };
@@ -324,6 +326,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				66DFCC5A2CCB6301004A227A /* Color in Frameworks */,
 				6605720C2CCB53CE00D699BA /* Geometry in Frameworks */,
 				6605720E2CCB53DA00D699BA /* BrushEngine in Frameworks */,
 			);
@@ -903,6 +906,7 @@
 			children = (
 				66D0843B2BA3840C00EB8556 /* LuxAnimate */,
 				660572082CCB533400D699BA /* Geometry */,
+				66DFCC572CCB62F5004A227A /* Color */,
 				660572042CCB4BA100D699BA /* BrushEngine */,
 				66D0843A2BA3840C00EB8556 /* Products */,
 			);
@@ -1528,6 +1532,10 @@
 		6605720D2CCB53DA00D699BA /* BrushEngine */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = BrushEngine;
+		};
+		66DFCC592CCB6301004A227A /* Color */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Color;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
