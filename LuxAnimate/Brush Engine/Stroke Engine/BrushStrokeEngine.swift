@@ -1,41 +1,41 @@
 //
-//  NewBrushStrokeEngine.swift
+//  BrushStrokeEngine.swift
 //
 
 import Foundation
 
 // MARK: - Structs
 
-extension NewBrushStrokeEngine {
+extension BrushStrokeEngine {
     
     struct ProcessorOutput {
-        var samples: [BrushEngine2.Sample]
+        var samples: [BrushEngine.Sample]
         var isFinalized: Bool
         var isStrokeEnd: Bool
         var strokeEndTime: TimeInterval
     }
     
     struct StampProcessorOutput {
-        var stamps: [BrushEngine2.Stamp]
+        var stamps: [BrushEngine.Stamp]
         var isFinalized: Bool
         var isStrokeEnd: Bool
     }
     
     struct ProcessOutput {
         var brush: Brush
-        var finalizedStamps: [BrushEngine2.Stamp]
-        var nonFinalizedStamps: [BrushEngine2.Stamp]
+        var finalizedStamps: [BrushEngine.Stamp]
+        var nonFinalizedStamps: [BrushEngine.Stamp]
     }
     
 }
 
-// MARK: - NewBrushStrokeEngine
+// MARK: - BrushStrokeEngine
 
-class NewBrushStrokeEngine {
+class BrushStrokeEngine {
     
     private let brush: Brush
     
-    private var savedState: NewBrushStrokeEngineState
+    private var savedState: BrushStrokeEngineState
     
     init(
         brush: Brush,
@@ -55,8 +55,8 @@ class NewBrushStrokeEngine {
     }
     
     func update(
-        addedSamples: [BrushEngine2.InputSample],
-        predictedSamples: [BrushEngine2.InputSample]
+        addedSamples: [BrushEngine.InputSample],
+        predictedSamples: [BrushEngine.InputSample]
     ) {
         savedState.handleInputUpdate(
             addedSamples: addedSamples,
@@ -64,7 +64,7 @@ class NewBrushStrokeEngine {
     }
     
     func update(
-        sampleUpdates: [BrushEngine2.InputSampleUpdate]
+        sampleUpdates: [BrushEngine.InputSampleUpdate]
     ) {
         savedState.handleInputUpdate(
             sampleUpdates: sampleUpdates)

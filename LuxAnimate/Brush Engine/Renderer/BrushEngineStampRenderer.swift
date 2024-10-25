@@ -1,19 +1,19 @@
 //
-//  BrushEngine2StampRenderer.swift
+//  BrushEngineStampRenderer.swift
 //
 
 import Metal
 
 private let paddingSizeThreshold: Double = 20
 
-struct BrushEngine2StampRenderer {
+struct BrushEngineStampRenderer {
     
     private let spriteRenderer = SpriteRenderer()
     
     func drawStamps(
         target: MTLTexture,
         viewportSize: Size,
-        stamps: any Sequence<BrushEngine2.Stamp>,
+        stamps: any Sequence<BrushEngine.Stamp>,
         brush: Brush,
         finalized: Bool
     ) {

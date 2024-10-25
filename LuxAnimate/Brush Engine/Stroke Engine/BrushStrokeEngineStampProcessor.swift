@@ -1,5 +1,5 @@
 //
-//  NewBrushStrokeEngineStampProcessor.swift
+//  BrushStrokeEngineStampProcessor.swift
 //
 
 import Foundation
@@ -13,10 +13,10 @@ private let drawControlPoints = false
 
 // MARK: - Structs
 
-extension NewBrushStrokeEngineStampProcessor {
+extension BrushStrokeEngineStampProcessor {
     
     struct Config {
-        var stampGenerator: NewBrushStrokeEngineStampGenerator
+        var stampGenerator: BrushStrokeEngineStampGenerator
         
         let sizeWobbleGenerator: PerlinNoiseGenerator
         let offsetXWobbleGenerator: PerlinNoiseGenerator
@@ -39,7 +39,7 @@ extension NewBrushStrokeEngineStampProcessor {
     }
     
     struct Segment {
-        var controlPointSamples: [BrushEngine2.Sample]
+        var controlPointSamples: [BrushEngine.Sample]
         var subSegments: [SubSegment]
         var startStrokeDistance: Double
         var length: Double
@@ -53,15 +53,15 @@ extension NewBrushStrokeEngineStampProcessor {
     }
     
     struct SubSegmentEndpoint {
-        var sample: BrushEngine2.Sample
-        var noiseSample: BrushEngine2.NoiseSample
+        var sample: BrushEngine.Sample
+        var noiseSample: BrushEngine.NoiseSample
     }
     
 }
 
-// MARK: - NewBrushStrokeEngineStampProcessor
+// MARK: - BrushStrokeEngineStampProcessor
 
-struct NewBrushStrokeEngineStampProcessor {
+struct BrushStrokeEngineStampProcessor {
     
     private let config: Config
     private var state = State()
@@ -75,7 +75,7 @@ struct NewBrushStrokeEngineStampProcessor {
         applyTaper: Bool
     ) {
         let stampGenerator =
-            NewBrushStrokeEngineStampGenerator(
+            BrushStrokeEngineStampGenerator(
                 brush: brush,
                 scale: scale,
                 color: color,
@@ -106,14 +106,14 @@ struct NewBrushStrokeEngineStampProcessor {
     // MARK: - Interface
     
     mutating func process(
-        input: NewBrushStrokeEngine.ProcessorOutput
-    ) -> NewBrushStrokeEngine.StampProcessorOutput {
+        input: BrushStrokeEngine.ProcessorOutput
+    ) -> BrushStrokeEngine.StampProcessorOutput {
         
         if !input.isFinalized {
             state.isOutputFinalized = false
         }
         
-        var outputStamps: [BrushEngine2.Stamp] = []
+        var outputStamps: [BrushEngine.Stamp] = []
         
         for sample in input.samples {
             Self.processSample(
@@ -140,7 +140,7 @@ struct NewBrushStrokeEngineStampProcessor {
             }
         }
         
-        return NewBrushStrokeEngine.StampProcessorOutput(
+        return BrushStrokeEngine.StampProcessorOutput(
             stamps: outputStamps,
             isFinalized: state.isOutputFinalized,
             isStrokeEnd: input.isStrokeEnd)
@@ -150,10 +150,10 @@ struct NewBrushStrokeEngineStampProcessor {
     
     private static func processSample(
         config: Config,
-        sample: BrushEngine2.Sample,
+        sample: BrushEngine.Sample,
         strokeEndTime: TimeInterval,
         state: inout State,
-        outputStamps: inout [BrushEngine2.Stamp]
+        outputStamps: inout [BrushEngine.Stamp]
     ) {
         let segment: Segment
         if let lastSegment = state.lastSegment {
@@ -198,11 +198,11 @@ struct NewBrushStrokeEngineStampProcessor {
         segment: Segment,
         strokeEndTime: TimeInterval,
         state: inout State,
-        outputStamps: inout [BrushEngine2.Stamp]
+        outputStamps: inout [BrushEngine.Stamp]
     ) {
         if drawControlPoints {
             for s in segment.controlPointSamples {
-                let stamp = BrushEngine2.Stamp(
+                let stamp = BrushEngine.Stamp(
                     position: s.position,
                     size: 20,
                     rotation: 0,
@@ -228,7 +228,7 @@ struct NewBrushStrokeEngineStampProcessor {
         subSegment: SubSegment,
         strokeEndTime: TimeInterval,
         state: inout State,
-        outputStamps: inout [BrushEngine2.Stamp]
+        outputStamps: inout [BrushEngine.Stamp]
     ) {
         while true {
             let nextStampStrokeDistance =
@@ -294,7 +294,7 @@ struct NewBrushStrokeEngineStampProcessor {
     
     private static func createSegment(
         config: Config,
-        controlPointSamples: [BrushEngine2.Sample],
+        controlPointSamples: [BrushEngine.Sample],
         startStrokeDistance: Double
     ) -> Segment {
         
@@ -315,7 +315,7 @@ struct NewBrushStrokeEngineStampProcessor {
     
     private static func subSegments(
         config: Config,
-        controlPointSamples: [BrushEngine2.Sample],
+        controlPointSamples: [BrushEngine.Sample],
         segmentStartStrokeDistance: Double
     ) -> [SubSegment] {
         
@@ -379,8 +379,8 @@ struct NewBrushStrokeEngineStampProcessor {
     }
     
     private static func subSegmentSamples(
-        controlPointSamples: [BrushEngine2.Sample]
-    ) -> [BrushEngine2.Sample] {
+        controlPointSamples: [BrushEngine.Sample]
+    ) -> [BrushEngine.Sample] {
         
         guard controlPointSamples.count == 4 else {
             fatalError()
@@ -392,7 +392,7 @@ struct NewBrushStrokeEngineStampProcessor {
         
         let count = segmentSubdivisionCount
         
-        var output: [BrushEngine2.Sample] = []
+        var output: [BrushEngine.Sample] = []
         output.reserveCapacity(count)
         
         for i in 0 ... count {
@@ -416,7 +416,7 @@ struct NewBrushStrokeEngineStampProcessor {
     private static func noiseSample(
         config: Config,
         strokeDistance: Double
-    ) -> BrushEngine2.NoiseSample {
+    ) -> BrushEngine.NoiseSample {
         
         let wobbleDistance = strokeDistance
             / config.stampGenerator.baseStampSize
@@ -428,7 +428,7 @@ struct NewBrushStrokeEngineStampProcessor {
         let offsetYWobble = config.offsetYWobbleGenerator
             .value(at: wobbleDistance)
         
-        return BrushEngine2.NoiseSample(
+        return BrushEngine.NoiseSample(
             sizeWobble: sizeWobble,
             offsetXWobble: offsetXWobble,
             offsetYWobble: offsetYWobble)

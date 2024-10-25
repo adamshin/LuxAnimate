@@ -13,9 +13,9 @@ struct BrushEngineSampleInterpolator {
     }
     
     static func interpolate(
-        samples: [BrushEngine2.Sample],
+        samples: [BrushEngine.Sample],
         weights: [Double]
-    ) throws -> BrushEngine2.Sample {
+    ) throws -> BrushEngine.Sample {
         
         // TODO: Interpolate angular values correctly!
         // (azimuth, roll)
@@ -32,7 +32,7 @@ struct BrushEngineSampleInterpolator {
             throw Error.zeroTotalWeight
         }
         
-        var o = BrushEngine2.Sample(
+        var o = BrushEngine.Sample(
             time: 0,
             position: .zero,
             pressure: 0,
@@ -57,9 +57,9 @@ struct BrushEngineSampleInterpolator {
     }
     
     static func interpolate(
-        noiseSamples samples: [BrushEngine2.NoiseSample],
+        noiseSamples samples: [BrushEngine.NoiseSample],
         weights: [Double]
-    ) throws -> BrushEngine2.NoiseSample {
+    ) throws -> BrushEngine.NoiseSample {
         
         guard !samples.isEmpty else {
             throw Error.emptyInput
@@ -73,7 +73,7 @@ struct BrushEngineSampleInterpolator {
             throw Error.zeroTotalWeight
         }
         
-        var o = BrushEngine2.NoiseSample(
+        var o = BrushEngine.NoiseSample(
             sizeWobble: 0,
             offsetXWobble: 0,
             offsetYWobble: 0)

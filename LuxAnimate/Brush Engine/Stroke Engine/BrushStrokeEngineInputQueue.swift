@@ -1,15 +1,15 @@
 //
-//  NewBrushStrokeEngineInputQueue.swift
+//  BrushStrokeEngineInputQueue.swift
 //
 
 import Foundation
 
-struct NewBrushStrokeEngineInputQueue {
+struct BrushStrokeEngineInputQueue {
     
     static let finalizationThreshold = 30
     
-    private var samples: [BrushEngine2.InputSample] = []
-    private var predictedSamples: [BrushEngine2.InputSample] = []
+    private var samples: [BrushEngine.InputSample] = []
+    private var predictedSamples: [BrushEngine.InputSample] = []
     
     private var lastSampleTime: TimeInterval = 0
     
@@ -18,8 +18,8 @@ struct NewBrushStrokeEngineInputQueue {
     // MARK: - Interface
     
     mutating func handleInputUpdate(
-        addedSamples: [BrushEngine2.InputSample],
-        predictedSamples: [BrushEngine2.InputSample]
+        addedSamples: [BrushEngine.InputSample],
+        predictedSamples: [BrushEngine.InputSample]
     ) {
         self.samples += addedSamples
         self.predictedSamples = predictedSamples
@@ -46,7 +46,7 @@ struct NewBrushStrokeEngineInputQueue {
     }
     
     mutating func handleInputUpdate(
-        sampleUpdates: [BrushEngine2.InputSampleUpdate]
+        sampleUpdates: [BrushEngine.InputSampleUpdate]
     ) {
         for u in sampleUpdates {
             samples = samples.map { s in
@@ -61,7 +61,7 @@ struct NewBrushStrokeEngineInputQueue {
     }
     
     mutating func processNextSample()
-    -> NewBrushStrokeEngine.ProcessorOutput {
+    -> BrushStrokeEngine.ProcessorOutput {
         
         if let s = samples.first {
             samples.removeFirst()
@@ -71,7 +71,7 @@ struct NewBrushStrokeEngineInputQueue {
             }
             
             let sample = Self.convert(inputSample: s)
-            return NewBrushStrokeEngine.ProcessorOutput(
+            return BrushStrokeEngine.ProcessorOutput(
                 samples: [sample],
                 isFinalized: isOutputFinalized,
                 isStrokeEnd: false,
@@ -81,14 +81,14 @@ struct NewBrushStrokeEngineInputQueue {
             predictedSamples.removeFirst()
             
             let sample = Self.convert(inputSample: s)
-            return NewBrushStrokeEngine.ProcessorOutput(
+            return BrushStrokeEngine.ProcessorOutput(
                 samples: [sample],
                 isFinalized: false,
                 isStrokeEnd: false,
                 strokeEndTime: lastSampleTime)
         }
         
-        return NewBrushStrokeEngine.ProcessorOutput(
+        return BrushStrokeEngine.ProcessorOutput(
             samples: [],
             isFinalized: false,
             isStrokeEnd: true,
@@ -98,10 +98,10 @@ struct NewBrushStrokeEngineInputQueue {
     // MARK: - Internal Logic
     
     private static func convert(
-        inputSample s: BrushEngine2.InputSample
-    ) -> BrushEngine2.Sample {
+        inputSample s: BrushEngine.InputSample
+    ) -> BrushEngine.Sample {
         
-        BrushEngine2.Sample(
+        BrushEngine.Sample(
             time: s.time,
             position: s.position,
             pressure: s.pressure,
@@ -111,9 +111,9 @@ struct NewBrushStrokeEngineInputQueue {
     }
     
     private static func applySampleUpdate(
-        sample s: BrushEngine2.InputSample,
-        update u: BrushEngine2.InputSampleUpdate
-    ) -> BrushEngine2.InputSample {
+        sample s: BrushEngine.InputSample,
+        update u: BrushEngine.InputSampleUpdate
+    ) -> BrushEngine.InputSample {
         
         var s = s
         

@@ -1,10 +1,10 @@
 //
-//  NewBrushStrokeEngineSampleResampler.swift
+//  BrushStrokeEngineSampleResampler.swift
 //
 
 import Foundation
 
-struct NewBrushStrokeEngineSampleResampler {
+struct BrushStrokeEngineSampleResampler {
     
     enum Error: Swift.Error {
         case emptyInput
@@ -27,14 +27,14 @@ struct NewBrushStrokeEngineSampleResampler {
     /// first/last sample.
     
     static func resample(
-        samples: [BrushEngine2.Sample],
+        samples: [BrushEngine.Sample],
         resampleTimes: [TimeInterval]
-    ) throws -> [BrushEngine2.Sample] {
+    ) throws -> [BrushEngine.Sample] {
 
         guard !samples.isEmpty, !resampleTimes.isEmpty
         else { throw Error.emptyInput }
         
-        var result = [BrushEngine2.Sample]()
+        var result = [BrushEngine.Sample]()
         result.reserveCapacity(resampleTimes.count)
         
         // Handle resample times before first sample

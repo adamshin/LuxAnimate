@@ -1,54 +1,54 @@
 //
-//  BrushEngine2.swift
+//  BrushEngine.swift
 //
 
 import Foundation
 import Metal
 
-extension BrushEngine2 {
+extension BrushEngine {
     
     @MainActor
     protocol Delegate: AnyObject {
         func onUpdateCanvasTexture(
-            _ e: BrushEngine2)
+            _ e: BrushEngine)
         
         func onFinalizeStroke(
-            _ e: BrushEngine2,
+            _ e: BrushEngine,
             canvasTexture: MTLTexture)
     }
     
 }
 
-// MARK: - BrushEngine2
+// MARK: - BrushEngine
 
 @MainActor
-class BrushEngine2 {
+class BrushEngine {
     
     weak var delegate: Delegate?
     
     private let baseCanvasTexture: MTLTexture
     
-    private let renderer: BrushEngine2Renderer
-    private let strokeRenderer: BrushEngine2StrokeRenderer // TODO: move to stroke engine?
+    private let renderer: BrushEngineRenderer
+    private let strokeRenderer: BrushEngineStrokeRenderer // TODO: move to stroke engine?
     
-    private var strokeEngine: NewBrushStrokeEngine?
+    private var strokeEngine: BrushStrokeEngine?
     
     // MARK: - Initializer
     
     init(
         canvasSize: PixelSize,
-        brushMode: BrushEngine2.BrushMode
+        brushMode: BrushEngine.BrushMode
     ) {
         baseCanvasTexture = try! TextureCreator
             .createEmptyTexture(
                 size: canvasSize,
                 mipMapped: false)
         
-        renderer = BrushEngine2Renderer(
+        renderer = BrushEngineRenderer(
             canvasSize: canvasSize,
             brushMode: brushMode)
         
-        strokeRenderer = BrushEngine2StrokeRenderer(
+        strokeRenderer = BrushEngineStrokeRenderer(
             canvasSize: canvasSize)
     }
     

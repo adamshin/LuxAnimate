@@ -54,15 +54,15 @@ class AnimFrameEditorBrushToolInternalState {
     
     weak var delegate: AnimFrameEditorBrushToolInternalStateDelegate?
     
-    private let brushEngine: BrushEngine2
+    private let brushEngine: BrushEngine
     
     private let drawingAssetProcessor = DrawingAssetProcessor()
     
     init(
         canvasSize: PixelSize,
-        brushMode: BrushEngine2.BrushMode
+        brushMode: BrushEngine.BrushMode
     ) {
-        brushEngine = BrushEngine2(
+        brushEngine = BrushEngine(
             canvasSize: canvasSize,
             brushMode: brushMode)
         
@@ -156,16 +156,16 @@ class AnimFrameEditorBrushToolInternalState {
 // MARK: - Delegates
 
 extension AnimFrameEditorBrushToolInternalState:
-    BrushEngine2.Delegate {
+    BrushEngine.Delegate {
     
     func onUpdateCanvasTexture(
-        _ e: BrushEngine2
+        _ e: BrushEngine
     ) {
         delegate?.onUpdateCanvasTexture(self)
     }
 
     func onFinalizeStroke(
-        _ e: BrushEngine2,
+        _ e: BrushEngine,
         canvasTexture: MTLTexture
     ) {
         do {

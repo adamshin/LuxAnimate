@@ -1,10 +1,10 @@
 //
-//  BrushEngine2+Types.swift
+//  BrushEngine+Types.swift
 //
 
 import Foundation
 
-extension BrushEngine2 {
+extension BrushEngine {
     
     enum BrushMode {
         case paint

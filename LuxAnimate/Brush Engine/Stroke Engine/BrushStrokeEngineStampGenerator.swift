@@ -1,5 +1,5 @@
 //
-//  NewBrushStrokeEngineStampGenerator.swift
+//  BrushStrokeEngineStampGenerator.swift
 //
 
 import Foundation
@@ -13,19 +13,19 @@ private let pressureSensitivity: Double = 1.5
 
 // MARK: - Structs
 
-extension NewBrushStrokeEngineStampGenerator {
+extension BrushStrokeEngineStampGenerator {
     
     struct Output {
-        var stamp: BrushEngine2.Stamp
+        var stamp: BrushEngine.Stamp
         var distanceToNextStamp: Double
         var isNonFinalized: Bool
     }
     
 }
 
-// MARK: - NewBrushStrokeEngineStampGenerator
+// MARK: - BrushStrokeEngineStampGenerator
 
-struct NewBrushStrokeEngineStampGenerator {
+struct BrushStrokeEngineStampGenerator {
     
     let brush: Brush
     let scale: Double
@@ -52,8 +52,8 @@ struct NewBrushStrokeEngineStampGenerator {
     }
     
     func stamp(
-        sample: BrushEngine2.Sample,
-        noiseSample: BrushEngine2.NoiseSample,
+        sample: BrushEngine.Sample,
+        noiseSample: BrushEngine.NoiseSample,
         strokeEndTime: TimeInterval
     ) -> Output {
         
@@ -107,7 +107,7 @@ struct NewBrushStrokeEngineStampGenerator {
             offset = offset.normalized()
         }
         
-        let stamp = BrushEngine2.Stamp(
+        let stamp = BrushEngine.Stamp(
             position: sample.position,
             size: stampSize,
             rotation: rotation,

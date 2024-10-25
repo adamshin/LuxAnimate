@@ -1,11 +1,11 @@
 //
-//  BrushEngine2Renderer.swift
+//  BrushEngineRenderer.swift
 //
 
 import Foundation
 import Metal
 
-class BrushEngine2Renderer {
+class BrushEngineRenderer {
     
     private let strokeBlendMode: BlendMode
     private let spriteRenderer = SpriteRenderer()
@@ -14,7 +14,7 @@ class BrushEngine2Renderer {
     
     init(
         canvasSize: PixelSize,
-        brushMode: BrushEngine2.BrushMode
+        brushMode: BrushEngine.BrushMode
     ) {
         strokeBlendMode = switch brushMode {
         case .paint: .normal

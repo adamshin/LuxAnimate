@@ -1,14 +1,14 @@
 //
-//  NewBrushStrokeEngineState.swift
+//  BrushStrokeEngineState.swift
 //
 
 import Foundation
 
-struct NewBrushStrokeEngineState {
+struct BrushStrokeEngineState {
     
-    private var inputQueue: NewBrushStrokeEngineInputQueue
-    private var smoothingProcessor: NewBrushStrokeEngineSmoothingProcessor
-    private var stampProcessor: NewBrushStrokeEngineStampProcessor
+    private var inputQueue: BrushStrokeEngineInputQueue
+    private var smoothingProcessor: BrushStrokeEngineSmoothingProcessor
+    private var stampProcessor: BrushStrokeEngineStampProcessor
     
     init(
         brush: Brush,
@@ -31,8 +31,8 @@ struct NewBrushStrokeEngineState {
     }
     
     mutating func handleInputUpdate(
-        addedSamples: [BrushEngine2.InputSample],
-        predictedSamples: [BrushEngine2.InputSample]
+        addedSamples: [BrushEngine.InputSample],
+        predictedSamples: [BrushEngine.InputSample]
     ) {
         inputQueue.handleInputUpdate(
             addedSamples: addedSamples,
@@ -40,14 +40,14 @@ struct NewBrushStrokeEngineState {
     }
     
     mutating func handleInputUpdate(
-        sampleUpdates: [BrushEngine2.InputSampleUpdate]
+        sampleUpdates: [BrushEngine.InputSampleUpdate]
     ) {
         inputQueue.handleInputUpdate(
             sampleUpdates: sampleUpdates)
     }
     
     mutating func processStep()
-    -> NewBrushStrokeEngine.StampProcessorOutput {
+    -> BrushStrokeEngine.StampProcessorOutput {
         
         let o1 = inputQueue.processNextSample()
         let o2 = smoothingProcessor.process(input: o1)

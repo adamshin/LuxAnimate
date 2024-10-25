@@ -1,5 +1,5 @@
 //
-//  NewBrushStrokeEngineSmoothingProcessor.swift
+//  BrushStrokeEngineSmoothingProcessor.swift
 //
 
 import Foundation
@@ -14,7 +14,7 @@ private let strokeTailSampleInterval: TimeInterval = 1/60
 
 // MARK: - Structs
 
-extension NewBrushStrokeEngineSmoothingProcessor {
+extension BrushStrokeEngineSmoothingProcessor {
     
     struct Config {
         var windowSize: TimeInterval
@@ -24,13 +24,13 @@ extension NewBrushStrokeEngineSmoothingProcessor {
     
 }
 
-// MARK: - NewBrushStrokeEngineSmoothingProcessor
+// MARK: - BrushStrokeEngineSmoothingProcessor
 
-struct NewBrushStrokeEngineSmoothingProcessor {
+struct BrushStrokeEngineSmoothingProcessor {
     
     private let config: Config
     
-    private var sampleBuffer: [BrushEngine2.Sample] = []
+    private var sampleBuffer: [BrushEngine.Sample] = []
     private var isOutputFinalized = true
     
     // MARK: - Init
@@ -65,14 +65,14 @@ struct NewBrushStrokeEngineSmoothingProcessor {
     // MARK: - Interface
     
     mutating func process(
-        input: NewBrushStrokeEngine.ProcessorOutput
-    ) -> NewBrushStrokeEngine.ProcessorOutput {
+        input: BrushStrokeEngine.ProcessorOutput
+    ) -> BrushStrokeEngine.ProcessorOutput {
         
         if !input.isFinalized {
             isOutputFinalized = false
         }
         
-        var outputSamples: [BrushEngine2.Sample] = []
+        var outputSamples: [BrushEngine.Sample] = []
         
         Self.processSamples(
             samples: input.samples,
@@ -91,7 +91,7 @@ struct NewBrushStrokeEngineSmoothingProcessor {
                 outputSamples: &outputSamples)
         }
         
-        return NewBrushStrokeEngine.ProcessorOutput(
+        return BrushStrokeEngine.ProcessorOutput(
             samples: outputSamples,
             isFinalized: isOutputFinalized,
             isStrokeEnd: input.isStrokeEnd,
@@ -101,11 +101,11 @@ struct NewBrushStrokeEngineSmoothingProcessor {
     // MARK: - Internal Logic
     
     private static func processSamples(
-        samples: [BrushEngine2.Sample],
+        samples: [BrushEngine.Sample],
         strokeEndTime: TimeInterval,
         config: Config,
-        sampleBuffer: inout [BrushEngine2.Sample],
-        outputSamples: inout [BrushEngine2.Sample]
+        sampleBuffer: inout [BrushEngine.Sample],
+        outputSamples: inout [BrushEngine.Sample]
     ) {
         for sample in samples {
             addSampleToBuffer(
@@ -125,8 +125,8 @@ struct NewBrushStrokeEngineSmoothingProcessor {
     private static func processStrokeEnd(
         strokeEndTime: TimeInterval,
         config: Config,
-        sampleBuffer: inout [BrushEngine2.Sample],
-        outputSamples: inout [BrushEngine2.Sample]
+        sampleBuffer: inout [BrushEngine.Sample],
+        outputSamples: inout [BrushEngine.Sample]
     ) {
         guard let lastSample = sampleBuffer.last
         else { return }
@@ -149,9 +149,9 @@ struct NewBrushStrokeEngineSmoothingProcessor {
     }
     
     private static func addSampleToBuffer(
-        sample: BrushEngine2.Sample,
+        sample: BrushEngine.Sample,
         config: Config,
-        sampleBuffer: inout [BrushEngine2.Sample]
+        sampleBuffer: inout [BrushEngine.Sample]
     ) {
         sampleBuffer.append(sample)
         
@@ -170,14 +170,14 @@ struct NewBrushStrokeEngineSmoothingProcessor {
     private static func sample(
         config: Config,
         windowEndTime: TimeInterval,
-        sampleBuffer: [BrushEngine2.Sample]
-    ) -> BrushEngine2.Sample {
+        sampleBuffer: [BrushEngine.Sample]
+    ) -> BrushEngine.Sample {
         
         let resampleTimes = config.resampleTimeOffsets
             .map { windowEndTime + $0 }
         
         let windowSamples =
-            try! NewBrushStrokeEngineSampleResampler
+            try! BrushStrokeEngineSampleResampler
                 .resample(
                     samples: sampleBuffer,
                     resampleTimes: resampleTimes)
@@ -188,9 +188,9 @@ struct NewBrushStrokeEngineSmoothingProcessor {
     }
     
     private static func weightedAverageSample(
-        samples: [BrushEngine2.Sample],
+        samples: [BrushEngine.Sample],
         weights: [Double]
-    ) -> BrushEngine2.Sample {
+    ) -> BrushEngine.Sample {
         
         guard !samples.isEmpty,
             samples.count == weights.count

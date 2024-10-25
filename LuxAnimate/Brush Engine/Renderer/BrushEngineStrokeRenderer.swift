@@ -1,14 +1,14 @@
 //
-//  BrushEngine2StrokeRenderer.swift
+//  BrushEngineStrokeRenderer.swift
 //
 
 import Metal
 
-class BrushEngine2StrokeRenderer {
+class BrushEngineStrokeRenderer {
     
     private let canvasSize: PixelSize
     
-    private let stampRenderer = BrushEngine2StampRenderer()
+    private let stampRenderer = BrushEngineStampRenderer()
     
     let finalizedStrokeTexture: MTLTexture
     let fullStrokeTexture: MTLTexture
@@ -54,7 +54,7 @@ class BrushEngine2StrokeRenderer {
     }
     
     func drawIncrementalStroke(
-        strokeProcessOutput s: NewBrushStrokeEngine.ProcessOutput
+        strokeProcessOutput s: BrushStrokeEngine.ProcessOutput
     ) {
 //        let totalStampCount =
 //            s.finalizedStamps.count +

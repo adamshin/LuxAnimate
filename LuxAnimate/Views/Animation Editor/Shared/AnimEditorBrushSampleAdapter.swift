@@ -26,7 +26,7 @@ struct AnimEditorBrushSampleAdapter {
     
     func convert(
         sample s: BrushGestureRecognizer.Sample
-    ) -> BrushEngine2.InputSample {
+    ) -> BrushEngine.InputSample {
         
         let position = transform * Vector(s.position)
         
@@ -34,7 +34,7 @@ struct AnimEditorBrushSampleAdapter {
             force: s.force,
             maxForce: s.maximumPossibleForce)
         
-        return BrushEngine2.InputSample(
+        return BrushEngine.InputSample(
             updateID: s.updateID,
             time: s.time,
             position: position,
@@ -50,7 +50,7 @@ struct AnimEditorBrushSampleAdapter {
     
     func convert(
         sampleUpdate s: BrushGestureRecognizer.SampleUpdate
-    ) -> BrushEngine2.InputSampleUpdate {
+    ) -> BrushEngine.InputSampleUpdate {
         
         let pressure = s.force.map {
             Self.pressure(
@@ -58,7 +58,7 @@ struct AnimEditorBrushSampleAdapter {
                 maxForce: s.maximumPossibleForce)
         }
         
-        return BrushEngine2.InputSampleUpdate(
+        return BrushEngine.InputSampleUpdate(
             updateID: s.updateID,
             pressure: pressure,
             altitude: s.altitude,
