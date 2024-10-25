@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		660572032CCAC46900D699BA /* BrushEngine+Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660572022CCAC46900D699BA /* BrushEngine+Types.swift */; };
+		660572072CCB4DA100D699BA /* BrushEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 660572062CCB4DA100D699BA /* BrushEngine */; };
 		66099BA72BDB195500243D9F /* CircleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66099BA62BDB195500243D9F /* CircleView.swift */; };
 		66099BAB2BDB1D8F00243D9F /* ClearColorRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66099BAA2BDB1D8F00243D9F /* ClearColorRenderer.swift */; };
 		66099BC42BDB32F500243D9F /* Brush.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66099BB92BDB32F500243D9F /* Brush.swift */; };
@@ -172,6 +173,7 @@
 
 /* Begin PBXFileReference section */
 		660572022CCAC46900D699BA /* BrushEngine+Types.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrushEngine+Types.swift"; sourceTree = "<group>"; };
+		660572042CCB4BA100D699BA /* BrushEngine */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = BrushEngine; sourceTree = "<group>"; };
 		66099BA62BDB195500243D9F /* CircleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CircleView.swift; sourceTree = "<group>"; };
 		66099BAA2BDB1D8F00243D9F /* ClearColorRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearColorRenderer.swift; sourceTree = "<group>"; };
 		66099BB92BDB32F500243D9F /* Brush.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Brush.swift; sourceTree = "<group>"; };
@@ -342,6 +344,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				660572072CCB4DA100D699BA /* BrushEngine in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -928,6 +931,7 @@
 			children = (
 				66D0843B2BA3840C00EB8556 /* LuxAnimate */,
 				66C7E93F2CB104F900173C44 /* LuxAnimateTests */,
+				660572042CCB4BA100D699BA /* BrushEngine */,
 				66D0843A2BA3840C00EB8556 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -1640,6 +1644,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		660572062CCB4DA100D699BA /* BrushEngine */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BrushEngine;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 66D084312BA3840B00EB8556 /* Project object */;
 }
