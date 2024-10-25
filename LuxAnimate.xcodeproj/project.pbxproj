@@ -161,16 +161,6 @@
 		66FE7A2E2C25E05100464A82 /* Array.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FE7A2D2C25E05100464A82 /* Array.swift */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		6678EAA32CACE9D600767021 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 66D084312BA3840B00EB8556 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 66D084382BA3840C00EB8556;
-			remoteInfo = LuxAnimate;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXFileReference section */
 		660572022CCAC46900D699BA /* BrushEngine+Types.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrushEngine+Types.swift"; sourceTree = "<group>"; };
 		660572042CCB4BA100D699BA /* BrushEngine */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = BrushEngine; sourceTree = "<group>"; };
@@ -273,7 +263,6 @@
 		66789ABF2C29E90B0020EACE /* RenderPreviewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderPreviewManager.swift; sourceTree = "<group>"; };
 		66789AC82C332D710020EACE /* IDGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IDGenerator.swift; sourceTree = "<group>"; };
 		6678A9BD2C8131E700838EA3 /* AnimFrameEditorEraseToolState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimFrameEditorEraseToolState.swift; sourceTree = "<group>"; };
-		6678EA9F2CACE9D600767021 /* LuxAnimateTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LuxAnimateTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		667BF74A2BA655CB003E3430 /* FileHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileHelper.swift; sourceTree = "<group>"; };
 		668A14CB2C7D1E2000D73D36 /* AnimEditorEraseToolControlsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorEraseToolControlsVC.swift; sourceTree = "<group>"; };
 		668A14D62C7D3EBE00D73D36 /* AnimFrameEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimFrameEditor.swift; sourceTree = "<group>"; };
@@ -333,13 +322,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		6678EA9C2CACE9D600767021 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		66D084362BA3840C00EB8556 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -919,18 +901,10 @@
 			path = "Drawing Asset Processor";
 			sourceTree = "<group>";
 		};
-		66C7E93F2CB104F900173C44 /* LuxAnimateTests */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = LuxAnimateTests;
-			sourceTree = "<group>";
-		};
 		66D084302BA3840B00EB8556 = {
 			isa = PBXGroup;
 			children = (
 				66D0843B2BA3840C00EB8556 /* LuxAnimate */,
-				66C7E93F2CB104F900173C44 /* LuxAnimateTests */,
 				660572042CCB4BA100D699BA /* BrushEngine */,
 				66D0843A2BA3840C00EB8556 /* Products */,
 			);
@@ -940,7 +914,6 @@
 			isa = PBXGroup;
 			children = (
 				66D084392BA3840C00EB8556 /* LuxAnimate.app */,
-				6678EA9F2CACE9D600767021 /* LuxAnimateTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1102,26 +1075,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		6678EA9E2CACE9D600767021 /* LuxAnimateTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 6678EAA52CACE9D600767021 /* Build configuration list for PBXNativeTarget "LuxAnimateTests" */;
-			buildPhases = (
-				6678EA9B2CACE9D600767021 /* Sources */,
-				6678EA9C2CACE9D600767021 /* Frameworks */,
-				6678EA9D2CACE9D600767021 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				6678EAA42CACE9D600767021 /* PBXTargetDependency */,
-			);
-			name = LuxAnimateTests;
-			packageProductDependencies = (
-			);
-			productName = LuxAnimateTests;
-			productReference = 6678EA9F2CACE9D600767021 /* LuxAnimateTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 		66D084382BA3840C00EB8556 /* LuxAnimate */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 66D0844D2BA3840D00EB8556 /* Build configuration list for PBXNativeTarget "LuxAnimate" */;
@@ -1149,10 +1102,6 @@
 				LastSwiftUpdateCheck = 1600;
 				LastUpgradeCheck = 1530;
 				TargetAttributes = {
-					6678EA9E2CACE9D600767021 = {
-						CreatedOnToolsVersion = 16.0;
-						TestTargetID = 66D084382BA3840C00EB8556;
-					};
 					66D084382BA3840C00EB8556 = {
 						CreatedOnToolsVersion = 15.3;
 						LastSwiftMigration = 1530;
@@ -1173,19 +1122,11 @@
 			projectRoot = "";
 			targets = (
 				66D084382BA3840C00EB8556 /* LuxAnimate */,
-				6678EA9E2CACE9D600767021 /* LuxAnimateTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		6678EA9D2CACE9D600767021 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		66D084372BA3840C00EB8556 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1203,13 +1144,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		6678EA9B2CACE9D600767021 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		66D084352BA3840C00EB8556 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1363,14 +1297,6 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXTargetDependency section */
-		6678EAA42CACE9D600767021 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 66D084382BA3840C00EB8556 /* LuxAnimate */;
-			targetProxy = 6678EAA32CACE9D600767021 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
 /* Begin PBXVariantGroup section */
 		66D084472BA3840D00EB8556 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
@@ -1383,44 +1309,6 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		6678EAA62CACE9D600767021 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 28XM46LW7H;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = adamshin.LuxAnimateTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LuxAnimate.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/LuxAnimate";
-			};
-			name = Debug;
-		};
-		6678EAA72CACE9D600767021 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 28XM46LW7H;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = adamshin.LuxAnimateTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LuxAnimate.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/LuxAnimate";
-			};
-			name = Release;
-		};
 		66D0844B2BA3840D00EB8556 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1616,15 +1504,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		6678EAA52CACE9D600767021 /* Build configuration list for PBXNativeTarget "LuxAnimateTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				6678EAA62CACE9D600767021 /* Debug */,
-				6678EAA72CACE9D600767021 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		66D084342BA3840B00EB8556 /* Build configuration list for PBXProject "LuxAnimate" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
