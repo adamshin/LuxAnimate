@@ -22,11 +22,10 @@ let package = Package(
             dependencies: [
                 "Geometry",
                 "Color",
-                "Shaders",
+                "ShaderTypes",
             ]),
         .target(
-            name: "Shaders",
-            exclude: ["Shaders.metal"],
+            name: "ShaderTypes",
             publicHeadersPath: ".")
     ]
 )

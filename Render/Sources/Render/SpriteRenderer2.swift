@@ -3,7 +3,7 @@ import Foundation
 import Metal
 import Geometry
 import Color
-import Shaders
+import ShaderTypes
 
 extension SpriteRenderer2 {
     

@@ -2,9 +2,7 @@
 import Foundation
 import Geometry
 import Color
-import Shaders
-
-// MARK: - Shader Types
+import ShaderTypes
 
 enum BlendMode {
     case normal
