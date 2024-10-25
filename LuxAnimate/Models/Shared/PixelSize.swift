@@ -55,3 +55,13 @@ extension PixelSize {
     }
     
 }
+
+extension Size2 {
+    
+    init(_ s: PixelSize) {
+        self.init(
+            width: Double(s.width),
+            height: Double(s.height))
+    }
+    
+}

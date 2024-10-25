@@ -38,12 +38,6 @@ extension Size2 {
         self.init(width: s.width, height: s.height)
     }
     
-    init(_ s: PixelSize) {
-        self.init(
-            width: Double(s.width),
-            height: Double(s.height))
-    }
-    
 }
 
 extension Matrix3 {

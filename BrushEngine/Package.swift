@@ -9,8 +9,12 @@ let package = Package(
             name: "BrushEngine",
             targets: ["BrushEngine"]),
     ],
+    dependencies: [
+        .package(path: "../Geometry")
+    ],
     targets: [
         .target(
-            name: "BrushEngine"),
+            name: "BrushEngine",
+            dependencies: ["Geometry"]),
     ]
 )
