@@ -4,7 +4,14 @@ import Foundation
 public typealias Vector = Vector2
 
 public struct Vector2: Sendable, Codable {
-    var x, y: Scalar
+    
+    public var x, y: Scalar
+    
+    public init(x: Scalar, y: Scalar) {
+        self.x = x
+        self.y = y
+    }
+    
 }
 
 public extension Vector2 {

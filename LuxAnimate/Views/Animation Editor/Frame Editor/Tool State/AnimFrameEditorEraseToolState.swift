@@ -3,6 +3,7 @@
 //
 
 import UIKit
+import Geometry
 
 class AnimFrameEditorEraseToolState: AnimFrameEditorToolState {
     

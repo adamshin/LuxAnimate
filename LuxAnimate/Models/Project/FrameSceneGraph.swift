@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import Geometry
 
 struct FrameSceneGraph: Codable {
     

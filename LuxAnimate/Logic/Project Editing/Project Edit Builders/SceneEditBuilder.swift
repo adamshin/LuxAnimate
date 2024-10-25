@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import Geometry
 
 private let newLayerContentSize = PixelSize(
     width: 1920, height: 1080)

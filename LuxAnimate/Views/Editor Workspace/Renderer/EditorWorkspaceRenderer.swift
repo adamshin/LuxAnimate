@@ -4,6 +4,7 @@
 
 import Metal
 import UIKit
+import Geometry
 
 private let backgroundColor = Color(UIColor.editorBackground)
 private let scalePixelateThreshold: Scalar = 1.0

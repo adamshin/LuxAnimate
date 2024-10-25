@@ -3,6 +3,7 @@
 //
 
 import UIKit
+import Geometry
 
 @MainActor
 protocol EditorWorkspaceOverlayViewDelegate: AnyObject {

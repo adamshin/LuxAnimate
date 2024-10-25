@@ -4,7 +4,14 @@ import Foundation
 public typealias Size = Size2
 
 public struct Size2: Sendable, Codable {
-    var width, height: Scalar
+    
+    public var width, height: Scalar
+    
+    public init(width: Scalar, height: Scalar) {
+        self.width = width
+        self.height = height
+    }
+    
 }
 
 public extension Size2 {

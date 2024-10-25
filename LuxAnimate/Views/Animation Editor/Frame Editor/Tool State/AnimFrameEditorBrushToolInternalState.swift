@@ -4,6 +4,7 @@
 
 import UIKit
 import Metal
+import Geometry
 
 @MainActor
 protocol AnimFrameEditorBrushToolInternalStateDelegate: AnyObject {

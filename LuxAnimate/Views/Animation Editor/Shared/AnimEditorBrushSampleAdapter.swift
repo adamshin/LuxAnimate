@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import Geometry
 
 private let fingerPressure = 0.2
 

@@ -3,6 +3,7 @@
 //
 
 import UIKit
+import Geometry
 
 private let translationDistanceThreshold: Scalar = 10
 

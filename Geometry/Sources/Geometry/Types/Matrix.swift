@@ -2,9 +2,11 @@
 import Foundation
 
 public struct Matrix3: Sendable, Codable {
-    var m11, m12, m13: Scalar
-    var m21, m22, m23: Scalar
-    var m31, m32, m33: Scalar
+    
+    public var m11, m12, m13: Scalar
+    public var m21, m22, m23: Scalar
+    public var m31, m32, m33: Scalar
+    
 }
 
 public extension Matrix3 {

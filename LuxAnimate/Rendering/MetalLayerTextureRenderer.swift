@@ -4,6 +4,7 @@
 
 import Foundation
 import MetalKit
+import Geometry
 
 struct MetalLayerTextureRenderer {
     

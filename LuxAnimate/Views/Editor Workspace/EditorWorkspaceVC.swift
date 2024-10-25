@@ -4,6 +4,7 @@
 
 import UIKit
 import Metal
+import Geometry
 
 private let minZoomScale: Scalar = 0.1
 private let maxZoomScale: Scalar = 30

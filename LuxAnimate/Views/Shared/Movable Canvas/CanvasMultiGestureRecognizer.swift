@@ -4,6 +4,7 @@
 
 import UIKit
 import UIKit.UIGestureRecognizerSubclass
+import Geometry
 
 // MARK: - CanvasMultiGestureRecognizerDelegate
 

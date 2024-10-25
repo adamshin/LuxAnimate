@@ -4,7 +4,6 @@
 
 import Foundation
 import Metal
-import Geometry
 
 struct AppConfig {
     

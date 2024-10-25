@@ -3,6 +3,7 @@
 //
 
 import Metal
+import Geometry
 
 private let paddingSizeThreshold: Double = 20
 

@@ -3,6 +3,7 @@
 //
 
 import Metal
+import Geometry
 
 @MainActor
 protocol AnimFrameEditorStateDelegate: AnyObject {

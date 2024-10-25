@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import Geometry
 
 private let segmentSubdivisionCount = 10
 

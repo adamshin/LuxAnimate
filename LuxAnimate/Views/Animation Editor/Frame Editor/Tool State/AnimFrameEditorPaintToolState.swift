@@ -3,6 +3,7 @@
 //
 
 import UIKit
+import Geometry
 
 private let brushColor = AppConfig.paintBrushColor
 

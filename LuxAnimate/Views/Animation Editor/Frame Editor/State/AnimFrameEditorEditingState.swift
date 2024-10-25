@@ -3,6 +3,7 @@
 //
 
 import Metal
+import Geometry
 
 class AnimFrameEditorEditingState: AnimFrameEditorState {
     
