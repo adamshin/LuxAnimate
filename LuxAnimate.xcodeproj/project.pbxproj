@@ -157,6 +157,7 @@
 		66E3E43C2C7AE24B0086D388 /* AnimEditorToolContainerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E3E43B2C7AE24B0086D388 /* AnimEditorToolContainerVC.swift */; };
 		66E523562BD37D8B00794751 /* MetalLayerTextureRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E523552BD37D8B00794751 /* MetalLayerTextureRenderer.swift */; };
 		66F138322C4854350078BFDA /* SceneEditorContentVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F138312C4854350078BFDA /* SceneEditorContentVC.swift */; };
+		66F49F122CCC218000816F4A /* Render in Frameworks */ = {isa = PBXBuildFile; productRef = 66F49F112CCC218000816F4A /* Render */; };
 		66FE7A2C2C21035D00464A82 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FE7A2B2C21035D00464A82 /* Data.swift */; };
 		66FE7A2E2C25E05100464A82 /* Array.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FE7A2D2C25E05100464A82 /* Array.swift */; };
 /* End PBXBuildFile section */
@@ -317,6 +318,7 @@
 		66E3E43B2C7AE24B0086D388 /* AnimEditorToolContainerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorToolContainerVC.swift; sourceTree = "<group>"; };
 		66E523552BD37D8B00794751 /* MetalLayerTextureRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalLayerTextureRenderer.swift; sourceTree = "<group>"; };
 		66F138312C4854350078BFDA /* SceneEditorContentVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneEditorContentVC.swift; sourceTree = "<group>"; };
+		66F49F0F2CCC216D00816F4A /* Render */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Render; sourceTree = "<group>"; };
 		66FE7A2B2C21035D00464A82 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
 		66FE7A2D2C25E05100464A82 /* Array.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Array.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -328,6 +330,7 @@
 			files = (
 				66DFCC5A2CCB6301004A227A /* Color in Frameworks */,
 				6605720C2CCB53CE00D699BA /* Geometry in Frameworks */,
+				66F49F122CCC218000816F4A /* Render in Frameworks */,
 				6605720E2CCB53DA00D699BA /* BrushEngine in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -907,6 +910,7 @@
 				66D0843B2BA3840C00EB8556 /* LuxAnimate */,
 				660572082CCB533400D699BA /* Geometry */,
 				66DFCC572CCB62F5004A227A /* Color */,
+				66F49F0F2CCC216D00816F4A /* Render */,
 				660572042CCB4BA100D699BA /* BrushEngine */,
 				66D0843A2BA3840C00EB8556 /* Products */,
 			);
@@ -1536,6 +1540,10 @@
 		66DFCC592CCB6301004A227A /* Color */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Color;
+		};
+		66F49F112CCC218000816F4A /* Render */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Render;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

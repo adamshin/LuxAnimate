@@ -3,14 +3,14 @@
 import PackageDescription
 
 let package = Package(
-    name: "BrushEngine",
+    name: "Render",
     platforms: [
-        .iOS(.v18),
+        .iOS(.v13),
     ],
     products: [
         .library(
-            name: "BrushEngine",
-            targets: ["BrushEngine"]),
+            name: "Render",
+            targets: ["Render"]),
     ],
     dependencies: [
         .package(path: "../Geometry"),
@@ -18,10 +18,15 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "BrushEngine",
+            name: "Render",
             dependencies: [
                 "Geometry",
                 "Color",
-            ])
+                "Shaders",
+            ]),
+        .target(
+            name: "Shaders",
+            exclude: ["Shaders.metal"],
+            publicHeadersPath: ".")
     ]
 )

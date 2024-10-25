@@ -1,30 +1,27 @@
-//
-//  SpriteRenderer.swift
-//
 
 import Foundation
 import Metal
 import Geometry
 import Color
-import ShaderTypes
+import Shaders
 
-extension SpriteRenderer {
+extension SpriteRenderer2 {
     
     private static let quadPositions: [Vector] = [
         .init(0, 0), .init(1, 0), .init(1, 1),
         .init(0, 0), .init(1, 1), .init(0, 1),
     ]
     
-    struct Sprite {
-        var position: Vector
-        var size: Size
-        var anchor: Vector
-        var transform: Matrix3
-        var color: Color
-        var alpha: Double
-        var paddingScale: Double
+    public struct Sprite {
+        public var position: Vector
+        public var size: Size
+        public var anchor: Vector
+        public var transform: Matrix3
+        public var color: Color
+        public var alpha: Double
+        public var paddingScale: Double
         
-        init(
+        public init(
             position: Vector,
             size: Size,
             anchor: Vector = .init(0.5, 0.5),
@@ -42,7 +39,7 @@ extension SpriteRenderer {
             self.paddingScale = paddingScale
         }
         
-        init(
+        public init(
             position: Vector,
             size: Size,
             anchor: Vector = .init(0.5, 0.5),
@@ -68,7 +65,7 @@ extension SpriteRenderer {
     
 }
 
-struct SpriteRenderer {
+public struct SpriteRenderer2 {
     
     private let metalDevice: MTLDevice
     private let pipelineState: MTLRenderPipelineState
@@ -80,8 +77,7 @@ struct SpriteRenderer {
         self.metalDevice = metalDevice
         
         let library = try! metalDevice
-            .makeDefaultLibrary(
-                bundle: Bundle.module)
+            .makeDefaultLibrary(bundle: Bundle.module)
         
         let vertexFunction = library.makeFunction(
             name: "spriteVertexShader")

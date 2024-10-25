@@ -1,6 +1,6 @@
 
-#ifndef ShaderTypes_h
-#define ShaderTypes_h
+#ifndef Shaders_h
+#define Shaders_h
 
 #include <simd/simd.h>
 
