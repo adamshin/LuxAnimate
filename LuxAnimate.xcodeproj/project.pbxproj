@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		660572032CCAC46900D699BA /* BrushEngine+Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660572022CCAC46900D699BA /* BrushEngine+Types.swift */; };
 		6605720C2CCB53CE00D699BA /* Geometry in Frameworks */ = {isa = PBXBuildFile; productRef = 6605720B2CCB53CE00D699BA /* Geometry */; };
-		6605720E2CCB53DA00D699BA /* BrushEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 6605720D2CCB53DA00D699BA /* BrushEngine */; };
 		66099BA72BDB195500243D9F /* CircleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66099BA62BDB195500243D9F /* CircleView.swift */; };
 		66099BAB2BDB1D8F00243D9F /* ClearColorRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66099BAA2BDB1D8F00243D9F /* ClearColorRenderer.swift */; };
 		66099BC42BDB32F500243D9F /* Brush.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66099BB92BDB32F500243D9F /* Brush.swift */; };
@@ -164,7 +163,6 @@
 
 /* Begin PBXFileReference section */
 		660572022CCAC46900D699BA /* BrushEngine+Types.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrushEngine+Types.swift"; sourceTree = "<group>"; };
-		660572042CCB4BA100D699BA /* BrushEngine */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = BrushEngine; sourceTree = "<group>"; };
 		660572082CCB533400D699BA /* Geometry */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Geometry; sourceTree = "<group>"; };
 		66099BA62BDB195500243D9F /* CircleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CircleView.swift; sourceTree = "<group>"; };
 		66099BAA2BDB1D8F00243D9F /* ClearColorRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearColorRenderer.swift; sourceTree = "<group>"; };
@@ -331,7 +329,6 @@
 				66DFCC5A2CCB6301004A227A /* Color in Frameworks */,
 				6605720C2CCB53CE00D699BA /* Geometry in Frameworks */,
 				66F49F122CCC218000816F4A /* Render in Frameworks */,
-				6605720E2CCB53DA00D699BA /* BrushEngine in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -911,7 +908,6 @@
 				660572082CCB533400D699BA /* Geometry */,
 				66DFCC572CCB62F5004A227A /* Color */,
 				66F49F0F2CCC216D00816F4A /* Render */,
-				660572042CCB4BA100D699BA /* BrushEngine */,
 				66D0843A2BA3840C00EB8556 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -1532,10 +1528,6 @@
 		6605720B2CCB53CE00D699BA /* Geometry */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Geometry;
-		};
-		6605720D2CCB53DA00D699BA /* BrushEngine */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = BrushEngine;
 		};
 		66DFCC592CCB6301004A227A /* Color */ = {
 			isa = XCSwiftPackageProductDependency;
