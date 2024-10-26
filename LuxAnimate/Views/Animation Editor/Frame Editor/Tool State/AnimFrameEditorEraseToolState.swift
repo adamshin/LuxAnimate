@@ -5,6 +5,7 @@
 import UIKit
 import Geometry
 import Color
+import BrushEngine
 
 class AnimFrameEditorEraseToolState: AnimFrameEditorToolState {
     
@@ -48,7 +49,7 @@ extension AnimFrameEditorEraseToolState:
 {
     func brush(
         _ s: AnimFrameEditorBrushToolInternalState
-    ) -> Brush? {
+    ) -> BrushEngine.Brush? {
         editorToolState.brush
     }
     

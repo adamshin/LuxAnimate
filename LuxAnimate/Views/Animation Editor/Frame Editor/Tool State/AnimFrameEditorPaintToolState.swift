@@ -5,6 +5,7 @@
 import UIKit
 import Geometry
 import Color
+import BrushEngine
 
 private let brushColor = AppConfig.paintBrushColor
 
@@ -51,7 +52,7 @@ extension AnimFrameEditorPaintToolState:
     
     func brush(
         _ s: AnimFrameEditorBrushToolInternalState
-    ) -> Brush? {
+    ) -> BrushEngine.Brush? {
         editorToolState.brush
     }
     

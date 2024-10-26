@@ -71,7 +71,7 @@ public class Canvas {
     
     // MARK: - Interface
     
-    var texture: MTLTexture { renderer.texture }
+    public var texture: MTLTexture { renderer.texture }
     
     public func setTextureContents(
         _ newTexture: MTLTexture

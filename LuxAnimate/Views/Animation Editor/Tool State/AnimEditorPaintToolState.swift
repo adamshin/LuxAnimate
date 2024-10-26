@@ -3,6 +3,7 @@
 //
 
 import UIKit
+import BrushEngine
 
 @MainActor
 protocol AnimEditorPaintToolStateDelegate:
@@ -19,15 +20,16 @@ class AnimEditorPaintToolState: AnimEditorToolState {
     private let brushGestureRecognizer = BrushGestureRecognizer()
     private let controlsVC = AnimEditorBrushToolControlsVC()
     
-    private(set) var brush: Brush?
+    private(set) var brush: BrushEngine.Brush?
     private(set) var scale: Double
     private(set) var smoothing: Double
     
     init() {
         let brushConfig = AppConfig.paintBrushConfig
         
-        brush = try? Brush(
-            configuration: brushConfig)
+        brush = try? BrushEngine.Brush(
+            configuration: brushConfig,
+            metalDevice: MetalInterface.shared.device)
         
         scale = AnimEditorToolSettingsStore
             .brushToolScale

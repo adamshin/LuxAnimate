@@ -6,13 +6,14 @@ import UIKit
 import Metal
 import Geometry
 import Color
+import BrushEngine
 
 @MainActor
 protocol AnimFrameEditorBrushToolInternalStateDelegate: AnyObject {
     
     func brush(
         _ s: AnimFrameEditorBrushToolInternalState
-    ) -> Brush?
+    ) -> BrushEngine.Brush?
     
     func color(
         _ s: AnimFrameEditorBrushToolInternalState
@@ -56,7 +57,7 @@ class AnimFrameEditorBrushToolInternalState {
     
     weak var delegate: AnimFrameEditorBrushToolInternalStateDelegate?
     
-    private let brushEngine: BrushEngine
+    private let canvas: BrushEngine.Canvas
     
     private let drawingAssetProcessor = DrawingAssetProcessor()
     
@@ -64,23 +65,28 @@ class AnimFrameEditorBrushToolInternalState {
         canvasSize: PixelSize,
         brushMode: BrushEngine.BrushMode
     ) {
-        brushEngine = BrushEngine(
-            canvasSize: canvasSize,
-            brushMode: brushMode)
+        canvas = BrushEngine.Canvas(
+            width: canvasSize.width,
+            height: canvasSize.height,
+            debugRender: AppConfig.brushDebugRender,
+            brushMode: brushMode,
+            pixelFormat: AppConfig.pixelFormat,
+            metalDevice: MetalInterface.shared.device,
+            commandQueue: MetalInterface.shared.commandQueue)
         
-        brushEngine.delegate = self
+        canvas.delegate = self
     }
     
     func onFrame() {
-        brushEngine.onFrame()
+        canvas.onFrame()
     }
     
     var canvasTexture: MTLTexture {
-        brushEngine.canvasTexture
+        canvas.texture
     }
     
     func setCanvasTextureContents(_ texture: MTLTexture) {
-        brushEngine.setCanvasTextureContents(texture)
+        canvas.setTextureContents(texture)
     }
     
     func beginStroke(
@@ -94,7 +100,7 @@ class AnimFrameEditorBrushToolInternalState {
         let scale = delegate.scale(self)
         let smoothing = delegate.smoothing(self)
         
-        brushEngine.beginStroke(
+        canvas.beginStroke(
             brush: brush,
             color: color,
             scale: scale,
@@ -121,7 +127,7 @@ class AnimFrameEditorBrushToolInternalState {
             adapter.convert(sample: $0)
         }
         
-        brushEngine.updateStroke(
+        canvas.updateStroke(
             addedSamples: addedSamples,
             predictedSamples: predictedSamples)
     }
@@ -141,16 +147,16 @@ class AnimFrameEditorBrushToolInternalState {
             adapter.convert(sampleUpdate: $0)
         }
         
-        brushEngine.updateStroke(
+        canvas.updateStroke(
             sampleUpdates: sampleUpdates)
     }
     
     func endStroke() {
-        brushEngine.endStroke()
+        canvas.endStroke()
     }
 
     func cancelStroke() {
-        brushEngine.cancelStroke()
+        canvas.cancelStroke()
     }
     
 }
@@ -158,22 +164,17 @@ class AnimFrameEditorBrushToolInternalState {
 // MARK: - Delegates
 
 extension AnimFrameEditorBrushToolInternalState:
-    BrushEngine.Delegate {
+    BrushEngine.Canvas.Delegate {
     
-    func onUpdateCanvasTexture(
-        _ e: BrushEngine
-    ) {
+    func onUpdateTexture(_ c: Canvas) {
         delegate?.onUpdateCanvasTexture(self)
     }
 
-    func onFinalizeStroke(
-        _ e: BrushEngine,
-        canvasTexture: MTLTexture
-    ) {
+    func onEndBrushStroke(_ c: Canvas) {
         do {
             // TODO: Do this on a background queue?
             let texture = try TextureCopier()
-                .copy(canvasTexture)
+                .copy(canvas.texture)
             
             let imageSet = try drawingAssetProcessor
                 .generate(sourceTexture: texture)

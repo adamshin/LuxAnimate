@@ -4,6 +4,7 @@
 
 import Foundation
 import Geometry
+import BrushEngine
 
 private let fingerPressure = 0.2
 

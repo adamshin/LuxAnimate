@@ -5,6 +5,7 @@
 import Foundation
 import Metal
 import Color
+import BrushEngine
 
 struct AppConfig {
     
@@ -13,7 +14,7 @@ struct AppConfig {
     
     static let drawingThumbnailSize = 300
     
-    static let brushRenderDebug = false
+    static let brushDebugRender = false
     
     static let paintBrushColor = Color.brushBlack
     static let strokeDebugColor = Color.debugRed
