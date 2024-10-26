@@ -1,78 +1,63 @@
-//
-//  BrushEngine.swift
-//
 
 import Foundation
 import Metal
 import Color
 import Render
 
-extension BrushEngine {
+extension Canvas {
     
     @MainActor
-    protocol Delegate: AnyObject {
-        func onUpdateCanvasTexture(
-            _ e: BrushEngine)
-        
-        func onFinalizeStroke(
-            _ e: BrushEngine,
-            canvasTexture: MTLTexture)
+    public protocol Delegate: AnyObject {
+        func onUpdateTexture(_ c: Canvas)
+        func onBrushStroke(_ c: Canvas)
     }
     
 }
 
-// MARK: - BrushEngine
-
 @MainActor
-class BrushEngine {
+class Canvas {
     
     weak var delegate: Delegate?
     
-    private let baseCanvasTexture: MTLTexture
+    private let baseTexture: MTLTexture
     
-    private let renderer: BrushEngineRenderer
-    private let strokeRenderer: BrushEngineStrokeRenderer // TODO: move to stroke engine?
+    // Renderer
+    // Stroke renderer?
     
-    private var strokeEngine: BrushStrokeEngine?
+    // Stroke engine
     
-    private let textureBlitter = TextureBlitter(
-        commandQueue: MetalInterface.shared.commandQueue)
+    // Texture blitter
     
     // MARK: - Init
     
     init(
-        canvasSize: PixelSize,
-        brushMode: BrushEngine.BrushMode
+        width: Int,
+        height: Int,
+        brushMode: BrushEngine.BrushMode,
+        pixelFormat: MTLPixelFormat,
+        metalDevice: MTLDevice,
+        commandQueue: MTLCommandQueue
     ) {
-        baseCanvasTexture = try! TextureCreator
+        let textureCreator = TextureCreator(
+            metalDevice: metalDevice,
+            commandQueue: commandQueue)
+        
+        baseTexture = try! textureCreator
             .createEmptyTexture(
-                size: canvasSize,
-                mipMapped: false)
-        
-        renderer = BrushEngineRenderer(
-            canvasSize: canvasSize,
-            brushMode: brushMode)
-        
-        strokeRenderer = BrushEngineStrokeRenderer(
-            canvasSize: canvasSize)
+                width: width,
+                height: height,
+                pixelFormat: pixelFormat,
+                usage: .shaderRead)
     }
     
     // MARK: - Interface
     
-    var canvasTexture: MTLTexture {
-        renderer.renderTarget
-    }
+//    var texture: MTLTexture { }
     
-    func setCanvasTextureContents(_ texture: MTLTexture) {
-        endStroke()
-        
-        try? textureBlitter.blit(
-            from: texture,
-            to: baseCanvasTexture)
-        
-        renderer.draw(
-            baseCanvasTexture: baseCanvasTexture,
-            strokeTexture: nil)
+    func setTextureContents(
+        _ newTexture: MTLTexture
+    ) {
+        // TODO
     }
     
     func beginStroke(
@@ -82,31 +67,32 @@ class BrushEngine {
         smoothing: Double,
         quickTap: Bool
     ) {
-        strokeEngine = .init(
-            brush: brush,
-            color: color,
-            scale: scale,
-            smoothing: smoothing,
-            quickTap: quickTap)
+//        strokeEngine = .init(
+//            brush: brush,
+//            color: color,
+//            scale: scale,
+//            smoothing: smoothing,
+//            quickTap: quickTap)
     }
     
     func updateStroke(
         addedSamples: [InputSample],
         predictedSamples: [InputSample]
     ) { 
-        strokeEngine?.update(
-            addedSamples: addedSamples,
-            predictedSamples: predictedSamples)
+//        strokeEngine?.update(
+//            addedSamples: addedSamples,
+//            predictedSamples: predictedSamples)
     }
     
     func updateStroke(
         sampleUpdates: [InputSampleUpdate]
     ) {
-        strokeEngine?.update(
-            sampleUpdates: sampleUpdates)
+//        strokeEngine?.update(
+//            sampleUpdates: sampleUpdates)
     }
     
     func endStroke() {
+        /*
         guard let strokeEngine else { return }
         
         let strokeProcessOutput = strokeEngine.process()
@@ -135,9 +121,11 @@ class BrushEngine {
         
         delegate?.onFinalizeStroke(self,
             canvasTexture: baseCanvasTexture)
+         */
     }
     
     func cancelStroke() {
+        /*
         strokeRenderer.clearStroke()
         
         renderer.draw(
@@ -147,9 +135,11 @@ class BrushEngine {
         self.strokeEngine = nil
         
         delegate?.onUpdateCanvasTexture(self)
+         */
     }
     
     func onFrame() {
+        /*
         guard let strokeEngine else { return }
         
         let strokeProcessOutput = strokeEngine.process()
@@ -162,6 +152,7 @@ class BrushEngine {
             strokeTexture: strokeRenderer.fullStrokeTexture)
         
         delegate?.onUpdateCanvasTexture(self)
+         */
     }
     
 }
