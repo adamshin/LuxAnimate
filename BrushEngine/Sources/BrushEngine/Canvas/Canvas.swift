@@ -9,30 +9,30 @@ extension Canvas {
     @MainActor
     public protocol Delegate: AnyObject {
         func onUpdateTexture(_ c: Canvas)
-        func onBrushStroke(_ c: Canvas)
+        func onEndBrushStroke(_ c: Canvas)
     }
     
 }
 
 @MainActor
-class Canvas {
+public class Canvas {
     
-    weak var delegate: Delegate?
+    public weak var delegate: Delegate?
+    
+    private let renderer: CanvasRenderer
+    private let strokeRenderer: StrokeRenderer
+    private let textureBlitter: TextureBlitter
     
     private let baseTexture: MTLTexture
     
-    // Renderer
-    // Stroke renderer?
-    
-    // Stroke engine
-    
-    // Texture blitter
+    private var strokeEngine: StrokeEngine?
     
     // MARK: - Init
     
-    init(
+    public init(
         width: Int,
         height: Int,
+        debugRender: Bool,
         brushMode: BrushEngine.BrushMode,
         pixelFormat: MTLPixelFormat,
         metalDevice: MTLDevice,
@@ -40,6 +40,25 @@ class Canvas {
     ) {
         let textureCreator = TextureCreator(
             metalDevice: metalDevice,
+            commandQueue: commandQueue)
+        
+        renderer = CanvasRenderer(
+            canvasWidth: width,
+            canvasHeight: height,
+            brushMode: brushMode,
+            pixelFormat: pixelFormat,
+            metalDevice: metalDevice,
+            commandQueue: commandQueue)
+        
+        strokeRenderer = StrokeRenderer(
+            canvasWidth: width,
+            canvasHeight: height,
+            debugRender: debugRender,
+            pixelFormat: pixelFormat,
+            metalDevice: metalDevice,
+            commandQueue: commandQueue)
+        
+        textureBlitter = TextureBlitter(
             commandQueue: commandQueue)
         
         baseTexture = try! textureCreator
@@ -52,107 +71,107 @@ class Canvas {
     
     // MARK: - Interface
     
-//    var texture: MTLTexture { }
+    var texture: MTLTexture { renderer.texture }
     
-    func setTextureContents(
+    public func setTextureContents(
         _ newTexture: MTLTexture
     ) {
-        // TODO
+        endStroke()
+        
+        try? textureBlitter.blit(
+            from: newTexture,
+            to: baseTexture)
+        
+        renderer.draw(
+            baseTexture: baseTexture,
+            strokeTexture: nil)
     }
     
-    func beginStroke(
+    public func beginStroke(
         brush: Brush,
         color: Color,
         scale: Double,
         smoothing: Double,
         quickTap: Bool
     ) {
-//        strokeEngine = .init(
-//            brush: brush,
-//            color: color,
-//            scale: scale,
-//            smoothing: smoothing,
-//            quickTap: quickTap)
+        strokeEngine = StrokeEngine(
+            brush: brush,
+            color: color,
+            scale: scale,
+            smoothing: smoothing,
+            quickTap: quickTap)
     }
     
-    func updateStroke(
+    public func updateStroke(
         addedSamples: [InputSample],
         predictedSamples: [InputSample]
     ) { 
-//        strokeEngine?.update(
-//            addedSamples: addedSamples,
-//            predictedSamples: predictedSamples)
+        strokeEngine?.update(
+            addedSamples: addedSamples,
+            predictedSamples: predictedSamples)
     }
     
-    func updateStroke(
+    public func updateStroke(
         sampleUpdates: [InputSampleUpdate]
     ) {
-//        strokeEngine?.update(
-//            sampleUpdates: sampleUpdates)
+        strokeEngine?.update(
+            sampleUpdates: sampleUpdates)
     }
     
-    func endStroke() {
-        /*
+    public func endStroke() {
         guard let strokeEngine else { return }
         
-        let strokeProcessOutput = strokeEngine.process()
+        let strokeEngineOutput = strokeEngine.process()
         
         strokeRenderer.drawIncrementalStroke(
-            strokeProcessOutput: strokeProcessOutput)
+            strokeEngineOutput: strokeEngineOutput)
         
         renderer.draw(
-            baseCanvasTexture: baseCanvasTexture,
+            baseTexture: baseTexture,
             strokeTexture: strokeRenderer.fullStrokeTexture)
         
         try? textureBlitter.blit(
-            from: renderer.renderTarget,
-            to: baseCanvasTexture,
+            from: renderer.texture,
+            to: baseTexture,
             waitUntilCompleted: true)
         
         strokeRenderer.clearStroke()
         
         renderer.draw(
-            baseCanvasTexture: baseCanvasTexture,
+            baseTexture: baseTexture,
             strokeTexture: nil)
         
         self.strokeEngine = nil
         
-        delegate?.onUpdateCanvasTexture(self)
-        
-        delegate?.onFinalizeStroke(self,
-            canvasTexture: baseCanvasTexture)
-         */
+        delegate?.onUpdateTexture(self)
+        delegate?.onEndBrushStroke(self)
     }
     
-    func cancelStroke() {
-        /*
+    public func cancelStroke() {
         strokeRenderer.clearStroke()
         
         renderer.draw(
-            baseCanvasTexture: baseCanvasTexture,
+            baseTexture: baseTexture,
             strokeTexture: nil)
         
         self.strokeEngine = nil
         
-        delegate?.onUpdateCanvasTexture(self)
-         */
+        delegate?.onUpdateTexture(self)
     }
     
-    func onFrame() {
-        /*
+    public func onFrame() {
         guard let strokeEngine else { return }
         
-        let strokeProcessOutput = strokeEngine.process()
+        let strokeEngineOutput = strokeEngine.process()
         
         strokeRenderer.drawIncrementalStroke(
-            strokeProcessOutput: strokeProcessOutput)
+            strokeEngineOutput: strokeEngineOutput)
         
         renderer.draw(
-            baseCanvasTexture: baseCanvasTexture,
+            baseTexture: baseTexture,
             strokeTexture: strokeRenderer.fullStrokeTexture)
         
-        delegate?.onUpdateCanvasTexture(self)
-         */
+        delegate?.onUpdateTexture(self)
     }
     
 }

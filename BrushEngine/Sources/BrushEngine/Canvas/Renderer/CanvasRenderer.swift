@@ -6,13 +6,13 @@ import Render
 
 class CanvasRenderer {
     
-    private let commandQueue: MTLCommandQueue
     private let strokeBlendMode: BlendMode
+    private let commandQueue: MTLCommandQueue
     
     private let textureBlitter: TextureBlitter
     private let spriteRenderer: SpriteRenderer
     
-    let renderTarget: MTLTexture
+    let texture: MTLTexture
     
     init(
         canvasWidth: Int,
@@ -40,7 +40,7 @@ class CanvasRenderer {
             metalDevice: metalDevice,
             commandQueue: commandQueue)
         
-        renderTarget = try! textureCreator
+        texture = try! textureCreator
             .createEmptyTexture(
                 width: canvasWidth,
                 height: canvasHeight,
@@ -54,7 +54,7 @@ class CanvasRenderer {
     ) {
         try? textureBlitter.blit(
             from: baseTexture,
-            to: renderTarget)
+            to: texture)
         
         let commandBuffer = commandQueue
             .makeCommandBuffer()!
@@ -62,7 +62,7 @@ class CanvasRenderer {
         if let strokeTexture {
             spriteRenderer.drawSprites(
                 commandBuffer: commandBuffer,
-                target: renderTarget,
+                target: texture,
                 viewportSize: Size(1, 1),
                 texture: strokeTexture,
                 sprites: [

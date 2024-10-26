@@ -12,15 +12,15 @@ extension StrokeEngine {
     }
     
     struct StepOutput {
-        var stamps: [StrokeStamp]
+        var stamps: [Stamp]
         var isStrokeEnd: Bool
         var isFinalized: Bool
     }
     
     struct Output {
         var brush: Brush
-        var finalizedStamps: [StrokeStamp]
-        var nonFinalizedStamps: [StrokeStamp]
+        var finalizedStamps: [Stamp]
+        var nonFinalizedStamps: [Stamp]
     }
     
 }

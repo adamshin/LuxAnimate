@@ -5,8 +5,8 @@ import MetalKit
 extension Brush {
     
     public struct Configuration {
-        public var id: String
-        public var name: String
+//        public var id: String
+//        public var name: String
         
         public var stampSize: Double
         public var stampSpacing: Double
@@ -24,7 +24,7 @@ extension Brush {
         
         public var baseSmoothing: Double
         
-        public var stampTextureID: String
+//        public var stampTextureID: String
     }
     
 }
@@ -32,14 +32,14 @@ extension Brush {
 public struct Brush {
     
     public var configuration: Configuration
-    public var textures: [String: MTLTexture]
+    public var stampTexture: MTLTexture
     
     init(
         configuration: Configuration,
-        textures: [String: MTLTexture]
+        stampTexture: MTLTexture
     ) {
         self.configuration = configuration
-        self.textures = textures
+        self.stampTexture = stampTexture
     }
     
 }

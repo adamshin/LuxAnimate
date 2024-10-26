@@ -7,11 +7,11 @@ struct StrokeEngineState {
     private var inputQueue:
         StrokeEngineInputQueue
     
-//    private var smoothingProcessor:
-//        StrokeEngineSmoothingProcessor
+    private var smoothingProcessor:
+        StrokeEngineSmoothingProcessor
     
-//    private var stampProcessor:
-//        StrokeEngineStampProcessor
+    private var stampProcessor:
+        StrokeEngineStampProcessor
     
     // MARK: - Init
     
@@ -24,15 +24,15 @@ struct StrokeEngineState {
     ) {
         inputQueue = .init()
         
-//        smoothingProcessor = .init(
-//            brush: brush,
-//            smoothing: smoothing)
+        smoothingProcessor = .init(
+            brush: brush,
+            smoothing: smoothing)
         
-//        stampProcessor = .init(
-//            brush: brush,
-//            scale: scale,
-//            color: color,
-//            applyTaper: applyTaper)
+        stampProcessor = .init(
+            brush: brush,
+            color: color,
+            scale: scale,
+            applyTaper: applyTaper)
     }
     
     // MARK: - Interface
@@ -57,16 +57,9 @@ struct StrokeEngineState {
     -> StrokeEngine.StepOutput {
         
         let o1 = inputQueue.processNextSample()
-//        let o2 = smoothingProcessor.process(input: o1)
+        let o2 = smoothingProcessor.process(input: o1)
         
-//        return stampProcessor.process(input: o2)
-        
-        return StrokeEngine.StepOutput(
-            stamps: [],
-            isStrokeEnd: false,
-            isFinalized: false)
+        return stampProcessor.process(input: o2)
     }
-    
-    
     
 }

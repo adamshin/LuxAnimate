@@ -120,12 +120,17 @@ struct StrokeSample {
     
 }
 
-struct StrokeStamp {
-    
+struct NoiseSample {
+    var sizeWobble: Double
+    var offsetXWobble: Double
+    var offsetYWobble: Double
+}
+
+struct Stamp {
     var position: Vector
     var size: Double
     var rotation: Double
     var alpha: Double
     var color: Color
-    
+    var offset: Vector
 }
