@@ -30,14 +30,11 @@ struct StampRenderer {
     func drawStamps(
         target: MTLTexture,
         viewportSize: Size,
-        stamps: any Sequence<Stamp>,
+        stamps: any Sequence<StrokeStamp>,
         brush: Brush,
         finalized: Bool
     ) {
         let sprites = stamps.map { s in
-            let offsetPosition =
-                s.position + s.offset * s.size
-            
             let paddingScale: Double =
                 s.size < paddingSizeThreshold ?
                 3 : 1
@@ -50,7 +47,7 @@ struct StampRenderer {
             }
             
             return SpriteRenderer.Sprite(
-                position: offsetPosition,
+                position: s.position,
                 size: Size(s.size, s.size),
                 rotation: s.rotation,
                 color: color,

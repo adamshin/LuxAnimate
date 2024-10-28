@@ -2,6 +2,16 @@
 import Foundation
 import Color
 
+extension StrokeEngineState {
+    
+    struct StepOutput {
+        var stamps: [StrokeStamp]
+        var isStrokeEnd: Bool
+        var isFinalized: Bool
+    }
+    
+}
+
 struct StrokeEngineState {
     
     private var inputQueue:
@@ -10,8 +20,11 @@ struct StrokeEngineState {
     private var smoothingProcessor:
         StrokeEngineSmoothingProcessor
     
-    private var stampProcessor:
-        StrokeEngineStampProcessor
+    private var strokeSampleProcessor:
+        StrokeEngineStrokeSampleProcessor
+    
+    private var strokeStampProcessor:
+        StrokeEngineStrokeStampProcessor
     
     // MARK: - Init
     
@@ -28,11 +41,15 @@ struct StrokeEngineState {
             brush: brush,
             smoothing: smoothing)
         
-        stampProcessor = .init(
+        strokeSampleProcessor = .init(
             brush: brush,
             color: color,
             scale: scale,
             applyTaper: applyTaper)
+        
+        strokeStampProcessor = .init(
+            brush: brush,
+            color: color)
     }
     
     // MARK: - Interface
@@ -54,12 +71,17 @@ struct StrokeEngineState {
     }
     
     mutating func processStep()
-    -> StrokeEngine.StepOutput {
+    -> StepOutput {
         
         let o1 = inputQueue.processNextSample()
         let o2 = smoothingProcessor.process(input: o1)
+        let o3 = strokeSampleProcessor.process(input: o2)
+        let o4 = strokeStampProcessor.process(input: o3)
         
-        return stampProcessor.process(input: o2)
+        return StepOutput(
+            stamps: o4.stamps,
+            isStrokeEnd: o4.isStrokeEnd,
+            isFinalized: o4.isFinalized)
     }
     
 }

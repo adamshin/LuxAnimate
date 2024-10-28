@@ -11,16 +11,22 @@ extension StrokeEngine {
         var isFinalized: Bool
     }
     
-    struct StepOutput {
-        var stamps: [Stamp]
+    struct StrokeSampleProcessorOutput {
+        var strokeSamples: [StrokeSample]
+        var isStrokeEnd: Bool
+        var isFinalized: Bool
+    }
+    
+    struct StrokeStampProcessorOutput {
+        var stamps: [StrokeStamp]
         var isStrokeEnd: Bool
         var isFinalized: Bool
     }
     
     struct Output {
         var brush: Brush
-        var finalizedStamps: [Stamp]
-        var nonFinalizedStamps: [Stamp]
+        var finalizedStamps: [StrokeStamp]
+        var nonFinalizedStamps: [StrokeStamp]
     }
     
 }

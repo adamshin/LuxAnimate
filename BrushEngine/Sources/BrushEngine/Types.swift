@@ -13,7 +13,6 @@ public enum BrushMode {
 public struct InputSample {
     
     public var updateID: Int?
-    
     public var time: TimeInterval
     public var position: Vector
     
@@ -99,38 +98,24 @@ struct Sample {
     
 }
 
-// TODO: Finish this
 struct StrokeSample {
     
-    var time: TimeInterval
     var position: Vector
-    var pressure: Double
-    var altitude: Double
-    var azimuth: Double
-    var roll: Double
-    
     var strokeDistance: Double
-    // TODO: Wobble distance, calculated separately?
     
-    var taperScale: Double
-    
-    var sizeWobble: Double
-    var offsetXWobble: Double
-    var offsetYWobble: Double
+    var stampOffset: Vector
+    var stampSize: Double
+    var stampRotation: Double
+    var stampAlpha: Double
     
 }
 
-struct NoiseSample {
-    var sizeWobble: Double
-    var offsetXWobble: Double
-    var offsetYWobble: Double
-}
-
-struct Stamp {
+struct StrokeStamp {
+    
     var position: Vector
     var size: Double
     var rotation: Double
     var alpha: Double
     var color: Color
-    var offset: Vector
+    
 }

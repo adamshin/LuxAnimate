@@ -2,6 +2,9 @@
 import Foundation
 import Geometry
 
+// TODO: Interpolate angular values correctly!
+// (azimuth, roll)
+
 struct SampleInterpolator {
     
     enum Error: Swift.Error {
@@ -14,9 +17,6 @@ struct SampleInterpolator {
         samples: [Sample],
         weights: [Double]
     ) throws -> Sample {
-        
-        // TODO: Interpolate angular values correctly!
-        // (azimuth, roll)
         
         guard !samples.isEmpty else {
             throw Error.emptyInput
@@ -55,9 +55,9 @@ struct SampleInterpolator {
     }
     
     static func interpolate(
-        noiseSamples samples: [NoiseSample],
+        strokeSamples samples: [StrokeSample],
         weights: [Double]
-    ) throws -> NoiseSample {
+    ) throws -> StrokeSample {
         
         guard !samples.isEmpty else {
             throw Error.emptyInput
@@ -71,10 +71,13 @@ struct SampleInterpolator {
             throw Error.zeroTotalWeight
         }
         
-        var o = NoiseSample(
-            sizeWobble: 0,
-            offsetXWobble: 0,
-            offsetYWobble: 0)
+        var o = StrokeSample(
+            position: .zero,
+            strokeDistance: 0,
+            stampOffset: .zero,
+            stampSize: 0,
+            stampRotation: 0,
+            stampAlpha: 0)
         
         for i in 0 ..< samples.count {
             let s = samples[i]
@@ -82,9 +85,12 @@ struct SampleInterpolator {
             
             let c = w / totalWeight
             
-            o.sizeWobble    += c * s.sizeWobble
-            o.offsetXWobble += c * s.offsetXWobble
-            o.offsetYWobble += c * s.offsetYWobble
+            o.position += c * s.position
+            o.strokeDistance += c * s.strokeDistance
+            o.stampOffset += c * s.stampOffset
+            o.stampSize += c * s.stampSize
+            o.stampRotation += c * s.stampRotation
+            o.stampAlpha += c * s.stampAlpha
         }
         return o
     }

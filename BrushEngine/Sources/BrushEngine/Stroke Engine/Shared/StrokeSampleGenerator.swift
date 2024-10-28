@@ -3,57 +3,72 @@ import Foundation
 import Geometry
 import Color
 
-private let minStampDistance: Double = 1.0
 private let minStampSize: Double = 0.5
-
-private let maxTaperTime: TimeInterval = 0.2
 
 private let pressureSensitivity: Double = 1.5
 
-extension StrokeEngineStampGenerator {
+private let maxTaperTime: TimeInterval = 0.2
+
+private let wobbleOctaveCount = 2
+private let wobblePersistence: Double = 0.5
+
+extension StrokeSampleGenerator {
     
     struct Output {
-        var stamp: Stamp
-        var distanceToNextStamp: Double
+        var strokeSample: StrokeSample
         var isNonFinalized: Bool
     }
     
 }
 
-struct StrokeEngineStampGenerator {
+struct StrokeSampleGenerator {
     
-    let brush: Brush
-    let color: Color
-    let scale: Double
-    let applyTaper: Bool
+    private let brush: Brush
+    private let applyTaper: Bool
     
-    let baseStampSize: Double
+    private let baseStampSize: Double
+    
+    private let sizeWobbleGenerator: PerlinNoiseGenerator
+    private let offsetXWobbleGenerator: PerlinNoiseGenerator
+    private let offsetYWobbleGenerator: PerlinNoiseGenerator
     
     init(
         brush: Brush,
-        color: Color,
         scale: Double,
         applyTaper: Bool
     ) {
         self.brush = brush
-        self.color = color
-        self.scale = scale
         self.applyTaper = applyTaper
         
         let maxStampSize = brush.configuration.stampSize
         
-        baseStampSize = map(
-            scale,
+        baseStampSize = map(scale,
             in: (0, 1),
             to: (minStampSize, maxStampSize))
+        
+        sizeWobbleGenerator = PerlinNoiseGenerator(
+            frequency: brush.configuration.wobbleFrequency,
+            octaveCount: wobbleOctaveCount,
+            persistence: wobblePersistence)
+        
+        offsetXWobbleGenerator = PerlinNoiseGenerator(
+            frequency: brush.configuration.wobbleFrequency,
+            octaveCount: wobbleOctaveCount,
+            persistence: wobblePersistence)
+        
+        offsetYWobbleGenerator = PerlinNoiseGenerator(
+            frequency: brush.configuration.wobbleFrequency,
+            octaveCount: wobbleOctaveCount,
+            persistence: wobblePersistence)
     }
     
-    func stamp(
+    func strokeSample(
         sample: Sample,
-        noiseSample: NoiseSample,
+        strokeDistance: Double,
         strokeEndTime: TimeInterval
     ) -> Output {
         
+        // Pressure
         let pressure = clamp(
             sample.pressure * pressureSensitivity,
             min: 0, max: 1)
@@ -62,22 +77,30 @@ struct StrokeEngineStampGenerator {
             + brush.configuration.pressureScaling
             * 2 * (pressure - 0.5)
         
+        // Taper
         let (taperScaleFactor, isInTaperEnd) =
             combinedTaper(
                 sampleTime: sample.time,
                 strokeEndTime: strokeEndTime)
         
-        // TESTING
-//        let wobbleIntensity = 1
-//            - brush.config.wobblePressureAttenuation
-//            * pow(pressure, 3)
-        let wobbleIntensity = 1.0
+        // Wobble
+        let sizeWobble = sizeWobbleGenerator
+            .value(at: strokeDistance)
+        let offsetXWobble = offsetXWobbleGenerator
+            .value(at: strokeDistance)
+        let offsetYWobble = offsetYWobbleGenerator
+            .value(at: strokeDistance)
+        
+        let wobbleIntensity = 1
+            - brush.configuration.wobblePressureAttenuation
+            * pow(pressure, 3)
         
         let wobbleScaleFactor = 1
-            + noiseSample.sizeWobble
+            + sizeWobble
             * brush.configuration.sizeWobble
             * wobbleIntensity
         
+        // Stamp size
         let stampSizeUnclamped = baseStampSize
             * pressureScaleFactor
             * taperScaleFactor
@@ -87,40 +110,39 @@ struct StrokeEngineStampGenerator {
             stampSizeUnclamped,
             minStampSize)
         
-        let rotation = sample.azimuth + sample.roll
+        // Stamp rotation
+        let stampRotation = sample.azimuth + sample.roll
         
-        let alpha = brush.configuration.stampAlpha
-        
-        let offsetX = noiseSample.offsetXWobble
+        // Stamp offset
+        let offsetX = offsetXWobble
             * brush.configuration.offsetWobble
             * wobbleIntensity
         
-        let offsetY = noiseSample.offsetYWobble
+        let offsetY = offsetYWobble
             * brush.configuration.offsetWobble
             * wobbleIntensity
         
-        var offset = Vector(offsetX, offsetY)
-        if offset.lengthSquared() > 1.0 {
-            offset = offset.normalized()
+        var stampOffset = Vector(offsetX, offsetY)
+        if stampOffset.lengthSquared() > 1.0 {
+            stampOffset = stampOffset.normalized()
         }
         
-        let stamp = BrushEngine.Stamp(
-            position: sample.position,
-            size: stampSize,
-            rotation: rotation,
-            alpha: alpha,
-            color: color,
-            offset: offset)
+        // Stamp alpha
+        let stampAlpha = brush.configuration.stampAlpha
         
-        let distanceToNextStamp = max(
-            stampSize * brush.configuration.stampSpacing,
-            minStampDistance)
+        // Stroke sample
+        let strokeSample = StrokeSample(
+            position: sample.position,
+            strokeDistance: strokeDistance,
+            stampOffset: stampOffset,
+            stampSize: stampSize,
+            stampRotation: stampRotation,
+            stampAlpha: stampAlpha)
         
         let isNonFinalized = isInTaperEnd
         
         return Output(
-            stamp: stamp,
-            distanceToNextStamp: distanceToNextStamp,
+            strokeSample: strokeSample,
             isNonFinalized: isNonFinalized)
     }
     
