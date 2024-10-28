@@ -36,11 +36,6 @@ struct StrokeEngineStrokeStampProcessor {
         input: StrokeEngine.StrokeSampleProcessorOutput
     ) -> StrokeEngine.StrokeStampProcessorOutput {
         
-        // TESTING
-        if let s = input.strokeSamples.last {
-            print(String(format: "%0.2f", s.strokeDistance))
-        }
-        
         var output: [StrokeStamp] = []
         
         for sample in input.strokeSamples {

@@ -84,12 +84,14 @@ struct StrokeSampleGenerator {
                 strokeEndTime: strokeEndTime)
         
         // Wobble
+        let wobbleDistance = strokeDistance / baseStampSize
+        
         let sizeWobble = sizeWobbleGenerator
-            .value(at: strokeDistance)
+            .value(at: wobbleDistance)
         let offsetXWobble = offsetXWobbleGenerator
-            .value(at: strokeDistance)
+            .value(at: wobbleDistance)
         let offsetYWobble = offsetYWobbleGenerator
-            .value(at: strokeDistance)
+            .value(at: wobbleDistance)
         
         let wobbleIntensity = 1
             - brush.configuration.wobblePressureAttenuation
