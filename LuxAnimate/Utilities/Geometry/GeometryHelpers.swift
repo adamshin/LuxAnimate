@@ -1,5 +1,6 @@
 
 import Foundation
+import Geometry
 
 // MARK: - Size
 
