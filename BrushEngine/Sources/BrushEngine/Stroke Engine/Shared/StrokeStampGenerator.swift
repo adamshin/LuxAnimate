@@ -2,24 +2,32 @@
 import Foundation
 import Geometry
 import Color
+import Render
+
+private let paddingSizeThreshold: Double = 20
 
 struct StrokeStampGenerator {
     
-    static func strokeStamps(
+    static func generate(
         sample s: StrokeSample,
-        color: Color
-    ) -> [StrokeStamp] {
-        
+        color: Color,
+        output: inout [SpriteRenderer.Sprite]
+    ) {
         let position = s.position + s.stampOffset
         
-        let strokeStamp = StrokeStamp(
-            position: position,
-            size: s.stampSize,
-            rotation: s.stampRotation,
-            alpha: s.stampAlpha,
-            color: color)
+        let paddingScale: Double =
+            s.stampSize < paddingSizeThreshold ?
+            3 : 1
         
-        return [strokeStamp]
+        let sprite = SpriteRenderer.Sprite(
+            position: position,
+            size: Size(s.stampSize, s.stampSize),
+            rotation: s.stampRotation,
+            color: color,
+            alpha: s.stampAlpha,
+            paddingScale: paddingScale)
+        
+        output.append(sprite)
     }
     
 }

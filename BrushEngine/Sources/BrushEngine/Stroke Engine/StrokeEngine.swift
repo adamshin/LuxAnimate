@@ -1,6 +1,7 @@
 
 import Foundation
 import Color
+import Render
 
 extension StrokeEngine {
     
@@ -18,15 +19,15 @@ extension StrokeEngine {
     }
     
     struct StrokeStampProcessorOutput {
-        var stamps: [StrokeStamp]
+        var stampSprites: [SpriteRenderer.Sprite]
         var isStrokeEnd: Bool
         var isFinalized: Bool
     }
     
     struct Output {
         var brush: Brush
-        var finalizedStamps: [StrokeStamp]
-        var nonFinalizedStamps: [StrokeStamp]
+        var finalizedStampSprites: [SpriteRenderer.Sprite]
+        var nonFinalizedStampSprites: [SpriteRenderer.Sprite]
     }
     
 }
@@ -75,17 +76,19 @@ class StrokeEngine {
         
         var output = Output(
             brush: brush,
-            finalizedStamps: [],
-            nonFinalizedStamps: [])
+            finalizedStampSprites: [],
+            nonFinalizedStampSprites: [])
         
         while true {
             let stepOutput = state.processStep()
             
             if stepOutput.isFinalized {
                 savedState = state
-                output.finalizedStamps += stepOutput.stamps
+                output.finalizedStampSprites
+                    += stepOutput.stampSprites
             } else {
-                output.nonFinalizedStamps += stepOutput.stamps
+                output.nonFinalizedStampSprites
+                    += stepOutput.stampSprites
             }
             
             if stepOutput.isStrokeEnd {

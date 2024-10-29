@@ -110,16 +110,6 @@ struct StrokeSample {
     
 }
 
-struct StrokeStamp {
-    
-    var position: Vector
-    var size: Double
-    var rotation: Double
-    var alpha: Double
-    var color: Color
-    
-}
-
 // MARK: - Interpolation
 
 // TODO: Interpolate angular values correctly!

@@ -9,7 +9,7 @@ class StrokeRenderer {
     private let canvasHeight: Int
     private let commandQueue: MTLCommandQueue
     
-    private let stampRenderer: StampRenderer
+    private let spriteRenderer: SpriteRenderer
     private let textureBlitter: TextureBlitter
     
     let finalizedStrokeTexture: MTLTexture
@@ -29,11 +29,9 @@ class StrokeRenderer {
         self.canvasHeight = canvasHeight
         self.commandQueue = commandQueue
         
-        stampRenderer = StampRenderer(
-            debugRender: debugRender,
+        spriteRenderer = SpriteRenderer(
             pixelFormat: pixelFormat,
-            metalDevice: metalDevice,
-            commandQueue: commandQueue)
+            metalDevice: metalDevice)
         
         textureBlitter = TextureBlitter(
             commandQueue: commandQueue)
@@ -56,6 +54,30 @@ class StrokeRenderer {
                 pixelFormat: pixelFormat,
                 usage: [.renderTarget, .shaderRead])
 
+    }
+    
+    // MARK: - Render
+    
+    func drawStamps(
+        target: MTLTexture,
+        viewportSize: Size,
+        sprites: [SpriteRenderer.Sprite],
+        brush: Brush
+    ) {
+        let commandBuffer = commandQueue
+            .makeCommandBuffer()!
+        
+        spriteRenderer.drawSprites(
+            commandBuffer: commandBuffer,
+            target: target,
+            viewportSize: viewportSize,
+            texture: brush.stampTexture,
+            sprites: sprites,
+            blendMode: .normal,
+            sampleMode: .linearClampEdgeToBlack,
+            colorMode: .brush)
+        
+        commandBuffer.commit()
     }
     
     // MARK: - Interface
@@ -89,23 +111,21 @@ class StrokeRenderer {
             Scalar(canvasWidth),
             Scalar(canvasHeight))
         
-        stampRenderer.drawStamps(
+        drawStamps(
             target: finalizedStrokeTexture,
             viewportSize: viewportSize,
-            stamps: s.finalizedStamps,
-            brush: s.brush,
-            finalized: true)
+            sprites: s.finalizedStampSprites,
+            brush: s.brush)
         
         try? textureBlitter.blit(
             from: finalizedStrokeTexture,
             to: fullStrokeTexture)
         
-        stampRenderer.drawStamps(
+        drawStamps(
             target: fullStrokeTexture,
             viewportSize: viewportSize,
-            stamps: s.nonFinalizedStamps,
-            brush: s.brush,
-            finalized: false)
+            sprites: s.nonFinalizedStampSprites,
+            brush: s.brush)
     }
     
 }

@@ -1,11 +1,12 @@
 
 import Foundation
 import Color
+import Render
 
 extension StrokeEngineState {
     
     struct StepOutput {
-        var stamps: [StrokeStamp]
+        var stampSprites: [SpriteRenderer.Sprite]
         var isStrokeEnd: Bool
         var isFinalized: Bool
     }
@@ -79,7 +80,7 @@ struct StrokeEngineState {
         let o4 = strokeStampProcessor.process(input: o3)
         
         return StepOutput(
-            stamps: o4.stamps,
+            stampSprites: o4.stampSprites,
             isStrokeEnd: o4.isStrokeEnd,
             isFinalized: o4.isFinalized)
     }

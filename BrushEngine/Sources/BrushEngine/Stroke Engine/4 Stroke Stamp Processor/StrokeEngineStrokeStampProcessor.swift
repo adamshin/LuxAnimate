@@ -1,6 +1,7 @@
 
 import Foundation
 import Color
+import Render
 
 private let minStampDistance: Double = 1.0
 
@@ -36,7 +37,7 @@ struct StrokeEngineStrokeStampProcessor {
         input: StrokeEngine.StrokeSampleProcessorOutput
     ) -> StrokeEngine.StrokeStampProcessorOutput {
         
-        var output: [StrokeStamp] = []
+        var output: [SpriteRenderer.Sprite] = []
         
         for sample in input.strokeSamples {
             Self.processStrokeSample(
@@ -47,7 +48,7 @@ struct StrokeEngineStrokeStampProcessor {
         }
         
         return .init(
-            stamps: output,
+            stampSprites: output,
             isStrokeEnd: input.isStrokeEnd,
             isFinalized: input.isFinalized)
     }
@@ -58,7 +59,7 @@ struct StrokeEngineStrokeStampProcessor {
         sample: StrokeSample,
         config: Config,
         state: inout State,
-        output: inout [StrokeStamp]
+        output: inout [SpriteRenderer.Sprite]
     ) {
         if let lastSample = state.lastSample {
             processStrokeSegment(
@@ -83,7 +84,7 @@ struct StrokeEngineStrokeStampProcessor {
         endSample: StrokeSample,
         config: Config,
         state: inout State,
-        output: inout [StrokeStamp]
+        output: inout [SpriteRenderer.Sprite]
     ) {
         let startStrokeDist = startSample.strokeDistance
         let endStrokeDist = endSample.strokeDistance
@@ -102,12 +103,12 @@ struct StrokeEngineStrokeStampProcessor {
                 to: (0, 1))
             let t = clamp(t0, min: 0, max: 1)
             
-            let s1 = startSample
-            let s2 = endSample
+            let s0 = startSample
+            let s1 = endSample
             
             let cursorSample = try! interpolate(
-                (s1, 1 - t),
-                (s2, t))
+                v0: s0, v1: s1,
+                w0: 1 - t, w1: t)
             
             createStamps(
                 cursorSample: cursorSample,
@@ -121,7 +122,7 @@ struct StrokeEngineStrokeStampProcessor {
         sample: StrokeSample,
         config: Config,
         state: inout State,
-        output: inout [StrokeStamp]
+        output: inout [SpriteRenderer.Sprite]
     ) {
         createStamps(
             cursorSample: sample,
@@ -134,14 +135,12 @@ struct StrokeEngineStrokeStampProcessor {
         cursorSample: StrokeSample,
         config: Config,
         state: inout State,
-        output: inout [StrokeStamp]
+        output: inout [SpriteRenderer.Sprite]
     ) {
-        let stamps = StrokeStampGenerator
-            .strokeStamps(
-                sample: cursorSample,
-                color: config.color)
-        
-        output += stamps
+        StrokeStampGenerator.generate(
+            sample: cursorSample,
+            color: config.color,
+            output: &output)
         
         state.nextCursorStrokeDistance =
             nextCursorStrokeDistance(

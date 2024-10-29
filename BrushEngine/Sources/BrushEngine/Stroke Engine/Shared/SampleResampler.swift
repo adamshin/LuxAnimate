@@ -52,18 +52,18 @@ struct SampleResampler {
             let currentResampleTime =
                 resampleTimes[result.count]
             
-            let s1 = samples[currentSampleIndex]
-            let s2 = samples[currentSampleIndex + 1]
+            let s0 = samples[currentSampleIndex]
+            let s1 = samples[currentSampleIndex + 1]
             
-            if currentResampleTime < s2.time,
-                s2.time > s1.time
+            if currentResampleTime < s1.time,
+                s1.time > s0.time
             {
-                let t = (currentResampleTime - s1.time)
-                    / (s2.time - s1.time)
+                let t = (currentResampleTime - s0.time)
+                    / (s1.time - s0.time)
                 
                 let sample = try! interpolate(
-                    (s1, 1 - t),
-                    (s2, t))
+                    v0: s0, v1: s1,
+                    w0: 1 - t, w1: t)
                 
                 result.append(sample)
                 
