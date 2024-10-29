@@ -16,7 +16,7 @@ extension BrushGestureRecognizer {
         
         static let strokeFinalizationDelay: TimeInterval = 0.1
         
-        static let gapFillTimeOffset: TimeInterval = 1/60
+        static let gapFillTimeOffset: TimeInterval = 1/120
     }
     
 }

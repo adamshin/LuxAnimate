@@ -352,22 +352,29 @@ class BrushGestureRecognizerActiveState:
             }
             
             // Fill gaps if necessary
+            let gapFillTimeOffset = BrushGestureRecognizer
+                .Config.gapFillTimeOffset
+            
             if let firstSample = samples.first,
-                firstSample.time - lastNonPredictedSample.time >
-                BrushGestureRecognizer.Config.gapFillTimeOffset * 2
+                lastNonPredictedSample.time <
+                firstSample.time -
+                gapFillTimeOffset * 1.5
             {
                 var gapFillSamples: [BrushGestureRecognizer.Sample] = []
                 
                 var time = lastNonPredictedSample.time
-                time += BrushGestureRecognizer.Config.gapFillTimeOffset
+                time += gapFillTimeOffset
                 
-                while time < firstSample.time {
+                while time <
+                    firstSample.time -
+                    gapFillTimeOffset * 0.5
+                {
                     var sample = lastNonPredictedSample
                     sample.time = time
                     
                     gapFillSamples.append(sample)
                     
-                    time += BrushGestureRecognizer.Config.gapFillTimeOffset
+                    time += gapFillTimeOffset
                 }
                 
                 samples = gapFillSamples + samples
@@ -435,22 +442,36 @@ class BrushGestureRecognizerActiveState:
         let gapFillTimeOffset = BrushGestureRecognizer
             .Config.gapFillTimeOffset
         
-        let nextSampleTime =
-            lastNonPredictedSample.time
-            + gapFillTimeOffset
+        let safetyBackoff: TimeInterval = 3/60
         
-        let safetyBackoff = gapFillTimeOffset * 3
+        var samples:
+            [BrushGestureRecognizer.Sample] = []
+        var predictedSamples:
+            [BrushGestureRecognizer.Sample] = []
         
-        if nextSampleTime < currentTime - safetyBackoff {
+        var nextSampleTime =
+            lastNonPredictedSample.time + gapFillTimeOffset
+        
+        while nextSampleTime < currentTime {
             var sample = lastNonPredictedSample
             sample.time = nextSampleTime
-            self.lastNonPredictedSample = sample
             
-            delegate?.onUpdateStroke(
-                self,
-                addedSamples: [sample],
-                predictedSamples: [])
+            if nextSampleTime <
+                currentTime - safetyBackoff
+            {
+                samples.append(sample)
+                self.lastNonPredictedSample = sample
+            } else {
+                predictedSamples.append(sample)
+            }
+            
+            nextSampleTime += gapFillTimeOffset
         }
+        
+        delegate?.onUpdateStroke(
+            self,
+            addedSamples: samples,
+            predictedSamples: predictedSamples)
     }
     
 }
