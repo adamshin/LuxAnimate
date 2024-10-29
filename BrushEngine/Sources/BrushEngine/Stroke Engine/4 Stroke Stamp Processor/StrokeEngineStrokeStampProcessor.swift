@@ -36,7 +36,6 @@ struct StrokeEngineStrokeStampProcessor {
         input: StrokeEngine.StrokeSampleProcessorOutput
     ) -> StrokeEngine.StrokeStampProcessorOutput {
         
-        /*
         var output: [StrokeStamp] = []
         
         for sample in input.strokeSamples {
@@ -45,13 +44,6 @@ struct StrokeEngineStrokeStampProcessor {
                 config: config,
                 state: &state,
                 output: &output)
-        }
-         */
-        let output = input.strokeSamples.flatMap { sample in
-            StrokeStampGenerator
-                .strokeStamps(
-                    sample: sample,
-                    color: .black.withAlpha(0.2))
         }
         
         return .init(
