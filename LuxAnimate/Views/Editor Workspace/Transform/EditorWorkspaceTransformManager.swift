@@ -7,7 +7,7 @@ import Geometry
 
 private let contentFitInset: CGFloat = 0
 
-private let rotationSnapThreshold: Scalar =
+private let rotationSnapThreshold: Double =
     8 * .radiansPerDegree
 
 private let shortSnapDuration: TimeInterval = 1.0
@@ -277,8 +277,8 @@ class EditorWorkspaceTransformManager {
     func handleUpdateTransformGesture(
         initialAnchorPosition: Vector,
         translation: Vector,
-        rotation: Scalar,
-        scale: Scalar
+        rotation: Double,
+        scale: Double
     ) {
         guard activeGestureTransform != nil
         else { return }

@@ -7,7 +7,7 @@ import Geometry
 
 private let fitToBoundsInset: CGFloat = 0
 
-private let rotationSnapThreshold: Scalar =
+private let rotationSnapThreshold: Double =
     8 * .radiansPerDegree
 
 // MARK: - MovableCanvasView
@@ -43,8 +43,8 @@ class MovableCanvasView: UIView {
         }
     }
     
-    var minScale: Scalar = 1
-    var maxScale: Scalar = 1
+    var minScale: Double = 1
+    var maxScale: Double = 1
     
     var isSingleFingerPanEnabled: Bool = true {
         didSet {
@@ -223,8 +223,8 @@ class MovableCanvasView: UIView {
     private func updateMultiGesture(
         initialAnchorPosition: Vector,
         translation: Vector,
-        rotation: Scalar,
-        scale: Scalar
+        rotation: Double,
+        scale: Double
     ) { 
         let anchor = Vector(
             initialAnchorPosition.x - bounds.width / 2,
@@ -306,8 +306,8 @@ extension MovableCanvasView: CanvasMultiGestureRecognizerGestureDelegate {
     func onUpdateGesture(
         initialAnchorPosition: Vector,
         translation: Vector,
-        rotation: Scalar,
-        scale: Scalar
+        rotation: Double,
+        scale: Double
     ) {
         updateMultiGesture(
             initialAnchorPosition: initialAnchorPosition,

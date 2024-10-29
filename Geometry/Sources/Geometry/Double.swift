@@ -1,9 +1,7 @@
 
 import Foundation
 
-public typealias Scalar = Double
-
-public extension Scalar {
+public extension Double {
     
     static let halfPi = pi / 2
     static let quarterPi = pi / 4

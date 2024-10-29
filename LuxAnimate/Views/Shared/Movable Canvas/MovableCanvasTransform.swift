@@ -8,8 +8,8 @@ import Geometry
 struct MovableCanvasTransform {
     
     var translation: Vector2 = .zero
-    var rotation: Scalar = 0
-    var scale: Scalar = 1
+    var rotation: Double = 0
+    var scale: Double = 1
     
 }
 
@@ -22,7 +22,7 @@ extension MovableCanvasTransform {
     }
     
     mutating func applyRotation(
-        _ dRotation: Scalar,
+        _ dRotation: Double,
         anchor: Vector2
     ) {
         applyTranslation(-anchor)
@@ -34,9 +34,9 @@ extension MovableCanvasTransform {
     }
     
     mutating func applyScale(
-        _ dScale: Scalar,
-        minScale: Scalar,
-        maxScale: Scalar,
+        _ dScale: Double,
+        minScale: Double,
+        maxScale: Double,
         anchor: Vector2
     ) {
         let newScale = clamp(
@@ -55,8 +55,8 @@ extension MovableCanvasTransform {
     }
     
     mutating func snapTranslationToKeepRectContainingOrigin(
-        x: Scalar, y: Scalar,
-        width: Scalar, height: Scalar
+        x: Double, y: Double,
+        width: Double, height: Double
     ) {
         let matrix = matrix()
         let matrixInverse = matrix.inverse()
@@ -72,9 +72,9 @@ extension MovableCanvasTransform {
         applyTranslation(-closestRectPointInViewSpace)
     }
     
-    mutating func snapRotation(threshold: Scalar) {
-        let snapAngles: [Scalar] = (0...4)
-            .map { Scalar($0) / 4 * .twoPi }
+    mutating func snapRotation(threshold: Double) {
+        let snapAngles: [Double] = (0...4)
+            .map { Double($0) / 4 * .twoPi }
         
         for snapAngle in snapAngles {
             let distance = snapAngle - rotation
@@ -86,8 +86,8 @@ extension MovableCanvasTransform {
     }
     
     mutating func snapScale(
-        minScale: Scalar,
-        maxScale: Scalar
+        minScale: Double,
+        maxScale: Double
     ) {
         applyScale(1,
             minScale: minScale,

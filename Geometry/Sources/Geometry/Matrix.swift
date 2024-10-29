@@ -3,9 +3,9 @@ import Foundation
 
 public struct Matrix3: Sendable, Codable {
     
-    public var m11, m12, m13: Scalar
-    public var m21, m22, m23: Scalar
-    public var m31, m32, m33: Scalar
+    public var m11, m12, m13: Double
+    public var m21, m22, m23: Double
+    public var m31, m32, m33: Double
     
 }
 
@@ -17,9 +17,9 @@ public extension Matrix3 {
         0, 0, 1)
     
     init(
-        _ m11: Scalar, _ m12: Scalar, _ m13: Scalar,
-        _ m21: Scalar, _ m22: Scalar, _ m23: Scalar,
-        _ m31: Scalar, _ m32: Scalar, _ m33: Scalar
+        _ m11: Double, _ m12: Double, _ m13: Double,
+        _ m21: Double, _ m22: Double, _ m23: Double,
+        _ m31: Double, _ m32: Double, _ m33: Double
     ) {
         self.m11 = m11; self.m12 = m12; self.m13 = m13
         self.m21 = m21; self.m22 = m22; self.m23 = m23
@@ -33,7 +33,7 @@ public extension Matrix3 {
             0, 0, 1)
     }
     
-    init(rotation a: Scalar) {
+    init(rotation a: Double) {
         let cs = cos(a)
         let sn = sin(a)
         self.init(
@@ -49,7 +49,7 @@ public extension Matrix3 {
             0, 0, 1)
     }
     
-    init(shearHorizontal a: Scalar) {
+    init(shearHorizontal a: Double) {
         self.init(
             1, tan(a), 0,
             0, 1, 0,
@@ -70,7 +70,7 @@ public extension Matrix3 {
         )
     }
 
-    func determinant() -> Scalar {
+    func determinant() -> Double {
         (m11 * m22 * m33 + m12 * m23 * m31 + m13 * m21 * m32) -
         (m13 * m22 * m31 + m11 * m23 * m32 + m12 * m21 * m33)
     }
@@ -86,7 +86,7 @@ public extension Matrix3 {
         adjugate() * (1 / determinant())
     }
     
-    static func * (lhs: Matrix3, rhs: Scalar) -> Matrix3 {
+    static func * (lhs: Matrix3, rhs: Double) -> Matrix3 {
         Matrix3(
             lhs.m11 * rhs, lhs.m12 * rhs, lhs.m13 * rhs,
             lhs.m21 * rhs, lhs.m22 * rhs, lhs.m23 * rhs,

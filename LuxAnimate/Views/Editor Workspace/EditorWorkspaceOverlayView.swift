@@ -15,8 +15,8 @@ protocol EditorWorkspaceOverlayViewDelegate: AnyObject {
         _ v: EditorWorkspaceOverlayView,
         initialAnchorPosition: Vector,
         translation: Vector,
-        rotation: Scalar,
-        scale: Scalar)
+        rotation: Double,
+        scale: Double)
     
     func onEndWorkspaceTransformGesture(
         _ v: EditorWorkspaceOverlayView,
@@ -137,8 +137,8 @@ extension EditorWorkspaceOverlayView: CanvasMultiGestureRecognizerGestureDelegat
     func onUpdateGesture(
         initialAnchorPosition: Vector,
         translation: Vector,
-        rotation: Scalar,
-        scale: Scalar
+        rotation: Double,
+        scale: Double
     ) {
         delegate?.onUpdateWorkspaceTransformGesture(
             self,

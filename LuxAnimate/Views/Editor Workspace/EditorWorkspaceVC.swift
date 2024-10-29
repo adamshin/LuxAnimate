@@ -6,8 +6,8 @@ import UIKit
 import Metal
 import Geometry
 
-private let minZoomScale: Scalar = 0.1
-private let maxZoomScale: Scalar = 30
+private let minZoomScale: Double = 0.1
+private let maxZoomScale: Double = 30
 
 @MainActor
 protocol EditorWorkspaceVCDelegate: AnyObject {
@@ -126,8 +126,8 @@ extension EditorWorkspaceVC: EditorWorkspaceOverlayViewDelegate {
         _ v: EditorWorkspaceOverlayView,
         initialAnchorPosition: Vector,
         translation: Vector,
-        rotation: Scalar,
-        scale: Scalar
+        rotation: Double,
+        scale: Double
     ) {
         workspaceTransformManager.handleUpdateTransformGesture(
             initialAnchorPosition: initialAnchorPosition,

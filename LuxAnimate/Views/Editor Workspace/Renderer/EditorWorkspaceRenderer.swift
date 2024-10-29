@@ -9,7 +9,7 @@ import Color
 import Render
 
 private let backgroundColor = Color(UIColor.editorBackground)
-private let scalePixelateThreshold: Scalar = 1.0
+private let scalePixelateThreshold: Double = 1.0
 
 struct EditorWorkspaceRenderer {
     

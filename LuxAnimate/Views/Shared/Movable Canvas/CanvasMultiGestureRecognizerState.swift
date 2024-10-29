@@ -5,14 +5,14 @@
 import UIKit
 import Geometry
 
-private let translationDistanceThreshold: Scalar = 10
+private let translationDistanceThreshold: Double = 10
 
-private let rotationDistanceThreshold: Scalar = 40
-private let rotationMaxAngleThreshold: Scalar = .pi / 8
+private let rotationDistanceThreshold: Double = 40
+private let rotationMaxAngleThreshold: Double = .pi / 8
 
-private let scaleDistanceThreshold: Scalar = 20
+private let scaleDistanceThreshold: Double = 20
 
-private let pinchFlickVelocityThreshold: Scalar = 1800
+private let pinchFlickVelocityThreshold: Double = 1800
 
 @MainActor
 protocol CanvasMultiGestureRecognizerInternalStateDelegate: AnyObject {
@@ -29,8 +29,8 @@ protocol CanvasMultiGestureRecognizerInternalStateDelegate: AnyObject {
     func onUpdateGesture(
         initialAnchorPosition: Vector,
         translation: Vector,
-        rotation: Scalar,
-        scale: Scalar)
+        rotation: Double,
+        scale: Double)
     
     func onEndGesture(
         finalAnchorPosition: Vector,
@@ -121,15 +121,15 @@ class CanvasMultiGestureRecognizerActiveState: CanvasMultiGestureRecognizerInter
     }
     
     struct RotationState {
-        var offset: Scalar
+        var offset: Double
     }
     
     struct ScaleState {
-        var baseTouchDistance: Scalar
+        var baseTouchDistance: Double
         
         var lastTimestamp: TimeInterval?
-        var lastTouchDistance: Scalar?
-        var pinchVelocity: Scalar?
+        var lastTouchDistance: Double?
+        var pinchVelocity: Double?
     }
     
     weak var delegate: CanvasMultiGestureRecognizerInternalStateDelegate?
@@ -175,8 +175,8 @@ class CanvasMultiGestureRecognizerActiveState: CanvasMultiGestureRecognizerInter
         
         // Output values
         let translation: Vector
-        var rotation: Scalar
-        var scale: Scalar
+        var rotation: Double
+        var scale: Double
         
         // Translation
         let translationRaw = currentCenterPos - initialCenterPos

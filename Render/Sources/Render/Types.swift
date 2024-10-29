@@ -61,7 +61,7 @@ extension SpriteVertex {
         position: Vector,
         texCoord: Vector,
         color: Color,
-        alpha: Scalar
+        alpha: Double
     ) {
         self.init(
             position: .init(

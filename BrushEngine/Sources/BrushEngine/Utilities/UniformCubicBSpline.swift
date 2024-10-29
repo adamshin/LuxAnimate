@@ -7,8 +7,8 @@ import Geometry
 struct UniformCubicBSpline {
     
     static func basisValues(
-        t: Scalar
-    ) -> (Scalar, Scalar, Scalar, Scalar) {
+        t: Double
+    ) -> (Double, Double, Double, Double) {
         let t2 = t*t
         let t3 = t2*t
         

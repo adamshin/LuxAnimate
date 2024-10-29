@@ -108,8 +108,8 @@ class StrokeRenderer {
 //        print("Drawing \(totalStampCount) stamps")
         
         let viewportSize = Size(
-            Scalar(canvasWidth),
-            Scalar(canvasHeight))
+            Double(canvasWidth),
+            Double(canvasHeight))
         
         drawStamps(
             target: finalizedStrokeTexture,

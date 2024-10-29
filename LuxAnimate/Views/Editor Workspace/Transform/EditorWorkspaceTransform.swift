@@ -7,8 +7,8 @@ import Geometry
 
 struct EditorWorkspaceTransform {
     var translation: Vector2
-    var rotation: Scalar
-    var scale: Scalar
+    var rotation: Double
+    var scale: Double
 }
 
 extension EditorWorkspaceTransform {
@@ -25,7 +25,7 @@ extension EditorWorkspaceTransform {
     }
     
     mutating func applyRotation(
-        _ dRotation: Scalar,
+        _ dRotation: Double,
         anchor: Vector2
     ) {
         applyTranslation(-anchor)
@@ -37,9 +37,9 @@ extension EditorWorkspaceTransform {
     }
     
     mutating func applyScale(
-        _ dScale: Scalar,
-        minScale: Scalar,
-        maxScale: Scalar,
+        _ dScale: Double,
+        minScale: Double,
+        maxScale: Double,
         anchor: Vector2
     ) {
         let newScale = clamp(
@@ -58,8 +58,8 @@ extension EditorWorkspaceTransform {
     }
     
     mutating func snapTranslationToKeepRectContainingOrigin(
-        x: Scalar, y: Scalar,
-        width: Scalar, height: Scalar
+        x: Double, y: Double,
+        width: Double, height: Double
     ) {
         let matrix = matrix()
         let matrixInverse = matrix.inverse()
@@ -76,11 +76,11 @@ extension EditorWorkspaceTransform {
     }
     
     mutating func snapRotation(
-        threshold: Scalar,
+        threshold: Double,
         anchor: Vector
     ) {
-        let snapAngles: [Scalar] = (0...4)
-            .map { Scalar($0) / 4 * .twoPi }
+        let snapAngles: [Double] = (0...4)
+            .map { Double($0) / 4 * .twoPi }
         
         for snapAngle in snapAngles {
             let distance = snapAngle - rotation
@@ -92,8 +92,8 @@ extension EditorWorkspaceTransform {
     }
     
     mutating func snapScale(
-        minScale: Scalar,
-        maxScale: Scalar,
+        minScale: Double,
+        maxScale: Double,
         anchor: Vector
     ) {
         applyScale(1,

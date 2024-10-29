@@ -4951,7 +4951,7 @@ XXH3_accumulate_512_neon( void* XXH_RESTRICT acc,
          */
         XXH_COMPILER_GUARD(xsecret);
 #endif
-        /* Scalar lanes use the normal scalarRound routine */
+        /* Double lanes use the normal scalarRound routine */
         for (i = XXH3_NEON_LANES; i < XXH_ACC_NB; i++) {
             XXH3_scalarRound(acc, input, secret, i);
         }
@@ -5316,7 +5316,7 @@ XXH_mult32to64_add64(xxh_u64 lhs, xxh_u64 rhs, xxh_u64 acc)
 
 /*!
  * @internal
- * @brief Scalar round for @ref XXH3_accumulate_512_scalar().
+ * @brief Double round for @ref XXH3_accumulate_512_scalar().
  *
  * This is extracted to its own function because the NEON path uses a combination
  * of NEON and scalar.
@@ -5365,7 +5365,7 @@ XXH_FORCE_INLINE XXH3_ACCUMULATE_TEMPLATE(scalar)
 
 /*!
  * @internal
- * @brief Scalar scramble step for @ref XXH3_scrambleAcc_scalar().
+ * @brief Double scramble step for @ref XXH3_scrambleAcc_scalar().
  *
  * This is extracted to its own function because the NEON path uses a combination
  * of NEON and scalar.

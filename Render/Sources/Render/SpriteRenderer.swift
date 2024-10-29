@@ -43,8 +43,8 @@ extension SpriteRenderer {
             position: Vector,
             size: Size,
             anchor: Vector = .init(0.5, 0.5),
-            rotation: Scalar = 0,
-            scale: Scalar = 1,
+            rotation: Double = 0,
+            scale: Double = 1,
             color: Color = .white,
             alpha: Double = 1,
             paddingScale: Double = 1
