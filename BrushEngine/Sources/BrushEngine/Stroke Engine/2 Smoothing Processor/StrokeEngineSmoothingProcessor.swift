@@ -7,7 +7,7 @@ private let resampleInterval: TimeInterval = 1/240
 private let minResampleCount = 10
 private let maxResampleCount = 100
 
-private let tailSampleInterval: TimeInterval = 1/120
+private let tailSampleInterval: TimeInterval = 1/60
 
 extension StrokeEngineSmoothingProcessor {
     
