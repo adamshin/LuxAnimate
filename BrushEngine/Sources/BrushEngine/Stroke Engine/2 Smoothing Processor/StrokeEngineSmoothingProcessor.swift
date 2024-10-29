@@ -5,9 +5,9 @@ private let maxWindowSize: TimeInterval = 0.4
 
 private let resampleInterval: TimeInterval = 1/240
 private let minResampleCount = 10
-private let maxResampleCount = 60
+private let maxResampleCount = 100
 
-private let tailSampleInterval: TimeInterval = 1/60
+private let tailSampleInterval: TimeInterval = 1/120
 
 extension StrokeEngineSmoothingProcessor {
     
@@ -166,7 +166,8 @@ struct StrokeEngineSmoothingProcessor {
         sampleBuffer: [Sample]
     ) -> BrushEngine.Sample {
         
-        let resampleTimes = config.resampleTimeOffsets
+        let resampleTimes = config
+            .resampleTimeOffsets
             .map { windowEndTime + $0 }
         
         let windowSamples =
