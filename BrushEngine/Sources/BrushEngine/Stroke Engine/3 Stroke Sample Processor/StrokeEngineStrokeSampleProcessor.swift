@@ -209,13 +209,14 @@ struct StrokeEngineStrokeSampleProcessor {
         for i in 0 ..< count {
             let t = Double(i) / Double(count)
             
-            let (b0, b1, b2, b3) = UniformCubicBSpline
-                .basisValues(t: t)
+            let (b0, b1, b2, b3) =
+                UniformCubicBSpline.basisValues(t: t)
             
-            let sample = try! SampleInterpolator
-                .interpolate(
-                    samples: controlPointSamples,
-                    weights: [b0, b1, b2, b3])
+            let sample = try! interpolate(
+                (controlPointSamples[0], b0),
+                (controlPointSamples[1], b1),
+                (controlPointSamples[2], b2),
+                (controlPointSamples[3], b3))
             
             output.append(sample)
         }

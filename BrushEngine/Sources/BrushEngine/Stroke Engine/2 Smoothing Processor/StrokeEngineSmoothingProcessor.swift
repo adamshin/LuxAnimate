@@ -191,8 +191,8 @@ struct StrokeEngineSmoothingProcessor {
             fatalError()
         }
         
-        return try! SampleInterpolator.interpolate(
-            samples: samples,
+        return try! interpolate(
+            values: samples,
             weights: weights)
     }
     

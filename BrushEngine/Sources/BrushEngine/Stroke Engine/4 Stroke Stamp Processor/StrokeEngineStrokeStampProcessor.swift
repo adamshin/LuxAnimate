@@ -105,12 +105,9 @@ struct StrokeEngineStrokeStampProcessor {
             let s1 = startSample
             let s2 = endSample
             
-            let cursorSample = try! SampleInterpolator
-                .interpolate2(
-                    strokeSample1: s1,
-                    strokeSample2: s2,
-                    weight1: 1-t,
-                    weight2: t)
+            let cursorSample = try! interpolate(
+                (s1, 1 - t),
+                (s2, t))
             
             createStamps(
                 cursorSample: cursorSample,

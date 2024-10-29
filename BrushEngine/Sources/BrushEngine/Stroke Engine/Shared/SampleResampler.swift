@@ -61,11 +61,9 @@ struct SampleResampler {
                 let t = (currentResampleTime - s1.time)
                     / (s2.time - s1.time)
                 
-                let sample = try!
-                    SampleInterpolator
-                        .interpolate(
-                            samples: [s1, s2],
-                            weights: [1-t, t])
+                let sample = try! interpolate(
+                    (s1, 1 - t),
+                    (s2, t))
                 
                 result.append(sample)
                 

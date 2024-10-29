@@ -119,3 +119,60 @@ struct StrokeStamp {
     var color: Color
     
 }
+
+// MARK: - Interpolation
+
+// TODO: Interpolate angular values correctly!
+// (azimuth, roll)
+
+extension Sample: Interpolatable {
+    
+    static var zero: Self {
+        Sample(
+            time: 0,
+            position: .zero,
+            pressure: 0,
+            altitude: 0,
+            azimuth: 0,
+            roll: 0)
+    }
+    
+    mutating func combine(
+        value v: Self,
+        weight w: Double
+    ) {
+        time     += w * v.time
+        position += w * v.position
+        pressure += w * v.pressure
+        altitude += w * v.altitude
+        azimuth  += w * v.azimuth
+        roll     += w * v.roll
+    }
+    
+}
+
+extension StrokeSample: Interpolatable {
+    
+    static var zero: Self {
+        StrokeSample(
+            position: .zero,
+            strokeDistance: 0,
+            stampOffset: .zero,
+            stampSize: 0,
+            stampRotation: 0,
+            stampAlpha: 0)
+    }
+    
+    mutating func combine(
+        value v: Self,
+        weight w: Double
+    ) {
+        position       += w * v.position
+        strokeDistance += w * v.strokeDistance
+        stampOffset    += w * v.stampOffset
+        stampSize      += w * v.stampSize
+        stampRotation  += w * v.stampRotation
+        stampAlpha     += w * v.stampAlpha
+    }
+    
+}
