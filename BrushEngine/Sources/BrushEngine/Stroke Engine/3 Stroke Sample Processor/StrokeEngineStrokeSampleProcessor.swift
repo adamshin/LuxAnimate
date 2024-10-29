@@ -200,10 +200,6 @@ struct StrokeEngineStrokeSampleProcessor {
         guard controlPointSamples.count == 4 else {
             fatalError()
         }
-        let s0 = controlPointSamples[0]
-        let s1 = controlPointSamples[1]
-        let s2 = controlPointSamples[2]
-        let s3 = controlPointSamples[3]
         
         let count = segmentSubdivisionCount
         
@@ -218,7 +214,7 @@ struct StrokeEngineStrokeSampleProcessor {
             
             let sample = try! SampleInterpolator
                 .interpolate(
-                    samples: [s0, s1, s2, s3],
+                    samples: controlPointSamples,
                     weights: [b0, b1, b2, b3])
             
             output.append(sample)

@@ -95,4 +95,45 @@ struct SampleInterpolator {
         return o
     }
     
+    static func interpolate2(
+        strokeSample1 s1: StrokeSample,
+        strokeSample2 s2: StrokeSample,
+        weight1 w1: Double,
+        weight2 w2: Double
+    ) throws -> StrokeSample {
+        
+        let totalWeight = w1 + w2
+        guard totalWeight != 0 else {
+            throw Error.zeroTotalWeight
+        }
+        
+        var o = StrokeSample(
+            position: .zero,
+            strokeDistance: 0,
+            stampOffset: .zero,
+            stampSize: 0,
+            stampRotation: 0,
+            stampAlpha: 0)
+        
+        // Sample 1
+        let c1 = w1 / totalWeight
+        o.position += c1 * s1.position
+        o.strokeDistance += c1 * s1.strokeDistance
+        o.stampOffset += c1 * s1.stampOffset
+        o.stampSize += c1 * s1.stampSize
+        o.stampRotation += c1 * s1.stampRotation
+        o.stampAlpha += c1 * s1.stampAlpha
+        
+        // Sample 2
+        let c2 = w2 / totalWeight
+        o.position += c2 * s2.position
+        o.strokeDistance += c2 * s2.strokeDistance
+        o.stampOffset += c2 * s2.stampOffset
+        o.stampSize += c2 * s2.stampSize
+        o.stampRotation += c2 * s2.stampRotation
+        o.stampAlpha += c2 * s2.stampAlpha
+        
+        return o
+    }
+    
 }
