@@ -47,7 +47,28 @@ struct StrokeEngineStrokeSampleProcessor {
     
     // MARK: - Interface
     
+    // TESTING
     mutating func process(
+        input: StrokeEngine.ProcessorOutput
+    ) -> StrokeEngine.StrokeSampleProcessorOutput {
+        
+        let strokeSamples = input.samples.map { sample in
+            let output = config.strokeSampleGenerator
+                .strokeSample(
+                    sample: sample,
+                    strokeDistance: 0,
+                    strokeEndTime: input.strokeEndTime)
+            return output.strokeSample
+        }
+        
+        return .init(
+            strokeSamples: strokeSamples,
+            isStrokeEnd: input.isStrokeEnd,
+            isFinalized: input.isFinalized)
+    }
+    // END TESTING
+    
+    mutating func process2(
         input: StrokeEngine.ProcessorOutput
     ) -> StrokeEngine.StrokeSampleProcessorOutput {
         

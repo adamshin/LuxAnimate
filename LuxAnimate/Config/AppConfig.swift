@@ -24,15 +24,15 @@ struct AppConfig {
     static let testBrushConfig = Brush.Configuration(
         stampTextureName: "brush1.png",
         stampSize: 100,
-        stampSpacing: 0.0,
+        stampSpacing: 0,
         stampAlpha: 1,
         pressureScaling: 0,
         taperLength: 0,
-        taperRoundness: 1.0,
-        sizeWobble: 0.8,
+        taperRoundness: 1,
+        sizeWobble: 0,
         offsetWobble: 0,
-        wobbleFrequency: 0.25,
-        wobblePressureAttenuation: 0.5,
+        wobbleFrequency: 0,
+        wobblePressureAttenuation: 0,
         baseSmoothing: 0)
     
     static let roundBrushConfig = Brush.Configuration(
