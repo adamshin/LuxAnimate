@@ -19,7 +19,7 @@ struct AppConfig {
     static let paintBrushColor = Color.brushBlack
     static let strokeDebugColor = Color.debugRed
     
-    static let paintBrushConfig = testBrushConfig
+    static let paintBrushConfig = arrowBrushConfig
     
     static let testBrushConfig = Brush.Configuration(
         stampTextureName: "brush1.png",
@@ -89,6 +89,20 @@ struct AppConfig {
         offsetWobble: 0.1,
         wobbleFrequency: 0.25,
         wobblePressureAttenuation: 0.5,
+        baseSmoothing: 0)
+    
+    static let arrowBrushConfig = Brush.Configuration(
+        stampTextureName: "brush4.png",
+        stampSize: 200,
+        stampSpacing: 1,
+        stampAlpha: 1,
+        pressureScaling: 0,
+        taperLength: 0,
+        taperRoundness: 0,
+        sizeWobble: 0,
+        offsetWobble: 0,
+        wobbleFrequency: 0,
+        wobblePressureAttenuation: 0,
         baseSmoothing: 0)
     
     static let eraseBrushConfig = Brush.Configuration(
