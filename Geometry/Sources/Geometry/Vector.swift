@@ -1,15 +1,33 @@
 
 import Foundation
+import simd
 
 public typealias Vector = Vector2
 
 public struct Vector2: Sendable, Codable {
     
-    public var x, y: Double
+    private var storage: SIMD2<Double>
+    
+    public var x: Double {
+        get { storage.x }
+        set { storage.x = newValue }
+    }
+    
+    public var y: Double {
+        get { storage.y }
+        set { storage.y = newValue }
+    }
+    
+    private init(storage: SIMD2<Double>) {
+        self.storage = storage
+    }
     
     public init(x: Double, y: Double) {
-        self.x = x
-        self.y = y
+        self.storage = .init(x, y)
+    }
+    
+    public init(_ x: Double, _ y: Double) {
+        self.storage = .init(x, y)
     }
     
 }
@@ -17,10 +35,6 @@ public struct Vector2: Sendable, Codable {
 public extension Vector2 {
     
     static let zero = Vector2(0, 0)
-    
-    init(_ x: Double, _ y: Double) {
-        self.init(x: x, y: y)
-    }
     
     var inverse: Vector2 {
         -self
@@ -31,69 +45,69 @@ public extension Vector2 {
     }
     
     func lengthSquared() -> Double {
-        x * x + y * y
+        simd_length_squared(storage)
     }
     
     func length() -> Double {
-        sqrt(lengthSquared())
+        simd_length(storage)
     }
     
     func dot(_ v: Vector2) -> Double {
-        x * v.x + y * v.y
+        simd_dot(storage, v.storage)
     }
     
     func normalized() -> Vector2 {
-        self / length()
+        Vector2(storage: simd_normalize(storage))
     }
     
     func rotated(by a: Double) -> Vector2 {
-        let cs = cos(a)
-        let sn = sin(a)
-        return Vector2(x * cs - y * sn, x * sn + y * cs)
+        return Matrix3(rotation: a) * self
     }
     
     func angle(to v: Vector2) -> Double {
-        atan2(x * v.y - y * v.x, x * v.x + y * v.y)
+        let cross = x * v.y - y * v.x
+        let dot = dot(v)
+        return atan2(cross, dot)
     }
     
     static prefix func - (v: Vector2) -> Vector2 {
-        Vector2(-v.x, -v.y)
+        Vector2(storage: -v.storage)
     }
     
     static func + (lhs: Vector2, rhs: Vector2) -> Vector2 {
-        Vector2(lhs.x + rhs.x, lhs.y + rhs.y)
+        Vector2(storage: lhs.storage + rhs.storage)
     }
     
     static func - (lhs: Vector2, rhs: Vector2) -> Vector2 {
-        Vector2(lhs.x - rhs.x, lhs.y - rhs.y)
+        Vector2(storage: lhs.storage - rhs.storage)
     }
     
     static func * (lhs: Vector2, rhs: Double) -> Vector2 {
-        Vector2(lhs.x * rhs, lhs.y * rhs)
+        Vector2(storage: lhs.storage * rhs)
     }
     
     static func * (lhs: Double, rhs: Vector2) -> Vector2 {
-        Vector2(lhs * rhs.x, lhs * rhs.y)
+        Vector2(storage: lhs * rhs.storage)
     }
     
     static func / (lhs: Vector2, rhs: Double) -> Vector2 {
-        Vector2(lhs.x / rhs, lhs.y / rhs)
+        Vector2(storage: lhs.storage / rhs)
     }
     
     static func += (lhs: inout Vector2, rhs: Vector2) {
-        lhs = lhs + rhs
+        lhs.storage += rhs.storage
     }
     
     static func -= (lhs: inout Vector2, rhs: Vector2) {
-        lhs = lhs - rhs
+        lhs.storage -= rhs.storage
     }
     
     static func *= (lhs: inout Vector2, rhs: Double) {
-        lhs = lhs * rhs
+        lhs.storage *= rhs
     }
     
     static func /= (lhs: inout Vector2, rhs: Double) {
-        lhs = lhs / rhs
+        lhs.storage /= rhs
     }
     
 }
