@@ -154,7 +154,7 @@ extension Matrix3: Codable {
             throw DecodingError.dataCorrupted(
                 DecodingError.Context(
                     codingPath: container.codingPath,
-                    debugDescription: "Matrix must be 3x3"))
+                    debugDescription: "Matrix3 must be 3x3"))
         }
         self.init(
             rows[0][0], rows[0][1], rows[0][2],

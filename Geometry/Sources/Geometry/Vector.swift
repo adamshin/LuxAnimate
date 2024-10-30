@@ -134,7 +134,7 @@ extension Vector2: Codable {
             throw DecodingError.dataCorrupted(
                 DecodingError.Context(
                     codingPath: container.codingPath,
-                    debugDescription: "Vector must have 2 components"))
+                    debugDescription: "Vector2 must have 2 components"))
         }
         self.init(values[0], values[1])
     }
