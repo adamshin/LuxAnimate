@@ -4,25 +4,32 @@ import simd
 
 public typealias Vector = Vector2
 
-public struct Vector2: Sendable, Codable {
+public struct Vector2: Sendable {
     
     private var storage: simd_double2
-    
-    public var x: Double {
-        get { storage.x }
-        set { storage.x = newValue }
-    }
-    
-    public var y: Double {
-        get { storage.y }
-        set { storage.y = newValue }
-    }
     
     private init(_ storage: simd_double2) {
         self.storage = storage
     }
     
 }
+
+// MARK: - Properties
+
+public extension Vector2 {
+    
+    var x: Double {
+        get { storage.x }
+        set { storage.x = newValue }
+    }
+    var y: Double {
+        get { storage.y }
+        set { storage.y = newValue }
+    }
+    
+}
+
+// MARK: - Operations
 
 public extension Vector2 {
     
@@ -106,6 +113,30 @@ public extension Vector2 {
     
     static func /= (lhs: inout Vector2, rhs: Double) {
         lhs.storage /= rhs
+    }
+    
+}
+
+// MARK: - Codable
+
+extension Vector2: Codable {
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.unkeyedContainer()
+        try container.encode([x, y])
+    }
+    
+    public init(from decoder: Decoder) throws {
+        var container = try decoder.unkeyedContainer()
+        let values = try container.decode([Double].self)
+        
+        guard values.count == 2 else {
+            throw DecodingError.dataCorrupted(
+                DecodingError.Context(
+                    codingPath: container.codingPath,
+                    debugDescription: "Vector must have 2 components"))
+        }
+        self.init(values[0], values[1])
     }
     
 }

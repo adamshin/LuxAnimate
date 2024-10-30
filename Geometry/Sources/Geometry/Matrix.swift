@@ -2,52 +2,60 @@
 import Foundation
 import simd
 
-public struct Matrix3: Sendable, Codable {
+public struct Matrix3: Sendable {
     
     private var storage: simd_double3x3
-    
-    public var m11: Double {
-        get { storage.columns.0.x }
-        set { storage.columns.0.x = newValue }
-    }
-    public var m12: Double {
-        get { storage.columns.1.x }
-        set { storage.columns.1.x = newValue }
-    }
-    public var m13: Double {
-        get { storage.columns.2.x }
-        set { storage.columns.2.x = newValue }
-    }
-    public var m21: Double {
-        get { storage.columns.0.y }
-        set { storage.columns.0.y = newValue }
-    }
-    public var m22: Double {
-        get { storage.columns.1.y }
-        set { storage.columns.1.y = newValue }
-    }
-    public var m23: Double {
-        get { storage.columns.2.y }
-        set { storage.columns.2.y = newValue }
-    }
-    public var m31: Double {
-        get { storage.columns.0.z }
-        set { storage.columns.0.z = newValue }
-    }
-    public var m32: Double {
-        get { storage.columns.1.z }
-        set { storage.columns.1.z = newValue }
-    }
-    public var m33: Double {
-        get { storage.columns.2.z }
-        set { storage.columns.2.z = newValue }
-    }
     
     private init(_ storage: simd_double3x3) {
         self.storage = storage
     }
     
 }
+
+// MARK: - Properties
+
+public extension Matrix3 {
+    
+    var m11: Double {
+        get { storage.columns.0.x }
+        set { storage.columns.0.x = newValue }
+    }
+    var m12: Double {
+        get { storage.columns.1.x }
+        set { storage.columns.1.x = newValue }
+    }
+    var m13: Double {
+        get { storage.columns.2.x }
+        set { storage.columns.2.x = newValue }
+    }
+    var m21: Double {
+        get { storage.columns.0.y }
+        set { storage.columns.0.y = newValue }
+    }
+    var m22: Double {
+        get { storage.columns.1.y }
+        set { storage.columns.1.y = newValue }
+    }
+    var m23: Double {
+        get { storage.columns.2.y }
+        set { storage.columns.2.y = newValue }
+    }
+    var m31: Double {
+        get { storage.columns.0.z }
+        set { storage.columns.0.z = newValue }
+    }
+    var m32: Double {
+        get { storage.columns.1.z }
+        set { storage.columns.1.z = newValue }
+    }
+    var m33: Double {
+        get { storage.columns.2.z }
+        set { storage.columns.2.z = newValue }
+    }
+    
+}
+
+// MARK: - Operations
 
 public extension Matrix3 {
     
@@ -125,21 +133,33 @@ public extension Matrix3 {
 
 // MARK: - Codable
 
-extension simd_double3x3: Codable {
-    
-    public init(from decoder: Decoder) throws {
-        var container = try decoder.unkeyedContainer()
-        let c0 = try container.decode(SIMD3<Double>.self)
-        let c1 = try container.decode(SIMD3<Double>.self)
-        let c2 = try container.decode(SIMD3<Double>.self)
-        self.init(columns: (c0, c1, c2))
-    }
+extension Matrix3: Codable {
     
     public func encode(to encoder: Encoder) throws {
         var container = encoder.unkeyedContainer()
-        try container.encode(columns.0)
-        try container.encode(columns.1)
-        try container.encode(columns.2)
+        try container.encode([
+            [m11, m12, m13],
+            [m21, m22, m23],
+            [m31, m32, m33]
+        ])
+    }
+    
+    public init(from decoder: Decoder) throws {
+        var container = try decoder.unkeyedContainer()
+        let rows = try container.decode([[Double]].self)
+        
+        guard rows.count == 3,
+            rows.allSatisfy({ $0.count == 3 })
+        else {
+            throw DecodingError.dataCorrupted(
+                DecodingError.Context(
+                    codingPath: container.codingPath,
+                    debugDescription: "Matrix must be 3x3"))
+        }
+        self.init(
+            rows[0][0], rows[0][1], rows[0][2],
+            rows[1][0], rows[1][1], rows[1][2],
+            rows[2][0], rows[2][1], rows[2][2])
     }
     
 }
