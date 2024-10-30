@@ -6,7 +6,7 @@ public typealias Vector = Vector2
 
 public struct Vector2: Sendable, Codable {
     
-    private var storage: SIMD2<Double>
+    private var storage: simd_double2
     
     public var x: Double {
         get { storage.x }
@@ -18,16 +18,8 @@ public struct Vector2: Sendable, Codable {
         set { storage.y = newValue }
     }
     
-    private init(storage: SIMD2<Double>) {
+    private init(_ storage: simd_double2) {
         self.storage = storage
-    }
-    
-    public init(x: Double, y: Double) {
-        self.storage = .init(x, y)
-    }
-    
-    public init(_ x: Double, _ y: Double) {
-        self.storage = .init(x, y)
     }
     
 }
@@ -36,9 +28,15 @@ public extension Vector2 {
     
     static let zero = Vector2(0, 0)
     
-    var inverse: Vector2 {
-        -self
+    init(x: Double, y: Double) {
+        self.storage = .init(x, y)
     }
+    
+    init(_ x: Double, _ y: Double) {
+        self.storage = .init(x, y)
+    }
+    
+    var inverse: Vector2 { -self }
     
     var perpendicularClockwise: Vector2 {
         Vector2(y, -x)
@@ -57,7 +55,7 @@ public extension Vector2 {
     }
     
     func normalized() -> Vector2 {
-        Vector2(storage: simd_normalize(storage))
+        Vector2(simd_normalize(storage))
     }
     
     func rotated(by a: Double) -> Vector2 {
@@ -71,27 +69,27 @@ public extension Vector2 {
     }
     
     static prefix func - (v: Vector2) -> Vector2 {
-        Vector2(storage: -v.storage)
+        Vector2(-v.storage)
     }
     
     static func + (lhs: Vector2, rhs: Vector2) -> Vector2 {
-        Vector2(storage: lhs.storage + rhs.storage)
+        Vector2(lhs.storage + rhs.storage)
     }
     
     static func - (lhs: Vector2, rhs: Vector2) -> Vector2 {
-        Vector2(storage: lhs.storage - rhs.storage)
+        Vector2(lhs.storage - rhs.storage)
     }
     
     static func * (lhs: Vector2, rhs: Double) -> Vector2 {
-        Vector2(storage: lhs.storage * rhs)
+        Vector2(lhs.storage * rhs)
     }
     
     static func * (lhs: Double, rhs: Vector2) -> Vector2 {
-        Vector2(storage: lhs * rhs.storage)
+        Vector2(lhs * rhs.storage)
     }
     
     static func / (lhs: Vector2, rhs: Double) -> Vector2 {
-        Vector2(storage: lhs.storage / rhs)
+        Vector2(lhs.storage / rhs)
     }
     
     static func += (lhs: inout Vector2, rhs: Vector2) {
