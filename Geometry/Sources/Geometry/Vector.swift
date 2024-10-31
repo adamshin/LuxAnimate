@@ -49,12 +49,12 @@ public extension Vector2 {
         Vector2(y, -x)
     }
     
-    func lengthSquared() -> Double {
-        simd_length_squared(storage)
-    }
-    
     func length() -> Double {
         simd_length(storage)
+    }
+    
+    func lengthSquared() -> Double {
+        simd_length_squared(storage)
     }
     
     func dot(_ v: Vector2) -> Double {
@@ -66,7 +66,12 @@ public extension Vector2 {
     }
     
     func rotated(by a: Double) -> Vector2 {
-        return Matrix3(rotation: a) * self
+        Matrix3(rotation: a) * self
+    }
+    
+    func rotated(by c: Complex) -> Vector2 {
+        let v = c * Complex(x, y)
+        return Vector2(v.x, v.y)
     }
     
     func angle(to v: Vector2) -> Double {
