@@ -113,7 +113,22 @@ struct StrokeSampleGenerator {
             minStampSize)
         
         // Stamp rotation
-        let stampRotation = sample.azimuth + sample.roll
+        let azimuth: Complex
+        if sample.azimuth.isZero {
+            azimuth = .i
+        } else {
+            azimuth = sample.azimuth
+        }
+        
+        let roll: Complex
+        if sample.roll.isZero {
+            roll = .one
+        } else {
+            roll = sample.roll
+        }
+        
+        let r = azimuth * roll
+        let stampRotation = r.normalized()
         
         // Stamp offset
         let offsetX = offsetXWobble

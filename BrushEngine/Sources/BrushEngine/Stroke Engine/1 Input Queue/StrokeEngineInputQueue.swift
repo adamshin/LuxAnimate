@@ -1,5 +1,6 @@
 
 import Foundation
+import Geometry
 
 struct StrokeEngineInputQueue {
     
@@ -26,10 +27,10 @@ struct StrokeEngineInputQueue {
         
         if finalizationOverflow > 0 {
             for i in 0 ..< finalizationOverflow {
-                samples[i].isPressureEstimated = false
-                samples[i].isAltitudeEstimated = false
-                samples[i].isAzimuthEstimated = false
-                samples[i].isRollEstimated = false
+                samples[i].estimationFlags.pressure = false
+                samples[i].estimationFlags.altitude = false
+                samples[i].estimationFlags.azimuth = false
+                samples[i].estimationFlags.roll = false
             }
         }
         
@@ -63,7 +64,7 @@ struct StrokeEngineInputQueue {
         if let s = samples.first {
             samples.removeFirst()
             
-            if s.hasEstimatedValues {
+            if s.estimationFlags.hasEstimatedValues {
                 isOutputFinalized = false
             }
             
@@ -98,13 +99,16 @@ struct StrokeEngineInputQueue {
         inputSample s: InputSample
     ) -> Sample {
         
-        Sample(
+        let azimuth = Complex(s.azimuth.x, s.azimuth.y)
+        let roll = Complex(length: 1, phase: s.roll)
+        
+        return Sample(
             time: s.time,
             position: s.position,
             pressure: s.pressure,
             altitude: s.altitude,
-            azimuth: s.azimuth,
-            roll: s.roll)
+            azimuth: azimuth,
+            roll: roll)
     }
     
     private static func applySampleUpdate(
@@ -115,28 +119,28 @@ struct StrokeEngineInputQueue {
         var s = s
         
         if let pressure = u.pressure,
-            s.isPressureEstimated
+            s.estimationFlags.pressure
         {
             s.pressure = pressure
-            s.isPressureEstimated = false
+            s.estimationFlags.pressure = false
         }
         if let altitude = u.altitude,
-            s.isAltitudeEstimated
+            s.estimationFlags.altitude
         {
             s.altitude = altitude
-            s.isAltitudeEstimated = false
+            s.estimationFlags.altitude = false
         }
         if let azimuth = u.azimuth,
-            s.isAzimuthEstimated
+            s.estimationFlags.azimuth
         {
             s.azimuth = azimuth
-            s.isAzimuthEstimated = false
+            s.estimationFlags.azimuth = false
         }
         if let roll = u.roll,
-            s.isRollEstimated
+            s.estimationFlags.roll
         {
             s.roll = roll
-            s.isRollEstimated = false
+            s.estimationFlags.roll = false
         }
         
         return s

@@ -28,6 +28,10 @@ public extension Vector2 {
         self.init(x: p.x, y: p.y)
     }
     
+    init(_ v: CGVector) {
+        self.init(x: v.dx, y: v.dy)
+    }
+    
     var description: String {
         String(format: "(x: %0.3f, y: %0.3f)", x, y)
     }

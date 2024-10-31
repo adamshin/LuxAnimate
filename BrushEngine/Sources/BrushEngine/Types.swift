@@ -18,20 +18,10 @@ public struct InputSample {
     
     public var pressure: Double
     public var altitude: Double
-    public var azimuth: Double
+    public var azimuth: Vector
     public var roll: Double
     
-    public var isPressureEstimated: Bool
-    public var isAltitudeEstimated: Bool
-    public var isAzimuthEstimated: Bool
-    public var isRollEstimated: Bool
-    
-    public var hasEstimatedValues: Bool {
-        isPressureEstimated ||
-        isAltitudeEstimated ||
-        isAzimuthEstimated ||
-        isRollEstimated
-    }
+    public var estimationFlags: InputSampleEstimationFlags
     
     public init(
         updateID: Int?,
@@ -39,12 +29,9 @@ public struct InputSample {
         position: Vector,
         pressure: Double,
         altitude: Double,
-        azimuth: Double,
+        azimuth: Vector,
         roll: Double,
-        isPressureEstimated: Bool,
-        isAltitudeEstimated: Bool,
-        isAzimuthEstimated: Bool,
-        isRollEstimated: Bool
+        estimationFlags: InputSampleEstimationFlags
     ) {
         self.updateID = updateID
         self.time = time
@@ -53,12 +40,35 @@ public struct InputSample {
         self.altitude = altitude
         self.azimuth = azimuth
         self.roll = roll
-        self.isPressureEstimated = isPressureEstimated
-        self.isAltitudeEstimated = isAltitudeEstimated
-        self.isAzimuthEstimated = isAzimuthEstimated
-        self.isRollEstimated = isRollEstimated
+        self.estimationFlags = estimationFlags
     }
     
+}
+
+public struct InputSampleEstimationFlags {
+    public var pressure: Bool
+    public var altitude: Bool
+    public var azimuth: Bool
+    public var roll: Bool
+    
+    public init(
+        pressure: Bool,
+        altitude: Bool,
+        azimuth: Bool,
+        roll: Bool
+    ) {
+        self.pressure = pressure
+        self.altitude = altitude
+        self.azimuth = azimuth
+        self.roll = roll
+    }
+    
+    public var hasEstimatedValues: Bool {
+        pressure ||
+        altitude ||
+        azimuth ||
+        roll
+    }
 }
 
 public struct InputSampleUpdate {
@@ -66,14 +76,14 @@ public struct InputSampleUpdate {
     public var updateID: Int
     public var pressure: Double?
     public var altitude: Double?
-    public var azimuth: Double?
+    public var azimuth: Vector?
     public var roll: Double?
     
     public init(
         updateID: Int,
         pressure: Double?,
         altitude: Double?,
-        azimuth: Double?,
+        azimuth: Vector?,
         roll: Double?
     ) {
         self.updateID = updateID
@@ -93,8 +103,8 @@ struct Sample {
     var position: Vector
     var pressure: Double
     var altitude: Double
-    var azimuth: Double
-    var roll: Double
+    var azimuth: Complex
+    var roll: Complex
     
 }
 
@@ -105,15 +115,12 @@ struct StrokeSample {
     
     var stampOffset: Vector
     var stampSize: Double
-    var stampRotation: Double
+    var stampRotation: Complex
     var stampAlpha: Double
     
 }
 
 // MARK: - Interpolation
-
-// TODO: Interpolate angular values correctly!
-// (azimuth, roll)
 
 extension Sample: Interpolatable {
     
@@ -123,8 +130,8 @@ extension Sample: Interpolatable {
             position: .zero,
             pressure: 0,
             altitude: 0,
-            azimuth: 0,
-            roll: 0)
+            azimuth: .zero,
+            roll: .zero)
     }
     
     mutating func combine(
@@ -149,7 +156,7 @@ extension StrokeSample: Interpolatable {
             strokeDistance: 0,
             stampOffset: .zero,
             stampSize: 0,
-            stampRotation: 0,
+            stampRotation: .zero,
             stampAlpha: 0)
     }
     

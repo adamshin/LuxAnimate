@@ -3,12 +3,12 @@
 //
 
 import UIKit
+import CoreGraphics
 
 // MARK: - Sample
 
 extension BrushGestureRecognizer {
     
-    @MainActor
     struct Sample {
         var time: TimeInterval
         var updateID: Int?
@@ -19,13 +19,17 @@ extension BrushGestureRecognizer {
         
         var force: Double
         var altitude: Double
-        var azimuth: Double
+        var azimuth: CGVector
         var roll: Double
         
-        var isForceEstimated: Bool
-        var isAltitudeEstimated: Bool
-        var isAzimuthEstimated: Bool
-        var isRollEstimated: Bool
+        var estimationFlags: SampleEstimationFlags
+    }
+    
+    struct SampleEstimationFlags {
+        var force: Bool
+        var altitude: Bool
+        var azimuth: Bool
+        var roll: Bool
     }
     
     struct SampleUpdate {
@@ -35,7 +39,7 @@ extension BrushGestureRecognizer {
         
         var force: Double?
         var altitude: Double?
-        var azimuth: Double?
+        var azimuth: CGVector?
         var roll: Double?
     }
     
@@ -88,6 +92,19 @@ extension BrushGestureRecognizer {
         let time = touch.timestamp - startTimestamp
         let updateID = touch.estimationUpdateIndex?.intValue
         
+        let forceEstimated = touch
+            .estimatedPropertiesExpectingUpdates
+            .contains(.force)
+        let altitudeEstimated = touch
+            .estimatedPropertiesExpectingUpdates
+            .contains(.altitude)
+        let azimuthEstimated = touch
+            .estimatedPropertiesExpectingUpdates
+            .contains(.azimuth)
+        let rollEstimated = touch
+            .estimatedPropertiesExpectingUpdates
+            .contains(.roll)
+        
         return BrushGestureRecognizer.Sample(
             time: time,
             updateID: updateID,
@@ -95,20 +112,13 @@ extension BrushGestureRecognizer {
             maximumPossibleForce: touch.maximumPossibleForce,
             force: touch.force,
             altitude: touch.altitudeAngle,
-            azimuth: touch.azimuthAngle(in: view),
+            azimuth: touch.azimuthUnitVector(in: view),
             roll: touch.rollAngle,
-            isForceEstimated: touch
-                .estimatedPropertiesExpectingUpdates
-                .contains(.force),
-            isAltitudeEstimated: touch
-                .estimatedPropertiesExpectingUpdates
-                .contains(.altitude),
-            isAzimuthEstimated: touch
-                .estimatedPropertiesExpectingUpdates
-                .contains(.azimuth),
-            isRollEstimated: touch
-                .estimatedPropertiesExpectingUpdates
-                .contains(.roll))
+            estimationFlags: .init(
+                force: forceEstimated,
+                altitude: altitudeEstimated,
+                azimuth: azimuthEstimated,
+                roll: rollEstimated))
     }
     
     static func extractSampleUpdates(
@@ -116,7 +126,7 @@ extension BrushGestureRecognizer {
         view: UIView?
     ) -> [SampleUpdate] {
         
-        return touches.compactMap { touch in
+        return touches.compactMap { touch -> SampleUpdate? in
             guard let updateID =
                 touch.estimationUpdateIndex?.intValue
             else { return nil }
@@ -125,22 +135,27 @@ extension BrushGestureRecognizer {
                 updateID: updateID,
                 maximumPossibleForce: touch.maximumPossibleForce)
             
-            if !touch.estimatedPropertiesExpectingUpdates
+            if !touch
+                .estimatedPropertiesExpectingUpdates
                 .contains(.force)
             {
                 sampleUpdate.force = touch.force
             }
-            if !touch.estimatedPropertiesExpectingUpdates
+            if !touch
+                .estimatedPropertiesExpectingUpdates
                 .contains(.altitude)
             {
                 sampleUpdate.altitude = touch.altitudeAngle
             }
-            if !touch.estimatedPropertiesExpectingUpdates
+            if !touch
+                .estimatedPropertiesExpectingUpdates
                 .contains(.azimuth)
             {
-                sampleUpdate.azimuth = touch.azimuthAngle(in: view)
+                sampleUpdate.azimuth = touch
+                    .azimuthUnitVector(in: view)
             }
-            if !touch.estimatedPropertiesExpectingUpdates
+            if !touch
+                .estimatedPropertiesExpectingUpdates
                 .contains(.roll)
             {
                 sampleUpdate.roll = touch.rollAngle

@@ -36,18 +36,21 @@ struct AnimEditorBrushSampleAdapter {
             force: s.force,
             maxForce: s.maximumPossibleForce)
         
+        let azimuth = Vector(s.azimuth)
+        
         return BrushEngine.InputSample(
             updateID: s.updateID,
             time: s.time,
             position: position,
             pressure: pressure,
             altitude: s.altitude,
-            azimuth: s.azimuth,
+            azimuth: azimuth,
             roll: s.roll,
-            isPressureEstimated: s.isForceEstimated,
-            isAltitudeEstimated: s.isAltitudeEstimated,
-            isAzimuthEstimated: s.isAzimuthEstimated,
-            isRollEstimated: s.isRollEstimated)
+            estimationFlags: .init(
+                pressure: s.estimationFlags.force,
+                altitude: s.estimationFlags.altitude,
+                azimuth: s.estimationFlags.azimuth,
+                roll: s.estimationFlags.roll))
     }
     
     func convert(
@@ -60,11 +63,13 @@ struct AnimEditorBrushSampleAdapter {
                 maxForce: s.maximumPossibleForce)
         }
         
+        let azimuth = s.azimuth.map { Vector($0) }
+        
         return BrushEngine.InputSampleUpdate(
             updateID: s.updateID,
             pressure: pressure,
             altitude: s.altitude,
-            azimuth: s.azimuth,
+            azimuth: azimuth,
             roll: s.roll)
     }
     

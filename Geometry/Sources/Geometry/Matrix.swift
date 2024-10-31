@@ -89,6 +89,13 @@ public extension Matrix3 {
             0, 0, 1)
     }
     
+    init(rotation c: Complex) {
+        self.init(
+            c.x, -c.y, 0,
+            c.y, c.x, 0,
+            0, 0, 1)
+    }
+    
     init(scale s: Vector2) {
         self.init(
             s.x, 0, 0,
