@@ -21,11 +21,7 @@ struct StrokeStampGenerator {
         if s.stampRotation.isZero {
             rotation = .one
         } else {
-            // Normalize and add 90 degs counterclockwise.
-            // This points the top of the stamp image
-            // towards the tip of the pencil.
-            let n = s.stampRotation.normalized()
-            rotation = n * -.i
+            rotation = s.stampRotation.normalized()
         }
         
         let paddingScale: Double =
