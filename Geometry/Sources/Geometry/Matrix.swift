@@ -148,7 +148,8 @@ extension Matrix3: Codable {
         var container = try decoder.unkeyedContainer()
         let rows = try container.decode([[Double]].self)
         
-        guard rows.count == 3,
+        guard
+            rows.count == 3,
             rows.allSatisfy({ $0.count == 3 })
         else {
             throw DecodingError.dataCorrupted(

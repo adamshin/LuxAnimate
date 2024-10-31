@@ -123,20 +123,15 @@ extension Vector2: Codable {
     
     public func encode(to encoder: Encoder) throws {
         var container = encoder.unkeyedContainer()
-        try container.encode([x, y])
+        try container.encode(x)
+        try container.encode(y)
     }
     
     public init(from decoder: Decoder) throws {
         var container = try decoder.unkeyedContainer()
-        let values = try container.decode([Double].self)
-        
-        guard values.count == 2 else {
-            throw DecodingError.dataCorrupted(
-                DecodingError.Context(
-                    codingPath: container.codingPath,
-                    debugDescription: "Vector2 must have 2 components"))
-        }
-        self.init(values[0], values[1])
+        let x = try container.decode(Double.self)
+        let y = try container.decode(Double.self)
+        self.init(x, y)
     }
     
 }
