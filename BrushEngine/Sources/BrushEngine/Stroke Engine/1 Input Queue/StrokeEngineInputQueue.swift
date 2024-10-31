@@ -100,7 +100,7 @@ struct StrokeEngineInputQueue {
     ) -> Sample {
         
         let azimuth = Complex(s.azimuth.x, s.azimuth.y)
-        let roll = Complex(length: 1, phase: s.roll)
+        let roll = Complex(length: 1, phase: -s.roll)
         
         return Sample(
             time: s.time,
