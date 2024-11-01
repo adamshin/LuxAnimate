@@ -28,10 +28,12 @@ struct StrokeStampGenerator {
             s.stampSize < paddingSizeThreshold ?
             3 : 1
         
+        let transform = Matrix3(rotation: rotation)
+        
         let sprite = SpriteRenderer.Sprite(
             position: position,
             size: size,
-            rotation: rotation,
+            transform: transform,
             color: color,
             alpha: s.stampAlpha,
             paddingScale: paddingScale)

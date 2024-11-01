@@ -61,29 +61,6 @@ extension SpriteRenderer {
             t = Matrix3(rotation: rotation) * t
             transform = t
         }
-        
-        public init(
-            position: Vector,
-            size: Size,
-            anchor: Vector = .init(0.5, 0.5),
-            rotation: Complex,
-            scale: Double = 1,
-            color: Color = .white,
-            alpha: Double = 1,
-            paddingScale: Double = 1
-        ) {
-            self.position = position
-            self.size = size
-            self.anchor = anchor
-            self.color = color
-            self.alpha = alpha
-            self.paddingScale = paddingScale
-            
-            var t = Matrix3.identity
-            t = Matrix3(scale: .init(scale, scale)) * t
-            t = Matrix3(rotation: rotation) * t
-            transform = t
-        }
     }
     
 }
