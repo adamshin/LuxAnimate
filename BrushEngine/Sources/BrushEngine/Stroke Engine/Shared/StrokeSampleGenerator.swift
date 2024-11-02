@@ -32,6 +32,8 @@ struct StrokeSampleGenerator {
     private let offsetXWobbleGenerator: PerlinNoiseGenerator
     private let offsetYWobbleGenerator: PerlinNoiseGenerator
     
+    // MARK: - Init
+    
     init(
         brush: Brush,
         scale: Double,
@@ -62,6 +64,8 @@ struct StrokeSampleGenerator {
             persistence: wobblePersistence)
     }
     
+    // MARK: - Interface
+    
     func strokeSample(
         sample: Sample,
         strokeDistance: Double,
@@ -79,7 +83,9 @@ struct StrokeSampleGenerator {
         
         // Taper
         let (taperScaleFactor, isInTaperEnd) =
-            combinedTaper(
+            Self.combinedTaper(
+                brush: brush,
+                applyTaper: applyTaper,
                 sampleTime: sample.time,
                 strokeEndTime: strokeEndTime)
         
@@ -163,11 +169,16 @@ struct StrokeSampleGenerator {
             isNonFinalized: isNonFinalized)
     }
     
-    private func combinedTaper(
+    // MARK: - Taper
+    
+    private static func combinedTaper(
+        brush: Brush,
+        applyTaper: Bool,
         sampleTime: TimeInterval,
         strokeEndTime: TimeInterval
     ) -> (Double, Bool) {
         
+        let roundness = brush.configuration.taperRoundness
         let taperTime: TimeInterval
         
         if !applyTaper {
@@ -192,14 +203,16 @@ struct StrokeSampleGenerator {
         
         if normalizedDistanceToStart < 1 {
             taperStartScale = taperScale(
-                for: normalizedDistanceToStart)
+                roundness: roundness,
+                distance: normalizedDistanceToStart)
         } else {
             taperStartScale = 1
         }
         
         if normalizedDistanceToEnd < 1 {
             taperEndScale = taperScale(
-                for: normalizedDistanceToEnd)
+                roundness: roundness,
+                distance: normalizedDistanceToEnd)
             isInTaperEnd = true
         } else {
             taperEndScale = 1
@@ -211,23 +224,17 @@ struct StrokeSampleGenerator {
         return (taperScale, isInTaperEnd)
     }
     
-    private func taperScale(
-        for normalizedDistance: Double
+    private static func taperScale(
+        roundness: Double,
+        distance: Double
     ) -> Double {
-        let x = 1 - clamp(
-            normalizedDistance,
-            min: 0, max: 1)
+        let d = clamp(distance, min: 0, max: 1)
+        let x = 1 - d
         
-        let s1 = 1 - x * x
-        let s2 = sqrt(s1)
+        let r = clamp(roundness, min: 0, max: 1)
+        let n = map(r, in: (0, 1), to: (1, 0.3))
         
-        let c2 = clamp(
-            brush.configuration.taperRoundness,
-            min: 0, max: 1)
-        
-        let c1 = 1 - c2
-        
-        return s1 * c1 + s2 * c2
+        return pow(1 - x*x, n)
     }
     
 }
