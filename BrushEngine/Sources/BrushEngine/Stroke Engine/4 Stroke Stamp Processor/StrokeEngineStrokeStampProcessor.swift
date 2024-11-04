@@ -15,6 +15,7 @@ struct StrokeEngineStrokeStampProcessor {
     struct State {
         var nextCursorStrokeDistance: Double = 0
         var lastSample: StrokeSample?
+        var stampGenerator = StrokeStampGenerator()
     }
     
     private let config: Config
@@ -137,8 +138,9 @@ struct StrokeEngineStrokeStampProcessor {
         state: inout State,
         output: inout [SpriteRenderer.Sprite]
     ) {
-        StrokeStampGenerator.generate(
+        state.stampGenerator.generate(
             sample: cursorSample,
+            brush: config.brush,
             color: config.color,
             output: &output)
         

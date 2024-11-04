@@ -11,6 +11,9 @@ extension Brush {
         public var stampSpacing: Double
         public var stampAlpha: Double
         
+        public var stampCount: Int
+        public var stampPositionJitter: Double
+        
         public var pressureScaling: Double
         
         public var taperLength: Double
@@ -25,10 +28,16 @@ extension Brush {
         
         public init(
             stampTextureName: String,
-            stampSize: Double, stampSpacing: Double,
-            stampAlpha: Double, pressureScaling: Double,
-            taperLength: Double, taperRoundness: Double,
-            sizeWobble: Double, offsetWobble: Double,
+            stampSize: Double,
+            stampSpacing: Double,
+            stampAlpha: Double,
+            stampCount: Int = 1,
+            stampPositionJitter: Double = 0,
+            pressureScaling: Double,
+            taperLength: Double,
+            taperRoundness: Double,
+            sizeWobble: Double,
+            offsetWobble: Double,
             wobbleFrequency: Double,
             wobblePressureAttenuation: Double,
             baseSmoothing: Double
@@ -37,6 +46,8 @@ extension Brush {
             self.stampSize = stampSize
             self.stampSpacing = stampSpacing
             self.stampAlpha = stampAlpha
+            self.stampCount = stampCount
+            self.stampPositionJitter = stampPositionJitter
             self.pressureScaling = pressureScaling
             self.taperLength = taperLength
             self.taperRoundness = taperRoundness
