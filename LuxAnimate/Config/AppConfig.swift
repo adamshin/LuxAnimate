@@ -23,11 +23,11 @@ struct AppConfig {
     
     static let pencilBrushConfig = Brush.Configuration(
         stampTextureName: "brush1.png",
-        stampSize: 50,
-        stampSpacing: 0,//0.25,
+        stampSize: 200,
+        stampSpacing: 0,
         stampAlpha: 0.1,
         stampCount: 16,
-        stampPositionJitter: 5.0,
+        stampPositionJitter: 0.5,
         pressureScaling: 0,
         taperLength: 0,
         taperRoundness: 0,

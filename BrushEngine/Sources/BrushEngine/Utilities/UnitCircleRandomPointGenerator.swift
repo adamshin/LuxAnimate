@@ -6,21 +6,21 @@ struct UnitCircleRandomPointGenerator {
     
     private let polarConverter = PolarApproximateConverter()
     
+    private let angleRange: Range<Double> = 0 ..< .twoPi
+    private let distanceRange: Range<Double> = 0 ..< 1
+    
     func point<T>(
         using generator: inout T
     ) -> Vector2 where T: RandomNumberGenerator {
         
         let angle = Double.random(
-            in: 0 ..< .twoPi,
-            using: &generator)
+            in: angleRange, using: &generator)
         
         let distance = Double.random(
-            in: 0 ..< 1,
-            using: &generator)
+            in: distanceRange, using: &generator)
         
         return polarConverter.point(
-            angle: angle,
-            distance: distance)
+            angle: angle, distance: distance)
     }
     
 }

@@ -48,11 +48,9 @@ struct StrokeStampGenerator {
         for _ in 0 ..< stampCount {
             var position = position
             
-            let positionJitter = Self.positionJitter(
+            let positionJitter = positionJitter(
                 brush: brush,
-                stampSize: s.stampSize,
-                unitCircleRandomPointGenerator: unitCircleRandomPointGenerator,
-                rng: &rng)
+                stampSize: s.stampSize)
             
             position += positionJitter
             
@@ -74,11 +72,9 @@ struct StrokeStampGenerator {
         }
     }
     
-    private static func positionJitter(
+    private mutating func positionJitter(
         brush: Brush,
-        stampSize: Double,
-        unitCircleRandomPointGenerator: UnitCircleRandomPointGenerator,
-        rng: inout SplitMixRandomNumberGenerator
+        stampSize: Double
     ) -> Vector {
         
         let point = unitCircleRandomPointGenerator
