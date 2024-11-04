@@ -11,7 +11,18 @@ private let paddingSizeThreshold: Double = 20
 
 struct StrokeStampGenerator {
     
-    private var jitterGenerator = JitterGenerator()
+    private let unitCircleRandomPointGenerator
+        = UnitCircleRandomPointGenerator()
+    
+    private var rng: SplitMixRandomNumberGenerator
+    
+    init() {
+        let seed = UInt64.random(
+            in: UInt64.min ... UInt64.max)
+        
+        rng = SplitMixRandomNumberGenerator(
+            seed: seed)
+    }
     
     mutating func generate(
         sample s: StrokeSample,
@@ -40,7 +51,8 @@ struct StrokeStampGenerator {
             let positionJitter = Self.positionJitter(
                 brush: brush,
                 stampSize: s.stampSize,
-                jitterGenerator: &jitterGenerator)
+                unitCircleRandomPointGenerator: unitCircleRandomPointGenerator,
+                rng: &rng)
             
             position += positionJitter
             
@@ -65,17 +77,16 @@ struct StrokeStampGenerator {
     private static func positionJitter(
         brush: Brush,
         stampSize: Double,
-        jitterGenerator: inout JitterGenerator
+        unitCircleRandomPointGenerator: UnitCircleRandomPointGenerator,
+        rng: inout SplitMixRandomNumberGenerator
     ) -> Vector {
         
-        let distance = jitterGenerator.next()
+        let point = unitCircleRandomPointGenerator
+            .point(using: &rng)
+        
+        return point
             * brush.configuration.stampPositionJitter
             * stampSize
-        
-        let angle = jitterGenerator.next()
-            * .twoPi
-        
-        return Vector(distance, 0).rotated(by: angle)
     }
     
 }
