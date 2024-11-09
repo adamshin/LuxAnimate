@@ -1,6 +1,6 @@
 
 #include <metal_stdlib>
-#include "../../ShaderTypes/include/ShaderTypes.h"
+#include "../../ShaderTypes/ShaderTypes.h"
 
 using namespace metal;
 
@@ -172,4 +172,88 @@ fragment float4 spriteFragmentShader(
     color.a *= in.alpha;
     
     return blend(color, dst, uniforms.blendMode);
+}
+
+// MARK: - Brush Stamp
+
+struct BrushStampVertexOutput {
+    float4 position [[position]];
+    float2 texCoord;
+    float4 color;
+    float alpha;
+};
+
+vertex BrushStampVertexOutput brushStampVertexShader(
+                                             
+    uint vertexID
+        [[vertex_id]],
+                                             
+    constant BrushStampVertex *vertices
+        [[buffer(BrushStampVertexBufferIndexVertices)]],
+                                             
+    constant BrushStampVertexUniforms& uniforms
+        [[buffer(BrushStampVertexBufferIndexUniforms)]]
+) {
+    BrushStampVertex in = vertices[vertexID];
+    BrushStampVertexOutput out;
+    
+    float2 clipSpacePosition = viewportToClipSpace(
+        in.position,
+        uniforms.viewportSize);
+    
+    out.position = float4(clipSpacePosition, 0.0, 1.0);
+    out.texCoord = in.texCoord;
+    out.color = in.color;
+    out.alpha = in.alpha;
+    
+    return out;
+}
+
+fragment float4 brushStampFragmentShader(
+                                     
+    BrushStampVertexOutput in
+        [[stage_in]],
+                                     
+    texture2d<float> shapeTexture
+        [[texture(0)]],
+                                         
+    texture2d<float> textureTexture
+        [[texture(1)]],
+                                     
+    constant BrushStampFragmentUniforms& uniforms
+        [[buffer(BrushStampFragmentBufferIndexUniforms)]],
+    
+    float4 dst
+        [[color(0)]])
+{
+    sampler shapeSampler = sampler(
+        address::clamp_to_edge,
+        mag_filter::linear,
+        min_filter::linear,
+        mip_filter::linear
+    );
+    sampler textureSampler = sampler(
+        address::repeat,
+        mag_filter::linear,
+        min_filter::linear,
+        mip_filter::linear
+    );
+    
+    // TODO: Pass texture scale in uniforms?
+//    float2 pixelCoords = in.position.xy;
+//    pixelCoords.x /= uniforms.viewportSize.x;
+//    pixelCoords.y /= uniforms.viewportSize.y;
+    
+    float4 shapeColor = shapeTexture.sample(shapeSampler, in.texCoord);
+    float4 textureColor = textureTexture.sample(textureSampler, in.position.xy / 400);
+    
+    // TODO: Compute alpha through different method (height?)
+    float alpha = shapeColor.r * textureColor.r;
+//    float alpha = shapeColor.r;
+    
+    float4 color = in.color;
+    color.a *= alpha;
+    color.a *= in.alpha;
+    
+    return blend(color, dst, ShaderBlendModeNormal);
 }

@@ -79,3 +79,28 @@ extension SpriteVertex {
     }
     
 }
+
+extension BrushStampVertex {
+    
+    init(
+        position: Vector,
+        texCoord: Vector,
+        color: Color,
+        alpha: Double
+    ) {
+        self.init(
+            position: .init(
+                x: Float(position.x),
+                y: Float(position.y)),
+            texCoord: .init(
+                x: Float(texCoord.x),
+                y: Float(texCoord.y)),
+            color: .init(
+                Float(color.r) / 255,
+                Float(color.g) / 255,
+                Float(color.b) / 255,
+                Float(color.a) / 255),
+            alpha: Float(alpha))
+    }
+    
+}

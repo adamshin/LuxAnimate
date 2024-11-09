@@ -38,7 +38,7 @@ struct StrokeEngineStrokeStampProcessor {
         input: StrokeEngine.StrokeSampleProcessorOutput
     ) -> StrokeEngine.StrokeStampProcessorOutput {
         
-        var output: [SpriteRenderer.Sprite] = []
+        var output: [BrushStampRenderer.Sprite] = []
         
         for sample in input.strokeSamples {
             Self.processStrokeSample(
@@ -60,7 +60,7 @@ struct StrokeEngineStrokeStampProcessor {
         sample: StrokeSample,
         config: Config,
         state: inout State,
-        output: inout [SpriteRenderer.Sprite]
+        output: inout [BrushStampRenderer.Sprite]
     ) {
         if let lastSample = state.lastSample {
             processStrokeSegment(
@@ -85,7 +85,7 @@ struct StrokeEngineStrokeStampProcessor {
         endSample: StrokeSample,
         config: Config,
         state: inout State,
-        output: inout [SpriteRenderer.Sprite]
+        output: inout [BrushStampRenderer.Sprite]
     ) {
         let startStrokeDist = startSample.strokeDistance
         let endStrokeDist = endSample.strokeDistance
@@ -123,7 +123,7 @@ struct StrokeEngineStrokeStampProcessor {
         sample: StrokeSample,
         config: Config,
         state: inout State,
-        output: inout [SpriteRenderer.Sprite]
+        output: inout [BrushStampRenderer.Sprite]
     ) {
         createStamps(
             cursorSample: sample,
@@ -136,7 +136,7 @@ struct StrokeEngineStrokeStampProcessor {
         cursorSample: StrokeSample,
         config: Config,
         state: inout State,
-        output: inout [SpriteRenderer.Sprite]
+        output: inout [BrushStampRenderer.Sprite]
     ) {
         state.stampGenerator.generate(
             sample: cursorSample,

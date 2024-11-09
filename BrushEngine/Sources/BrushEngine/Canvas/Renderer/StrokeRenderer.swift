@@ -9,7 +9,7 @@ class StrokeRenderer {
     private let canvasHeight: Int
     private let commandQueue: MTLCommandQueue
     
-    private let spriteRenderer: SpriteRenderer
+    private let stampRenderer: BrushStampRenderer
     private let textureBlitter: TextureBlitter
     
     let finalizedStrokeTexture: MTLTexture
@@ -29,7 +29,7 @@ class StrokeRenderer {
         self.canvasHeight = canvasHeight
         self.commandQueue = commandQueue
         
-        spriteRenderer = SpriteRenderer(
+        stampRenderer = BrushStampRenderer(
             pixelFormat: pixelFormat,
             metalDevice: metalDevice)
         
@@ -61,17 +61,18 @@ class StrokeRenderer {
     func drawStamps(
         target: MTLTexture,
         viewportSize: Size,
-        sprites: [SpriteRenderer.Sprite],
+        sprites: [BrushStampRenderer.Sprite],
         brush: Brush
     ) {
         let commandBuffer = commandQueue
             .makeCommandBuffer()!
         
-        spriteRenderer.drawSprites(
+        stampRenderer.drawSprites(
             commandBuffer: commandBuffer,
             target: target,
             viewportSize: viewportSize,
-            texture: brush.stampTexture,
+            shapeTexture: brush.shapeTexture,
+            textureTexture: brush.textureTexture,
             sprites: sprites,
             blendMode: .normal,
             sampleMode: .linearClampEdgeToBlack,

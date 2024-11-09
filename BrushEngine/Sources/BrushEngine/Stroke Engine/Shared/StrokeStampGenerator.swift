@@ -28,7 +28,7 @@ struct StrokeStampGenerator {
         sample s: StrokeSample,
         brush: Brush,
         color: Color,
-        output: inout [SpriteRenderer.Sprite]
+        output: inout [BrushStampRenderer.Sprite]
     ) {
         let position = s.position + s.stampOffset
         let size = Size(s.stampSize, s.stampSize)
@@ -60,7 +60,7 @@ struct StrokeStampGenerator {
             
             let transform = Matrix3(rotation: rotation)
             
-            let sprite = SpriteRenderer.Sprite(
+            let sprite = BrushStampRenderer.Sprite(
                 position: position,
                 size: size,
                 transform: transform,

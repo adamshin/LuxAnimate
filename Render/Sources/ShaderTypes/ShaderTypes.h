@@ -61,4 +61,38 @@ typedef struct
     float alpha;
 } SpriteVertex;
 
+// MARK: - Brush Stamp
+
+typedef enum
+{
+    BrushStampVertexBufferIndexVertices = 0,
+    BrushStampVertexBufferIndexUniforms = 1,
+} BrushStampVertexBufferIndex;
+
+typedef enum
+{
+    BrushStampFragmentBufferIndexUniforms = 0,
+} BrushStampFragmentBufferIndex;
+
+typedef struct
+{
+    simd_float2 viewportSize;
+} BrushStampVertexUniforms;
+
+typedef struct
+{
+//    ShaderBlendMode blendMode;
+//    ShaderSampleMode sampleMode;
+//    ShaderColorMode colorMode;
+    simd_float2 viewportSize;
+} BrushStampFragmentUniforms;
+
+typedef struct
+{
+    simd_float2 position;
+    simd_float2 texCoord;
+    simd_float4 color;
+    float alpha;
+} BrushStampVertex;
+
 #endif

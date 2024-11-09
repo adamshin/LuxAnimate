@@ -6,7 +6,7 @@ import Render
 extension StrokeEngineState {
     
     struct StepOutput {
-        var stampSprites: [SpriteRenderer.Sprite]
+        var stampSprites: [BrushStampRenderer.Sprite]
         var isStrokeEnd: Bool
         var isFinalized: Bool
     }

@@ -19,15 +19,15 @@ extension StrokeEngine {
     }
     
     struct StrokeStampProcessorOutput {
-        var stampSprites: [SpriteRenderer.Sprite]
+        var stampSprites: [BrushStampRenderer.Sprite]
         var isStrokeEnd: Bool
         var isFinalized: Bool
     }
     
     struct Output {
         var brush: Brush
-        var finalizedStampSprites: [SpriteRenderer.Sprite]
-        var nonFinalizedStampSprites: [SpriteRenderer.Sprite]
+        var finalizedStampSprites: [BrushStampRenderer.Sprite]
+        var nonFinalizedStampSprites: [BrushStampRenderer.Sprite]
     }
     
 }

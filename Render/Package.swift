@@ -25,6 +25,7 @@ let package = Package(
                 "ShaderTypes",
             ]),
         .target(
-            name: "ShaderTypes")
+            name: "ShaderTypes",
+            publicHeadersPath: ".")
     ]
 )

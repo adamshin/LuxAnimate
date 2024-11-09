@@ -21,13 +21,14 @@ struct AppConfig {
     
     static let paintBrushConfig = pencilBrushConfig
     
-    static let pencilBrushConfig = Brush.Configuration(
-        stampTextureName: "brush1.png",
+    static let pencilBrushConfig = BrushConfiguration(
+        shapeTextureName: "brush1.png",
+        textureTextureName: "texture1.png",
         stampSize: 200,
-        stampSpacing: 0,
-        stampAlpha: 0.1,
-        stampCount: 16,
-        stampPositionJitter: 0.5,
+        stampSpacing: 0.2,
+        stampAlpha: 0.2,
+        stampCount: 2,
+        stampPositionJitter: 0.2,
         pressureScaling: 0,
         taperLength: 0,
         taperRoundness: 0,
@@ -37,8 +38,9 @@ struct AppConfig {
         wobblePressureAttenuation: 0,
         baseSmoothing: 0)
     
-    static let testBrushConfig = Brush.Configuration(
-        stampTextureName: "brush1.png",
+    static let testBrushConfig = BrushConfiguration(
+        shapeTextureName: "brush1.png",
+        textureTextureName: nil,
         stampSize: 300,
         stampSpacing: 0,
         stampAlpha: 1,
@@ -51,8 +53,9 @@ struct AppConfig {
         wobblePressureAttenuation: 0,
         baseSmoothing: 0)
     
-    static let roundBrushConfig = Brush.Configuration(
-        stampTextureName: "brush1.png",
+    static let roundBrushConfig = BrushConfiguration(
+        shapeTextureName: "brush1.png",
+        textureTextureName: nil,
         stampSize: 200,
         stampSpacing: 0,
         stampAlpha: 1,
@@ -65,8 +68,9 @@ struct AppConfig {
         wobblePressureAttenuation: 0,
         baseSmoothing: 0)
     
-    static let taperBrushConfig = Brush.Configuration(
-        stampTextureName: "brush1.png",
+    static let taperBrushConfig = BrushConfiguration(
+        shapeTextureName: "brush1.png",
+        textureTextureName: nil,
         stampSize: 200,
         stampSpacing: 0,
         stampAlpha: 1,
@@ -79,8 +83,9 @@ struct AppConfig {
         wobblePressureAttenuation: 0,
         baseSmoothing: 0)
     
-    static let penBrushConfig = Brush.Configuration(
-        stampTextureName: "brush1.png",
+    static let penBrushConfig = BrushConfiguration(
+        shapeTextureName: "brush1.png",
+        textureTextureName: nil,
         stampSize: 30,
         stampSpacing: 0.0,
         stampAlpha: 1,
@@ -93,8 +98,9 @@ struct AppConfig {
         wobblePressureAttenuation: 0.5,
         baseSmoothing: 0.1)
     
-    static let wobbleBrushConfig = Brush.Configuration(
-        stampTextureName: "brush1.png",
+    static let wobbleBrushConfig = BrushConfiguration(
+        shapeTextureName: "brush1.png",
+        textureTextureName: nil,
         stampSize: 100,
         stampSpacing: 0.0,
         stampAlpha: 1,
@@ -107,8 +113,9 @@ struct AppConfig {
         wobblePressureAttenuation: 0.5,
         baseSmoothing: 0)
     
-    static let arrowBrushConfig = Brush.Configuration(
-        stampTextureName: "brush4.png",
+    static let arrowBrushConfig = BrushConfiguration(
+        shapeTextureName: "brush4.png",
+        textureTextureName: nil,
         stampSize: 200,
         stampSpacing: 1,
         stampAlpha: 1,
@@ -121,8 +128,9 @@ struct AppConfig {
         wobblePressureAttenuation: 0,
         baseSmoothing: 0)
     
-    static let eraseBrushConfig = Brush.Configuration(
-        stampTextureName: "brush1.png",
+    static let eraseBrushConfig = BrushConfiguration(
+        shapeTextureName: "brush1.png",
+        textureTextureName: nil,
         stampSize: 200,
         stampSpacing: 0.0,
         stampAlpha: 1,
