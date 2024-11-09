@@ -5,7 +5,8 @@ import Color
 
 private let minStampSize: Double = 0.5
 
-private let pressureSensitivity: Double = 1.5
+private let pressureScale: Double = 1.0
+private let pressurePower: Double = 0.6
 
 private let maxTaperTime: TimeInterval = 0.2
 
@@ -73,21 +74,31 @@ struct StrokeSampleGenerator {
     ) -> Output {
         
         // Pressure
-        let pressure = clamp(
-            sample.pressure * pressureSensitivity,
+        let clampedPressure = clamp(
+            sample.pressure * pressureScale,
             min: 0, max: 1)
         
+        let pressure = pow(clampedPressure, pressurePower)
+        
         let pressureScaleFactor = 1
-            + brush.configuration.pressureScaling
+            + brush.configuration.pressureSize
             * 2 * (pressure - 0.5)
         
+        let pressureAlpha = 1
+            - brush.configuration.pressureStampAlpha
+            * (1 - pressure)
+        
         // Taper
-        let (taperScaleFactor, isInTaperEnd) =
+        let (taperAmount, isInTaperEnd) =
             Self.combinedTaper(
                 brush: brush,
                 applyTaper: applyTaper,
                 sampleTime: sample.time,
                 strokeEndTime: strokeEndTime)
+        
+        let taperSize = 1
+            - (1 - taperAmount)
+            * brush.configuration.taperSize
         
         // Wobble
         let wobbleDistance = strokeDistance / baseStampSize
@@ -111,7 +122,7 @@ struct StrokeSampleGenerator {
         // Stamp size
         let stampSizeUnclamped = baseStampSize
             * pressureScaleFactor
-            * taperScaleFactor
+            * taperSize
             * wobbleScaleFactor
         
         let stampSize = max(
@@ -152,6 +163,7 @@ struct StrokeSampleGenerator {
         
         // Stamp alpha
         let stampAlpha = brush.configuration.stampAlpha
+            * pressureAlpha
         
         // Stroke sample
         let strokeSample = StrokeSample(
@@ -197,34 +209,34 @@ struct StrokeSampleGenerator {
             (strokeEndTime - sampleTime)
             / taperTime
         
-        let taperStartScale: Double
-        let taperEndScale: Double
+        let taperStartAmount: Double
+        let taperEndAmount: Double
         let isInTaperEnd: Bool
         
         if normalizedDistanceToStart < 1 {
-            taperStartScale = taperScale(
+            taperStartAmount = taperAmount(
                 roundness: roundness,
                 distance: normalizedDistanceToStart)
         } else {
-            taperStartScale = 1
+            taperStartAmount = 1
         }
         
         if normalizedDistanceToEnd < 1 {
-            taperEndScale = taperScale(
+            taperEndAmount = taperAmount(
                 roundness: roundness,
                 distance: normalizedDistanceToEnd)
             isInTaperEnd = true
         } else {
-            taperEndScale = 1
+            taperEndAmount = 1
             isInTaperEnd = false
         }
         
-        let taperScale = taperStartScale * taperEndScale
+        let taperAmount = taperStartAmount * taperEndAmount
         
-        return (taperScale, isInTaperEnd)
+        return (taperAmount, isInTaperEnd)
     }
     
-    private static func taperScale(
+    private static func taperAmount(
         roundness: Double,
         distance: Double
     ) -> Double {

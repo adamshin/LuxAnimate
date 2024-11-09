@@ -13,11 +13,14 @@ public struct BrushConfiguration: Sendable {
     
     public var stampCount: Int
     public var stampPositionJitter: Double
+    public var stampRotationJitter: Double
     
-    public var pressureScaling: Double
+    public var pressureSize: Double
+    public var pressureStampAlpha: Double
     
     public var taperLength: Double
     public var taperRoundness: Double
+    public var taperSize: Double
     
     public var sizeWobble: Double
     public var offsetWobble: Double
@@ -34,9 +37,12 @@ public struct BrushConfiguration: Sendable {
         stampAlpha: Double,
         stampCount: Int = 1,
         stampPositionJitter: Double = 0,
-        pressureScaling: Double,
+        stampRotationJitter: Double = 0,
+        pressureSize: Double,
+        pressureStampAlpha: Double = 0,
         taperLength: Double,
         taperRoundness: Double,
+        taperSize: Double = 0,
         sizeWobble: Double,
         offsetWobble: Double,
         wobbleFrequency: Double,
@@ -50,9 +56,12 @@ public struct BrushConfiguration: Sendable {
         self.stampAlpha = stampAlpha
         self.stampCount = stampCount
         self.stampPositionJitter = stampPositionJitter
-        self.pressureScaling = pressureScaling
+        self.stampRotationJitter = stampRotationJitter
+        self.pressureSize = pressureSize
+        self.pressureStampAlpha = pressureStampAlpha
         self.taperLength = taperLength
         self.taperRoundness = taperRoundness
+        self.taperSize = taperSize
         self.sizeWobble = sizeWobble
         self.offsetWobble = offsetWobble
         self.wobbleFrequency = wobbleFrequency

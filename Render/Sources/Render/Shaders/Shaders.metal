@@ -227,7 +227,8 @@ fragment float4 brushStampFragmentShader(
         [[color(0)]])
 {
     sampler shapeSampler = sampler(
-        address::clamp_to_edge,
+        address::clamp_to_border,
+        border_color::opaque_black,
         mag_filter::linear,
         min_filter::linear,
         mip_filter::linear
@@ -245,11 +246,14 @@ fragment float4 brushStampFragmentShader(
 //    pixelCoords.y /= uniforms.viewportSize.y;
     
     float4 shapeColor = shapeTexture.sample(shapeSampler, in.texCoord);
-    float4 textureColor = textureTexture.sample(textureSampler, in.position.xy / 400);
     
     // TODO: Compute alpha through different method (height?)
-    float alpha = shapeColor.r * textureColor.r;
-//    float alpha = shapeColor.r;
+    float alpha = shapeColor.r;
+    
+    if (!is_null_texture(textureTexture)) {
+        float4 textureColor = textureTexture.sample(textureSampler, in.position.xy / 400);
+        alpha *= textureColor.r;
+    }
     
     float4 color = in.color;
     color.a *= alpha;

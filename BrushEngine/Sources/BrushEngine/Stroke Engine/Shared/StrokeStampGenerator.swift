@@ -51,14 +51,17 @@ struct StrokeStampGenerator {
             let positionJitter = positionJitter(
                 brush: brush,
                 stampSize: s.stampSize)
-            
             position += positionJitter
+            
+            let rotationJitter = rotationJitter(
+                brush: brush)
             
             let paddingScale: Double =
                 s.stampSize < paddingSizeThreshold ?
                 3 : 1
             
-            let transform = Matrix3(rotation: rotation)
+            var transform = Matrix3(rotation: rotation)
+            transform = Matrix3(rotation: rotationJitter) * transform
             
             let sprite = BrushStampRenderer.Sprite(
                 position: position,
@@ -83,6 +86,18 @@ struct StrokeStampGenerator {
         return point
             * brush.configuration.stampPositionJitter
             * stampSize
+    }
+    
+    private mutating func rotationJitter(
+        brush: Brush
+    ) -> Double {
+        
+        let rotation = Double.random(
+            in: -.pi ... .pi,
+            using: &rng)
+        
+        return rotation
+            * brush.configuration.stampRotationJitter
     }
     
 }
