@@ -22,24 +22,26 @@ struct AppConfig {
     static let paintBrushConfig = pencilBrushConfig
     
     static let pencilBrushConfig = BrushConfiguration(
-        shapeTextureName: "brush-pencil.png",
+        shapeTextureName: "brush-pencil2.png",
 //        textureTextureName: "texture1.png",
         textureTextureName: nil,
-        stampSize: 20,
+        stampSize: 50,
         stampSpacing: 0.1,
-        stampAlpha: 0.1,
+        stampAlpha: 0.15,
         stampCount: 2,
         stampPositionJitter: 0.05,
         stampRotationJitter: 0.2,
+        stampSizeJitter: 0.3,
+        stampAlphaJitter: 0.3,
         pressureSize: 0.9,
-        pressureStampAlpha: 0.3,
+        pressureStampAlpha: 0.5,
         taperLength: 0.1,
         taperRoundness: 0.5,
         taperSize: 0.8,
-        sizeWobble: 0.1,
+        sizeWobble: 0,
         offsetWobble: 0,
-        wobbleFrequency: 1.0,
-        wobblePressureAttenuation: 0.5,
+        wobbleFrequency: 0,
+        wobblePressureAttenuation: 0,
         baseSmoothing: 0)
     
     static let testBrushConfig = BrushConfiguration(

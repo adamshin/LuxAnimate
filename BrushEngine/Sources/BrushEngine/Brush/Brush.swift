@@ -14,6 +14,8 @@ public struct BrushConfiguration: Sendable {
     public var stampCount: Int
     public var stampPositionJitter: Double
     public var stampRotationJitter: Double
+    public var stampSizeJitter: Double
+    public var stampAlphaJitter: Double
     
     public var pressureSize: Double
     public var pressureStampAlpha: Double
@@ -38,6 +40,8 @@ public struct BrushConfiguration: Sendable {
         stampCount: Int = 1,
         stampPositionJitter: Double = 0,
         stampRotationJitter: Double = 0,
+        stampSizeJitter: Double = 0,
+        stampAlphaJitter: Double = 0,
         pressureSize: Double,
         pressureStampAlpha: Double = 0,
         taperLength: Double,
@@ -57,6 +61,8 @@ public struct BrushConfiguration: Sendable {
         self.stampCount = stampCount
         self.stampPositionJitter = stampPositionJitter
         self.stampRotationJitter = stampRotationJitter
+        self.stampSizeJitter = stampSizeJitter
+        self.stampAlphaJitter = stampAlphaJitter
         self.pressureSize = pressureSize
         self.pressureStampAlpha = pressureStampAlpha
         self.taperLength = taperLength

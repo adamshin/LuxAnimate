@@ -81,8 +81,8 @@ struct StrokeSampleGenerator {
         let pressure = pow(clampedPressure, pressurePower)
         
         let pressureScaleFactor = 1
-            + brush.configuration.pressureSize
-            * 2 * (pressure - 0.5)
+            - brush.configuration.pressureSize
+            * (1 - pressure)
         
         let pressureAlpha = 1
             - brush.configuration.pressureStampAlpha

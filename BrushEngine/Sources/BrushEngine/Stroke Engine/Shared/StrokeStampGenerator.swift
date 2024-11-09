@@ -31,7 +31,6 @@ struct StrokeStampGenerator {
         output: inout [BrushStampRenderer.Sprite]
     ) {
         let position = s.position + s.stampOffset
-        let size = Size(s.stampSize, s.stampSize)
         
         let rotation: Complex
         if s.stampRotation.isZero {
@@ -47,6 +46,8 @@ struct StrokeStampGenerator {
         
         for _ in 0 ..< stampCount {
             var position = position
+            var size = s.stampSize
+            var alpha = s.stampAlpha
             
             let positionJitter = positionJitter(
                 brush: brush,
@@ -55,6 +56,12 @@ struct StrokeStampGenerator {
             
             let rotationJitter = rotationJitter(
                 brush: brush)
+            
+            size = size
+                * (1 - Double.random(in: 0 ..< 1) * brush.configuration.stampSizeJitter)
+            
+            alpha = alpha
+                * (1 - Double.random(in: 0 ..< 1) * brush.configuration.stampAlphaJitter)
             
             let paddingScale: Double =
                 s.stampSize < paddingSizeThreshold ?
@@ -65,10 +72,10 @@ struct StrokeStampGenerator {
             
             let sprite = BrushStampRenderer.Sprite(
                 position: position,
-                size: size,
+                size: Size(size, size),
                 transform: transform,
                 color: color,
-                alpha: s.stampAlpha,
+                alpha: alpha,
                 paddingScale: paddingScale)
             
             output.append(sprite)
