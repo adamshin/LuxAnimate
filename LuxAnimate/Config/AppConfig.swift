@@ -41,6 +41,7 @@ struct AppConfig {
         offsetWobble: 0,
         wobbleFrequency: 0,
         wobblePressureAttenuation: 0,
+        stampRotationMode: .azimuth,
         baseSmoothing: 0)
     
     static let testBrushConfig = BrushConfiguration(

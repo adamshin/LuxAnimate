@@ -6,6 +6,12 @@ import MetalKit
     
 public struct BrushConfiguration: Sendable {
     
+    public enum StampRotationMode: Sendable {
+        case fixed
+        case azimuth
+        case azimuthAndRoll
+    }
+    
     public var shapeTextureName: String
     public var textureTextureName: String?
     
@@ -31,6 +37,8 @@ public struct BrushConfiguration: Sendable {
     public var wobbleFrequency: Double
     public var wobblePressureAttenuation: Double
     
+    public var stampRotationMode: StampRotationMode
+    
     public var baseSmoothing: Double
     
     public init(
@@ -53,6 +61,7 @@ public struct BrushConfiguration: Sendable {
         offsetWobble: Double,
         wobbleFrequency: Double,
         wobblePressureAttenuation: Double,
+        stampRotationMode: StampRotationMode = .fixed,
         baseSmoothing: Double
     ) {
         self.shapeTextureName = shapeTextureName
@@ -74,6 +83,7 @@ public struct BrushConfiguration: Sendable {
         self.offsetWobble = offsetWobble
         self.wobbleFrequency = wobbleFrequency
         self.wobblePressureAttenuation = wobblePressureAttenuation
+        self.stampRotationMode = stampRotationMode
         self.baseSmoothing = baseSmoothing
     }
     

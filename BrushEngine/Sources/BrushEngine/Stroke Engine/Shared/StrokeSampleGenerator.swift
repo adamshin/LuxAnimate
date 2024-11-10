@@ -144,7 +144,15 @@ struct StrokeSampleGenerator {
             rollRotation = sample.roll
         }
         
-        let r = azimuthRotation * rollRotation
+        let r: Complex
+        switch brush.configuration.stampRotationMode {
+        case .fixed:
+            r = .one
+        case .azimuth:
+            r = azimuthRotation
+        case .azimuthAndRoll:
+            r = azimuthRotation * rollRotation
+        }
         let stampRotation = r.normalized()
         
         // Stamp offset
