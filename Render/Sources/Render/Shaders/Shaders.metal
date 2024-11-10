@@ -246,12 +246,12 @@ fragment float4 brushStampFragmentShader(
 //    pixelCoords.y /= uniforms.viewportSize.y;
     
     float4 shapeColor = shapeTexture.sample(shapeSampler, in.texCoord);
-    
-    // TODO: Compute alpha through different method (height?)
     float alpha = shapeColor.r;
     
     if (!is_null_texture(textureTexture)) {
-        float4 textureColor = textureTexture.sample(textureSampler, in.position.xy / 400);
+        // TODO: Compute alpha through different method (height?)
+        // TODO: Figure out the math here, instead of hardcoding texture size
+        float4 textureColor = textureTexture.sample(textureSampler, in.position.xy / 512);
         alpha *= textureColor.r;
     }
     

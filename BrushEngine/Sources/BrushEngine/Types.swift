@@ -116,7 +116,7 @@ struct StrokeSample {
     var stampOffset: Vector
     var stampSize: Double
     var stampRotation: Complex
-    var stampAlpha: Double
+    var stampOpacity: Double
     
 }
 
@@ -157,7 +157,7 @@ extension StrokeSample: Interpolatable {
             stampOffset: .zero,
             stampSize: 0,
             stampRotation: .zero,
-            stampAlpha: 0)
+            stampOpacity: 0)
     }
     
     mutating func combine(
@@ -169,7 +169,7 @@ extension StrokeSample: Interpolatable {
         stampOffset    += w * v.stampOffset
         stampSize      += w * v.stampSize
         stampRotation  += w * v.stampRotation
-        stampAlpha     += w * v.stampAlpha
+        stampOpacity     += w * v.stampOpacity
     }
     
 }

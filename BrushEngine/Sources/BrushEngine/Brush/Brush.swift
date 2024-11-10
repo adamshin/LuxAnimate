@@ -1,6 +1,8 @@
 
 import Metal
 import MetalKit
+
+// TODO: Add parameters for pressure sensitivity (gamma)!
     
 public struct BrushConfiguration: Sendable {
     
@@ -9,16 +11,16 @@ public struct BrushConfiguration: Sendable {
     
     public var stampSize: Double
     public var stampSpacing: Double
-    public var stampAlpha: Double
+    public var stampOpacity: Double
     
     public var stampCount: Int
     public var stampPositionJitter: Double
     public var stampRotationJitter: Double
     public var stampSizeJitter: Double
-    public var stampAlphaJitter: Double
+    public var stampOpacityJitter: Double
     
     public var pressureSize: Double
-    public var pressureStampAlpha: Double
+    public var pressureStampOpacity: Double
     
     public var taperLength: Double
     public var taperRoundness: Double
@@ -36,14 +38,14 @@ public struct BrushConfiguration: Sendable {
         textureTextureName: String?,
         stampSize: Double,
         stampSpacing: Double,
-        stampAlpha: Double,
+        stampOpacity: Double,
         stampCount: Int = 1,
         stampPositionJitter: Double = 0,
         stampRotationJitter: Double = 0,
         stampSizeJitter: Double = 0,
-        stampAlphaJitter: Double = 0,
+        stampOpacityJitter: Double = 0,
         pressureSize: Double,
-        pressureStampAlpha: Double = 0,
+        pressureStampOpacity: Double = 0,
         taperLength: Double,
         taperRoundness: Double,
         taperSize: Double = 0,
@@ -57,14 +59,14 @@ public struct BrushConfiguration: Sendable {
         self.textureTextureName = textureTextureName
         self.stampSize = stampSize
         self.stampSpacing = stampSpacing
-        self.stampAlpha = stampAlpha
+        self.stampOpacity = stampOpacity
         self.stampCount = stampCount
         self.stampPositionJitter = stampPositionJitter
         self.stampRotationJitter = stampRotationJitter
         self.stampSizeJitter = stampSizeJitter
-        self.stampAlphaJitter = stampAlphaJitter
+        self.stampOpacityJitter = stampOpacityJitter
         self.pressureSize = pressureSize
-        self.pressureStampAlpha = pressureStampAlpha
+        self.pressureStampOpacity = pressureStampOpacity
         self.taperLength = taperLength
         self.taperRoundness = taperRoundness
         self.taperSize = taperSize

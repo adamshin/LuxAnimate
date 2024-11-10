@@ -80,12 +80,12 @@ struct StrokeSampleGenerator {
         
         let pressure = pow(clampedPressure, pressurePower)
         
-        let pressureScaleFactor = 1
+        let pressureSize = 1
             - brush.configuration.pressureSize
             * (1 - pressure)
         
-        let pressureAlpha = 1
-            - brush.configuration.pressureStampAlpha
+        let pressureOpacity = 1
+            - brush.configuration.pressureStampOpacity
             * (1 - pressure)
         
         // Taper
@@ -114,16 +114,16 @@ struct StrokeSampleGenerator {
             - brush.configuration.wobblePressureAttenuation
             * pow(pressure, 3)
         
-        let wobbleScaleFactor = 1
+        let wobbleSize = 1
             + sizeWobble
             * brush.configuration.sizeWobble
             * wobbleIntensity
         
         // Stamp size
         let stampSizeUnclamped = baseStampSize
-            * pressureScaleFactor
+            * pressureSize
             * taperSize
-            * wobbleScaleFactor
+            * wobbleSize
         
         let stampSize = max(
             stampSizeUnclamped,
@@ -161,9 +161,9 @@ struct StrokeSampleGenerator {
             stampOffset = stampOffset.normalized()
         }
         
-        // Stamp alpha
-        let stampAlpha = brush.configuration.stampAlpha
-            * pressureAlpha
+        // Stamp opacity
+        let stampOpacity = brush.configuration.stampOpacity
+            * pressureOpacity
         
         // Stroke sample
         let strokeSample = StrokeSample(
@@ -172,7 +172,7 @@ struct StrokeSampleGenerator {
             stampOffset: stampOffset,
             stampSize: stampSize,
             stampRotation: stampRotation,
-            stampAlpha: stampAlpha)
+            stampOpacity: stampOpacity)
         
         let isNonFinalized = isInTaperEnd
         

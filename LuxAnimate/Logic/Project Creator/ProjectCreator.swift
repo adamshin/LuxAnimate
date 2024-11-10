@@ -5,8 +5,7 @@
 import Foundation
 
 private let defaultCanvasSize = PixelSize(
-    width: 1920, 
-    height: 1080)
+    width: 1920, height: 1080)
 
 private let defaultFramesPerSecond = 12
 

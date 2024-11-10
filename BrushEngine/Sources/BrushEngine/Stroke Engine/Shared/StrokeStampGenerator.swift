@@ -47,7 +47,7 @@ struct StrokeStampGenerator {
         for _ in 0 ..< stampCount {
             var position = position
             var size = s.stampSize
-            var alpha = s.stampAlpha
+            var opacity = s.stampOpacity
             
             let positionJitter = positionJitter(
                 brush: brush,
@@ -60,8 +60,8 @@ struct StrokeStampGenerator {
             size = size
                 * (1 - Double.random(in: 0 ..< 1) * brush.configuration.stampSizeJitter)
             
-            alpha = alpha
-                * (1 - Double.random(in: 0 ..< 1) * brush.configuration.stampAlphaJitter)
+            opacity = opacity
+                * (1 - Double.random(in: 0 ..< 1) * brush.configuration.stampOpacityJitter)
             
             let paddingScale: Double =
                 s.stampSize < paddingSizeThreshold ?
@@ -75,7 +75,7 @@ struct StrokeStampGenerator {
                 size: Size(size, size),
                 transform: transform,
                 color: color,
-                alpha: alpha,
+                alpha: opacity,
                 paddingScale: paddingScale)
             
             output.append(sprite)
