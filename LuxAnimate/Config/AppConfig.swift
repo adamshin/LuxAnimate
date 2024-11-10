@@ -16,7 +16,7 @@ struct AppConfig {
     
     static let brushDebugRender = false
     
-    static let paintBrushColor = Color.brushDarkGray
+    static let paintBrushColor = Color.black
     static let strokeDebugColor = Color.debugRed
     
     static let paintBrushConfig = inkBrushConfig
@@ -33,10 +33,12 @@ struct AppConfig {
         stampSizeJitter: 0.3,
         stampOpacityJitter: 0.2,
         pressureSize: 0.95,
+        pressureSizeGamma: 0.6,
         pressureStampOpacity: 0.5,
-        taperLength: 0.1,
-        taperRoundness: 0.9,
-        taperSize: 0.8,
+        pressureStampOpacityGamma: 0.8,
+        taperLength: 0.05,
+        taperRoundness: 0.8,
+        taperSize: 0.7,
         sizeWobble: 0,
         offsetWobble: 0,
         wobbleFrequency: 0,
@@ -50,15 +52,16 @@ struct AppConfig {
         stampSize: 100,
         stampSpacing: 0,
         stampOpacity: 1,
-        pressureSize: 1.0,
-        taperLength: 0, //0.2,
-        taperRoundness: 0, //0.8,
-        taperSize: 0, //1,
+        pressureSize: 0.98,
+        pressureSizeGamma: 1.0,
+        taperLength: 0.2,
+        taperRoundness: 0.9,
+        taperSize: 1,
         sizeWobble: 0,
         offsetWobble: 0,
         wobbleFrequency: 0,
         wobblePressureAttenuation: 0,
-        baseSmoothing: 0) //0.1)
+        baseSmoothing: 0.15)
     
     static let roundBrushConfig = BrushConfiguration(
         shapeTextureName: "brush1.png",

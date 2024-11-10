@@ -26,7 +26,9 @@ public struct BrushConfiguration: Sendable {
     public var stampOpacityJitter: Double
     
     public var pressureSize: Double
+    public var pressureSizeGamma: Double
     public var pressureStampOpacity: Double
+    public var pressureStampOpacityGamma: Double
     
     public var taperLength: Double
     public var taperRoundness: Double
@@ -53,7 +55,9 @@ public struct BrushConfiguration: Sendable {
         stampSizeJitter: Double = 0,
         stampOpacityJitter: Double = 0,
         pressureSize: Double,
+        pressureSizeGamma: Double = 0.6,
         pressureStampOpacity: Double = 0,
+        pressureStampOpacityGamma: Double = 0.6,
         taperLength: Double,
         taperRoundness: Double,
         taperSize: Double = 0,
@@ -75,7 +79,9 @@ public struct BrushConfiguration: Sendable {
         self.stampSizeJitter = stampSizeJitter
         self.stampOpacityJitter = stampOpacityJitter
         self.pressureSize = pressureSize
+        self.pressureSizeGamma = pressureSizeGamma
         self.pressureStampOpacity = pressureStampOpacity
+        self.pressureStampOpacityGamma = pressureStampOpacityGamma
         self.taperLength = taperLength
         self.taperRoundness = taperRoundness
         self.taperSize = taperSize

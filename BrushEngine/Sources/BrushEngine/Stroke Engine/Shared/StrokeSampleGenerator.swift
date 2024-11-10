@@ -6,7 +6,6 @@ import Color
 private let minStampSize: Double = 0.5
 
 private let pressureScale: Double = 1.0
-private let pressurePower: Double = 0.6
 
 private let maxTaperTime: TimeInterval = 0.2
 
@@ -74,19 +73,25 @@ struct StrokeSampleGenerator {
     ) -> Output {
         
         // Pressure
-        let clampedPressure = clamp(
+        let pressure = clamp(
             sample.pressure * pressureScale,
             min: 0, max: 1)
         
-        let pressure = pow(clampedPressure, pressurePower)
+        let pressureSize = pow(
+            pressure,
+            brush.configuration.pressureSizeGamma)
         
-        let pressureSize = 1
+        let pressureStampOpacity = pow(
+            pressure,
+            brush.configuration.pressureStampOpacityGamma)
+        
+        let pressureSizeFactor = 1
             - brush.configuration.pressureSize
-            * (1 - pressure)
+            * (1 - pressureSize)
         
-        let pressureOpacity = 1
+        let pressureOpacityFactor = 1
             - brush.configuration.pressureStampOpacity
-            * (1 - pressure)
+            * (1 - pressureStampOpacity)
         
         // Taper
         let (taperAmount, isInTaperEnd) =
@@ -121,7 +126,7 @@ struct StrokeSampleGenerator {
         
         // Stamp size
         let stampSizeUnclamped = baseStampSize
-            * pressureSize
+            * pressureSizeFactor
             * taperSize
             * wobbleSize
         
@@ -171,7 +176,7 @@ struct StrokeSampleGenerator {
         
         // Stamp opacity
         let stampOpacity = brush.configuration.stampOpacity
-            * pressureOpacity
+            * pressureOpacityFactor
         
         // Stroke sample
         let strokeSample = StrokeSample(
