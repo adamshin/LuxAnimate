@@ -16,7 +16,7 @@ struct AppConfig {
     
     static let brushDebugRender = false
     
-    static let paintBrushColor = Color.black
+    static let paintBrushColor = Color.brushDarkGray
     static let strokeDebugColor = Color.debugRed
     
     static let paintBrushConfig = pencilBrushConfig

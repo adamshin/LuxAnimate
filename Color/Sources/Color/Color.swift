@@ -27,7 +27,8 @@ public extension Color {
     static let green = Color(hex: "00FF00")
     static let blue = Color(hex: "0000FF")
     
-    static let brushBlack = Color(hex: "404448")
+    static let brushDarkGray = Color(hex: "404448")
+    static let brushGray = Color(hex: "5f656b")
     static let brushRed = Color(hex: "FA7070")
     static let brushGreen = Color(hex: "88AB8E")
     static let brushBlue = Color(hex: "61A3BA")
