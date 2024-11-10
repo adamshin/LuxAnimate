@@ -23,12 +23,12 @@ struct AppConfig {
     
     static let pencilBrushConfig = BrushConfiguration(
         shapeTextureName: "brush-pencil-3.png",
-        textureTextureName: "noise3.png",
+        textureTextureName: "noise4.png",
         stampSize: 60,
         stampSpacing: 0.1,
         stampOpacity: 0.25,
         stampCount: 2,
-        stampPositionJitter: 0,
+        stampPositionJitter: 0.05,
         stampRotationJitter: 0.2,
         stampSizeJitter: 0.3,
         stampOpacityJitter: 0.2,
