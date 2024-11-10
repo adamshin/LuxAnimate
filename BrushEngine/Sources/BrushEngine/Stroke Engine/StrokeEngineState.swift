@@ -18,6 +18,9 @@ struct StrokeEngineState {
     private var inputQueue:
         StrokeEngineInputQueue
     
+    private var pressureFilteringProcessor:
+        StrokeEnginePressureFilteringProcessor
+    
     private var smoothingProcessor:
         StrokeEngineSmoothingProcessor
     
@@ -37,6 +40,8 @@ struct StrokeEngineState {
         applyTaper: Bool
     ) {
         inputQueue = .init()
+        
+        pressureFilteringProcessor = .init()
         
         smoothingProcessor = .init(
             brush: brush,
@@ -75,14 +80,16 @@ struct StrokeEngineState {
     -> StepOutput {
         
         let o1 = inputQueue.processNextSample()
-        let o2 = smoothingProcessor.process(input: o1)
-        let o3 = strokeSampleProcessor.process(input: o2)
-        let o4 = strokeStampProcessor.process(input: o3)
+        let o2 = pressureFilteringProcessor.process(input: o1)
+        let o3 = smoothingProcessor.process(input: o2)
+        let o4 = strokeSampleProcessor.process(input: o3)
+        let o5 = strokeStampProcessor.process(input: o4)
         
+        let out = o5
         return StepOutput(
-            stampSprites: o4.stampSprites,
-            isStrokeEnd: o4.isStrokeEnd,
-            isFinalized: o4.isFinalized)
+            stampSprites: out.stampSprites,
+            isStrokeEnd: out.isStrokeEnd,
+            isFinalized: out.isFinalized)
     }
     
 }

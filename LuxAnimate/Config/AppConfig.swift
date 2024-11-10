@@ -19,7 +19,7 @@ struct AppConfig {
     static let paintBrushColor = Color.brushDarkGray
     static let strokeDebugColor = Color.debugRed
     
-    static let paintBrushConfig = pencilBrushConfig
+    static let paintBrushConfig = inkBrushConfig
     
     static let pencilBrushConfig = BrushConfiguration(
         shapeTextureName: "brush-pencil-3.png",
@@ -44,21 +44,21 @@ struct AppConfig {
         stampRotationMode: .azimuth,
         baseSmoothing: 0)
     
-    static let testBrushConfig = BrushConfiguration(
+    static let inkBrushConfig = BrushConfiguration(
         shapeTextureName: "brush1.png",
         textureTextureName: nil,
-        stampSize: 300,
+        stampSize: 100,
         stampSpacing: 0,
         stampOpacity: 1,
-        pressureSize: 0,
-        taperLength: 0.1,
-        taperRoundness: 1,
-        taperSize: 1,
+        pressureSize: 1.0,
+        taperLength: 0, //0.2,
+        taperRoundness: 0, //0.8,
+        taperSize: 0, //1,
         sizeWobble: 0,
         offsetWobble: 0,
         wobbleFrequency: 0,
         wobblePressureAttenuation: 0,
-        baseSmoothing: 0)
+        baseSmoothing: 0) //0.1)
     
     static let roundBrushConfig = BrushConfiguration(
         shapeTextureName: "brush1.png",
