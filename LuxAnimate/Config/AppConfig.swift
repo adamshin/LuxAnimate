@@ -19,11 +19,10 @@ struct AppConfig {
     static let paintBrushColor = Color.black
     static let strokeDebugColor = Color.debugRed
     
-    static let paintBrushConfig = pencilBrushConfig
-    
+    /*
     static let pencilBrushConfig = BrushConfiguration(
         shapeTextureName: "brush-pencil-3.png",
-        textureTextureName: "noise4.png",
+        grainTextureName: "noise4.png",
         stampSize: 60,
         stampSpacing: 0.1,
         stampOpacity: 0.25,
@@ -48,7 +47,7 @@ struct AppConfig {
     
     static let inkBrushConfig = BrushConfiguration(
         shapeTextureName: "brush1.png",
-        textureTextureName: nil,
+        grainTextureName: nil,
         stampSize: 100,
         stampSpacing: 0,
         stampOpacity: 1,
@@ -65,7 +64,7 @@ struct AppConfig {
     
     static let roundBrushConfig = BrushConfiguration(
         shapeTextureName: "brush1.png",
-        textureTextureName: nil,
+        grainTextureName: nil,
         stampSize: 200,
         stampSpacing: 0,
         stampOpacity: 1,
@@ -80,7 +79,7 @@ struct AppConfig {
     
     static let taperBrushConfig = BrushConfiguration(
         shapeTextureName: "brush1.png",
-        textureTextureName: nil,
+        grainTextureName: nil,
         stampSize: 200,
         stampSpacing: 0,
         stampOpacity: 1,
@@ -96,7 +95,7 @@ struct AppConfig {
     
     static let penBrushConfig = BrushConfiguration(
         shapeTextureName: "brush1.png",
-        textureTextureName: nil,
+        grainTextureName: nil,
         stampSize: 30,
         stampSpacing: 0.0,
         stampOpacity: 1,
@@ -112,7 +111,7 @@ struct AppConfig {
     
     static let wobbleBrushConfig = BrushConfiguration(
         shapeTextureName: "brush1.png",
-        textureTextureName: nil,
+        grainTextureName: nil,
         stampSize: 100,
         stampSpacing: 0.0,
         stampOpacity: 1,
@@ -128,7 +127,7 @@ struct AppConfig {
     
     static let arrowBrushConfig = BrushConfiguration(
         shapeTextureName: "brush4.png",
-        textureTextureName: nil,
+        grainTextureName: nil,
         stampSize: 200,
         stampSpacing: 1,
         stampOpacity: 1,
@@ -143,7 +142,7 @@ struct AppConfig {
     
     static let eraseBrushConfig = BrushConfiguration(
         shapeTextureName: "brush1.png",
-        textureTextureName: nil,
+        grainTextureName: nil,
         stampSize: 200,
         stampSpacing: 0.0,
         stampOpacity: 1,
@@ -155,6 +154,7 @@ struct AppConfig {
         wobbleFrequency: 0,
         wobblePressureAttenuation: 0,
         baseSmoothing: 0)
+     */
     
     static let onionSkinConfig = AnimEditorOnionSkinConfig(
         prevCount: 5,

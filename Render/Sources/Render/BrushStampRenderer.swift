@@ -101,7 +101,7 @@ public struct BrushStampRenderer {
         target: MTLTexture,
         viewportSize: Size,
         shapeTexture: MTLTexture,
-        textureTexture: MTLTexture?,
+        grainTexture: MTLTexture?,
         sprites: [Sprite],
         blendMode: BlendMode = .normal,
         sampleMode: SampleMode = .linear,
@@ -179,8 +179,8 @@ public struct BrushStampRenderer {
         
         renderEncoder.setFragmentTexture(shapeTexture, index: 0)
         
-        if let textureTexture {
-            renderEncoder.setFragmentTexture(textureTexture, index: 1)
+        if let grainTexture {
+            renderEncoder.setFragmentTexture(grainTexture, index: 1)
         }
         
         renderEncoder.drawPrimitives(

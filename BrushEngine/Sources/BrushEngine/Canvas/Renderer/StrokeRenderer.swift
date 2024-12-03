@@ -72,7 +72,7 @@ class StrokeRenderer {
             target: target,
             viewportSize: viewportSize,
             shapeTexture: brush.shapeTexture,
-            textureTexture: brush.textureTexture,
+            grainTexture: brush.grainTexture,
             sprites: sprites,
             blendMode: .normal,
             sampleMode: .linearClampEdgeToBlack,

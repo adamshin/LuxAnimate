@@ -217,7 +217,7 @@ fragment float4 brushStampFragmentShader(
     texture2d<float> shapeTexture
         [[texture(0)]],
                                          
-    texture2d<float> textureTexture
+    texture2d<float> grainTexture
         [[texture(1)]],
                                      
     constant BrushStampFragmentUniforms& uniforms
@@ -233,7 +233,7 @@ fragment float4 brushStampFragmentShader(
         min_filter::linear,
         mip_filter::linear
     );
-    sampler textureSampler = sampler(
+    sampler grainSampler = sampler(
         address::repeat,
         mag_filter::linear,
         min_filter::linear,
@@ -248,11 +248,11 @@ fragment float4 brushStampFragmentShader(
     float4 shapeColor = shapeTexture.sample(shapeSampler, in.texCoord);
     float alpha = shapeColor.r;
     
-    if (!is_null_texture(textureTexture)) {
+    if (!is_null_texture(grainTexture)) {
         // TODO: Compute alpha through different method (height?)
         // TODO: Figure out the math here, instead of hardcoding texture size
-        float4 textureColor = textureTexture.sample(textureSampler, in.position.xy / 512);
-        alpha *= textureColor.r;
+        float4 grainColor = grainTexture.sample(grainSampler, in.position.xy / 512);
+        alpha *= grainColor.r;
     }
     
     float4 color = in.color;

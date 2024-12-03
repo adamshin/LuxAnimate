@@ -25,10 +25,9 @@ class AnimEditorPaintToolState: AnimEditorToolState {
     private(set) var smoothing: Double
     
     init() {
-        let brushConfig = AppConfig.paintBrushConfig
-        
-        brush = try? BrushEngine.Brush(
-            configuration: brushConfig,
+        // TODO: Load brush from directory
+        brush = try? BrushEngine.BrushLoader.loadBrush(
+            directoryURL: URL(filePath: "")!,
             metalDevice: MetalInterface.shared.device)
         
         scale = AnimEditorToolSettingsStore
