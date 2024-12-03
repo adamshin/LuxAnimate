@@ -19,7 +19,7 @@ struct AppConfig {
     static let paintBrushColor = Color.black
     static let strokeDebugColor = Color.debugRed
     
-    static let paintBrushConfig = inkBrushConfig
+    static let paintBrushConfig = pencilBrushConfig
     
     static let pencilBrushConfig = BrushConfiguration(
         shapeTextureName: "brush-pencil-3.png",
