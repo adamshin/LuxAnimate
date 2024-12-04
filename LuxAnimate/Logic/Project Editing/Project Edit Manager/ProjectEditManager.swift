@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import FileCoding
 
 extension ProjectEditManager {
     

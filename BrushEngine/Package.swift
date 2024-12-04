@@ -16,6 +16,7 @@ let package = Package(
         .package(path: "../Geometry"),
         .package(path: "../Color"),
         .package(path: "../Render"),
+        .package(path: "../FileCoding"),
     ],
     targets: [
         .target(
@@ -24,6 +25,7 @@ let package = Package(
                 "Geometry",
                 "Color",
                 "Render",
+                "FileCoding",
             ]),
 
     ]

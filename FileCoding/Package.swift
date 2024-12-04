@@ -3,17 +3,14 @@
 import PackageDescription
 
 let package = Package(
-    name: "Color",
-    platforms: [
-        .iOS(.v13),
-    ],
+    name: "FileCoding",
     products: [
         .library(
-            name: "Color",
-            targets: ["Color"]),
+            name: "FileCoding",
+            targets: ["FileCoding"]),
     ],
     targets: [
         .target(
-            name: "Color"),
+            name: "FileCoding"),
     ]
 )

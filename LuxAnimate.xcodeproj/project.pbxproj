@@ -12,7 +12,6 @@
 		66099BD32BDB527B00243D9F /* WrappedDisplayLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66099BD22BDB527B00243D9F /* WrappedDisplayLink.swift */; };
 		66099BD52BDB568E00243D9F /* TextureDataReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66099BD42BDB568E00243D9F /* TextureDataReader.swift */; };
 		660ABA492C01926A00B5C668 /* ProjectCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660ABA482C01926A00B5C668 /* ProjectCreator.swift */; };
-		660CD1332BAE4D0E00C8C7B5 /* JSONFileCoders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660CD1322BAE4D0E00C8C7B5 /* JSONFileCoders.swift */; };
 		6613C1F42BE2E72E0019E667 /* EditorMenuCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6613C1F32BE2E72E0019E667 /* EditorMenuCardView.swift */; };
 		6619CB622C791E9700458B79 /* AnimEditorVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6619CB612C791E9700458B79 /* AnimEditorVC.swift */; };
 		661A245B2C865F740031FE82 /* AnimEditorToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 661A245A2C865F740031FE82 /* AnimEditorToolbarView.swift */; };
@@ -81,6 +80,7 @@
 		66789AC92C332D710020EACE /* IDGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66789AC82C332D710020EACE /* IDGenerator.swift */; };
 		6678A9BE2C8131E700838EA3 /* AnimFrameEditorEraseToolState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6678A9BD2C8131E700838EA3 /* AnimFrameEditorEraseToolState.swift */; };
 		667BF74B2BA655CB003E3430 /* FileHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667BF74A2BA655CB003E3430 /* FileHelper.swift */; };
+		6683307C2D00196A00B1B8BC /* FileCoding in Frameworks */ = {isa = PBXBuildFile; productRef = 6683307B2D00196A00B1B8BC /* FileCoding */; };
 		668A14CC2C7D1E2000D73D36 /* AnimEditorEraseToolControlsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668A14CB2C7D1E2000D73D36 /* AnimEditorEraseToolControlsVC.swift */; };
 		668A14D72C7D3EBE00D73D36 /* AnimFrameEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668A14D62C7D3EBE00D73D36 /* AnimFrameEditor.swift */; };
 		668A14D92C7D7BCD00D73D36 /* AnimEditorToolState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668A14D82C7D7BCD00D73D36 /* AnimEditorToolState.swift */; };
@@ -139,7 +139,6 @@
 		66099BD22BDB527B00243D9F /* WrappedDisplayLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WrappedDisplayLink.swift; sourceTree = "<group>"; };
 		66099BD42BDB568E00243D9F /* TextureDataReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextureDataReader.swift; sourceTree = "<group>"; };
 		660ABA482C01926A00B5C668 /* ProjectCreator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectCreator.swift; sourceTree = "<group>"; };
-		660CD1322BAE4D0E00C8C7B5 /* JSONFileCoders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONFileCoders.swift; sourceTree = "<group>"; };
 		6613C1F32BE2E72E0019E667 /* EditorMenuCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorMenuCardView.swift; sourceTree = "<group>"; };
 		6619CB612C791E9700458B79 /* AnimEditorVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorVC.swift; sourceTree = "<group>"; };
 		661A245A2C865F740031FE82 /* AnimEditorToolbarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorToolbarView.swift; sourceTree = "<group>"; };
@@ -209,6 +208,7 @@
 		66789AC82C332D710020EACE /* IDGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IDGenerator.swift; sourceTree = "<group>"; };
 		6678A9BD2C8131E700838EA3 /* AnimFrameEditorEraseToolState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimFrameEditorEraseToolState.swift; sourceTree = "<group>"; };
 		667BF74A2BA655CB003E3430 /* FileHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileHelper.swift; sourceTree = "<group>"; };
+		668330792D00195C00B1B8BC /* FileCoding */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = FileCoding; sourceTree = "<group>"; };
 		668A14CB2C7D1E2000D73D36 /* AnimEditorEraseToolControlsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorEraseToolControlsVC.swift; sourceTree = "<group>"; };
 		668A14D62C7D3EBE00D73D36 /* AnimFrameEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimFrameEditor.swift; sourceTree = "<group>"; };
 		668A14D82C7D7BCD00D73D36 /* AnimEditorToolState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorToolState.swift; sourceTree = "<group>"; };
@@ -273,6 +273,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6683307C2D00196A00B1B8BC /* FileCoding in Frameworks */,
 				66DFCC5A2CCB6301004A227A /* Color in Frameworks */,
 				666234D42CCC592900A9ADE0 /* BrushEngine in Frameworks */,
 				6605720C2CCB53CE00D699BA /* Geometry in Frameworks */,
@@ -283,14 +284,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		660CD1312BAE4CFA00C8C7B5 /* Coding */ = {
-			isa = PBXGroup;
-			children = (
-				660CD1322BAE4D0E00C8C7B5 /* JSONFileCoders.swift */,
-			);
-			path = Coding;
-			sourceTree = "<group>";
-		};
 		6613C1F02BE2DC990019E667 /* Editor Menu */ = {
 			isa = PBXGroup;
 			children = (
@@ -774,6 +767,7 @@
 				660572082CCB533400D699BA /* Geometry */,
 				66DFCC572CCB62F5004A227A /* Color */,
 				66F49F0F2CCC216D00816F4A /* Render */,
+				668330792D00195C00B1B8BC /* FileCoding */,
 				666234D12CCC591C00A9ADE0 /* BrushEngine */,
 				66D0843A2BA3840C00EB8556 /* Products */,
 			);
@@ -925,7 +919,6 @@
 				66789ABE2C29E8F20020EACE /* Render Preview */,
 				667BF7492BA655B6003E3430 /* File Helper */,
 				66789AC72C332D630020EACE /* ID */,
-				660CD1312BAE4CFA00C8C7B5 /* Coding */,
 			);
 			path = Logic;
 			sourceTree = "<group>";
@@ -1112,7 +1105,6 @@
 				661A88A12C9932BF007900B1 /* AnimEditorTimelineFrameMenuView.swift in Sources */,
 				663D40D42C35EA9C004B8591 /* ProjectEditManager.swift in Sources */,
 				666FABBC2C98FF4B001D0477 /* ProjectEditBuilder.swift in Sources */,
-				660CD1332BAE4D0E00C8C7B5 /* JSONFileCoders.swift in Sources */,
 				66E3E4362C7ADE7C0086D388 /* AnimEditorToolbarVC.swift in Sources */,
 				664C28212C75306D002166D6 /* EditorWorkspaceSceneGraph.swift in Sources */,
 				6622325B2BE0750300C8813F /* EditorCollapsibleContentVC.swift in Sources */,
@@ -1370,6 +1362,10 @@
 		666234D32CCC592900A9ADE0 /* BrushEngine */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = BrushEngine;
+		};
+		6683307B2D00196A00B1B8BC /* FileCoding */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FileCoding;
 		};
 		66DFCC592CCB6301004A227A /* Color */ = {
 			isa = XCSwiftPackageProductDependency;

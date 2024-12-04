@@ -1,6 +1,7 @@
 
 import Foundation
 import Metal
+import FileCoding
 
 public struct BrushLoader {
     

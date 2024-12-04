@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import FileCoding
 
 // TODO: Modify this to load asynchronously?
 

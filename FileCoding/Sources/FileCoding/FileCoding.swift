@@ -1,20 +1,19 @@
-//
-//  JSONFileCoders.swift
-//
 
 import Foundation
 
-nonisolated(unsafe) private let dateFormatter: ISO8601DateFormatter = {
+nonisolated(unsafe)
+private let dateFormatter: ISO8601DateFormatter = {
     let f = ISO8601DateFormatter()
     f.formatOptions.insert(.withFractionalSeconds)
     return f
 }()
 
-class JSONFileEncoder: JSONEncoder, @unchecked Sendable {
+public class JSONFileEncoder:
+    JSONEncoder, @unchecked Sendable
+{
+    public static let shared = JSONFileEncoder()
     
-    static let shared = JSONFileEncoder()
-    
-    override init() {
+    public override init() {
         super.init()
         
         outputFormatting = [.sortedKeys]
@@ -33,11 +32,12 @@ class JSONFileEncoder: JSONEncoder, @unchecked Sendable {
     
 }
 
-class JSONFileDecoder: JSONDecoder, @unchecked Sendable {
+public class JSONFileDecoder:
+    JSONDecoder, @unchecked Sendable
+{
+    public static let shared = JSONFileDecoder()
     
-    static let shared = JSONFileDecoder()
-    
-    override init() {
+    public override init() {
         super.init()
         
         dateDecodingStrategy = .custom {

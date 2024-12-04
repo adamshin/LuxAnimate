@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import FileCoding
 
 private let defaultCanvasSize = PixelSize(
     width: 1920, height: 1080)
