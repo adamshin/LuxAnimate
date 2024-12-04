@@ -14,13 +14,24 @@ public struct BrushLoader {
         metalDevice: MTLDevice
     ) throws -> Brush {
         
-        // How should brush directory be structured?
-        // Brush manifest, configuration?
-        // Maybe a separate manifest isn't needed?
-        // Might be nice to separate informational data
-        // (brush name, ID, etc) from configuration.
-        //
+        let metadata = try metadata(in: directoryURL)
         
+        fatalError()
+    }
+    
+    private static func metadata(
+        in directoryURL: URL
+    ) throws -> BrushMetadata {
+        
+        let url = directoryURL
+            .appending(path: "metadata")
+        
+        let data = try Data(contentsOf: url)
+        
+//        return try JSONFileDecoder.shared.decode
+        
+        // TODO: We need JSONFileDecoder here.
+        // This should be pulled into a package.
         fatalError()
     }
     
