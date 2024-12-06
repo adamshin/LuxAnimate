@@ -25,10 +25,8 @@ class AnimEditorEraseToolState: AnimEditorToolState {
     private(set) var smoothing: Double
     
     init() {
-        // TODO: Load brush from directory
-        brush = try? BrushEngine.BrushLoader.loadBrush(
-            directoryURL: URL(filePath: "")!,
-            metalDevice: MetalInterface.shared.device)
+        brush = try? BrushLibraryManager.loadBrush(
+            id: AppConfig.eraseBrushID)
         
         scale = AnimEditorToolSettingsStore
             .eraseToolScale

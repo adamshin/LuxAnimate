@@ -6,7 +6,7 @@ import Foundation
 
 struct FileHelper {
     
-    static let libraryManifestFileName = "libraryManifest"
+    static let projectLibraryManifestFileName = "projectLibraryManifest"
     static let projectManifestFileName = "projectManifest"
     
     private static var fileManager: FileManager {
@@ -15,8 +15,10 @@ struct FileHelper {
     
     static let shared = FileHelper()
     
-    let libraryDirectoryURL: URL
-    let libraryManifestURL: URL
+    let projectLibraryDirectoryURL: URL
+    let projectLibraryManifestURL: URL
+    
+    let brushLibraryDirectoryURL: URL
     
     let cacheDirectoryURL: URL
     
@@ -27,12 +29,16 @@ struct FileHelper {
             appropriateFor: nil,
             create: false)
         
-        libraryDirectoryURL = documentDirectoryURL.appending(
-            path: "library",
+        projectLibraryDirectoryURL = documentDirectoryURL.appending(
+            path: "projectLibrary",
             directoryHint: .isDirectory)
         
-        libraryManifestURL = libraryDirectoryURL.appending(
-            path: Self.libraryManifestFileName)
+        projectLibraryManifestURL = projectLibraryDirectoryURL.appending(
+            path: Self.projectLibraryManifestFileName)
+        
+        brushLibraryDirectoryURL = documentDirectoryURL.appending(
+            path: "brushLibrary",
+            directoryHint: .isDirectory)
         
         cacheDirectoryURL = try! Self.fileManager.url(
             for: .cachesDirectory,
@@ -42,7 +48,7 @@ struct FileHelper {
     }
     
     func projectURL(for projectID: String) -> URL {
-        libraryDirectoryURL.appending(
+        projectLibraryDirectoryURL.appending(
             path: projectID,
             directoryHint: .isDirectory)
     }

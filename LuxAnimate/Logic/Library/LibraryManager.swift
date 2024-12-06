@@ -25,7 +25,7 @@ struct LibraryManager {
     // MARK: - Internal Methods
     
     private func createLibraryDirectoryIfNeeded() throws {
-        let url = FileHelper.shared.libraryDirectoryURL
+        let url = FileHelper.shared.projectLibraryDirectoryURL
         if fileManager.fileExists(atPath: url.path()) {
             return
         }
@@ -37,7 +37,7 @@ struct LibraryManager {
     private func createLibraryManifestIfNeeded() throws {
         try createLibraryDirectoryIfNeeded()
         
-        let url = FileHelper.shared.libraryManifestURL
+        let url = FileHelper.shared.projectLibraryManifestURL
         if fileManager.fileExists(atPath: url.path()) {
             return
         }
@@ -49,7 +49,7 @@ struct LibraryManager {
     private func getLibraryManifest() throws -> LibraryManifest {
         try createLibraryManifestIfNeeded()
         
-        let url = FileHelper.shared.libraryManifestURL
+        let url = FileHelper.shared.projectLibraryManifestURL
         let data = try Data(contentsOf: url)
         
         return try JSONFileDecoder.shared.decode(LibraryManifest.self, from: data)
@@ -58,7 +58,7 @@ struct LibraryManager {
     private func setLibraryManifest(
         _ libraryManifest: LibraryManifest
     ) throws {
-        let url = FileHelper.shared.libraryManifestURL
+        let url = FileHelper.shared.projectLibraryManifestURL
         
         let data = try JSONFileEncoder.shared.encode(libraryManifest)
         try data.write(to: url)

@@ -19,31 +19,10 @@ struct AppConfig {
     static let paintBrushColor = Color.black
     static let strokeDebugColor = Color.debugRed
     
+    static let paintBrushID = "pencil"
+    static let eraseBrushID = "eraser"
+    
     /*
-    static let pencilBrushConfig = BrushConfiguration(
-        shapeTextureName: "brush-pencil-3.png",
-        grainTextureName: "noise4.png",
-        stampSize: 60,
-        stampSpacing: 0.1,
-        stampOpacity: 0.25,
-        stampCount: 2,
-        stampPositionJitter: 0.05,
-        stampRotationJitter: 0.2,
-        stampSizeJitter: 0.3,
-        stampOpacityJitter: 0.2,
-        pressureSize: 0.95,
-        pressureSizeGamma: 0.6,
-        pressureStampOpacity: 0.5,
-        pressureStampOpacityGamma: 0.8,
-        taperLength: 0.05,
-        taperRoundness: 0.8,
-        taperSize: 0.7,
-        sizeWobble: 0,
-        offsetWobble: 0,
-        wobbleFrequency: 0,
-        wobblePressureAttenuation: 0,
-        stampRotationMode: .azimuth,
-        baseSmoothing: 0)
     
     static let inkBrushConfig = BrushConfiguration(
         shapeTextureName: "brush1.png",

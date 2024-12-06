@@ -5,6 +5,7 @@ import Metal
 
 public struct Brush {
     
+    public var id: String
     public var metadata: BrushMetadata
     public var configuration: BrushConfiguration
     
@@ -17,7 +18,6 @@ public struct Brush {
 
 public struct BrushMetadata: Codable, Sendable {
     
-    public var id: String
     public var name: String
     
 }
@@ -32,7 +32,7 @@ public struct BrushConfiguration: Codable, Sendable {
         case azimuthAndRoll = 2
     }
     
-    public var stampSize: Double = 0
+    public var stampSize: Double = 100
     public var stampSpacing: Double = 0
     public var stampOpacity: Double = 1
     

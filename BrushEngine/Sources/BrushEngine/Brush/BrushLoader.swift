@@ -1,92 +1,107 @@
 
 import Foundation
 import Metal
+import MetalKit
 import FileCoding
 
 public struct BrushLoader {
     
-    public enum LoadError: Error {
-        case manifestNotFound
-        case textureNotFound
-    }
-    
     public static func loadBrush(
-        directoryURL: URL,
+        id: String,
+        url directoryURL: URL,
         metalDevice: MTLDevice
     ) throws -> Brush {
         
-        let metadata = try metadata(in: directoryURL)
+        let textureLoader = MTKTextureLoader(
+            device: metalDevice)
         
-        fatalError()
+        let metadata = try metadata(
+            in: directoryURL)
+        let configuration = try configuration(
+            in: directoryURL)
+        
+        let shapeTexture = try shapeTexture(
+            directoryURL: directoryURL,
+            textureLoader: textureLoader)
+        
+        let grainTexture = try grainTexture(
+            directoryURL: directoryURL,
+            textureLoader: textureLoader)
+        
+        return Brush(
+            id: id,
+            metadata: metadata,
+            configuration: configuration,
+            shapeTexture: shapeTexture,
+            grainTexture: grainTexture)
     }
     
     private static func metadata(
         in directoryURL: URL
     ) throws -> BrushMetadata {
         
-        let url = directoryURL
-            .appending(path: "metadata")
-        
+        let url = directoryURL.appending(
+            path: "metadata")
         let data = try Data(contentsOf: url)
         
-//        return try JSONFileDecoder.shared.decode
-        
-        // TODO: We need JSONFileDecoder here.
-        // This should be pulled into a package.
-        fatalError()
+        return try JSONFileDecoder.shared
+            .decode(BrushMetadata.self, from: data)
     }
     
-    /*
-    public init(
-        configuration c: BrushConfiguration,
-        metalDevice: MTLDevice
-    ) throws {
+    private static func configuration(
+        in directoryURL: URL
+    ) throws -> BrushConfiguration {
         
-        self.configuration = c
+        let url = directoryURL.appending(
+            path: "configuration")
+        let data = try Data(contentsOf: url)
         
-        guard let shapeTextureURL = Bundle.main.url(
-            forResource: c.shapeTextureName,
-            withExtension: nil)
-        else {
-            throw LoadError.textureNotFound
-        }
-        
-        let loader = MTKTextureLoader(device: metalDevice)
-        
-        shapeTexture = try Self.loadTexture(
-            loader: loader,
-            url: shapeTextureURL)
-        
-        if let grainTextureName = c.grainTextureName {
-            guard let grainTextureURL = Bundle.main.url(
-                forResource: grainTextureName,
-                withExtension: nil)
-            else {
-                throw LoadError.textureNotFound
-            }
-            
-            grainTexture = try Self.loadTexture(
-                loader: loader,
-                url: grainTextureURL)
-        } else {
-            grainTexture = nil
-        }
+        return try JSONFileDecoder.shared
+            .decode(BrushConfiguration.self, from: data)
     }
     
-    private static func loadTexture(
-        loader: MTKTextureLoader,
-        url: URL
+    private static func shapeTexture(
+        directoryURL: URL,
+        textureLoader: MTKTextureLoader
     ) throws -> MTLTexture {
         
-        return try loader.newTexture(
+        let url = directoryURL.appending(path: "shape")
+        
+        return try texture(
+            url: url,
+            textureLoader: textureLoader)
+    }
+    
+    private static func grainTexture(
+        directoryURL: URL,
+        textureLoader: MTKTextureLoader
+    ) throws -> MTLTexture? {
+        
+        let url = directoryURL.appending(path: "grain")
+        
+        guard FileManager.default
+            .fileExists(atPath: url.path())
+        else { return nil }
+        
+        return try texture(
+            url: url,
+            textureLoader: textureLoader)
+    }
+    
+    private static func texture(
+        url: URL,
+        textureLoader: MTKTextureLoader
+    ) throws -> MTLTexture {
+        try textureLoader.newTexture(
             URL: url,
             options: [
-                .textureStorageMode: MTLStorageMode.private.rawValue,
-                .textureUsage: MTLTextureUsage.shaderRead.rawValue,
+                .textureStorageMode:
+                    MTLStorageMode.private.rawValue,
+                .textureUsage:
+                    MTLTextureUsage.shaderRead.rawValue,
                 .generateMipmaps: true,
                 .SRGB: false,
             ])
     }
-     */
     
 }

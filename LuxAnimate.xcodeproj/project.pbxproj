@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 70;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -81,6 +81,8 @@
 		6678A9BE2C8131E700838EA3 /* AnimFrameEditorEraseToolState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6678A9BD2C8131E700838EA3 /* AnimFrameEditorEraseToolState.swift */; };
 		667BF74B2BA655CB003E3430 /* FileHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667BF74A2BA655CB003E3430 /* FileHelper.swift */; };
 		6683307C2D00196A00B1B8BC /* FileCoding in Frameworks */ = {isa = PBXBuildFile; productRef = 6683307B2D00196A00B1B8BC /* FileCoding */; };
+		6684A3A92D0264B00006E223 /* BrushLibraryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6684A3A82D0264B00006E223 /* BrushLibraryManager.swift */; };
+		6684A3BA2D0270420006E223 /* DefaultBrushes.zip in Resources */ = {isa = PBXBuildFile; fileRef = 6684A3B92D0270420006E223 /* DefaultBrushes.zip */; };
 		668A14CC2C7D1E2000D73D36 /* AnimEditorEraseToolControlsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668A14CB2C7D1E2000D73D36 /* AnimEditorEraseToolControlsVC.swift */; };
 		668A14D72C7D3EBE00D73D36 /* AnimFrameEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668A14D62C7D3EBE00D73D36 /* AnimFrameEditor.swift */; };
 		668A14D92C7D7BCD00D73D36 /* AnimEditorToolState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668A14D82C7D7BCD00D73D36 /* AnimEditorToolState.swift */; };
@@ -209,6 +211,8 @@
 		6678A9BD2C8131E700838EA3 /* AnimFrameEditorEraseToolState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimFrameEditorEraseToolState.swift; sourceTree = "<group>"; };
 		667BF74A2BA655CB003E3430 /* FileHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileHelper.swift; sourceTree = "<group>"; };
 		668330792D00195C00B1B8BC /* FileCoding */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = FileCoding; sourceTree = "<group>"; };
+		6684A3A82D0264B00006E223 /* BrushLibraryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrushLibraryManager.swift; sourceTree = "<group>"; };
+		6684A3B92D0270420006E223 /* DefaultBrushes.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = DefaultBrushes.zip; sourceTree = "<group>"; };
 		668A14CB2C7D1E2000D73D36 /* AnimEditorEraseToolControlsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorEraseToolControlsVC.swift; sourceTree = "<group>"; };
 		668A14D62C7D3EBE00D73D36 /* AnimFrameEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimFrameEditor.swift; sourceTree = "<group>"; };
 		668A14D82C7D7BCD00D73D36 /* AnimEditorToolState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorToolState.swift; sourceTree = "<group>"; };
@@ -263,10 +267,6 @@
 		66FE7A2B2C21035D00464A82 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
 		66FE7A2D2C25E05100464A82 /* Array.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Array.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		666234DA2CCC75CD00A9ADE0 /* Brushes */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Brushes; sourceTree = "<group>"; };
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		66D084362BA3840C00EB8556 /* Frameworks */ = {
@@ -618,6 +618,14 @@
 			path = "File Helper";
 			sourceTree = "<group>";
 		};
+		6684A3A72D02649D0006E223 /* Brush Library */ = {
+			isa = PBXGroup;
+			children = (
+				6684A3A82D0264B00006E223 /* BrushLibraryManager.swift */,
+			);
+			path = "Brush Library";
+			sourceTree = "<group>";
+		};
 		668A14CF2C7D3D1800D73D36 /* Animation Editor */ = {
 			isa = PBXGroup;
 			children = (
@@ -824,9 +832,9 @@
 		66D084542BA3CD3F00EB8556 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				666234DA2CCC75CD00A9ADE0 /* Brushes */,
 				66DE6BA42C923CE900A687C4 /* Assets.xcassets */,
 				66D084472BA3840D00EB8556 /* LaunchScreen.storyboard */,
+				6684A3B92D0270420006E223 /* DefaultBrushes.zip */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -912,6 +920,7 @@
 			isa = PBXGroup;
 			children = (
 				66D084802BA3FDF200EB8556 /* Library */,
+				6684A3A72D02649D0006E223 /* Brush Library */,
 				66789ACF2C3336880020EACE /* Project Creator */,
 				66A59E9A2C8A388200CF553E /* Project Editing */,
 				661A24632C8697250031FE82 /* Frame Scene Graph */,
@@ -945,9 +954,6 @@
 			buildRules = (
 			);
 			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				666234DA2CCC75CD00A9ADE0 /* Brushes */,
 			);
 			name = LuxAnimate;
 			productName = LuxAnimate;
@@ -994,6 +1000,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				66DE6BA52C923CE900A687C4 /* Assets.xcassets in Resources */,
+				6684A3BA2D0270420006E223 /* DefaultBrushes.zip in Resources */,
 				66D084492BA3840D00EB8556 /* Base in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1079,6 +1086,7 @@
 				66D084772BA3CEC300EB8556 /* ContainerViewController.swift in Sources */,
 				66311CDB2BD73FAF00D53489 /* ImageResizer.swift in Sources */,
 				66D0843D2BA3840C00EB8556 /* AppDelegate.swift in Sources */,
+				6684A3A92D0264B00006E223 /* BrushLibraryManager.swift in Sources */,
 				668A14CC2C7D1E2000D73D36 /* AnimEditorEraseToolControlsVC.swift in Sources */,
 				66789AC92C332D710020EACE /* IDGenerator.swift in Sources */,
 				662542A32C8BDDFB007D3DFB /* SceneEditBuilder.swift in Sources */,
