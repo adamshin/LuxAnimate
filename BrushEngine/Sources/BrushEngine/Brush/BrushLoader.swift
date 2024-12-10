@@ -49,8 +49,9 @@ public struct BrushLoader {
             path: "metadata")
         let data = try Data(contentsOf: url)
         
-        return try JSONFileDecoder.shared
-            .decode(BrushMetadata.self, from: data)
+        return try JSONFileDecoder.shared.decode(
+            BrushMetadata.self,
+            from: data)
     }
     
     private static func configuration(
@@ -61,8 +62,11 @@ public struct BrushLoader {
             path: "configuration")
         let data = try Data(contentsOf: url)
         
-        return try JSONFileDecoder.shared
-            .decode(BrushConfiguration.self, from: data)
+        let c = try JSONFileDecoder.shared.decode(
+            BrushConfigurationCodable.self,
+            from: data)
+        
+        return BrushConfiguration(c)
     }
     
     private static func shapeTexture(
