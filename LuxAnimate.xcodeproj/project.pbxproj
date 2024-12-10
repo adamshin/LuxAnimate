@@ -83,6 +83,7 @@
 		6683307C2D00196A00B1B8BC /* FileCoding in Frameworks */ = {isa = PBXBuildFile; productRef = 6683307B2D00196A00B1B8BC /* FileCoding */; };
 		6684A3A92D0264B00006E223 /* BrushLibraryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6684A3A82D0264B00006E223 /* BrushLibraryManager.swift */; };
 		6684A3BA2D0270420006E223 /* DefaultBrushes.zip in Resources */ = {isa = PBXBuildFile; fileRef = 6684A3B92D0270420006E223 /* DefaultBrushes.zip */; };
+		6684A3BD2D02AC9B0006E223 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 6684A3BC2D02AC9B0006E223 /* ZIPFoundation */; };
 		668A14CC2C7D1E2000D73D36 /* AnimEditorEraseToolControlsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668A14CB2C7D1E2000D73D36 /* AnimEditorEraseToolControlsVC.swift */; };
 		668A14D72C7D3EBE00D73D36 /* AnimFrameEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668A14D62C7D3EBE00D73D36 /* AnimFrameEditor.swift */; };
 		668A14D92C7D7BCD00D73D36 /* AnimEditorToolState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668A14D82C7D7BCD00D73D36 /* AnimEditorToolState.swift */; };
@@ -278,6 +279,7 @@
 				666234D42CCC592900A9ADE0 /* BrushEngine in Frameworks */,
 				6605720C2CCB53CE00D699BA /* Geometry in Frameworks */,
 				66F49F122CCC218000816F4A /* Render in Frameworks */,
+				6684A3BD2D02AC9B0006E223 /* ZIPFoundation in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -985,6 +987,9 @@
 				Base,
 			);
 			mainGroup = 66D084302BA3840B00EB8556;
+			packageReferences = (
+				6684A3BB2D02AC9B0006E223 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
+			);
 			productRefGroup = 66D0843A2BA3840C00EB8556 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -1362,6 +1367,17 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		6684A3BB2D02AC9B0006E223 /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/weichsel/ZIPFoundation";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.19;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		6605720B2CCB53CE00D699BA /* Geometry */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -1374,6 +1390,11 @@
 		6683307B2D00196A00B1B8BC /* FileCoding */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = FileCoding;
+		};
+		6684A3BC2D02AC9B0006E223 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6684A3BB2D02AC9B0006E223 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
 		};
 		66DFCC592CCB6301004A227A /* Color */ = {
 			isa = XCSwiftPackageProductDependency;

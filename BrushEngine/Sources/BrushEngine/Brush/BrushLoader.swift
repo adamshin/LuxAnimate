@@ -12,28 +12,33 @@ public struct BrushLoader {
         metalDevice: MTLDevice
     ) throws -> Brush {
         
-        let textureLoader = MTKTextureLoader(
-            device: metalDevice)
-        
-        let metadata = try metadata(
-            in: directoryURL)
-        let configuration = try configuration(
-            in: directoryURL)
-        
-        let shapeTexture = try shapeTexture(
-            directoryURL: directoryURL,
-            textureLoader: textureLoader)
-        
-        let grainTexture = try grainTexture(
-            directoryURL: directoryURL,
-            textureLoader: textureLoader)
-        
-        return Brush(
-            id: id,
-            metadata: metadata,
-            configuration: configuration,
-            shapeTexture: shapeTexture,
-            grainTexture: grainTexture)
+        do {
+            let textureLoader = MTKTextureLoader(
+                device: metalDevice)
+            
+            let metadata = try metadata(
+                in: directoryURL)
+            let configuration = try configuration(
+                in: directoryURL)
+            
+            let shapeTexture = try shapeTexture(
+                directoryURL: directoryURL,
+                textureLoader: textureLoader)
+            
+            let grainTexture = try grainTexture(
+                directoryURL: directoryURL,
+                textureLoader: textureLoader)
+            
+            return Brush(
+                id: id,
+                metadata: metadata,
+                configuration: configuration,
+                shapeTexture: shapeTexture,
+                grainTexture: grainTexture)
+        } catch {
+            print(error)
+            throw error
+        }
     }
     
     private static func metadata(

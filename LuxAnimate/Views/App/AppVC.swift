@@ -11,7 +11,7 @@ class AppVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        BrushLibraryManager.initialize()
+        try? BrushLibraryManager.initialize()
         
         addChild(libraryVC, to: view)
     }
