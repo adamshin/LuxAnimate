@@ -60,6 +60,10 @@ class AnimEditorEraseToolState: AnimEditorToolState {
         brushGestureRecognizer.isEnabled = enabled
     }
     
+    func toggleToolExpandedOptionsVisible() {
+        // TODO
+    }
+    
 }
 
 // MARK: - Delegates

@@ -25,8 +25,9 @@ class AnimEditorPaintToolState: AnimEditorToolState {
     private(set) var smoothing: Double
     
     init() {
+        // TODO: Allow switching brushes
         brush = try? BrushLibraryManager.loadBrush(
-            id: AppConfig.paintBrushID)
+            id: AppConfig.paintBrushIDs.first!)
         
         scale = AnimEditorToolSettingsStore
             .brushToolScale
@@ -58,6 +59,10 @@ class AnimEditorPaintToolState: AnimEditorToolState {
     
     func setEditInteractionEnabled(_ enabled: Bool) {
         brushGestureRecognizer.isEnabled = enabled
+    }
+    
+    func toggleToolExpandedOptionsVisible() {
+        print("Toggle")
     }
     
 }

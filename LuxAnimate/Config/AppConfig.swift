@@ -19,7 +19,13 @@ struct AppConfig {
     static let paintBrushColor = Color.black
     static let strokeDebugColor = Color.debugRed
     
-    static let paintBrushID = "pencil"
+    static let paintBrushIDs = [
+        "pencil",
+        "inkbrush",
+        "round",
+        "wobble",
+    ]
+    
     static let eraseBrushID = "round"
     
     static let onionSkinConfig = AnimEditorOnionSkinConfig(

@@ -17,4 +17,6 @@ protocol AnimEditorToolState: AnyObject {
     
     func setEditInteractionEnabled(_ enabled: Bool)
     
+    func toggleToolExpandedOptionsVisible()
+    
 }

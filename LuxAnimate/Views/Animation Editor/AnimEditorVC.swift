@@ -356,10 +356,19 @@ extension AnimEditorVC: AnimEditorToolbarVCDelegate {
     }
     
     func onSelectPaintTool(_ vc: AnimEditorToolbarVC) {
+        if state.selectedTool == .paint {
+            toolState?.toggleToolExpandedOptionsVisible()
+            return
+        }
         let update = state.update(selectedTool: .paint)
         applyStateUpdate(update: update)
     }
+    
     func onSelectEraseTool(_ vc: AnimEditorToolbarVC) {
+        if state.selectedTool == .erase {
+            toolState?.toggleToolExpandedOptionsVisible()
+            return
+        }
         let update = state.update(selectedTool: .erase)
         applyStateUpdate(update: update)
     }
