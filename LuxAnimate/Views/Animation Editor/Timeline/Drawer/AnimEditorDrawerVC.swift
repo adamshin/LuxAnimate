@@ -1,40 +1,41 @@
 //
-//  EditorCollapsibleContentVC.swift
+//  AnimEditorDrawerVC.swift
 //
 
 import UIKit
 
-private let barHeight: CGFloat = 48
+private let toolbarHeight: CGFloat = 48
 private let separatorColor = UIColor(white: 1, alpha: 0.04)
 
 private let animationDuration: TimeInterval = 0.25
 private let animationBounce: TimeInterval = 0
 
 @MainActor
-protocol EditorCollapsibleContentVCDelegate: AnyObject {
+protocol AnimEditorDrawerVCDelegate: AnyObject {
     
     func onSetExpanded(
-        _ vc: EditorCollapsibleContentVC,
+        _ vc: AnimEditorDrawerVC,
         _ expanded: Bool)
     
     func onChangeContentAreaSize(
-        _ vc: EditorCollapsibleContentVC)
+        _ vc: AnimEditorDrawerVC)
     
 }
 
-class EditorCollapsibleContentVC: UIViewController {
+class AnimEditorDrawerVC: UIViewController {
     
-    weak var delegate: EditorCollapsibleContentVCDelegate?
+    weak var delegate: AnimEditorDrawerVCDelegate?
     
-    let contentAreaView = UIView()
+    let remainderContentView = PassthroughView()
     
-    let barView = EditorCollapsibleBarBarView()
+    let drawerContentView = UIView()
+    let toolbar = AnimEditorDrawerToolbar()
     let collapsibleContentView = UIView()
     
     private let bottomAreaContainer = UIView()
     private let separator = UIView()
     
-    private let swipeGesture = EditorCollapsibleContentSwipeGestureRecognizer()
+    private let swipeGesture = AnimEditorDrawerSwipeGestureRecognizer()
     
     private var expandedConstraint: NSLayoutConstraint?
     private var collapsedConstraint: NSLayoutConstraint?
@@ -50,20 +51,26 @@ class EditorCollapsibleContentVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.addSubview(contentAreaView)
-        contentAreaView.pinEdges([.horizontal, .bottom])
+        view.addSubview(remainderContentView)
+        remainderContentView.pinEdges([.horizontal, .top])
+        
+        view.addSubview(drawerContentView)
+        drawerContentView.pinEdges([.horizontal, .bottom])
+        drawerContentView.pin(.top,
+            to: remainderContentView,
+            toAnchor: .bottom)
         
         let blurView = ChromeBlurView()
-        contentAreaView.addSubview(blurView)
+        drawerContentView.addSubview(blurView)
         blurView.pinEdges()
         blurView.backgroundColor = .editorBarShadow
         
         let stack = UIStackView()
         stack.axis = .vertical
-        contentAreaView.addSubview(stack)
+        drawerContentView.addSubview(stack)
         stack.pinEdges()
         
-        stack.addArrangedSubview(barView)
+        stack.addArrangedSubview(toolbar)
         
         let separatorContainer = UIView()
         separatorContainer.backgroundColor = .editorBarOverlay
@@ -85,7 +92,7 @@ class EditorCollapsibleContentVC: UIViewController {
             .pinEdges(.bottom, to: view.safeAreaLayoutGuide)
             .constraints.first!
         
-        contentAreaView.addGestureRecognizer(swipeGesture)
+        drawerContentView.addGestureRecognizer(swipeGesture)
         swipeGesture.delegate = self
         swipeGesture.gestureDelegate = self
         
@@ -138,7 +145,7 @@ class EditorCollapsibleContentVC: UIViewController {
     
 }
 
-extension EditorCollapsibleContentVC: UIGestureRecognizerDelegate {
+extension AnimEditorDrawerVC: UIGestureRecognizerDelegate {
     
     func gestureRecognizer(
         _ gestureRecognizer: UIGestureRecognizer,
@@ -154,7 +161,8 @@ extension EditorCollapsibleContentVC: UIGestureRecognizerDelegate {
     
 }
 
-extension EditorCollapsibleContentVC: EditorCollapsibleContentSwipeGestureRecognizerDelegate {
+extension AnimEditorDrawerVC:
+    AnimEditorDrawerSwipeGestureRecognizerDelegate {
     
     func onSwipe(up: Bool) {
         setExpanded(up, animated: true)
@@ -162,9 +170,9 @@ extension EditorCollapsibleContentVC: EditorCollapsibleContentSwipeGestureRecogn
     
 }
 
-// MARK: - Bar View
+// MARK: - Toolbar
 
-class EditorCollapsibleBarBarView: UIView {
+class AnimEditorDrawerToolbar: UIView {
     
     let topShadowView = UIView()
     
@@ -172,7 +180,7 @@ class EditorCollapsibleBarBarView: UIView {
         super.init(frame: .zero)
         backgroundColor = .editorBarOverlay
         
-        pinHeight(to: barHeight)
+        pinHeight(to: toolbarHeight)
         
         topShadowView.backgroundColor = .editorBarShadow
         addSubview(topShadowView)

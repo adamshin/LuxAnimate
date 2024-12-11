@@ -48,8 +48,7 @@ class AnimEditorTimelineVC: UIViewController {
     
     weak var delegate: Delegate?
     
-    private let collapsibleContentVC = EditorCollapsibleContentVC()
-    
+    private let drawerVC = AnimEditorDrawerVC()
     private let toolbarVC = AnimEditorTimelineToolbarVC()
     private let trackVC = AnimEditorTimelineTrackVC()
     
@@ -86,15 +85,15 @@ class AnimEditorTimelineVC: UIViewController {
     // MARK: - Setup
     
     private func setupUI() {
-        collapsibleContentVC.delegate = self
+        drawerVC.delegate = self
         toolbarVC.delegate = self
         trackVC.delegate = self
         
-        addChild(collapsibleContentVC, to: view)
-        addChild(toolbarVC, to: collapsibleContentVC.barView)
-        addChild(trackVC, to: collapsibleContentVC.collapsibleContentView)
+        addChild(drawerVC, to: view)
+        addChild(toolbarVC, to: drawerVC.toolbar)
+        addChild(trackVC, to: drawerVC.collapsibleContentView)
         
-        collapsibleContentVC.setExpanded(false, animated: false)
+        drawerVC.setExpanded(false, animated: false)
     }
     
     // MARK: - Menu
@@ -143,12 +142,12 @@ class AnimEditorTimelineVC: UIViewController {
     }
     
     func setExpanded(_ expanded: Bool) {
-        collapsibleContentVC.setExpanded(
+        drawerVC.setExpanded(
             expanded, animated: false)
     }
     
-    var contentAreaView: UIView {
-        collapsibleContentVC.contentAreaView
+    var remainderContentView: UIView {
+        drawerVC.remainderContentView
     }
     
 }
@@ -156,17 +155,17 @@ class AnimEditorTimelineVC: UIViewController {
 // MARK: - Delegates
 
 extension AnimEditorTimelineVC:
-    EditorCollapsibleContentVCDelegate {
+    AnimEditorDrawerVCDelegate {
     
     func onSetExpanded(
-        _ vc: EditorCollapsibleContentVC,
+        _ vc: AnimEditorDrawerVC,
         _ expanded: Bool
     ) {
         toolbarVC.setExpanded(expanded)
     }
     
     func onChangeContentAreaSize(
-        _ vc: EditorCollapsibleContentVC
+        _ vc: AnimEditorDrawerVC
     ) {
         delegate?.onChangeContentAreaSize(self)
     }
@@ -192,7 +191,7 @@ extension AnimEditorTimelineVC:
     }
     
     func onSelectToggleExpanded(_ vc: AnimEditorTimelineToolbarVC) {
-        collapsibleContentVC.toggleExpanded()
+        drawerVC.toggleExpanded()
     }
     
 }

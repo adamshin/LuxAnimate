@@ -1,5 +1,5 @@
 //
-//  EditorCollapsibleContentSwipeGestureRecognizer.swift
+//  AnimEditorDrawerSwipeGestureRecognizer.swift
 //
 
 import UIKit
@@ -9,13 +9,13 @@ private let moveThreshold: CGFloat = 25
 private let flickVelocityThreshold: CGFloat = 500
 
 @MainActor
-protocol EditorCollapsibleContentSwipeGestureRecognizerDelegate: AnyObject {
+protocol AnimEditorDrawerSwipeGestureRecognizerDelegate: AnyObject {
     func onSwipe(up: Bool)
 }
 
-class EditorCollapsibleContentSwipeGestureRecognizer: UIGestureRecognizer {
+class AnimEditorDrawerSwipeGestureRecognizer: UIGestureRecognizer {
     
-    weak var gestureDelegate: EditorCollapsibleContentSwipeGestureRecognizerDelegate?
+    weak var gestureDelegate: AnimEditorDrawerSwipeGestureRecognizerDelegate?
     
     struct TrackedTouch {
         var touch: UITouch
