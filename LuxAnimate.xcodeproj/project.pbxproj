@@ -33,6 +33,7 @@
 		662232712BE1B79300C8813F /* AnimEditorToolSidebarSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662232702BE1B79300C8813F /* AnimEditorToolSidebarSlider.swift */; };
 		6625429F2C8BB6BF007D3DFB /* ThreadSafeDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6625429E2C8BB6BF007D3DFB /* ThreadSafeDictionary.swift */; };
 		662542A32C8BDDFB007D3DFB /* SceneEditBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662542A22C8BDDFB007D3DFB /* SceneEditBuilder.swift */; };
+		6629F6B42D094220008197CB /* DefaultBrushes.zip in Resources */ = {isa = PBXBuildFile; fileRef = 6629F6B32D094220008197CB /* DefaultBrushes.zip */; };
 		663107AF2C67F8D90028C89C /* EditorWorkspaceRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663107AE2C67F8D90028C89C /* EditorWorkspaceRenderer.swift */; };
 		66311CDB2BD73FAF00D53489 /* ImageResizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66311CDA2BD73FAF00D53489 /* ImageResizer.swift */; };
 		663D40D42C35EA9C004B8591 /* ProjectEditManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663D40D32C35EA9C004B8591 /* ProjectEditManager.swift */; };
@@ -82,7 +83,6 @@
 		667BF74B2BA655CB003E3430 /* FileHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667BF74A2BA655CB003E3430 /* FileHelper.swift */; };
 		6683307C2D00196A00B1B8BC /* FileCoding in Frameworks */ = {isa = PBXBuildFile; productRef = 6683307B2D00196A00B1B8BC /* FileCoding */; };
 		6684A3A92D0264B00006E223 /* BrushLibraryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6684A3A82D0264B00006E223 /* BrushLibraryManager.swift */; };
-		6684A3BA2D0270420006E223 /* DefaultBrushes.zip in Resources */ = {isa = PBXBuildFile; fileRef = 6684A3B92D0270420006E223 /* DefaultBrushes.zip */; };
 		6684A3BD2D02AC9B0006E223 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 6684A3BC2D02AC9B0006E223 /* ZIPFoundation */; };
 		668A14CC2C7D1E2000D73D36 /* AnimEditorEraseToolControlsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668A14CB2C7D1E2000D73D36 /* AnimEditorEraseToolControlsVC.swift */; };
 		668A14D72C7D3EBE00D73D36 /* AnimFrameEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668A14D62C7D3EBE00D73D36 /* AnimFrameEditor.swift */; };
@@ -163,6 +163,7 @@
 		662232702BE1B79300C8813F /* AnimEditorToolSidebarSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorToolSidebarSlider.swift; sourceTree = "<group>"; };
 		6625429E2C8BB6BF007D3DFB /* ThreadSafeDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadSafeDictionary.swift; sourceTree = "<group>"; };
 		662542A22C8BDDFB007D3DFB /* SceneEditBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneEditBuilder.swift; sourceTree = "<group>"; };
+		6629F6B32D094220008197CB /* DefaultBrushes.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = DefaultBrushes.zip; sourceTree = "<group>"; };
 		663107AE2C67F8D90028C89C /* EditorWorkspaceRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorWorkspaceRenderer.swift; sourceTree = "<group>"; };
 		66311CDA2BD73FAF00D53489 /* ImageResizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageResizer.swift; sourceTree = "<group>"; };
 		6632594A2BB66BB300460F70 /* BridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BridgingHeader.h; sourceTree = "<group>"; };
@@ -213,7 +214,6 @@
 		667BF74A2BA655CB003E3430 /* FileHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileHelper.swift; sourceTree = "<group>"; };
 		668330792D00195C00B1B8BC /* FileCoding */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = FileCoding; sourceTree = "<group>"; };
 		6684A3A82D0264B00006E223 /* BrushLibraryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrushLibraryManager.swift; sourceTree = "<group>"; };
-		6684A3B92D0270420006E223 /* DefaultBrushes.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = DefaultBrushes.zip; sourceTree = "<group>"; };
 		668A14CB2C7D1E2000D73D36 /* AnimEditorEraseToolControlsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorEraseToolControlsVC.swift; sourceTree = "<group>"; };
 		668A14D62C7D3EBE00D73D36 /* AnimFrameEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimFrameEditor.swift; sourceTree = "<group>"; };
 		668A14D82C7D7BCD00D73D36 /* AnimEditorToolState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorToolState.swift; sourceTree = "<group>"; };
@@ -836,7 +836,7 @@
 			children = (
 				66DE6BA42C923CE900A687C4 /* Assets.xcassets */,
 				66D084472BA3840D00EB8556 /* LaunchScreen.storyboard */,
-				6684A3B92D0270420006E223 /* DefaultBrushes.zip */,
+				6629F6B32D094220008197CB /* DefaultBrushes.zip */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -1005,7 +1005,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				66DE6BA52C923CE900A687C4 /* Assets.xcassets in Resources */,
-				6684A3BA2D0270420006E223 /* DefaultBrushes.zip in Resources */,
+				6629F6B42D094220008197CB /* DefaultBrushes.zip in Resources */,
 				66D084492BA3840D00EB8556 /* Base in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
