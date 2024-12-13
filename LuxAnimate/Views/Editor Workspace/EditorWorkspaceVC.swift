@@ -71,7 +71,36 @@ class EditorWorkspaceVC: UIViewController {
             metalView.bounds.width,
             metalView.bounds.height))
         
-        handleSafeAreaReferenceViewBoundsChange()
+        updateSafeAreaInsets()
+    }
+    
+    // MARK: - Safe Area
+    
+    private func updateSafeAreaInsets() {
+        guard let safeAreaReferenceView
+        else { return }
+        
+        guard let safeAreaReferenceLayer =
+            safeAreaReferenceView.layer.presentation()
+        else { return }
+        
+        let safeAreaFrame = safeAreaReferenceLayer
+            .convert(
+                safeAreaReferenceLayer.frame,
+                to: metalView.layer)
+        
+        var insets = EditorWorkspaceTransformManager
+            .SafeAreaInsets.zero
+        
+        insets.left = safeAreaFrame.minX
+        insets.right = view.bounds.width
+            - safeAreaFrame.maxX
+        
+        insets.top = safeAreaFrame.minY
+        insets.bottom = view.bounds.height
+            - safeAreaFrame.maxY
+        
+        transformManager.setViewportSafeAreaInsets(insets)
     }
     
     // MARK: - Render
@@ -118,9 +147,11 @@ class EditorWorkspaceVC: UIViewController {
     }
     
     func onFrame() {
+        updateSafeAreaInsets()
+        transformManager.onFrame()
+        
         // TODO: Check needsDraw?
         autoreleasepool {
-            transformManager.onFrame()
             draw()
         }
     }
@@ -141,25 +172,7 @@ class EditorWorkspaceVC: UIViewController {
     
     func setSafeAreaReferenceView(_ v: UIView) {
         safeAreaReferenceView = v
-        handleSafeAreaReferenceViewBoundsChange()
-    }
-    
-    func handleSafeAreaReferenceViewBoundsChange() {
-        guard let safeAreaReferenceView else { return }
-        
-        let safeAreaFrame = safeAreaReferenceView.convert(
-            safeAreaReferenceView.bounds,
-            to: view)
-        
-        var insets = EditorWorkspaceTransformManager
-            .SafeAreaInsets.zero
-        
-        insets.left = safeAreaFrame.minX
-        insets.right = view.bounds.width - safeAreaFrame.maxX
-        insets.top = safeAreaFrame.minY
-        insets.bottom = view.bounds.height - safeAreaFrame.maxY
-        
-        transformManager.setViewportSafeAreaInsets(insets)
+        updateSafeAreaInsets()
     }
     
 }

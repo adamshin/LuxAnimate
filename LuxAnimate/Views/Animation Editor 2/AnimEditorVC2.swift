@@ -5,6 +5,10 @@
 import UIKit
 import Geometry
 
+private let contentSize = Size(
+//    width: 1920, height: 1080)
+    width: 1080, height: 1920)
+
 @MainActor
 protocol AnimEditorVC2Delegate: AnyObject {
     
@@ -114,11 +118,6 @@ class AnimEditorVC2: UIViewController {
         setInitialState()
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        workspaceVC.handleSafeAreaReferenceViewBoundsChange()
-    }
-    
     override var prefersStatusBarHidden: Bool { true }
     
     // MARK: - Setup
@@ -168,8 +167,6 @@ class AnimEditorVC2: UIViewController {
     }
     
     private func setInitialSceneGraph() {
-        let contentSize = Size(width: 1920, height: 1080)
-        
         let sceneGraph = EditorWorkspaceSceneGraph(
             contentSize: contentSize,
             layers: [
@@ -375,9 +372,7 @@ extension AnimEditorVC2: AnimEditorTimelineVC.Delegate {
     
     func onChangeDrawerSize(
         _ vc: AnimEditorTimelineVC
-    ) {
-        workspaceVC.handleSafeAreaReferenceViewBoundsChange()
-    }
+    ) { }
     
     func onChangeFocusedFrameIndex(
         _ vc: AnimEditorTimelineVC,
