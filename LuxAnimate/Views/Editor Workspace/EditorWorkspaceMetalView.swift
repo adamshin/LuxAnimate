@@ -4,14 +4,18 @@
 
 import UIKit
 
-@MainActor
-protocol EditorWorkspaceMetalViewDelegate: AnyObject {
-    func onRequestDraw(_ view: EditorWorkspaceMetalView)
+extension EditorWorkspaceMetalView {
+    
+    @MainActor
+    protocol Delegate: AnyObject {
+        func onRequestDraw(_ v: EditorWorkspaceMetalView)
+    }
+    
 }
 
 class EditorWorkspaceMetalView: UIView {
     
-    weak var delegate: EditorWorkspaceMetalViewDelegate?
+    weak var delegate: Delegate?
     
     override class var layerClass: AnyClass {
         CAMetalLayer.self

@@ -17,7 +17,7 @@ protocol AnimEditorDrawerVCDelegate: AnyObject {
         _ vc: AnimEditorDrawerVC,
         _ expanded: Bool)
     
-    func onChangeContentAreaSize(
+    func onChangeDrawerSize(
         _ vc: AnimEditorDrawerVC)
     
 }
@@ -124,7 +124,7 @@ class AnimEditorDrawerVC: UIViewController {
                 expanded ? separatorColor : .clear
             
             self.view.layoutIfNeeded()
-            self.delegate?.onChangeContentAreaSize(self)
+            self.delegate?.onChangeDrawerSize(self)
         }
         
         if animated {

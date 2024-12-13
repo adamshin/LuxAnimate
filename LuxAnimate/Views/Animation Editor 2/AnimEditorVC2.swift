@@ -32,11 +32,11 @@ class AnimEditorVC2: UIViewController {
     
     // MARK: - View
     
-//    private let workspaceVC = EditorWorkspaceVC()
+    private let workspaceVC = EditorWorkspaceVC()
+    private let timelineVC: AnimEditorTimelineVC
+    
     private let toolbarVC = AnimEditorToolbarVC2()
     private let workspaceControlsVC = AnimEditorWorkspaceControlsVC()
-    
-    private let timelineVC: AnimEditorTimelineVC
     
     // MARK: - State
     
@@ -93,9 +93,9 @@ class AnimEditorVC2: UIViewController {
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
         
-//        workspaceVC.delegate = self
-        toolbarVC.delegate = self
+        workspaceVC.delegate = self
         timelineVC.delegate = self
+        toolbarVC.delegate = self
         
         assetLoader.delegate = self
         editBuilder.delegate = self
@@ -121,8 +121,7 @@ class AnimEditorVC2: UIViewController {
     private func setupUI() {
         view.backgroundColor = .editorBackground
         
-//        addChild(workspaceVC, to: bodyView.workspaceContainer)
-        
+        addChild(workspaceVC, to: view)
         addChild(toolbarVC, to: view)
         addChild(timelineVC, to: toolbarVC.remainderContentView)
         addChild(workspaceControlsVC, to: timelineVC.remainderContentView)
@@ -151,6 +150,25 @@ class AnimEditorVC2: UIViewController {
 //            selectedTool: state.selectedTool)
         
         updateFrameEditor()
+        
+        // TESTING
+        setInitialSceneGraph()
+    }
+    
+    private func setInitialSceneGraph() {
+        let contentSize = Size(width: 1920, height: 1080)
+        
+        let sceneGraph = EditorWorkspaceSceneGraph(
+            contentSize: contentSize,
+            layers: [
+                .init(
+                    content: .rect(.init(color: .brushBlue)),
+                    contentSize: contentSize,
+                    transform: .identity,
+                    alpha: 1)
+            ])
+        
+        workspaceVC.setSceneGraph(sceneGraph)
     }
     
     private func applyStateUpdate(
@@ -250,48 +268,7 @@ class AnimEditorVC2: UIViewController {
     // MARK: - Frame
     
     private func onFrame() {
-//        autoreleasepool {
-//            workspaceVC.onFrame()
-//            
-//            let sceneGraph = frameEditor?.onFrame()
-//            if let sceneGraph {
-                // Maybe only set this if it changes?
-//                workspaceVC.setContentSize(sceneGraph.contentSize)
-//                
-//                let viewportSize = workspaceVC.viewportSize()
-//                let workspaceTransform = workspaceVC.workspaceTransform()
-                
-//                draw(
-//                    viewportSize: viewportSize,
-//                    workspaceTransform: workspaceTransform,
-//                    sceneGraph: sceneGraph)
-//            }
-//        }
-    }
-    
-    // MARK: - Render
-    
-    private func draw(
-        viewportSize: Size,
-        workspaceTransform: EditorWorkspaceTransform,
-        sceneGraph: EditorWorkspaceSceneGraph
-    ) {
-//        guard let drawable = workspaceVC
-//            .metalView.metalLayer.nextDrawable()
-//        else { return }
-//        
-//        let commandBuffer = MetalInterface.shared
-//            .commandQueue.makeCommandBuffer()!
-//        
-//        workspaceRenderer.draw(
-//            target: drawable.texture,
-//            commandBuffer: commandBuffer,
-//            viewportSize: viewportSize,
-//            workspaceTransform: workspaceTransform,
-//            sceneGraph: sceneGraph)
-//        
-//        commandBuffer.present(drawable)
-//        commandBuffer.commit()
+        workspaceVC.onFrame()
     }
     
     // MARK: - Navigation
@@ -332,7 +309,7 @@ class AnimEditorVC2: UIViewController {
 
 // MARK: - Delegates
 
-extension AnimEditorVC2: EditorWorkspaceVCDelegate {
+extension AnimEditorVC2: EditorWorkspaceVC.Delegate {
     
     func onSelectUndo(_ vc: EditorWorkspaceVC) {
         delegate?.onRequestUndo(self)
@@ -384,10 +361,10 @@ extension AnimEditorVC2: AnimEditorToolbarVC2Delegate {
 
 extension AnimEditorVC2: AnimEditorTimelineVC.Delegate {
     
-    func onChangeContentAreaSize(
+    func onChangeDrawerSize(
         _ vc: AnimEditorTimelineVC
     ) {
-        // TODO: We need to do stuff here?
+        // TODO: Update workspace safe area?
     }
     
     func onChangeFocusedFrameIndex(

@@ -42,7 +42,7 @@ class AnimEditorEraseToolState: AnimEditorToolState {
         workspaceVC: EditorWorkspaceVC,
         toolControlsVC: AnimEditorToolControlsVC
     ) {
-        workspaceVC.addToolGestureRecognizer(
+        workspaceVC.addOverlayGestureRecognizer(
             brushGestureRecognizer)
         
         toolControlsVC.show(controlsVC)
@@ -52,7 +52,7 @@ class AnimEditorEraseToolState: AnimEditorToolState {
         workspaceVC: EditorWorkspaceVC,
         toolControlsVC: AnimEditorToolControlsVC
     ) {
-        workspaceVC.removeAllToolGestureRecognizers()
+        workspaceVC.removeAllOverlayGestureRecognizers()
         toolControlsVC.show(nil)
     }
     

@@ -8,13 +8,21 @@ import Geometry
 import Color
 import Render
 
-private let backgroundColor = Color(UIColor.editorBackground)
+// MARK: - Config
+
+private let backgroundColor = Color(
+    UIColor.editorBackground)
+
 private let scalePixelateThreshold: Double = 1.0
+
+// MARK: - EditorWorkspaceRenderer
 
 struct EditorWorkspaceRenderer {
     
     private let spriteRenderer: SpriteRenderer
     private let blankTexture: MTLTexture
+    
+    // MARK: - Init
     
     init(
         pixelFormat: MTLPixelFormat = AppConfig.metalLayerPixelFormat
@@ -26,6 +34,8 @@ struct EditorWorkspaceRenderer {
         blankTexture = createBlankTexture(color: .white)!
     }
     
+    // MARK: - Draw
+    
     func draw(
         target: MTLTexture,
         commandBuffer: MTLCommandBuffer,
@@ -34,9 +44,10 @@ struct EditorWorkspaceRenderer {
         sceneGraph: EditorWorkspaceSceneGraph
     ) {
         // Transform
-        let viewportTransform = Matrix3(translation: Vector(
-            viewportSize.width / 2,
-            viewportSize.height / 2))
+        let viewportTransform = Matrix3(
+            translation: Vector(
+                viewportSize.width / 2,
+                viewportSize.height / 2))
         
         let contentTransform =
             viewportTransform *
@@ -139,22 +150,41 @@ struct EditorWorkspaceRenderer {
     
 }
 
-private func createBlankTexture(color: Color) -> MTLTexture? {
-    let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(
-        pixelFormat: .rgba8Unorm,
-        width: 1,
-        height: 1,
-        mipmapped: false)
-    textureDescriptor.usage = [.shaderRead, .shaderWrite]
+// MARK: - Utilities
+
+private func createBlankTexture(
+    color: Color
+) -> MTLTexture? {
+    
+    let textureDescriptor =
+        MTLTextureDescriptor.texture2DDescriptor(
+            pixelFormat: .rgba8Unorm,
+            width: 1,
+            height: 1,
+            mipmapped: false)
+    
+    textureDescriptor.usage = [
+        .shaderRead,
+        .shaderWrite
+    ]
     
     guard let texture = MetalInterface.shared.device
         .makeTexture(descriptor: textureDescriptor)
     else { return nil }
     
     let region = MTLRegionMake2D(0, 0, 1, 1)
-    var c = simd_uchar4(color.r, color.g, color.b, color.a)
     
-    texture.replace(region: region, mipmapLevel: 0, withBytes: &c, bytesPerRow: 4)
+    var c = simd_uchar4(
+        color.r,
+        color.g,
+        color.b,
+        color.a)
+    
+    texture.replace(
+        region: region,
+        mipmapLevel: 0,
+        withBytes: &c,
+        bytesPerRow: 4)
     
     return texture
 }

@@ -309,8 +309,8 @@
 		661A24612C8696CE0031FE82 /* Editor Workspace */ = {
 			isa = PBXGroup;
 			children = (
-				661A24622C8696F00031FE82 /* Transform */,
 				661A24662C8697FB0031FE82 /* Scene Graph */,
+				661A24622C8696F00031FE82 /* Transform */,
 				668A14D32C7D3E2D00D73D36 /* Renderer */,
 				664C281C2C741011002166D6 /* EditorWorkspaceVC.swift */,
 				664C281E2C741062002166D6 /* EditorWorkspaceMetalView.swift */,

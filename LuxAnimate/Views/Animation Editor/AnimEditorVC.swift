@@ -256,23 +256,23 @@ class AnimEditorVC: UIViewController {
     // MARK: - Frame
     
     private func onFrame() {
-        autoreleasepool {
-            workspaceVC.onFrame()
-            
-            let sceneGraph = frameEditor?.onFrame()
-            if let sceneGraph {
-                // Maybe only set this if it changes?
-                workspaceVC.setContentSize(sceneGraph.contentSize)
-                
-                let viewportSize = workspaceVC.viewportSize()
-                let workspaceTransform = workspaceVC.workspaceTransform()
-                
-                draw(
-                    viewportSize: viewportSize,
-                    workspaceTransform: workspaceTransform,
-                    sceneGraph: sceneGraph)
-            }
-        }
+//        autoreleasepool {
+//            workspaceVC.onFrame()
+//            
+//            let sceneGraph = frameEditor?.onFrame()
+//            if let sceneGraph {
+//                // Maybe only set this if it changes?
+//                workspaceVC.setContentSize(sceneGraph.contentSize)
+//                
+//                let viewportSize = workspaceVC.viewportSize()
+//                let workspaceTransform = workspaceVC.workspaceTransform()
+//                
+//                draw(
+//                    viewportSize: viewportSize,
+//                    workspaceTransform: workspaceTransform,
+//                    sceneGraph: sceneGraph)
+//            }
+//        }
     }
     
     // MARK: - Render
@@ -282,22 +282,22 @@ class AnimEditorVC: UIViewController {
         workspaceTransform: EditorWorkspaceTransform,
         sceneGraph: EditorWorkspaceSceneGraph
     ) {
-        guard let drawable = workspaceVC
-            .metalView.metalLayer.nextDrawable()
-        else { return }
-        
-        let commandBuffer = MetalInterface.shared
-            .commandQueue.makeCommandBuffer()!
-        
-        workspaceRenderer.draw(
-            target: drawable.texture,
-            commandBuffer: commandBuffer,
-            viewportSize: viewportSize,
-            workspaceTransform: workspaceTransform,
-            sceneGraph: sceneGraph)
-        
-        commandBuffer.present(drawable)
-        commandBuffer.commit()
+//        guard let drawable = workspaceVC
+//            .metalView.metalLayer.nextDrawable()
+//        else { return }
+//        
+//        let commandBuffer = MetalInterface.shared
+//            .commandQueue.makeCommandBuffer()!
+//        
+//        workspaceRenderer.draw(
+//            target: drawable.texture,
+//            commandBuffer: commandBuffer,
+//            viewportSize: viewportSize,
+//            workspaceTransform: workspaceTransform,
+//            sceneGraph: sceneGraph)
+//        
+//        commandBuffer.present(drawable)
+//        commandBuffer.commit()
     }
     
     // MARK: - Navigation
@@ -338,7 +338,7 @@ class AnimEditorVC: UIViewController {
 
 // MARK: - Delegates
 
-extension AnimEditorVC: EditorWorkspaceVCDelegate {
+extension AnimEditorVC: EditorWorkspaceVC.Delegate {
     
     func onSelectUndo(_ vc: EditorWorkspaceVC) {
         delegate?.onRequestUndo(self)
@@ -390,7 +390,7 @@ extension AnimEditorVC: AnimEditorToolbarVCDelegate {
 
 extension AnimEditorVC: AnimEditorTimelineVC.Delegate {
     
-    func onChangeContentAreaSize(
+    func onChangeDrawerSize(
         _ vc: AnimEditorTimelineVC
     ) { }
     

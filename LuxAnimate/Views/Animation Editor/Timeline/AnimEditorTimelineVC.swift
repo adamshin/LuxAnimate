@@ -9,7 +9,7 @@ extension AnimEditorTimelineVC {
     @MainActor
     protocol Delegate: AnyObject {
         
-        func onChangeContentAreaSize(
+        func onChangeDrawerSize(
             _ vc: AnimEditorTimelineVC)
         
         func onChangeFocusedFrameIndex(
@@ -164,10 +164,10 @@ extension AnimEditorTimelineVC:
         toolbarVC.setExpanded(expanded)
     }
     
-    func onChangeContentAreaSize(
+    func onChangeDrawerSize(
         _ vc: AnimEditorDrawerVC
     ) {
-        delegate?.onChangeContentAreaSize(self)
+        delegate?.onChangeDrawerSize(self)
     }
     
 }

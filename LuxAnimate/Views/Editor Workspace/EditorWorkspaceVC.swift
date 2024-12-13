@@ -9,32 +9,40 @@ import Geometry
 private let minZoomScale: Double = 0.1
 private let maxZoomScale: Double = 30
 
-@MainActor
-protocol EditorWorkspaceVCDelegate: AnyObject {
+extension EditorWorkspaceVC {
     
-    func onSelectUndo(_ vc: EditorWorkspaceVC)
-    func onSelectRedo(_ vc: EditorWorkspaceVC)
+    @MainActor
+    protocol Delegate: AnyObject {
+        func onSelectUndo(_ vc: EditorWorkspaceVC)
+        func onSelectRedo(_ vc: EditorWorkspaceVC)
+    }
     
 }
 
 class EditorWorkspaceVC: UIViewController {
     
-    weak var delegate: EditorWorkspaceVCDelegate?
+    weak var delegate: Delegate?
     
-    let metalView = EditorWorkspaceMetalView()
+    private let metalView = EditorWorkspaceMetalView()
     private let overlayView = EditorWorkspaceOverlayView()
     
-    private let workspaceTransformManager = EditorWorkspaceTransformManager()
+    private let transformManager =
+        EditorWorkspaceTransformManager()
+    
+    private let renderer = EditorWorkspaceRenderer()
+    
+    private var sceneGraph: EditorWorkspaceSceneGraph?
+    private var needsDraw = false
     
     // MARK: - Init
     
     init() {
         super.init(nibName: nil, bundle: nil)
         
-        workspaceTransformManager.delegate = self
-        workspaceTransformManager.setMinScale(minZoomScale)
-        workspaceTransformManager.setMaxScale(maxZoomScale)
-        workspaceTransformManager.fitContentToViewport()
+        transformManager.delegate = self
+        transformManager.setMinScale(minZoomScale)
+        transformManager.setMaxScale(maxZoomScale)
+        transformManager.fitContentToViewport()
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -57,69 +65,103 @@ class EditorWorkspaceVC: UIViewController {
         metalView.frame = view.bounds
         overlayView.frame = view.bounds
         
-        workspaceTransformManager.setViewportSize(
-            Size(
-                metalView.bounds.width,
-                metalView.bounds.height))
+        transformManager.setViewportSize(Size(
+            metalView.bounds.width,
+            metalView.bounds.height))
+    }
+    
+    // MARK: - Render
+    
+    private func draw() {
+        guard let sceneGraph else { return }
+        
+        guard let drawable =
+            metalView.metalLayer.nextDrawable()
+        else { return }
+        
+        let viewportSize = Size(
+            metalView.bounds.width,
+            metalView.bounds.height)
+        
+        let workspaceTransform =
+            transformManager.transform()
+        
+        let commandBuffer = MetalInterface.shared
+            .commandQueue.makeCommandBuffer()!
+        
+        renderer.draw(
+            target: drawable.texture,
+            commandBuffer: commandBuffer,
+            viewportSize: viewportSize,
+            workspaceTransform: workspaceTransform,
+            sceneGraph: sceneGraph)
+        
+        commandBuffer.present(drawable)
+        commandBuffer.commit()
     }
     
     // MARK: - Interface
     
+    func setSceneGraph(
+        _ sceneGraph: EditorWorkspaceSceneGraph
+    ) {
+        self.sceneGraph = sceneGraph
+        
+        // TODO: Only set this if it changes?
+        transformManager.setContentSize(
+            sceneGraph.contentSize)
+        
+        needsDraw = true
+    }
+    
     func onFrame() {
-        workspaceTransformManager.onFrame()
+        autoreleasepool {
+            transformManager.onFrame()
+            draw()
+            
+//            if needsDraw {
+//                needsDraw = false
+//                draw()
+//            }
+        }
     }
     
-    func setContentSize(_ contentSize: Size) {
-        workspaceTransformManager
-            .setContentSize(contentSize)
+    func addOverlayGestureRecognizer(
+        _ g: UIGestureRecognizer
+    ) {
+        overlayView.addOverlayGestureRecognizer(g)
     }
     
-    func addToolGestureRecognizer(_ g: UIGestureRecognizer) {
-        overlayView.addToolGestureRecognizer(g)
-    }
-    
-    func removeAllToolGestureRecognizers() {
-        overlayView.removeAllToolGestureRecognizers()
-    }
-    
-    func viewportSize() -> Size {
-        Size(
-            metalView.bounds.width,
-            metalView.bounds.height)
+    func removeAllOverlayGestureRecognizers() {
+        overlayView.removeAllOverlayGestureRecognizers()
     }
     
     func workspaceTransform() -> EditorWorkspaceTransform {
-        workspaceTransformManager.transform()
+        transformManager.transform()
     }
     
 }
 
 // MARK: - Delegates
 
-extension EditorWorkspaceVC: EditorWorkspaceTransformManagerDelegate {
+extension EditorWorkspaceVC:
+    EditorWorkspaceMetalView.Delegate {
     
-    func onUpdateTransform(
-        _ m: EditorWorkspaceTransformManager
-    ) { 
-        // TODO: Report to delegate that we need draw?
+    func onRequestDraw(
+        _ view: EditorWorkspaceMetalView
+    ) {
+        needsDraw = true
     }
     
 }
 
-extension EditorWorkspaceVC: EditorWorkspaceMetalViewDelegate {
-    
-    func onRequestDraw(_ view: EditorWorkspaceMetalView) {
-        // TODO: Report to delegate that we need draw?
-    }
-    
-}
-
-extension EditorWorkspaceVC: EditorWorkspaceOverlayViewDelegate {
+extension EditorWorkspaceVC:
+    EditorWorkspaceOverlayView.Delegate {
     
     func onBeginWorkspaceTransformGesture(
         _ v: EditorWorkspaceOverlayView
     ) {
-        workspaceTransformManager.handleBeginTransformGesture()
+        transformManager.handleBeginTransformGesture()
     }
     
     func onUpdateWorkspaceTransformGesture(
@@ -129,7 +171,7 @@ extension EditorWorkspaceVC: EditorWorkspaceOverlayViewDelegate {
         rotation: Double,
         scale: Double
     ) {
-        workspaceTransformManager.handleUpdateTransformGesture(
+        transformManager.handleUpdateTransformGesture(
             initialAnchorPosition: initialAnchorPosition,
             translation: translation,
             rotation: rotation,
@@ -141,7 +183,7 @@ extension EditorWorkspaceVC: EditorWorkspaceOverlayViewDelegate {
         finalAnchorPosition: Vector,
         pinchFlickIn: Bool
     ) {
-        workspaceTransformManager.handleEndTransformGesture(
+        transformManager.handleEndTransformGesture(
             finalAnchorPosition: finalAnchorPosition,
             pinchFlickIn: pinchFlickIn)
     }
@@ -152,6 +194,17 @@ extension EditorWorkspaceVC: EditorWorkspaceOverlayViewDelegate {
     
     func onSelectRedo(_ v: EditorWorkspaceOverlayView) {
         delegate?.onSelectRedo(self)
+    }
+    
+}
+
+extension EditorWorkspaceVC:
+    EditorWorkspaceTransformManager.Delegate {
+    
+    func onUpdateTransform(
+        _ m: EditorWorkspaceTransformManager
+    ) {
+        needsDraw = true
     }
     
 }
