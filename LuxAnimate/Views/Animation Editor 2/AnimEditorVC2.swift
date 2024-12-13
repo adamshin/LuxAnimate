@@ -114,6 +114,11 @@ class AnimEditorVC2: UIViewController {
         setInitialState()
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        workspaceVC.handleSafeAreaReferenceViewBoundsChange()
+    }
+    
     override var prefersStatusBarHidden: Bool { true }
     
     // MARK: - Setup
@@ -123,8 +128,15 @@ class AnimEditorVC2: UIViewController {
         
         addChild(workspaceVC, to: view)
         addChild(toolbarVC, to: view)
-        addChild(timelineVC, to: toolbarVC.remainderContentView)
-        addChild(workspaceControlsVC, to: timelineVC.remainderContentView)
+        
+        addChild(timelineVC,
+            to: toolbarVC.remainderContentView)
+        
+        addChild(workspaceControlsVC,
+            to: timelineVC.remainderContentView)
+        
+        workspaceVC.setSafeAreaReferenceView(
+            timelineVC.remainderContentView)
     }
     
     private func setupDisplayLink() {
@@ -364,7 +376,7 @@ extension AnimEditorVC2: AnimEditorTimelineVC.Delegate {
     func onChangeDrawerSize(
         _ vc: AnimEditorTimelineVC
     ) {
-        // TODO: Update workspace safe area?
+        workspaceVC.handleSafeAreaReferenceViewBoundsChange()
     }
     
     func onChangeFocusedFrameIndex(

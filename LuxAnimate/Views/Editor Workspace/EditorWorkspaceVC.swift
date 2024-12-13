@@ -34,6 +34,8 @@ class EditorWorkspaceVC: UIViewController {
     private var sceneGraph: EditorWorkspaceSceneGraph?
     private var needsDraw = false
     
+    private var safeAreaReferenceView: UIView?
+    
     // MARK: - Init
     
     init() {
@@ -68,6 +70,8 @@ class EditorWorkspaceVC: UIViewController {
         transformManager.setViewportSize(Size(
             metalView.bounds.width,
             metalView.bounds.height))
+        
+        handleSafeAreaReferenceViewBoundsChange()
     }
     
     // MARK: - Render
@@ -107,7 +111,6 @@ class EditorWorkspaceVC: UIViewController {
     ) {
         self.sceneGraph = sceneGraph
         
-        // TODO: Only set this if it changes?
         transformManager.setContentSize(
             sceneGraph.contentSize)
         
@@ -115,14 +118,10 @@ class EditorWorkspaceVC: UIViewController {
     }
     
     func onFrame() {
+        // TODO: Check needsDraw?
         autoreleasepool {
             transformManager.onFrame()
             draw()
-            
-//            if needsDraw {
-//                needsDraw = false
-//                draw()
-//            }
         }
     }
     
@@ -138,6 +137,29 @@ class EditorWorkspaceVC: UIViewController {
     
     func workspaceTransform() -> EditorWorkspaceTransform {
         transformManager.transform()
+    }
+    
+    func setSafeAreaReferenceView(_ v: UIView) {
+        safeAreaReferenceView = v
+        handleSafeAreaReferenceViewBoundsChange()
+    }
+    
+    func handleSafeAreaReferenceViewBoundsChange() {
+        guard let safeAreaReferenceView else { return }
+        
+        let safeAreaFrame = safeAreaReferenceView.convert(
+            safeAreaReferenceView.bounds,
+            to: view)
+        
+        var insets = EditorWorkspaceTransformManager
+            .SafeAreaInsets.zero
+        
+        insets.left = safeAreaFrame.minX
+        insets.right = view.bounds.width - safeAreaFrame.maxX
+        insets.top = safeAreaFrame.minY
+        insets.bottom = view.bounds.height - safeAreaFrame.maxY
+        
+        transformManager.setViewportSafeAreaInsets(insets)
     }
     
 }
