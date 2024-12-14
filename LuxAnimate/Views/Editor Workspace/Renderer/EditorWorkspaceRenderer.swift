@@ -25,7 +25,8 @@ struct EditorWorkspaceRenderer {
     // MARK: - Init
     
     init(
-        pixelFormat: MTLPixelFormat = AppConfig.metalLayerPixelFormat
+        pixelFormat: MTLPixelFormat =
+            AppConfig.metalLayerPixelFormat
     ) {
         spriteRenderer = SpriteRenderer(
             pixelFormat: pixelFormat,
@@ -37,13 +38,13 @@ struct EditorWorkspaceRenderer {
     // MARK: - Draw
     
     func draw(
-        target: MTLTexture,
-        commandBuffer: MTLCommandBuffer,
+        drawable: CAMetalDrawable,
         viewportSize: Size,
         workspaceTransform: EditorWorkspaceTransform,
         sceneGraph: EditorWorkspaceSceneGraph
     ) {
-        // Transform
+        let target = drawable.texture
+        
         let viewportTransform = Matrix3(
             translation: Vector(
                 viewportSize.width / 2,
@@ -53,39 +54,147 @@ struct EditorWorkspaceRenderer {
             viewportTransform *
             workspaceTransform.matrix()
         
-        // Pixelation
         let pixelate =
             workspaceTransform.scale >
             scalePixelateThreshold
         
+        let commandBuffer = MetalInterface.shared
+            .commandQueue.makeCommandBuffer()!
+        
+        drawSceneGraph(
+            target: target,
+            commandBuffer: commandBuffer,
+            viewportSize: viewportSize,
+            contentTransform: contentTransform,
+            pixelate: pixelate,
+            sceneGraph: sceneGraph)
+        
+        commandBuffer.present(drawable)
+        commandBuffer.commit()
+    }
+    
+    private func drawSceneGraph(
+        target: MTLTexture,
+        commandBuffer: MTLCommandBuffer,
+        viewportSize: Size,
+        contentTransform: Matrix3,
+        pixelate: Bool,
+        sceneGraph: EditorWorkspaceSceneGraph
+    ) {
         // Background color
         ClearColorRenderer.drawClearColor(
             commandBuffer: commandBuffer,
             target: target,
             color: backgroundColor)
         
+        // Frame
+        drawLayer(
+            target: target,
+            commandBuffer: commandBuffer,
+            viewportSize: viewportSize,
+            contentTransform: Matrix3(
+                translation: Vector(
+                    viewportSize.width / 2,
+                    viewportSize.height / 2)),
+            pixelate: false,
+            layer: .init(
+                content: .rect(.init(color: .green)),
+                contentSize: viewportSize,
+                transform: .identity,
+                alpha: 1))
+        
+        drawLayer(
+            target: target,
+            commandBuffer: commandBuffer,
+            viewportSize: viewportSize,
+            contentTransform: Matrix3(
+                translation: Vector(
+                    viewportSize.width / 2,
+                    viewportSize.height / 2)),
+            pixelate: false,
+            layer: .init(
+                content: .rect(.init(color: backgroundColor)),
+                contentSize: Size(
+                    viewportSize.width - 48,
+                    viewportSize.height - 48),
+                transform: .identity,
+                alpha: 1))
+        
+        // Corners
+        for offset: (Double, Double) in
+            [(0, 0), (0, 1), (1, 0), (1, 1)] {
+            
+            let size: Double = 48
+            drawLayer(
+                target: target,
+                commandBuffer: commandBuffer,
+                viewportSize: viewportSize,
+                contentTransform: .identity,
+                pixelate: false,
+                layer: .init(
+                    content: .rect(.init(color: .debugRed)),
+                    contentSize: Size(size, size),
+                    transform: .init(translation: Vector(
+                        size/2 + offset.0 * (viewportSize.width - size),
+                        size/2 + offset.1 * (viewportSize.height - size))),
+                    alpha: 1))
+        }
+        
+        // Center
+        drawLayer(
+            target: target,
+            commandBuffer: commandBuffer,
+            viewportSize: viewportSize,
+            contentTransform: Matrix3(
+                translation: Vector(
+                    viewportSize.width / 2,
+                    viewportSize.height / 2)),
+            pixelate: false,
+            layer: .init(
+                content: .rect(.init(color: .brushBlue)),
+                contentSize: Size(200, 200),
+                transform: .identity,
+                alpha: 1))
+        
         // Layers
         for layer in sceneGraph.layers {
-            switch layer.content {
-            case .image(let content):
-                drawImageLayer(
-                    target: target,
-                    commandBuffer: commandBuffer,
-                    viewportSize: viewportSize,
-                    contentTransform: contentTransform,
-                    layer: layer,
-                    content: content,
-                    pixelate: pixelate)
-                
-            case .rect(let content):
-                drawRectLayer(
-                    target: target,
-                    commandBuffer: commandBuffer,
-                    viewportSize: viewportSize,
-                    contentTransform: contentTransform,
-                    layer: layer,
-                    content: content)
-            }
+            drawLayer(
+                target: target,
+                commandBuffer: commandBuffer,
+                viewportSize: viewportSize,
+                contentTransform: contentTransform,
+                pixelate: pixelate,
+                layer: layer)
+        }
+    }
+    
+    private func drawLayer(
+        target: MTLTexture,
+        commandBuffer: MTLCommandBuffer,
+        viewportSize: Size,
+        contentTransform: Matrix3,
+        pixelate: Bool,
+        layer: EditorWorkspaceSceneGraph.Layer
+    ) {
+        switch layer.content {
+        case .image(let content):
+            drawImageLayer(
+                target: target,
+                commandBuffer: commandBuffer,
+                viewportSize: viewportSize,
+                contentTransform: contentTransform,
+                pixelate: pixelate,
+                layer: layer,
+                content: content)
+            
+        case .rect(let content):
+            drawRectLayer(
+                target: target,
+                commandBuffer: commandBuffer,
+                viewportSize: viewportSize,
+                contentTransform: contentTransform,
+                layer: layer,
+                content: content)
         }
     }
     
@@ -94,9 +203,9 @@ struct EditorWorkspaceRenderer {
         commandBuffer: MTLCommandBuffer,
         viewportSize: Size,
         contentTransform: Matrix3,
+        pixelate: Bool,
         layer: EditorWorkspaceSceneGraph.Layer,
-        content: EditorWorkspaceSceneGraph.ImageLayerContent,
-        pixelate: Bool
+        content: EditorWorkspaceSceneGraph.ImageLayerContent
     ) {
         guard let texture = content.texture else { return }
         

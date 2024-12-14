@@ -6,8 +6,7 @@ import UIKit
 import Geometry
 
 private let contentSize = Size(
-//    width: 1920, height: 1080)
-    width: 1080, height: 1920)
+    width: 1920, height: 1080)
 
 @MainActor
 protocol AnimEditorVC2Delegate: AnyObject {
@@ -171,7 +170,7 @@ class AnimEditorVC2: UIViewController {
             contentSize: contentSize,
             layers: [
                 .init(
-                    content: .rect(.init(color: .brushBlue)),
+                    content: .rect(.init(color: .white)),
                     contentSize: contentSize,
                     transform: .identity,
                     alpha: 1)

@@ -67,16 +67,34 @@ class EditorWorkspaceVC: UIViewController {
         metalView.frame = view.bounds
         overlayView.frame = view.bounds
         
-        transformManager.setViewportSize(Size(
-            metalView.bounds.width,
-            metalView.bounds.height))
-        
-        updateSafeAreaInsets()
+        updateLayout()
     }
     
-    // MARK: - Safe Area
+    // MARK: - Layout
     
-    private func updateSafeAreaInsets() {
+    private func updateLayout() {
+        guard let presentationLayer =
+            view.layer.presentation()
+        else { return }
+        
+        updateViewportSize(
+            presentationLayer: presentationLayer)
+        
+        updateViewportSafeAreaInsets(
+            presentationLayer: presentationLayer)
+    }
+    
+    private func updateViewportSize(
+        presentationLayer: CALayer
+    ) {
+        transformManager.setViewportSize(Size(
+            presentationLayer.bounds.width,
+            presentationLayer.bounds.height))
+    }
+    
+    private func updateViewportSafeAreaInsets(
+        presentationLayer: CALayer
+    ) {
         guard let safeAreaReferenceView
         else { return }
         
@@ -87,17 +105,20 @@ class EditorWorkspaceVC: UIViewController {
         let safeAreaFrame = safeAreaReferenceLayer
             .convert(
                 safeAreaReferenceLayer.frame,
-                to: metalView.layer)
+                to: presentationLayer)
         
         var insets = EditorWorkspaceTransformManager
             .SafeAreaInsets.zero
         
         insets.left = safeAreaFrame.minX
-        insets.right = view.bounds.width
+        insets.top = safeAreaFrame.minY
+        
+        insets.right =
+            presentationLayer.bounds.width
             - safeAreaFrame.maxX
         
-        insets.top = safeAreaFrame.minY
-        insets.bottom = view.bounds.height
+        insets.bottom =
+            presentationLayer.bounds.height
             - safeAreaFrame.maxY
         
         transformManager.setViewportSafeAreaInsets(insets)
@@ -112,25 +133,22 @@ class EditorWorkspaceVC: UIViewController {
             metalView.metalLayer.nextDrawable()
         else { return }
         
+        guard let presentationLayer =
+            metalView.metalLayer.presentation()
+        else { return }
+        
         let viewportSize = Size(
-            metalView.bounds.width,
-            metalView.bounds.height)
+            presentationLayer.bounds.width,
+            presentationLayer.bounds.height)
         
         let workspaceTransform =
             transformManager.transform()
         
-        let commandBuffer = MetalInterface.shared
-            .commandQueue.makeCommandBuffer()!
-        
         renderer.draw(
-            target: drawable.texture,
-            commandBuffer: commandBuffer,
+            drawable: drawable,
             viewportSize: viewportSize,
             workspaceTransform: workspaceTransform,
             sceneGraph: sceneGraph)
-        
-        commandBuffer.present(drawable)
-        commandBuffer.commit()
     }
     
     // MARK: - Interface
@@ -147,10 +165,9 @@ class EditorWorkspaceVC: UIViewController {
     }
     
     func onFrame() {
-        updateSafeAreaInsets()
+        updateLayout()
         transformManager.onFrame()
         
-        // TODO: Check needsDraw?
         autoreleasepool {
             draw()
         }
@@ -172,7 +189,7 @@ class EditorWorkspaceVC: UIViewController {
     
     func setSafeAreaReferenceView(_ v: UIView) {
         safeAreaReferenceView = v
-        updateSafeAreaInsets()
+        updateLayout()
     }
     
 }
