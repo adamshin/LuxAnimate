@@ -319,7 +319,7 @@ extension SceneEditorVC: SceneEditorContentVCDelegate {
     
 }
 
-extension SceneEditorVC: AnimEditorVC2Delegate {
+extension SceneEditorVC: AnimEditorVC2.Delegate {
     
     func onRequestUndo(_ vc: AnimEditorVC2) {
         delegate?.onRequestUndo(self)

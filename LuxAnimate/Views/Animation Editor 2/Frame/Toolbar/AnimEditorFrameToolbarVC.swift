@@ -1,25 +1,29 @@
 //
-//  AnimEditorToolbarVC2.swift
+//  AnimEditorFrameToolbarVC.swift
 //
 
 import UIKit
 
-@MainActor
-protocol AnimEditorToolbarVC2Delegate: AnyObject {
-    func onSelectBack(_ vc: AnimEditorToolbarVC2)
+extension AnimEditorFrameToolbarVC {
     
-    func onSelectPaintTool(_ vc: AnimEditorToolbarVC2)
-    func onSelectEraseTool(_ vc: AnimEditorToolbarVC2)
+    @MainActor
+    protocol Delegate: AnyObject {
+        func onSelectBack(_ vc: AnimEditorFrameToolbarVC)
+        
+        func onSelectPaintTool(_ vc: AnimEditorFrameToolbarVC)
+        func onSelectEraseTool(_ vc: AnimEditorFrameToolbarVC)
+        
+        func onSelectUndo(_ vc: AnimEditorFrameToolbarVC)
+        func onSelectRedo(_ vc: AnimEditorFrameToolbarVC)
+    }
     
-    func onSelectUndo(_ vc: AnimEditorToolbarVC2)
-    func onSelectRedo(_ vc: AnimEditorToolbarVC2)
 }
 
-class AnimEditorToolbarVC2: UIViewController {
+class AnimEditorFrameToolbarVC: UIViewController {
     
-    weak var delegate: AnimEditorToolbarVC2Delegate?
+    weak var delegate: Delegate?
     
-    private let bodyView = AnimEditorToolbarView2()
+    private let bodyView = AnimEditorFrameToolbarView()
     
     override func loadView() {
         view = bodyView
@@ -56,7 +60,9 @@ class AnimEditorToolbarVC2: UIViewController {
         bodyView.remainderContentView
     }
     
-    func update(projectState: ProjectEditManager.State) {
+    func update(
+        projectState: ProjectEditManager.State
+    ) {
         let undoAvailable =
             projectState.availableUndoCount > 0
         let redoAvailable =

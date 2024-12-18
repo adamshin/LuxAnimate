@@ -1,10 +1,10 @@
 //
-//  AnimEditorWorkspaceControlsVC.swift
+//  AnimEditorFrameControlsVC.swift
 //
 
 import UIKit
 
-class AnimEditorWorkspaceControlsVC: UIViewController {
+class AnimEditorFrameControlsVC: UIViewController {
     
     override func loadView() {
         view = PassthroughView()

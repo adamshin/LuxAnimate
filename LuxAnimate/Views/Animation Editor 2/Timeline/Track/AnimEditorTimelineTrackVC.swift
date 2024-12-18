@@ -193,6 +193,8 @@ class AnimEditorTimelineTrackVC: UIViewController {
     }
     
     private func focusFrame(at index: Int, animated: Bool) {
+        guard model.frames.count > 0 else { return }
+        
         let clampedIndex = clamp(index,
             min: 0,
             max: model.frames.count - 1)

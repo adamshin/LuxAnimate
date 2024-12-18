@@ -1,5 +1,5 @@
 //
-//  AnimEditorToolbarView2.swift
+//  AnimEditorFrameToolbarView.swift
 //
 
 import UIKit
@@ -14,7 +14,7 @@ private let iconConfig = UIImage.SymbolConfiguration(
     weight: .medium,
     scale: .medium)
 
-class AnimEditorToolbarView2: PassthroughView {
+class AnimEditorFrameToolbarView: PassthroughView {
     
     let barView = UIView()
     let remainderContentView = PassthroughView()

@@ -8,27 +8,31 @@ import Geometry
 private let contentSize = Size(
     width: 1920, height: 1080)
 
-@MainActor
-protocol AnimEditorVC2Delegate: AnyObject {
-    
-    func onRequestUndo(_ vc: AnimEditorVC2)
-    func onRequestRedo(_ vc: AnimEditorVC2)
-    
-    func onRequestSceneEdit(
-        _ vc: AnimEditorVC2,
-        sceneEdit: ProjectEditBuilder.SceneEdit,
-        editContext: Sendable?)
-    
-    func pendingEditAsset(
-        _ vc: AnimEditorVC2,
-        assetID: String
-    ) -> ProjectEditManager.NewAsset?
-    
-}
-
 struct AnimEditorVCEditContext2 {
     var sender: AnimEditorVC2
     var isFromFrameEditor: Bool
+}
+
+extension AnimEditorVC2 {
+    
+    @MainActor
+    protocol Delegate: AnyObject {
+        
+        func onRequestUndo(_ vc: AnimEditorVC2)
+        func onRequestRedo(_ vc: AnimEditorVC2)
+        
+        func onRequestSceneEdit(
+            _ vc: AnimEditorVC2,
+            sceneEdit: ProjectEditBuilder.SceneEdit,
+            editContext: Sendable?)
+        
+        func pendingEditAsset(
+            _ vc: AnimEditorVC2,
+            assetID: String
+        ) -> ProjectEditManager.NewAsset?
+        
+    }
+    
 }
 
 class AnimEditorVC2: UIViewController {
@@ -36,10 +40,9 @@ class AnimEditorVC2: UIViewController {
     // MARK: - View
     
     private let workspaceVC = EditorWorkspaceVC()
-    private let timelineVC: AnimEditorTimelineVC
     
-    private let toolbarVC = AnimEditorToolbarVC2()
-    private let workspaceControlsVC = AnimEditorWorkspaceControlsVC()
+    private let timelineVC: AnimEditorTimelineVC
+    private let frameVC: AnimEditorFrameVC
     
     // MARK: - State
     
@@ -60,7 +63,7 @@ class AnimEditorVC2: UIViewController {
     
     // MARK: - Delegate
     
-    weak var delegate: AnimEditorVC2Delegate?
+    weak var delegate: Delegate?
     
     // MARK: - Init
     
@@ -80,6 +83,8 @@ class AnimEditorVC2: UIViewController {
         timelineVC = AnimEditorTimelineVC(
             projectID: projectID)
         
+        frameVC = AnimEditorFrameVC()
+        
         state = try AnimEditorState(
             projectID: projectID,
             layerID: layerID,
@@ -98,7 +103,7 @@ class AnimEditorVC2: UIViewController {
         
         workspaceVC.delegate = self
         timelineVC.delegate = self
-        toolbarVC.delegate = self
+        frameVC.delegate = self
         
         assetLoader.delegate = self
         editBuilder.delegate = self
@@ -125,16 +130,14 @@ class AnimEditorVC2: UIViewController {
         view.backgroundColor = .editorBackground
         
         addChild(workspaceVC, to: view)
-        addChild(toolbarVC, to: view)
         
-        addChild(timelineVC,
-            to: toolbarVC.remainderContentView)
+        addChild(timelineVC, to: view)
         
-        addChild(workspaceControlsVC,
+        addChild(frameVC,
             to: timelineVC.remainderContentView)
         
         workspaceVC.setSafeAreaReferenceView(
-            timelineVC.remainderContentView)
+            frameVC.remainderContentView)
     }
     
     private func setupDisplayLink() {
@@ -146,15 +149,18 @@ class AnimEditorVC2: UIViewController {
     // MARK: - State
     
     private func setInitialState() {
-        toolbarVC.update(
-            projectState: state.projectState)
-        toolbarVC.update(
-            selectedTool: state.selectedTool)
+//        toolbarVC.update(
+//            projectState: state.projectState)
+//        toolbarVC.update(
+//            selectedTool: state.selectedTool)
         
         timelineVC.update(
             timelineModel: state.timelineModel)
         timelineVC.update(
             focusedFrameIndex: state.focusedFrameIndex)
+        
+        frameVC.update(
+            projectState: state.projectState)
         
 //        updateToolState(
 //            selectedTool: state.selectedTool)
@@ -190,12 +196,12 @@ class AnimEditorVC2: UIViewController {
         self.state = state
         
         if changes.projectState {
-            toolbarVC.update(
+            frameVC.update(
                 projectState: state.projectState)
         }
         if changes.selectedTool {
-            toolbarVC.update(
-                selectedTool: state.selectedTool)
+//            toolbarVC.update(
+//                selectedTool: state.selectedTool)
         }
         if changes.onionSkin {
 //            toolbarVC.update(
@@ -328,41 +334,30 @@ extension AnimEditorVC2: EditorWorkspaceVC.Delegate {
     
 }
 
-extension AnimEditorVC2: AnimEditorToolbarVC2Delegate {
+extension AnimEditorVC2: AnimEditorFrameVC.Delegate {
     
-    func onSelectBack(_ vc: AnimEditorToolbarVC2) {
+    func onSelectBack(_ vc: AnimEditorFrameVC) {
         dismiss()
     }
     
-    func onSelectPaintTool(_ vc: AnimEditorToolbarVC2) {
-        if state.selectedTool == .paint {
-            toolState?.toggleToolExpandedOptionsVisible()
-            return
-        }
-        let update = state.update(selectedTool: .paint)
-        applyStateUpdate(update: update)
-    }
-    
-    func onSelectEraseTool(_ vc: AnimEditorToolbarVC2) {
-        if state.selectedTool == .erase {
-            toolState?.toggleToolExpandedOptionsVisible()
-            return
-        }
-        let update = state.update(selectedTool: .erase)
-        applyStateUpdate(update: update)
-    }
-    
-    func onSelectToggleOnionSkin(_ vc: AnimEditorToolbarVC2) {
-        let update = state.update(
-            onionSkinOn: !state.onionSkinOn)
-        applyStateUpdate(update: update)
-    }
-    
-    func onSelectUndo(_ vc: AnimEditorToolbarVC2) {
+    func onRequestUndo(_ vc: AnimEditorFrameVC) {
         delegate?.onRequestUndo(self)
     }
-    func onSelectRedo(_ vc: AnimEditorToolbarVC2) {
+    func onRequestRedo(_ vc: AnimEditorFrameVC) {
         delegate?.onRequestRedo(self)
+    }
+    
+    func onRequestSceneEdit(
+        _ vc: AnimEditorFrameVC,
+        sceneEdit: ProjectEditBuilder.SceneEdit,
+        editContext: Sendable?
+    ) { }
+    
+    func pendingEditAsset(
+        _ vc: AnimEditorFrameVC,
+        assetID: String
+    ) -> ProjectEditManager.NewAsset? {
+        nil
     }
     
 }

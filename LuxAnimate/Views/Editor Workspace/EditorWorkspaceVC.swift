@@ -6,6 +6,8 @@ import UIKit
 import Metal
 import Geometry
 
+// TODO: Only redraw when scene graph or transform changes
+
 private let minZoomScale: Double = 0.1
 private let maxZoomScale: Double = 30
 
@@ -104,7 +106,7 @@ class EditorWorkspaceVC: UIViewController {
         
         let safeAreaFrame = safeAreaReferenceLayer
             .convert(
-                safeAreaReferenceLayer.frame,
+                safeAreaReferenceLayer.bounds,
                 to: presentationLayer)
         
         var insets = EditorWorkspaceTransformManager
