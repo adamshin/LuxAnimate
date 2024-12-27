@@ -43,10 +43,10 @@ extension AnimEditorFrameVC {
 
 class AnimEditorFrameVC: UIViewController {
     
+    private let bodyView = AnimEditorFrameView()
+    
     private let toolbarVC = AnimEditorFrameToolbarVC()
     private let controlsVC = AnimEditorFrameControlsVC()
-    
-    // TODO: Tool controls, tool state?
     
     // MARK: - Delegate
     
@@ -63,16 +63,14 @@ class AnimEditorFrameVC: UIViewController {
     // MARK: - Lifecycle
     
     override func loadView() {
-        view = PassthroughView()
+        view = bodyView
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        addChild(toolbarVC, to: view)
-        
-        addChild(controlsVC,
-            to: toolbarVC.remainderContentView)
+        addChild(toolbarVC, to: bodyView.toolbarContainer)
+        addChild(controlsVC, to: bodyView.contentContainer)
         
         toolbarVC.delegate = self
     }
@@ -86,8 +84,8 @@ class AnimEditorFrameVC: UIViewController {
             projectState: projectState)
     }
     
-    var remainderContentView: UIView {
-        toolbarVC.remainderContentView
+    var contentAreaView: UIView {
+        bodyView.contentContainer
     }
     
 }
@@ -101,18 +99,21 @@ extension AnimEditorFrameVC:
         delegate?.onSelectBack(self)
     }
     
-    func onSelectPaintTool(_ vc: AnimEditorFrameToolbarVC) {
-    }
-    
-    func onSelectEraseTool(_ vc: AnimEditorFrameToolbarVC) {
-    }
-    
     func onSelectUndo(_ vc: AnimEditorFrameToolbarVC) {
         delegate?.onRequestUndo(self)
     }
     
     func onSelectRedo(_ vc: AnimEditorFrameToolbarVC) {
         delegate?.onRequestRedo(self)
+    }
+    
+    func onSelectTool(
+        _ vc: AnimEditorFrameToolbarVC,
+        tool: AnimEditorFrameToolbarVC.Tool,
+        alreadySelected: Bool
+    ) {
+        // TODO
+        toolbarVC.update(selectedTool: tool)
     }
     
 }

@@ -130,14 +130,13 @@ class AnimEditorVC2: UIViewController {
         view.backgroundColor = .editorBackground
         
         addChild(workspaceVC, to: view)
-        
         addChild(timelineVC, to: view)
         
         addChild(frameVC,
             to: timelineVC.remainderContentView)
         
         workspaceVC.setSafeAreaReferenceView(
-            frameVC.remainderContentView)
+            frameVC.contentAreaView)
     }
     
     private func setupDisplayLink() {

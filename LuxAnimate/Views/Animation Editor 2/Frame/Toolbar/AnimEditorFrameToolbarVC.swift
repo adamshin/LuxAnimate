@@ -6,24 +6,38 @@ import UIKit
 
 extension AnimEditorFrameToolbarVC {
     
+    enum Tool {
+        case paint
+        case erase
+    }
+    
+}
+
+extension AnimEditorFrameToolbarVC {
+    
     @MainActor
     protocol Delegate: AnyObject {
         func onSelectBack(_ vc: AnimEditorFrameToolbarVC)
         
-        func onSelectPaintTool(_ vc: AnimEditorFrameToolbarVC)
-        func onSelectEraseTool(_ vc: AnimEditorFrameToolbarVC)
-        
         func onSelectUndo(_ vc: AnimEditorFrameToolbarVC)
         func onSelectRedo(_ vc: AnimEditorFrameToolbarVC)
+        
+        func onSelectTool(
+            _ vc: AnimEditorFrameToolbarVC,
+            tool: AnimEditorFrameToolbarVC.Tool,
+            alreadySelected: Bool)
     }
     
 }
 
 class AnimEditorFrameToolbarVC: UIViewController {
     
-    weak var delegate: Delegate?
-    
     private let bodyView = AnimEditorFrameToolbarView()
+    
+    private let toolPickerVC
+        = AnimEditorFrameToolbarToolPickerVC()
+    
+    weak var delegate: Delegate?
     
     override func loadView() {
         view = bodyView
@@ -32,51 +46,63 @@ class AnimEditorFrameToolbarVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        bodyView.backButton.addHandler { [weak self] in
-            guard let self else { return }
-            self.delegate?.onSelectBack(self)
-        }
+        addChild(toolPickerVC,
+            to: bodyView.toolPickerContainer)
         
-        bodyView.paintButton.addHandler { [weak self] in
-            guard let self else { return }
-            self.delegate?.onSelectPaintTool(self)
-        }
-        bodyView.eraseButton.addHandler { [weak self] in
-            guard let self else { return }
-            self.delegate?.onSelectEraseTool(self)
-        }
-        
-        bodyView.undoButton.addHandler { [weak self] in
-            guard let self else { return }
-            self.delegate?.onSelectUndo(self)
-        }
-        bodyView.redoButton.addHandler { [weak self] in
-            guard let self else { return }
-            self.delegate?.onSelectRedo(self)
-        }
-    }
-    
-    var remainderContentView: UIView {
-        bodyView.remainderContentView
+        bodyView.delegate = self
+        toolPickerVC.delegate = self
     }
     
     func update(
         projectState: ProjectEditManager.State
     ) {
-        let undoAvailable =
+        let undoEnabled =
             projectState.availableUndoCount > 0
-        let redoAvailable =
+        let redoEnabled =
             projectState.availableRedoCount > 0
         
-        bodyView.undoButton.isEnabled = undoAvailable
-        bodyView.redoButton.isEnabled = redoAvailable
+        bodyView.update(
+            undoEnabled: undoEnabled,
+            redoEnabled: redoEnabled)
     }
     
-    func update(selectedTool: AnimEditorState.Tool) {
-        switch selectedTool {
-        case .paint: bodyView.selectPaintTool()
-        case .erase: bodyView.selectEraseTool()
-        }
+    func update(
+        selectedTool: AnimEditorFrameToolbarVC.Tool
+    ) {
+        toolPickerVC.update(selectedTool: selectedTool)
+    }
+    
+}
+
+// MARK: - Delegates
+
+extension AnimEditorFrameToolbarVC:
+    AnimEditorFrameToolbarView.Delegate {
+    
+    func onSelectBack(_ v: AnimEditorFrameToolbarView) {
+        delegate?.onSelectBack(self)
+    }
+    func onSelectUndo(_ v: AnimEditorFrameToolbarView) {
+        delegate?.onSelectUndo(self)
+    }
+    func onSelectRedo(_ v: AnimEditorFrameToolbarView) {
+        delegate?.onSelectRedo(self)
+    }
+    
+}
+
+extension AnimEditorFrameToolbarVC:
+    AnimEditorFrameToolbarToolPickerView.Delegate {
+    
+    func onSelectTool(
+        _ v: AnimEditorFrameToolbarToolPickerView,
+        tool: AnimEditorFrameToolbarVC.Tool,
+        alreadySelected: Bool
+    ) {
+        delegate?.onSelectTool(
+            self,
+            tool: tool,
+            alreadySelected: alreadySelected)
     }
     
 }

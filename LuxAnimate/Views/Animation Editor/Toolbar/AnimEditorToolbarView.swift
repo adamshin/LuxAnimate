@@ -155,17 +155,17 @@ class AnimEditorToolbarView: UIView {
     required init?(coder: NSCoder) { fatalError() }
     
     func selectPaintTool() {
-        paintButton.tintColor = .tint
+        paintButton.tintColor = .appTint
         eraseButton.tintColor = .editorLabel
     }
     func selectEraseTool() {
         paintButton.tintColor = .editorLabel
-        eraseButton.tintColor = .tint
+        eraseButton.tintColor = .appTint
     }
     
     func setOnionSkinOn(_ on: Bool) {
         onionSkinButton.tintColor =
-            on ? .tint : .editorLabel
+            on ? .appTint : .editorLabel
     }
     
 }
