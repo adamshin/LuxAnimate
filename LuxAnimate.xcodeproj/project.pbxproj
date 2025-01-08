@@ -352,16 +352,6 @@
 			path = "Scene Graph";
 			sourceTree = "<group>";
 		};
-		661A889E2C993250007900B1 /* Shared */ = {
-			isa = PBXGroup;
-			children = (
-				66AD3A892BEC46BD002B294A /* AnimEditorToolSidebarSliderContainer.swift */,
-				662232702BE1B79300C8813F /* AnimEditorToolSidebarSlider.swift */,
-				6643CAFC2BE38AD40094B998 /* AnimEditorToolSidebarCardView.swift */,
-			);
-			path = Shared;
-			sourceTree = "<group>";
-		};
 		661A889F2C9932B1007900B1 /* Menu */ = {
 			isa = PBXGroup;
 			children = (
@@ -461,6 +451,26 @@
 				6613C1F02BE2DC990019E667 /* Editor Menu */,
 			);
 			path = Shared;
+			sourceTree = "<group>";
+		};
+		66392A242D21143500B0CC56 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				66AD3A892BEC46BD002B294A /* AnimEditorToolSidebarSliderContainer.swift */,
+				662232702BE1B79300C8813F /* AnimEditorToolSidebarSlider.swift */,
+				6643CAFC2BE38AD40094B998 /* AnimEditorToolSidebarCardView.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		66392A252D21170200B0CC56 /* Tool Controls */ = {
+			isa = PBXGroup;
+			children = (
+				66392A242D21143500B0CC56 /* Shared */,
+				664120522C7A727E00CF98B8 /* AnimEditorBrushToolControlsVC.swift */,
+				668A14CB2C7D1E2000D73D36 /* AnimEditorEraseToolControlsVC.swift */,
+			);
+			path = "Tool Controls";
 			sourceTree = "<group>";
 		};
 		663D40D22C35EA88004B8591 /* Project Edit Manager */ = {
@@ -671,6 +681,7 @@
 		6681BB242D0A4F5E00AAED6A /* Controls */ = {
 			isa = PBXGroup;
 			children = (
+				66392A252D21170200B0CC56 /* Tool Controls */,
 				6681BB252D0A4F6900AAED6A /* AnimEditorFrameControlsVC.swift */,
 			);
 			path = Controls;
@@ -713,10 +724,7 @@
 		668A14D12C7D3D8A00D73D36 /* Tool Controls */ = {
 			isa = PBXGroup;
 			children = (
-				661A889E2C993250007900B1 /* Shared */,
 				66E3E43B2C7AE24B0086D388 /* AnimEditorToolContainerVC.swift */,
-				664120522C7A727E00CF98B8 /* AnimEditorBrushToolControlsVC.swift */,
-				668A14CB2C7D1E2000D73D36 /* AnimEditorEraseToolControlsVC.swift */,
 			);
 			path = "Tool Controls";
 			sourceTree = "<group>";

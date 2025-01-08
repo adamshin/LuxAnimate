@@ -4,22 +4,14 @@
 
 import UIKit
 
-// MARK: - Config
-
-private let buttonWidth: CGFloat = 64
-
-private let iconConfig = UIImage.SymbolConfiguration(
-    pointSize: 19,
-    weight: .medium,
-    scale: .medium)
-
 // MARK: - Tools
 
-private let tools: [AnimEditorFrameToolbarVC.Tool] = [
-    .paint, .erase,
+private let tools: [AnimEditorFrameVC.Tool] = [
+    .paint,
+    .erase,
 ]
 
-extension AnimEditorFrameToolbarVC.Tool {
+extension AnimEditorFrameVC.Tool {
     
     var name: String {
         switch self {
@@ -37,6 +29,15 @@ extension AnimEditorFrameToolbarVC.Tool {
     
 }
 
+// MARK: - Config
+
+private let buttonWidth: CGFloat = 64
+
+private let iconConfig = UIImage.SymbolConfiguration(
+    pointSize: 19,
+    weight: .medium,
+    scale: .medium)
+
 // MARK: - Delegate
 
 extension AnimEditorFrameToolbarToolPickerView {
@@ -46,8 +47,7 @@ extension AnimEditorFrameToolbarToolPickerView {
         
         func onSelectTool(
             _ v: AnimEditorFrameToolbarToolPickerView,
-            tool: AnimEditorFrameToolbarVC.Tool,
-            alreadySelected: Bool)
+            tool: AnimEditorFrameVC.Tool)
         
     }
     
@@ -58,8 +58,6 @@ extension AnimEditorFrameToolbarToolPickerView {
 class AnimEditorFrameToolbarToolPickerView: UIView {
     
     private let toolButtons: [UIButton]
-    
-    private var selectedTool: AnimEditorFrameToolbarVC.Tool?
     
     weak var delegate: Delegate?
     
@@ -104,21 +102,14 @@ class AnimEditorFrameToolbarToolPickerView: UIView {
         else { return }
         
         let tool = tools[index]
-        let alreadySelected = selectedTool == tool
-        
-        delegate?.onSelectTool(
-            self,
-            tool: tool,
-            alreadySelected: alreadySelected)
+        delegate?.onSelectTool(self, tool: tool)
     }
     
     // MARK: - Interface
     
     func update(
-        selectedTool: AnimEditorFrameToolbarVC.Tool?
+        selectedTool: AnimEditorFrameVC.Tool?
     ) {
-        self.selectedTool = selectedTool
-        
         for (index, button) in toolButtons.enumerated() {
             let isSelected = selectedTool == tools[index]
             if isSelected {

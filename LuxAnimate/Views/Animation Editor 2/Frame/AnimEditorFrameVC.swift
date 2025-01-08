@@ -4,18 +4,14 @@
 
 import UIKit
 
-// What should this view controller contain?
-
-// I think "workspace state" should live in the
-// AnimEditorVC. This view controller should just handle
-// tool state UI and controls, and report upwards.
-
-// The AnimEditorVC can update workspace state based on
-// the state of the frame VC and the timeline VC.
-
-// The workspace state will hook into UI, but exist as
-// a non-UI object. I think this makes more sense than
-// being a view controller.
+extension AnimEditorFrameVC {
+    
+    enum Tool {
+        case paint
+        case erase
+    }
+    
+}
 
 extension AnimEditorFrameVC {
     
@@ -26,6 +22,10 @@ extension AnimEditorFrameVC {
         
         func onRequestUndo(_ vc: AnimEditorFrameVC)
         func onRequestRedo(_ vc: AnimEditorFrameVC)
+        
+        func onSelectTool(
+            _ vc: AnimEditorFrameVC,
+            tool: Tool)
         
         func onRequestSceneEdit(
             _ vc: AnimEditorFrameVC,
@@ -69,10 +69,21 @@ class AnimEditorFrameVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        toolbarVC.delegate = self
+        
         addChild(toolbarVC, to: bodyView.toolbarContainer)
         addChild(controlsVC, to: bodyView.contentContainer)
         
-        toolbarVC.delegate = self
+        setSelectedTool(.paint)
+    }
+    
+    // MARK: - Tools
+    
+    private func setSelectedTool(
+        _ selectedTool: Tool
+    ) {
+        toolbarVC.update(selectedTool: selectedTool)
+        controlsVC.update(selectedTool: selectedTool)
     }
     
     // MARK: - Interface
@@ -86,6 +97,10 @@ class AnimEditorFrameVC: UIViewController {
     
     var contentAreaView: UIView {
         bodyView.contentContainer
+    }
+    
+    var selectedTool: Tool? {
+        toolbarVC.selectedTool
     }
     
 }
@@ -109,11 +124,16 @@ extension AnimEditorFrameVC:
     
     func onSelectTool(
         _ vc: AnimEditorFrameToolbarVC,
-        tool: AnimEditorFrameToolbarVC.Tool,
-        alreadySelected: Bool
+        tool: AnimEditorFrameVC.Tool,
+        isAlreadySelected: Bool
     ) {
-        // TODO
-        toolbarVC.update(selectedTool: tool)
+        if isAlreadySelected {
+            // TODO: Show tool options popup
+            
+        } else {
+            controlsVC.update(selectedTool: tool)
+            delegate?.onSelectTool(self, tool: tool)
+        }
     }
     
 }

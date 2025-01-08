@@ -17,4 +17,10 @@ class AnimEditorFrameControlsVC: UIViewController {
         addChild(vc, to: view)
     }
     
+    func update(
+        selectedTool: AnimEditorFrameVC.Tool
+    ) {
+        // TODO: Show tool controls
+    }
+    
 }

@@ -6,15 +6,6 @@ import UIKit
 
 extension AnimEditorFrameToolbarVC {
     
-    enum Tool {
-        case paint
-        case erase
-    }
-    
-}
-
-extension AnimEditorFrameToolbarVC {
-    
     @MainActor
     protocol Delegate: AnyObject {
         func onSelectBack(_ vc: AnimEditorFrameToolbarVC)
@@ -24,8 +15,8 @@ extension AnimEditorFrameToolbarVC {
         
         func onSelectTool(
             _ vc: AnimEditorFrameToolbarVC,
-            tool: AnimEditorFrameToolbarVC.Tool,
-            alreadySelected: Bool)
+            tool: AnimEditorFrameVC.Tool,
+            isAlreadySelected: Bool)
     }
     
 }
@@ -38,6 +29,8 @@ class AnimEditorFrameToolbarVC: UIViewController {
         = AnimEditorFrameToolbarToolPickerVC()
     
     weak var delegate: Delegate?
+    
+    // MARK: - Lifecycle
     
     override func loadView() {
         view = bodyView
@@ -53,6 +46,8 @@ class AnimEditorFrameToolbarVC: UIViewController {
         toolPickerVC.delegate = self
     }
     
+    // MARK: - Interface
+    
     func update(
         projectState: ProjectEditManager.State
     ) {
@@ -67,9 +62,13 @@ class AnimEditorFrameToolbarVC: UIViewController {
     }
     
     func update(
-        selectedTool: AnimEditorFrameToolbarVC.Tool
+        selectedTool: AnimEditorFrameVC.Tool
     ) {
         toolPickerVC.update(selectedTool: selectedTool)
+    }
+    
+    var selectedTool: AnimEditorFrameVC.Tool? {
+        toolPickerVC.selectedTool
     }
     
 }
@@ -92,17 +91,16 @@ extension AnimEditorFrameToolbarVC:
 }
 
 extension AnimEditorFrameToolbarVC:
-    AnimEditorFrameToolbarToolPickerView.Delegate {
+    AnimEditorFrameToolbarToolPickerVC.Delegate {
     
     func onSelectTool(
-        _ v: AnimEditorFrameToolbarToolPickerView,
-        tool: AnimEditorFrameToolbarVC.Tool,
-        alreadySelected: Bool
+        _ v: AnimEditorFrameToolbarToolPickerVC,
+        tool: AnimEditorFrameVC.Tool,
+        isAlreadySelected: Bool
     ) {
-        delegate?.onSelectTool(
-            self,
+        delegate?.onSelectTool(self,
             tool: tool,
-            alreadySelected: alreadySelected)
+            isAlreadySelected: isAlreadySelected)
     }
     
 }

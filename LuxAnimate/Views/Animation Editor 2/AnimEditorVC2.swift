@@ -346,6 +346,13 @@ extension AnimEditorVC2: AnimEditorFrameVC.Delegate {
         delegate?.onRequestRedo(self)
     }
     
+    func onSelectTool(
+        _ vc: AnimEditorFrameVC,
+        tool: AnimEditorFrameVC.Tool
+    ) {
+        // TODO: Handle tool selection
+    }
+    
     func onRequestSceneEdit(
         _ vc: AnimEditorFrameVC,
         sceneEdit: ProjectEditBuilder.SceneEdit,
@@ -382,6 +389,9 @@ extension AnimEditorVC2: AnimEditorTimelineVC.Delegate {
     func onSelectPlayPause(
         _ vc: AnimEditorTimelineVC
     ) { }
+    
+    // TODO: Consolidate these methods into a single
+    // 'apply edit' method?
     
     func onRequestCreateDrawing(
         _ vc: AnimEditorTimelineVC,
