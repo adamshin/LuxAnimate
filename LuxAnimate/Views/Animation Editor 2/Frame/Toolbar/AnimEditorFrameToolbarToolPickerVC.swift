@@ -59,6 +59,7 @@ extension AnimEditorFrameToolbarToolPickerVC:
         tool: AnimEditorFrameVC.Tool
     ) {
         let isAlreadySelected = selectedTool == tool
+        selectedTool = tool
         
         bodyView.update(selectedTool: tool)
         

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		66040DBB2D31ADCB00CB750A /* AnimEditorToolSidebarSliderPopupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66040DBA2D31ADCB00CB750A /* AnimEditorToolSidebarSliderPopupView.swift */; };
 		6605720C2CCB53CE00D699BA /* Geometry in Frameworks */ = {isa = PBXBuildFile; productRef = 6605720B2CCB53CE00D699BA /* Geometry */; };
 		66099BA72BDB195500243D9F /* CircleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66099BA62BDB195500243D9F /* CircleView.swift */; };
 		66099BD32BDB527B00243D9F /* WrappedDisplayLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66099BD22BDB527B00243D9F /* WrappedDisplayLink.swift */; };
@@ -30,7 +31,7 @@
 		66211E962BEF590F005490C4 /* AnimEditorTimelineToolbarFrameWidgetControlVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66211E952BEF590F005490C4 /* AnimEditorTimelineToolbarFrameWidgetControlVC.swift */; };
 		66211EAE2BF3159B005490C4 /* TextureCopier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66211EAD2BF3159B005490C4 /* TextureCopier.swift */; };
 		6622325B2BE0750300C8813F /* AnimEditorDrawerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6622325A2BE0750300C8813F /* AnimEditorDrawerVC.swift */; };
-		662232712BE1B79300C8813F /* AnimEditorToolSidebarSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662232702BE1B79300C8813F /* AnimEditorToolSidebarSlider.swift */; };
+		662232712BE1B79300C8813F /* AnimEditorToolSidebarSliderBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662232702BE1B79300C8813F /* AnimEditorToolSidebarSliderBar.swift */; };
 		6625429F2C8BB6BF007D3DFB /* ThreadSafeDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6625429E2C8BB6BF007D3DFB /* ThreadSafeDictionary.swift */; };
 		662542A32C8BDDFB007D3DFB /* SceneEditBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662542A22C8BDDFB007D3DFB /* SceneEditBuilder.swift */; };
 		6629F6B42D094220008197CB /* DefaultBrushes.zip in Resources */ = {isa = PBXBuildFile; fileRef = 6629F6B32D094220008197CB /* DefaultBrushes.zip */; };
@@ -100,7 +101,7 @@
 		66A59EAA2C8B973900CF553E /* SceneRenderManifestGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A59EA92C8B973900CF553E /* SceneRenderManifestGenerator.swift */; };
 		66A653042C209DFB0060A216 /* XXHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A653032C209DFB0060A216 /* XXHash.swift */; };
 		66A653062C20AFE70060A216 /* xxhash.c in Sources */ = {isa = PBXBuildFile; fileRef = 66A653052C20AFE70060A216 /* xxhash.c */; };
-		66AD3A8A2BEC46BD002B294A /* AnimEditorToolSidebarSliderContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66AD3A892BEC46BD002B294A /* AnimEditorToolSidebarSliderContainer.swift */; };
+		66AD3A8A2BEC46BD002B294A /* AnimEditorToolSidebarSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66AD3A892BEC46BD002B294A /* AnimEditorToolSidebarSlider.swift */; };
 		66AD3A8C2BEC900C002B294A /* MultiFingerTapGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66AD3A8B2BEC900C002B294A /* MultiFingerTapGestureRecognizer.swift */; };
 		66B2BE422BCB55FF0072AC1B /* PixelSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B2BE412BCB55FF0072AC1B /* PixelSize.swift */; };
 		66B491B32BD9993F008A2A2E /* TextureCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B491B22BD9993F008A2A2E /* TextureCreator.swift */; };
@@ -145,6 +146,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		66040DBA2D31ADCB00CB750A /* AnimEditorToolSidebarSliderPopupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorToolSidebarSliderPopupView.swift; sourceTree = "<group>"; };
 		660572082CCB533400D699BA /* Geometry */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Geometry; sourceTree = "<group>"; };
 		66099BA62BDB195500243D9F /* CircleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CircleView.swift; sourceTree = "<group>"; };
 		66099BD22BDB527B00243D9F /* WrappedDisplayLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WrappedDisplayLink.swift; sourceTree = "<group>"; };
@@ -168,7 +170,7 @@
 		66211E952BEF590F005490C4 /* AnimEditorTimelineToolbarFrameWidgetControlVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorTimelineToolbarFrameWidgetControlVC.swift; sourceTree = "<group>"; };
 		66211EAD2BF3159B005490C4 /* TextureCopier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextureCopier.swift; sourceTree = "<group>"; };
 		6622325A2BE0750300C8813F /* AnimEditorDrawerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorDrawerVC.swift; sourceTree = "<group>"; };
-		662232702BE1B79300C8813F /* AnimEditorToolSidebarSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorToolSidebarSlider.swift; sourceTree = "<group>"; };
+		662232702BE1B79300C8813F /* AnimEditorToolSidebarSliderBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorToolSidebarSliderBar.swift; sourceTree = "<group>"; };
 		6625429E2C8BB6BF007D3DFB /* ThreadSafeDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadSafeDictionary.swift; sourceTree = "<group>"; };
 		662542A22C8BDDFB007D3DFB /* SceneEditBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneEditBuilder.swift; sourceTree = "<group>"; };
 		6629F6B32D094220008197CB /* DefaultBrushes.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = DefaultBrushes.zip; sourceTree = "<group>"; };
@@ -239,7 +241,7 @@
 		66A653022C2099440060A216 /* xxhash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = xxhash.h; sourceTree = "<group>"; };
 		66A653032C209DFB0060A216 /* XXHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XXHash.swift; sourceTree = "<group>"; };
 		66A653052C20AFE70060A216 /* xxhash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = xxhash.c; sourceTree = "<group>"; };
-		66AD3A892BEC46BD002B294A /* AnimEditorToolSidebarSliderContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorToolSidebarSliderContainer.swift; sourceTree = "<group>"; };
+		66AD3A892BEC46BD002B294A /* AnimEditorToolSidebarSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorToolSidebarSlider.swift; sourceTree = "<group>"; };
 		66AD3A8B2BEC900C002B294A /* MultiFingerTapGestureRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiFingerTapGestureRecognizer.swift; sourceTree = "<group>"; };
 		66B2BE412BCB55FF0072AC1B /* PixelSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelSize.swift; sourceTree = "<group>"; };
 		66B491B22BD9993F008A2A2E /* TextureCreator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextureCreator.swift; sourceTree = "<group>"; };
@@ -456,8 +458,9 @@
 		66392A242D21143500B0CC56 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				66AD3A892BEC46BD002B294A /* AnimEditorToolSidebarSliderContainer.swift */,
-				662232702BE1B79300C8813F /* AnimEditorToolSidebarSlider.swift */,
+				66AD3A892BEC46BD002B294A /* AnimEditorToolSidebarSlider.swift */,
+				662232702BE1B79300C8813F /* AnimEditorToolSidebarSliderBar.swift */,
+				66040DBA2D31ADCB00CB750A /* AnimEditorToolSidebarSliderPopupView.swift */,
 				6643CAFC2BE38AD40094B998 /* AnimEditorToolSidebarCardView.swift */,
 			);
 			path = Shared;
@@ -1116,14 +1119,14 @@
 				6656A4BB2C8789930059C452 /* FrameSceneGraphGenerator.swift in Sources */,
 				6619CB622C791E9700458B79 /* AnimEditorVC.swift in Sources */,
 				66A653062C20AFE70060A216 /* xxhash.c in Sources */,
-				66AD3A8A2BEC46BD002B294A /* AnimEditorToolSidebarSliderContainer.swift in Sources */,
+				66AD3A8A2BEC46BD002B294A /* AnimEditorToolSidebarSlider.swift in Sources */,
 				66789AC02C29E90B0020EACE /* RenderPreviewManager.swift in Sources */,
 				6681BB262D0A4F6900AAED6A /* AnimEditorFrameControlsVC.swift in Sources */,
 				668A14D92C7D7BCD00D73D36 /* AnimEditorToolState.swift in Sources */,
 				66AD3A8C2BEC900C002B294A /* MultiFingerTapGestureRecognizer.swift in Sources */,
 				664C28272C758B99002166D6 /* EditorWorkspaceTransform.swift in Sources */,
 				66637A962CA23E3D00EA88ED /* BrushGestureRecognizer+State.swift in Sources */,
-				662232712BE1B79300C8813F /* AnimEditorToolSidebarSlider.swift in Sources */,
+				662232712BE1B79300C8813F /* AnimEditorToolSidebarSliderBar.swift in Sources */,
 				664C28232C755402002166D6 /* EditorWorkspaceOverlayView.swift in Sources */,
 				6651A9E22C962B6F00E3520A /* AnimEditorTimelineModel.swift in Sources */,
 				664C28252C757E95002166D6 /* EditorWorkspaceTransformManager.swift in Sources */,
@@ -1157,6 +1160,7 @@
 				66211EAE2BF3159B005490C4 /* TextureCopier.swift in Sources */,
 				6643CB062BE483030094B998 /* EditorMenuView.swift in Sources */,
 				66D084772BA3CEC300EB8556 /* ContainerViewController.swift in Sources */,
+				66040DBB2D31ADCB00CB750A /* AnimEditorToolSidebarSliderPopupView.swift in Sources */,
 				66392A1F2D1E5D0000B0CC56 /* AnimEditorFrameView.swift in Sources */,
 				66311CDB2BD73FAF00D53489 /* ImageResizer.swift in Sources */,
 				66D0843D2BA3840C00EB8556 /* AppDelegate.swift in Sources */,

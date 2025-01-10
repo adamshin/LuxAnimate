@@ -33,9 +33,9 @@ class AnimEditorEraseToolState: AnimEditorToolState {
         smoothing = AnimEditorToolSettingsStore
             .eraseToolSmoothing
         
-        controlsVC.delegate = self
-        controlsVC.scale = scale
-        controlsVC.smoothing = smoothing
+//        controlsVC.delegate = self
+//        controlsVC.scale = scale
+//        controlsVC.smoothing = smoothing
     }
     
     func beginState(
@@ -68,16 +68,16 @@ class AnimEditorEraseToolState: AnimEditorToolState {
 
 // MARK: - Delegates
 
-extension AnimEditorEraseToolState: AnimEditorEraseToolControlsVCDelegate {
-    
-    func onChangeScale(_ vc: AnimEditorEraseToolControlsVC) {
-        scale = controlsVC.scale
-        AnimEditorToolSettingsStore
-            .eraseToolScale = scale
-    }
-    func onChangeSmoothing(_ vc: AnimEditorEraseToolControlsVC) {
-        smoothing = controlsVC.smoothing
-        AnimEditorToolSettingsStore.eraseToolSmoothing = smoothing
-    }
-    
-}
+//extension AnimEditorEraseToolState: AnimEditorEraseToolControlsVCDelegate {
+//    
+//    func onChangeScale(_ vc: AnimEditorEraseToolControlsVC) {
+//        scale = controlsVC.scale
+//        AnimEditorToolSettingsStore
+//            .eraseToolScale = scale
+//    }
+//    func onChangeSmoothing(_ vc: AnimEditorEraseToolControlsVC) {
+//        smoothing = controlsVC.smoothing
+//        AnimEditorToolSettingsStore.eraseToolSmoothing = smoothing
+//    }
+//    
+//}

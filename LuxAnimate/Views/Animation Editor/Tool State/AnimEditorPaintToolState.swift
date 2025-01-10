@@ -34,9 +34,9 @@ class AnimEditorPaintToolState: AnimEditorToolState {
         smoothing = AnimEditorToolSettingsStore
             .brushToolSmoothing
         
-        controlsVC.delegate = self
-        controlsVC.scale = scale
-        controlsVC.smoothing = smoothing
+//        controlsVC.delegate = self
+//        controlsVC.scale = scale
+//        controlsVC.smoothing = smoothing
     }
     
     func beginState(
@@ -69,16 +69,16 @@ class AnimEditorPaintToolState: AnimEditorToolState {
 
 // MARK: - Delegates
 
-extension AnimEditorPaintToolState: AnimEditorBrushToolControlsVCDelegate {
-    
-    func onChangeScale(_ vc: AnimEditorBrushToolControlsVC) {
-        scale = controlsVC.scale
-        AnimEditorToolSettingsStore
-            .brushToolScale = scale
-    }
-    func onChangeSmoothing(_ vc: AnimEditorBrushToolControlsVC) {
-        smoothing = controlsVC.smoothing
-        AnimEditorToolSettingsStore.brushToolSmoothing = smoothing
-    }
-    
-}
+//extension AnimEditorPaintToolState: AnimEditorBrushToolControlsVCDelegate {
+//    
+//    func onChangeScale(_ vc: AnimEditorBrushToolControlsVC) {
+//        scale = controlsVC.scale
+//        AnimEditorToolSettingsStore
+//            .brushToolScale = scale
+//    }
+//    func onChangeSmoothing(_ vc: AnimEditorBrushToolControlsVC) {
+//        smoothing = controlsVC.smoothing
+//        AnimEditorToolSettingsStore.brushToolSmoothing = smoothing
+//    }
+//    
+//}

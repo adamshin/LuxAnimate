@@ -7,25 +7,19 @@ import UIKit
 private let scaleGamma: Double = 2.0
 private let smoothingGamma: Double = 1.5
 
-@MainActor
-protocol AnimEditorBrushToolControlsVCDelegate: AnyObject {
-    func onChangeScale(_ vc: AnimEditorBrushToolControlsVC)
-    func onChangeSmoothing(_ vc: AnimEditorBrushToolControlsVC)
-}
-
 class AnimEditorBrushToolControlsVC: UIViewController {
     
-    weak var delegate: AnimEditorBrushToolControlsVCDelegate?
+    private let scaleSlider =
+        AnimEditorToolSidebarSlider(
+            title: "Size",
+            gamma: scaleGamma,
+            valueDisplayMode: .percent(minValue: 1))
     
-    private let scaleSlider = AnimEditorToolSidebarSliderContainer(
-        title: "Size",
-        gamma: scaleGamma,
-        valueDisplayMode: .percent(minValue: 1))
-    
-    private let smoothingSlider = AnimEditorToolSidebarSliderContainer(
-        title: "Smoothing",
-        gamma: smoothingGamma,
-        valueDisplayMode: .percent(minValue: 0))
+    private let smoothingSlider =
+        AnimEditorToolSidebarSlider(
+            title: "Smoothing",
+            gamma: smoothingGamma,
+            valueDisplayMode: .percent(minValue: 0))
     
     override func loadView() {
         view = PassthroughView()
@@ -33,7 +27,18 @@ class AnimEditorBrushToolControlsVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupUI()
         
+        scaleSlider.value =
+            AnimEditorToolSettingsStore
+                .brushToolScale
+        
+        smoothingSlider.value =
+            AnimEditorToolSettingsStore
+                .brushToolSmoothing
+    }
+    
+    private func setupUI() {
         let stack = UIStackView()
         stack.axis = .vertical
         view.addSubview(stack)
@@ -47,28 +52,24 @@ class AnimEditorBrushToolControlsVC: UIViewController {
         smoothingSlider.delegate = self
     }
     
-    var scale: Double {
-        get { scaleSlider.value }
-        set { scaleSlider.value = newValue }
-    }
-    
-    var smoothing: Double {
-        get { smoothingSlider.value }
-        set { smoothingSlider.value = newValue }
-    }
-    
 }
 
 extension AnimEditorBrushToolControlsVC:
-    AnimEditorToolSidebarSliderContainer.Delegate {
+    AnimEditorToolSidebarSlider.Delegate {
     
-    func onChangeValue(_ v: AnimEditorToolSidebarSliderContainer) {
+    func onChangeValue(
+        _ v: AnimEditorToolSidebarSlider
+    ) {
         switch v {
         case scaleSlider:
-            delegate?.onChangeScale(self)
+            AnimEditorToolSettingsStore
+                .brushToolScale = v.value
+            
         case smoothingSlider:
-            delegate?.onChangeSmoothing(self)
-        default: 
+            AnimEditorToolSettingsStore
+                .brushToolSmoothing = v.value
+            
+        default:
             break
         }
     }

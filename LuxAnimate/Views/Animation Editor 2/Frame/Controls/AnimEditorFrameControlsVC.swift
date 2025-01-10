@@ -4,7 +4,13 @@
 
 import UIKit
 
+// TODO: Switch between displayed tool controls.
+// Have tool controls save values in shared store?
+
 class AnimEditorFrameControlsVC: UIViewController {
+    
+    private let toolControlsContainerVC =
+        ContainerViewController()
     
     override func loadView() {
         view = PassthroughView()
@@ -13,14 +19,20 @@ class AnimEditorFrameControlsVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let vc = AnimEditorBrushToolControlsVC()
-        addChild(vc, to: view)
+        addChild(toolControlsContainerVC, to: view)
     }
     
     func update(
         selectedTool: AnimEditorFrameVC.Tool
-    ) {
-        // TODO: Show tool controls
+    ) { 
+        switch selectedTool {
+        case .paint:
+            let vc = AnimEditorBrushToolControlsVC()
+            toolControlsContainerVC.show(vc)
+        case .erase:
+            let vc = AnimEditorEraseToolControlsVC()
+            toolControlsContainerVC.show(vc)
+        }
     }
     
 }
