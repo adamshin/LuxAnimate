@@ -660,14 +660,14 @@
 			path = "File Helper";
 			sourceTree = "<group>";
 		};
-		6681BB1A2D0A442B00AAED6A /* Animation Editor 2 */ = {
+		6681BB1A2D0A442B00AAED6A /* Animation Editor */ = {
 			isa = PBXGroup;
 			children = (
 				6651A9D42C961FEF00E3520A /* Timeline */,
 				665F68892D123EA7004E5E70 /* Frame */,
 				6681BB1B2D0A444300AAED6A /* AnimEditorVC2.swift */,
 			);
-			path = "Animation Editor 2";
+			path = "Animation Editor";
 			sourceTree = "<group>";
 		};
 		6681BB1F2D0A493600AAED6A /* Toolbar */ = {
@@ -698,7 +698,7 @@
 			path = "Brush Library";
 			sourceTree = "<group>";
 		};
-		668A14CF2C7D3D1800D73D36 /* Animation Editor */ = {
+		668A14CF2C7D3D1800D73D36 /* Animation Editor (old) */ = {
 			isa = PBXGroup;
 			children = (
 				668A14D52C7D3EB500D73D36 /* Frame Editor */,
@@ -712,7 +712,7 @@
 				66E3E4372C7ADEC90086D388 /* AnimEditorView.swift */,
 				661E9F2E2C9CF48B00A75A2F /* AnimEditorState.swift */,
 			);
-			path = "Animation Editor";
+			path = "Animation Editor (old)";
 			sourceTree = "<group>";
 		};
 		668A14D02C7D3D2C00D73D36 /* Toolbar */ = {
@@ -889,8 +889,8 @@
 				66D084552BA3CDE400EB8556 /* App */,
 				66D0847B2BA3D78900EB8556 /* Library */,
 				663107B02C6ABC0F0028C89C /* Editor */,
-				668A14CF2C7D3D1800D73D36 /* Animation Editor */,
-				6681BB1A2D0A442B00AAED6A /* Animation Editor 2 */,
+				668A14CF2C7D3D1800D73D36 /* Animation Editor (old) */,
+				6681BB1A2D0A442B00AAED6A /* Animation Editor */,
 				661A24612C8696CE0031FE82 /* Editor Workspace */,
 				66311CE52BD7898000D53489 /* Shared */,
 				66211EA92BF2C747005490C4 /* Gestures */,

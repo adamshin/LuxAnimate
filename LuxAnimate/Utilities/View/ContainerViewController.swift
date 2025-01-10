@@ -57,3 +57,12 @@ class ContainerViewController: UIViewController {
     }
     
 }
+
+class PassthroughContainerViewController:
+    ContainerViewController {
+    
+    override func loadView() {
+        view = PassthroughView()
+    }
+    
+}
