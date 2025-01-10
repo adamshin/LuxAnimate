@@ -9,11 +9,11 @@ protocol AnimEditorToolState: AnyObject {
     
     func beginState(
         workspaceVC: EditorWorkspaceVC,
-        toolControlsVC: AnimEditorToolControlsVC)
+        toolControlsVC: UIViewController)
     
     func endState(
         workspaceVC: EditorWorkspaceVC,
-        toolControlsVC: AnimEditorToolControlsVC)
+        toolControlsVC: UIViewController)
     
     func setEditInteractionEnabled(_ enabled: Bool)
     

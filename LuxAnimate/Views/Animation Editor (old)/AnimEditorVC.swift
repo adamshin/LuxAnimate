@@ -35,7 +35,7 @@ class AnimEditorVC: UIViewController {
     
     private let workspaceVC = EditorWorkspaceVC()
     private let toolbarVC = AnimEditorToolbarVC()
-    private let toolControlsVC = AnimEditorToolControlsVC()
+//    private let toolControlsVC = AnimEditorToolControlsVC()
     
     private let timelineVC: AnimEditorTimelineVC
     
@@ -126,7 +126,7 @@ class AnimEditorVC: UIViewController {
     private func setupUI() {
         addChild(workspaceVC, to: bodyView.workspaceContainer)
         addChild(toolbarVC, to: bodyView.toolbarContainer)
-        addChild(toolControlsVC, to: bodyView.toolControlsContainer)
+//        addChild(toolControlsVC, to: bodyView.toolControlsContainer)
         
         // TODO: Proper view structure
         addChild(timelineVC, to: bodyView.workspaceContainer)
@@ -220,15 +220,15 @@ class AnimEditorVC: UIViewController {
     private func enterToolState(
         _ newToolState: AnimEditorToolState
     ) {
-        toolState?.endState(
-            workspaceVC: workspaceVC,
-            toolControlsVC: toolControlsVC)
+//        toolState?.endState(
+//            workspaceVC: workspaceVC,
+//            toolControlsVC: toolControlsVC)
         
         toolState = newToolState
         
-        newToolState.beginState(
-            workspaceVC: workspaceVC,
-            toolControlsVC: toolControlsVC)
+//        newToolState.beginState(
+//            workspaceVC: workspaceVC,
+//            toolControlsVC: toolControlsVC)
     }
     
     // MARK: - Frame Editor

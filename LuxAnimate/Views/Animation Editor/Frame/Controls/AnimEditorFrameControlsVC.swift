@@ -6,8 +6,8 @@ import UIKit
 
 class AnimEditorFrameControlsVC: UIViewController {
     
-    private let toolControlsContainerVC =
-        PassthroughContainerViewController()
+    private let toolControlsVC =
+        AnimEditorFrameToolControlsVC()
     
     override func loadView() {
         view = PassthroughView()
@@ -15,21 +15,17 @@ class AnimEditorFrameControlsVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        addChild(toolControlsContainerVC, to: view)
+        addChild(toolControlsVC, to: view)
     }
     
     func update(
         selectedTool: AnimEditorFrameVC.Tool
-    ) { 
-        switch selectedTool {
-        case .paint:
-            let vc = AnimEditorBrushToolControlsVC()
-            toolControlsContainerVC.show(vc)
-        case .erase:
-            let vc = AnimEditorEraseToolControlsVC()
-            toolControlsContainerVC.show(vc)
-        }
+    ) {
+        toolControlsVC.update(selectedTool: selectedTool)
+    }
+    
+    func showExpandedToolControls() {
+        toolControlsVC.showExpandedControls()
     }
     
 }

@@ -40,20 +40,20 @@ class AnimEditorEraseToolState: AnimEditorToolState {
     
     func beginState(
         workspaceVC: EditorWorkspaceVC,
-        toolControlsVC: AnimEditorToolControlsVC
+        toolControlsVC: UIViewController
     ) {
         workspaceVC.addOverlayGestureRecognizer(
             brushGestureRecognizer)
         
-        toolControlsVC.show(controlsVC)
+//        toolControlsVC.show(controlsVC)
     }
     
     func endState(
         workspaceVC: EditorWorkspaceVC,
-        toolControlsVC: AnimEditorToolControlsVC
+        toolControlsVC: UIViewController
     ) {
         workspaceVC.removeAllOverlayGestureRecognizers()
-        toolControlsVC.show(nil)
+//        toolControlsVC.show(nil)
     }
     
     func setEditInteractionEnabled(_ enabled: Bool) {

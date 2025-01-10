@@ -128,8 +128,7 @@ extension AnimEditorFrameVC:
         isAlreadySelected: Bool
     ) {
         if isAlreadySelected {
-            // TODO: Show tool options popup
-            
+            controlsVC.showExpandedToolControls()
         } else {
             controlsVC.update(selectedTool: tool)
             delegate?.onSelectTool(self, tool: tool)

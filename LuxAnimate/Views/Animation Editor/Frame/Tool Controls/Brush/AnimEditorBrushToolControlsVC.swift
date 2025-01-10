@@ -7,7 +7,8 @@ import UIKit
 private let scaleGamma: Double = 2.0
 private let smoothingGamma: Double = 1.5
 
-class AnimEditorBrushToolControlsVC: UIViewController {
+class AnimEditorBrushToolControlsVC:
+    UIViewController, AnimEditorToolControlsVC {
     
     private let scaleSlider =
         AnimEditorToolSidebarSlider(
@@ -50,6 +51,10 @@ class AnimEditorBrushToolControlsVC: UIViewController {
         
         scaleSlider.delegate = self
         smoothingSlider.delegate = self
+    }
+    
+    func showExpandedControls() {
+        print("FOO")
     }
     
 }
