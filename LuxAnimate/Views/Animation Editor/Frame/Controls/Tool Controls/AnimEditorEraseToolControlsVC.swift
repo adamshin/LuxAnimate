@@ -4,8 +4,7 @@
 
 import UIKit
 
-class AnimEditorEraseToolControlsVC:
-    UIViewController, AnimEditorToolControlsVC {
+class AnimEditorEraseToolControlsVC: UIViewController {
     
     override func loadView() {
         view = PassthroughView()

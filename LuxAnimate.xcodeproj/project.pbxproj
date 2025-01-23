@@ -304,22 +304,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		66040DBE2D31BD0E00CB750A /* Brush */ = {
-			isa = PBXGroup;
-			children = (
-				664120522C7A727E00CF98B8 /* AnimEditorBrushToolControlsVC.swift */,
-			);
-			path = Brush;
-			sourceTree = "<group>";
-		};
-		66040DBF2D31BD1100CB750A /* Erase */ = {
-			isa = PBXGroup;
-			children = (
-				668A14CB2C7D1E2000D73D36 /* AnimEditorEraseToolControlsVC.swift */,
-			);
-			path = Erase;
-			sourceTree = "<group>";
-		};
 		6613C1F02BE2DC990019E667 /* Editor Menu */ = {
 			isa = PBXGroup;
 			children = (
@@ -485,10 +469,9 @@
 		66392A252D21170200B0CC56 /* Tool Controls */ = {
 			isa = PBXGroup;
 			children = (
-				66040DBE2D31BD0E00CB750A /* Brush */,
-				66040DBF2D31BD1100CB750A /* Erase */,
-				66392A242D21143500B0CC56 /* Shared */,
 				66040DBC2D31BC8400CB750A /* AnimEditorFrameToolControlsVC.swift */,
+				664120522C7A727E00CF98B8 /* AnimEditorBrushToolControlsVC.swift */,
+				668A14CB2C7D1E2000D73D36 /* AnimEditorEraseToolControlsVC.swift */,
 			);
 			path = "Tool Controls";
 			sourceTree = "<group>";
@@ -610,7 +593,7 @@
 			children = (
 				6681BB1F2D0A493600AAED6A /* Toolbar */,
 				6681BB242D0A4F5E00AAED6A /* Controls */,
-				66392A252D21170200B0CC56 /* Tool Controls */,
+				66392A242D21143500B0CC56 /* Shared */,
 				665F688A2D123EB0004E5E70 /* AnimEditorFrameVC.swift */,
 				66392A1E2D1E5D0000B0CC56 /* AnimEditorFrameView.swift */,
 			);
@@ -702,6 +685,7 @@
 		6681BB242D0A4F5E00AAED6A /* Controls */ = {
 			isa = PBXGroup;
 			children = (
+				66392A252D21170200B0CC56 /* Tool Controls */,
 				6681BB252D0A4F6900AAED6A /* AnimEditorFrameControlsVC.swift */,
 			);
 			path = Controls;

@@ -9,6 +9,8 @@ class AnimEditorFrameControlsVC: UIViewController {
     private let toolControlsVC =
         AnimEditorFrameToolControlsVC()
     
+    // MARK: - Lifecycle
+    
     override func loadView() {
         view = PassthroughView()
     }
@@ -17,6 +19,8 @@ class AnimEditorFrameControlsVC: UIViewController {
         super.viewDidLoad()
         addChild(toolControlsVC, to: view)
     }
+    
+    // MARK: - Interface
     
     func update(
         selectedTool: AnimEditorFrameVC.Tool

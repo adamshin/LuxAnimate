@@ -4,17 +4,10 @@
 
 import UIKit
 
-protocol AnimEditorToolControlsVC: UIViewController {
-    func showExpandedControls()
-}
-
 class AnimEditorFrameToolControlsVC: UIViewController {
     
     private let containerVC =
         PassthroughContainerViewController()
-    
-    private var activeToolControlsVC:
-        AnimEditorToolControlsVC?
     
     override func loadView() {
         view = PassthroughView()
@@ -31,18 +24,16 @@ class AnimEditorFrameToolControlsVC: UIViewController {
         switch selectedTool {
         case .paint:
             let vc = AnimEditorBrushToolControlsVC()
-            activeToolControlsVC = vc
             containerVC.show(vc)
             
         case .erase:
             let vc = AnimEditorEraseToolControlsVC()
-            activeToolControlsVC = vc
             containerVC.show(vc)
         }
     }
     
     func showExpandedControls() {
-        activeToolControlsVC?.showExpandedControls()
+        
     }
     
 }
