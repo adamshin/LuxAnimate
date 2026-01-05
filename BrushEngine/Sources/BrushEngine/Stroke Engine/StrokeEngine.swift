@@ -78,7 +78,7 @@ class StrokeEngine {
                 stroke.nonFinalizedStamps += batch.stamps
             }
             
-            if batch.isStrokeEnd {
+            if batch.isLastBatch {
                 break
             }
         }

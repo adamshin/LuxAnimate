@@ -60,13 +60,13 @@ struct StrokeEngineStrokeSampleProcessor {
         for sample in input.samples {
             Self.processSample(
                 sample: sample,
-                strokeEndTime: input.strokeEndTime,
+                lastSampleTime: input.lastSampleTime,
                 config: config,
                 state: &state,
                 output: &output)
         }
         
-        if input.isStrokeEnd,
+        if input.isLastBatch,
             let lastControlPointSample =
                 state.lastControlPointSamples?.last
         {
@@ -75,7 +75,7 @@ struct StrokeEngineStrokeSampleProcessor {
             for _ in 0 ..< 3 {
                 Self.processSample(
                     sample: lastControlPointSample,
-                    strokeEndTime: input.strokeEndTime,
+                    lastSampleTime: input.lastSampleTime,
                     config: config,
                     state: &state,
                     output: &output)
@@ -84,7 +84,7 @@ struct StrokeEngineStrokeSampleProcessor {
         
         return .init(
             samples: output,
-            isStrokeEnd: input.isStrokeEnd,
+            isLastBatch: input.isLastBatch,
             isFinalized: state.isOutputFinalized)
     }
     
@@ -92,7 +92,7 @@ struct StrokeEngineStrokeSampleProcessor {
     
     private static func processSample(
         sample: IntermediateSample,
-        strokeEndTime: TimeInterval,
+        lastSampleTime: TimeInterval,
         config: Config,
         state: inout State,
         output: inout [StrokeSample]
@@ -108,7 +108,7 @@ struct StrokeEngineStrokeSampleProcessor {
             
             processSegment(
                 controlPointSamples: controlPointSamples,
-                strokeEndTime: strokeEndTime,
+                lastSampleTime: lastSampleTime,
                 config: config,
                 state: &state,
                 output: &output)
@@ -120,7 +120,7 @@ struct StrokeEngineStrokeSampleProcessor {
             
             processSegment(
                 controlPointSamples: controlPointSamples,
-                strokeEndTime: strokeEndTime,
+                lastSampleTime: lastSampleTime,
                 config: config,
                 state: &state,
                 output: &output)
@@ -129,7 +129,7 @@ struct StrokeEngineStrokeSampleProcessor {
     
     private static func processSegment(
         controlPointSamples: [IntermediateSample],
-        strokeEndTime: TimeInterval,
+        lastSampleTime: TimeInterval,
         config: Config,
         state: inout State,
         output: inout [StrokeSample]
@@ -143,7 +143,7 @@ struct StrokeEngineStrokeSampleProcessor {
         for sample in subSegmentSamples {
             processSubSegmentSample(
                 sample: sample,
-                strokeEndTime: strokeEndTime,
+                lastSampleTime: lastSampleTime,
                 config: config,
                 state: &state,
                 output: &output)
@@ -152,7 +152,7 @@ struct StrokeEngineStrokeSampleProcessor {
     
     private static func processSubSegmentSample(
         sample: IntermediateSample,
-        strokeEndTime: TimeInterval,
+        lastSampleTime: TimeInterval,
         config: Config,
         state: inout State,
         output: inout [StrokeSample]
@@ -180,7 +180,7 @@ struct StrokeEngineStrokeSampleProcessor {
             .strokeSample(
                 sample: sample,
                 strokeDistance: strokeDistance,
-                strokeEndTime: strokeEndTime)
+                lastSampleTime: lastSampleTime)
         
         let strokeSample = strokeSampleOutput.strokeSample
         

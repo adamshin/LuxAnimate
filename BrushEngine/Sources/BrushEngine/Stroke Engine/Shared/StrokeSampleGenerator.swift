@@ -69,7 +69,7 @@ struct StrokeSampleGenerator {
     func strokeSample(
         sample: IntermediateSample,
         strokeDistance: Double,
-        strokeEndTime: TimeInterval
+        lastSampleTime: TimeInterval
     ) -> Output {
         
         // Pressure
@@ -99,7 +99,7 @@ struct StrokeSampleGenerator {
                 brush: brush,
                 applyTaper: applyTaper,
                 sampleTime: sample.time,
-                strokeEndTime: strokeEndTime)
+                lastSampleTime: lastSampleTime)
         
         let taperSize = 1
             - (1 - taperAmount)
@@ -200,7 +200,7 @@ struct StrokeSampleGenerator {
         brush: Brush,
         applyTaper: Bool,
         sampleTime: TimeInterval,
-        strokeEndTime: TimeInterval
+        lastSampleTime: TimeInterval
     ) -> (Double, Bool) {
         
         let roundness = brush.configuration.taperRoundness
@@ -219,7 +219,7 @@ struct StrokeSampleGenerator {
             sampleTime / taperTime
         
         let normalizedDistanceToEnd =
-            (strokeEndTime - sampleTime)
+            (lastSampleTime - sampleTime)
             / taperTime
         
         let taperStartAmount: Double

@@ -39,8 +39,6 @@ struct StrokeEngineInputQueue {
         {
             lastSampleTime = lastSample.time
         }
-        
-//        print("Input queue sample count: \(samples.count)")
     }
     
     mutating func handleInputUpdate(
@@ -71,8 +69,8 @@ struct StrokeEngineInputQueue {
             let sample = Self.convert(inputSample: s)
             return IntermediateSampleBatch(
                 samples: [sample],
-                strokeEndTime: lastSampleTime,
-                isStrokeEnd: false,
+                lastSampleTime: lastSampleTime,
+                isLastBatch: false,
                 isFinalized: isOutputFinalized)
             
         } else if let s = predictedSamples.first {
@@ -81,15 +79,15 @@ struct StrokeEngineInputQueue {
             let sample = Self.convert(inputSample: s)
             return IntermediateSampleBatch(
                 samples: [sample],
-                strokeEndTime: lastSampleTime,
-                isStrokeEnd: false,
+                lastSampleTime: lastSampleTime,
+                isLastBatch: false,
                 isFinalized: false)
         }
         
         return IntermediateSampleBatch(
             samples: [],
-            strokeEndTime: lastSampleTime,
-            isStrokeEnd: true,
+            lastSampleTime: lastSampleTime,
+            isLastBatch: true,
             isFinalized: false)
     }
     
