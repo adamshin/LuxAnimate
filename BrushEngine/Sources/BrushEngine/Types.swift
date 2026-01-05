@@ -132,8 +132,8 @@ struct StrokeStamp {
 struct IntermediateSampleBatch {
     
     var samples: [IntermediateSample]
-    var lastSampleTime: TimeInterval
-    var isLastBatch: Bool
+    var finalSampleTime: TimeInterval
+    var isFinalBatch: Bool
     var isFinalized: Bool
     
 }
@@ -141,7 +141,7 @@ struct IntermediateSampleBatch {
 struct StrokeSampleBatch {
     
     var samples: [StrokeSample]
-    var isLastBatch: Bool
+    var isFinalBatch: Bool
     var isFinalized: Bool
     
 }
@@ -149,7 +149,7 @@ struct StrokeSampleBatch {
 struct StrokeStampBatch {
     
     var stamps: [StrokeStamp]
-    var isLastBatch: Bool
+    var isFinalBatch: Bool
     var isFinalized: Bool
     
 }

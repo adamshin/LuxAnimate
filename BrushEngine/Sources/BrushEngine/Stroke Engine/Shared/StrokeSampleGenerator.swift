@@ -69,7 +69,7 @@ struct StrokeSampleGenerator {
     func strokeSample(
         sample: IntermediateSample,
         strokeDistance: Double,
-        lastSampleTime: TimeInterval
+        finalSampleTime: TimeInterval
     ) -> Output {
         
         // Pressure
@@ -99,7 +99,7 @@ struct StrokeSampleGenerator {
                 brush: brush,
                 applyTaper: applyTaper,
                 sampleTime: sample.time,
-                lastSampleTime: lastSampleTime)
+                finalSampleTime: finalSampleTime)
         
         let taperSize = 1
             - (1 - taperAmount)
@@ -200,7 +200,7 @@ struct StrokeSampleGenerator {
         brush: Brush,
         applyTaper: Bool,
         sampleTime: TimeInterval,
-        lastSampleTime: TimeInterval
+        finalSampleTime: TimeInterval
     ) -> (Double, Bool) {
         
         let roundness = brush.configuration.taperRoundness
@@ -215,29 +215,29 @@ struct StrokeSampleGenerator {
             taperTime = taperLength * maxTaperTime
         }
         
-        let normalizedDistanceToStart =
+        let normalizedTimeDistanceToStart =
             sampleTime / taperTime
         
-        let normalizedDistanceToEnd =
-            (lastSampleTime - sampleTime)
+        let normalizedTimeDistanceToEnd =
+            (finalSampleTime - sampleTime)
             / taperTime
         
         let taperStartAmount: Double
         let taperEndAmount: Double
         let isInTaperEnd: Bool
         
-        if normalizedDistanceToStart < 1 {
+        if normalizedTimeDistanceToStart < 1 {
             taperStartAmount = taperAmount(
                 roundness: roundness,
-                distance: normalizedDistanceToStart)
+                distance: normalizedTimeDistanceToStart)
         } else {
             taperStartAmount = 1
         }
         
-        if normalizedDistanceToEnd < 1 {
+        if normalizedTimeDistanceToEnd < 1 {
             taperEndAmount = taperAmount(
                 roundness: roundness,
-                distance: normalizedDistanceToEnd)
+                distance: normalizedTimeDistanceToEnd)
             isInTaperEnd = true
         } else {
             taperEndAmount = 1

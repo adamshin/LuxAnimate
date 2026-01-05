@@ -9,7 +9,7 @@ struct StrokeEngineInputQueue {
     private var samples: [BrushEngine.InputSample] = []
     private var predictedSamples: [BrushEngine.InputSample] = []
     
-    private var lastSampleTime: TimeInterval = 0
+    private var finalSampleTime: TimeInterval = 0
     
     private var isOutputFinalized = true
     
@@ -34,10 +34,10 @@ struct StrokeEngineInputQueue {
             }
         }
         
-        if let lastSample =
+        if let finalSample =
             predictedSamples.last ?? samples.last
         {
-            lastSampleTime = lastSample.time
+            finalSampleTime = finalSample.time
         }
     }
     
@@ -69,8 +69,8 @@ struct StrokeEngineInputQueue {
             let sample = Self.convert(inputSample: s)
             return IntermediateSampleBatch(
                 samples: [sample],
-                lastSampleTime: lastSampleTime,
-                isLastBatch: false,
+                finalSampleTime: finalSampleTime,
+                isFinalBatch: false,
                 isFinalized: isOutputFinalized)
             
         } else if let s = predictedSamples.first {
@@ -79,15 +79,15 @@ struct StrokeEngineInputQueue {
             let sample = Self.convert(inputSample: s)
             return IntermediateSampleBatch(
                 samples: [sample],
-                lastSampleTime: lastSampleTime,
-                isLastBatch: false,
+                finalSampleTime: finalSampleTime,
+                isFinalBatch: false,
                 isFinalized: false)
         }
         
         return IntermediateSampleBatch(
             samples: [],
-            lastSampleTime: lastSampleTime,
-            isLastBatch: true,
+            finalSampleTime: finalSampleTime,
+            isFinalBatch: true,
             isFinalized: false)
     }
     

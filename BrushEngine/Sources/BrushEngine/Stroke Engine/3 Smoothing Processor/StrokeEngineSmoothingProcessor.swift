@@ -69,16 +69,14 @@ struct StrokeEngineSmoothingProcessor {
 
         Self.processSamples(
             samples: input.samples,
-            lastSampleTime: input.lastSampleTime,
             config: config,
             sampleBuffer: &sampleBuffer,
             outputSamples: &outputSamples)
         
-        if input.isLastBatch {
+        if input.isFinalBatch {
             isOutputFinalized = false
             
-            Self.processStrokeEnd(
-                lastSampleTime: input.lastSampleTime,
+            Self.processSampleTail(
                 config: config,
                 sampleBuffer: &sampleBuffer,
                 outputSamples: &outputSamples)
@@ -86,8 +84,8 @@ struct StrokeEngineSmoothingProcessor {
         
         return IntermediateSampleBatch(
             samples: outputSamples,
-            lastSampleTime: input.lastSampleTime,
-            isLastBatch: input.isLastBatch,
+            finalSampleTime: input.finalSampleTime,
+            isFinalBatch: input.isFinalBatch,
             isFinalized: isOutputFinalized)
     }
     
@@ -95,7 +93,6 @@ struct StrokeEngineSmoothingProcessor {
     
     private static func processSamples(
         samples: [IntermediateSample],
-        lastSampleTime: TimeInterval,
         config: Config,
         sampleBuffer: inout [IntermediateSample],
         outputSamples: inout [IntermediateSample]
@@ -115,8 +112,7 @@ struct StrokeEngineSmoothingProcessor {
         }
     }
     
-    private static func processStrokeEnd(
-        lastSampleTime: TimeInterval,
+    private static func processSampleTail(
         config: Config,
         sampleBuffer: inout [IntermediateSample],
         outputSamples: inout [IntermediateSample]

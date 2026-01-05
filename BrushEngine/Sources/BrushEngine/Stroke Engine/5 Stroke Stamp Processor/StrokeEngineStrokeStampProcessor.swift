@@ -50,7 +50,7 @@ struct StrokeEngineStrokeStampProcessor {
         
         return .init(
             stamps: output,
-            isLastBatch: input.isLastBatch,
+            isFinalBatch: input.isFinalBatch,
             isFinalized: input.isFinalized)
     }
     
