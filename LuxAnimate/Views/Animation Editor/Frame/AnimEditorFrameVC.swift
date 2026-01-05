@@ -46,7 +46,9 @@ class AnimEditorFrameVC: UIViewController {
     private let bodyView = AnimEditorFrameView()
     
     private let toolbarVC = AnimEditorFrameToolbarVC()
-    private let controlsVC = AnimEditorFrameControlsVC()
+//    private let controlsVC = AnimEditorFrameControlsVC()
+    
+    private let toolStateManager = AnimEditorFrameToolStateManager()
     
     // MARK: - Delegate
     
@@ -72,7 +74,7 @@ class AnimEditorFrameVC: UIViewController {
         toolbarVC.delegate = self
         
         addChild(toolbarVC, to: bodyView.toolbarContainer)
-        addChild(controlsVC, to: bodyView.contentContainer)
+//        addChild(controlsVC, to: bodyView.contentContainer)
         
         setSelectedTool(.paint)
     }
@@ -83,7 +85,7 @@ class AnimEditorFrameVC: UIViewController {
         _ selectedTool: Tool
     ) {
         toolbarVC.update(selectedTool: selectedTool)
-        controlsVC.update(selectedTool: selectedTool)
+//        controlsVC.update(selectedTool: selectedTool)
     }
     
     // MARK: - Interface
@@ -127,12 +129,12 @@ extension AnimEditorFrameVC:
         tool: AnimEditorFrameVC.Tool,
         isAlreadySelected: Bool
     ) {
-        if isAlreadySelected {
-            controlsVC.showExpandedToolControls()
-        } else {
-            controlsVC.update(selectedTool: tool)
-            delegate?.onSelectTool(self, tool: tool)
-        }
+//        if isAlreadySelected {
+//            controlsVC.showExpandedToolControls()
+//        } else {
+//            controlsVC.update(selectedTool: tool)
+//            delegate?.onSelectTool(self, tool: tool)
+//        }
     }
     
 }
