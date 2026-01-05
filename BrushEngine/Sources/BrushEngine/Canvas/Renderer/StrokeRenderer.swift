@@ -61,9 +61,11 @@ class StrokeRenderer {
     func drawStamps(
         target: MTLTexture,
         viewportSize: Size,
-        sprites: [BrushStampRenderer.Sprite],
+        stamps: [StrokeStamp],
         brush: Brush
     ) {
+        let sprites = stamps.map { $0.sprite }
+        
         let commandBuffer = commandQueue
             .makeCommandBuffer()!
         
@@ -107,13 +109,10 @@ class StrokeRenderer {
             Double(canvasWidth),
             Double(canvasHeight))
         
-        let finalizedSprites = incrementalStroke.finalizedStamps.map { $0.sprite }
-        let nonFinalizedSprites = incrementalStroke.nonFinalizedStamps.map { $0.sprite }
-        
         drawStamps(
             target: finalizedStrokeTexture,
             viewportSize: viewportSize,
-            sprites: finalizedSprites,
+            stamps: incrementalStroke.finalizedStamps,
             brush: incrementalStroke.brush)
         
         try? textureBlitter.blit(
@@ -123,7 +122,7 @@ class StrokeRenderer {
         drawStamps(
             target: fullStrokeTexture,
             viewportSize: viewportSize,
-            sprites: nonFinalizedSprites,
+            stamps: incrementalStroke.nonFinalizedStamps,
             brush: incrementalStroke.brush)
     }
     
