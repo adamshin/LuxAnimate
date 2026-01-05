@@ -3,6 +3,8 @@ import Foundation
 import Color
 import Render
 
+// MARK: - Types
+
 extension StrokeEngine {
     
     struct IncrementalStroke {
@@ -13,11 +15,15 @@ extension StrokeEngine {
     
 }
 
+// MARK: - StrokeEngine
+
 class StrokeEngine {
     
     private let brush: Brush
     
     private var stateCheckpoint: StrokeEngineState
+    
+    // MARK: - Init
     
     init(
         brush: Brush,
@@ -35,6 +41,8 @@ class StrokeEngine {
             smoothing: smoothing,
             applyTaper: !quickTap)
     }
+    
+    // MARK: - Interface
     
     func update(
         addedSamples: [InputSample],
@@ -55,27 +63,27 @@ class StrokeEngine {
     func process() -> IncrementalStroke {
         var state = stateCheckpoint
         
-        var output = IncrementalStroke(
+        var stroke = IncrementalStroke(
             brush: brush,
             finalizedStamps: [],
             nonFinalizedStamps: [])
         
         while true {
-            let stepOutput = state.processStep()
+            let batch = state.processStep()
             
-            if stepOutput.isFinalized {
+            if batch.isFinalized {
                 stateCheckpoint = state
-                output.finalizedStamps += stepOutput.stamps
+                stroke.finalizedStamps += batch.stamps
             } else {
-                output.nonFinalizedStamps += stepOutput.stamps
+                stroke.nonFinalizedStamps += batch.stamps
             }
             
-            if stepOutput.isStrokeEnd {
+            if batch.isStrokeEnd {
                 break
             }
         }
         
-        return output
+        return stroke
     }
     
 }
