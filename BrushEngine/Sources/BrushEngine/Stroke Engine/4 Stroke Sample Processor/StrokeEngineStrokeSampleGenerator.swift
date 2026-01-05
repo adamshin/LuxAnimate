@@ -12,7 +12,7 @@ private let maxTaperTime: TimeInterval = 0.2
 private let wobbleOctaveCount = 2
 private let wobblePersistence: Double = 0.5
 
-extension StrokeSampleGenerator {
+extension StrokeEngineStrokeSampleGenerator {
     
     struct Output {
         var strokeSample: StrokeSample
@@ -21,7 +21,7 @@ extension StrokeSampleGenerator {
     
 }
 
-struct StrokeSampleGenerator {
+struct StrokeEngineStrokeSampleGenerator {
     
     private let brush: Brush
     private let applyTaper: Bool

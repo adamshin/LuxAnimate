@@ -167,7 +167,7 @@ struct StrokeEngineSmoothingProcessor {
             .map { windowEndTime + $0 }
         
         let windowSamples =
-            try! SampleResampler.resample(
+            try! StrokeEngineSampleResampler.resample(
                 samples: sampleBuffer,
                 resampleTimes: resampleTimes)
         

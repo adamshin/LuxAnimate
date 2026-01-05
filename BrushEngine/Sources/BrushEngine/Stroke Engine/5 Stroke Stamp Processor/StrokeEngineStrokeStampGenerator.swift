@@ -9,7 +9,7 @@ private let maxStampCount = 16
 
 private let paddingSizeThreshold: Double = 20
 
-struct StrokeStampGenerator {
+struct StrokeEngineStrokeStampGenerator {
     
     private let unitCircleRandomPointGenerator
         = UnitCircleRandomPointGenerator()

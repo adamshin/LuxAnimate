@@ -10,7 +10,8 @@ private let segmentSubdivisionCount = 10
 extension StrokeEngineStrokeSampleProcessor {
     
     struct Config {
-        let strokeSampleGenerator: StrokeSampleGenerator
+        let strokeSampleGenerator:
+            StrokeEngineStrokeSampleGenerator
     }
     
     struct State {
@@ -36,13 +37,11 @@ struct StrokeEngineStrokeSampleProcessor {
         scale: Double,
         applyTaper: Bool
     ) {
-        let strokeSampleGenerator = StrokeSampleGenerator(
-            brush: brush,
-            scale: scale,
-            applyTaper: applyTaper)
-        
         config = Config(
-            strokeSampleGenerator: strokeSampleGenerator)
+            strokeSampleGenerator: .init(
+                brush: brush,
+                scale: scale,
+                applyTaper: applyTaper))
     }
     
     // MARK: - Interface

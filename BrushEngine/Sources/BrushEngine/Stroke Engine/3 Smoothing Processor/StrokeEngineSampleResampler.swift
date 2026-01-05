@@ -1,7 +1,7 @@
 
 import Foundation
 
-struct SampleResampler {
+struct StrokeEngineSampleResampler {
     
     enum Error: Swift.Error {
         case emptyInput

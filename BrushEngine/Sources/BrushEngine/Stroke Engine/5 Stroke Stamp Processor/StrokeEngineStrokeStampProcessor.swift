@@ -5,7 +5,9 @@ import Render
 
 private let minStampDistance: Double = 1.0
 
-struct StrokeEngineStrokeStampProcessor {
+// MARK: - Structs
+
+extension StrokeEngineStrokeStampProcessor {
     
     struct Config {
         let brush: Brush
@@ -15,8 +17,14 @@ struct StrokeEngineStrokeStampProcessor {
     struct State {
         var nextCursorStrokeDistance: Double = 0
         var lastSample: StrokeSample?
-        var stampGenerator = StrokeStampGenerator()
+        var stampGenerator = StrokeEngineStrokeStampGenerator()
     }
+    
+}
+
+// MARK: - StrokeEngineStrokeStampProcessor
+
+struct StrokeEngineStrokeStampProcessor {
     
     private let config: Config
     private var state = State()
