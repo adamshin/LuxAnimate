@@ -59,7 +59,7 @@ struct StrokeEngineInputQueue {
     }
     
     mutating func processNextSample()
-    -> StrokeEngine.ProcessorOutput {
+    -> IntermediateSampleBatch {
         
         if let s = samples.first {
             samples.removeFirst()
@@ -69,7 +69,7 @@ struct StrokeEngineInputQueue {
             }
             
             let sample = Self.convert(inputSample: s)
-            return StrokeEngine.ProcessorOutput(
+            return IntermediateSampleBatch(
                 samples: [sample],
                 strokeEndTime: lastSampleTime,
                 isStrokeEnd: false,
@@ -79,14 +79,14 @@ struct StrokeEngineInputQueue {
             predictedSamples.removeFirst()
             
             let sample = Self.convert(inputSample: s)
-            return StrokeEngine.ProcessorOutput(
+            return IntermediateSampleBatch(
                 samples: [sample],
                 strokeEndTime: lastSampleTime,
                 isStrokeEnd: false,
                 isFinalized: false)
         }
         
-        return StrokeEngine.ProcessorOutput(
+        return IntermediateSampleBatch(
             samples: [],
             strokeEndTime: lastSampleTime,
             isStrokeEnd: true,
@@ -97,12 +97,12 @@ struct StrokeEngineInputQueue {
     
     private static func convert(
         inputSample s: InputSample
-    ) -> Sample {
+    ) -> IntermediateSample {
         
         let azimuth = Complex(s.azimuth.x, s.azimuth.y)
         let roll = Complex(length: 1, phase: -s.roll)
         
-        return Sample(
+        return IntermediateSample(
             time: s.time,
             position: s.position,
             pressure: s.pressure,

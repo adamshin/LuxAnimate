@@ -67,7 +67,7 @@ struct StrokeSampleGenerator {
     // MARK: - Interface
     
     func strokeSample(
-        sample: Sample,
+        sample: IntermediateSample,
         strokeDistance: Double,
         strokeEndTime: TimeInterval
     ) -> Output {

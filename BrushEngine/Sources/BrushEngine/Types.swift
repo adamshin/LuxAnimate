@@ -2,6 +2,7 @@
 import Foundation
 import Geometry
 import Color
+import Render
 
 // MARK: - Public Types
 
@@ -95,9 +96,9 @@ public struct InputSampleUpdate {
     
 }
 
-// MARK: - Internal Types
+// MARK: - Samples
 
-struct Sample {
+struct IntermediateSample {
     
     var time: TimeInterval
     var position: Vector
@@ -120,12 +121,45 @@ struct StrokeSample {
     
 }
 
+struct StrokeStamp {
+    
+    var sprite: BrushStampRenderer.Sprite
+    
+}
+
+// MARK: - Batches
+
+struct IntermediateSampleBatch {
+    
+    var samples: [IntermediateSample]
+    var strokeEndTime: TimeInterval
+    var isStrokeEnd: Bool
+    var isFinalized: Bool
+    
+}
+
+struct StrokeSampleBatch {
+    
+    var samples: [StrokeSample]
+    var isStrokeEnd: Bool
+    var isFinalized: Bool
+    
+}
+
+struct StrokeStampBatch {
+    
+    var stamps: [StrokeStamp]
+    var isStrokeEnd: Bool
+    var isFinalized: Bool
+    
+}
+
 // MARK: - Interpolation
 
-extension Sample: Interpolatable {
+extension IntermediateSample: Interpolatable {
     
     static var zero: Self {
-        Sample(
+        .init(
             time: 0,
             position: .zero,
             pressure: 0,
@@ -151,7 +185,7 @@ extension Sample: Interpolatable {
 extension StrokeSample: Interpolatable {
     
     static var zero: Self {
-        StrokeSample(
+        .init(
             position: .zero,
             strokeDistance: 0,
             stampOffset: .zero,
@@ -169,7 +203,7 @@ extension StrokeSample: Interpolatable {
         stampOffset    += w * v.stampOffset
         stampSize      += w * v.stampSize
         stampRotation  += w * v.stampRotation
-        stampOpacity     += w * v.stampOpacity
+        stampOpacity   += w * v.stampOpacity
     }
     
 }

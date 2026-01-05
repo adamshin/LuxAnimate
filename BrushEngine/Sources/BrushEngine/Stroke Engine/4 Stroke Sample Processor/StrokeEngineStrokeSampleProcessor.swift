@@ -14,7 +14,7 @@ extension StrokeEngineStrokeSampleProcessor {
     }
     
     struct State {
-        var lastControlPointSamples: [Sample]?
+        var lastControlPointSamples: [IntermediateSample]?
         var lastStrokeSample: StrokeSample?
         var isOutputFinalized = true
     }
@@ -48,8 +48,8 @@ struct StrokeEngineStrokeSampleProcessor {
     // MARK: - Interface
     
     mutating func process(
-        input: StrokeEngine.ProcessorOutput
-    ) -> StrokeEngine.StrokeSampleProcessorOutput {
+        input: IntermediateSampleBatch
+    ) -> StrokeSampleBatch {
         
         if !input.isFinalized {
             state.isOutputFinalized = false
@@ -83,7 +83,7 @@ struct StrokeEngineStrokeSampleProcessor {
         }
         
         return .init(
-            strokeSamples: output,
+            samples: output,
             isStrokeEnd: input.isStrokeEnd,
             isFinalized: state.isOutputFinalized)
     }
@@ -91,7 +91,7 @@ struct StrokeEngineStrokeSampleProcessor {
     // MARK: - Internal Logic
     
     private static func processSample(
-        sample: Sample,
+        sample: IntermediateSample,
         strokeEndTime: TimeInterval,
         config: Config,
         state: inout State,
@@ -128,7 +128,7 @@ struct StrokeEngineStrokeSampleProcessor {
     }
     
     private static func processSegment(
-        controlPointSamples: [Sample],
+        controlPointSamples: [IntermediateSample],
         strokeEndTime: TimeInterval,
         config: Config,
         state: inout State,
@@ -151,7 +151,7 @@ struct StrokeEngineStrokeSampleProcessor {
     }
     
     private static func processSubSegmentSample(
-        sample: Sample,
+        sample: IntermediateSample,
         strokeEndTime: TimeInterval,
         config: Config,
         state: inout State,
@@ -193,9 +193,9 @@ struct StrokeEngineStrokeSampleProcessor {
     }
     
     private static func subSegmentSamples(
-        controlPointSamples: [Sample],
+        controlPointSamples: [IntermediateSample],
         subdivisionCount: Int
-    ) -> [Sample] {
+    ) -> [IntermediateSample] {
         
         guard controlPointSamples.count == 4 else {
             fatalError()
@@ -207,7 +207,7 @@ struct StrokeEngineStrokeSampleProcessor {
         
         let count = segmentSubdivisionCount
         
-        var output: [Sample] = []
+        var output: [IntermediateSample] = []
         output.reserveCapacity(count)
         
         for i in 0 ..< count {

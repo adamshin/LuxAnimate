@@ -5,29 +5,10 @@ import Render
 
 extension StrokeEngine {
     
-    struct ProcessorOutput {
-        var samples: [Sample]
-        var strokeEndTime: TimeInterval
-        var isStrokeEnd: Bool
-        var isFinalized: Bool
-    }
-    
-    struct StrokeSampleProcessorOutput {
-        var strokeSamples: [StrokeSample]
-        var isStrokeEnd: Bool
-        var isFinalized: Bool
-    }
-    
-    struct StrokeStampProcessorOutput {
-        var stampSprites: [BrushStampRenderer.Sprite]
-        var isStrokeEnd: Bool
-        var isFinalized: Bool
-    }
-    
-    struct Output {
+    struct IncrementalStroke {
         var brush: Brush
-        var finalizedStampSprites: [BrushStampRenderer.Sprite]
-        var nonFinalizedStampSprites: [BrushStampRenderer.Sprite]
+        var finalizedStamps: [StrokeStamp]
+        var nonFinalizedStamps: [StrokeStamp]
     }
     
 }
@@ -36,7 +17,7 @@ class StrokeEngine {
     
     private let brush: Brush
     
-    private var savedState: StrokeEngineState
+    private var stateCheckpoint: StrokeEngineState
     
     init(
         brush: Brush,
@@ -47,7 +28,7 @@ class StrokeEngine {
     ) {
         self.brush = brush
         
-        savedState = .init(
+        stateCheckpoint = .init(
             brush: brush,
             color: color,
             scale: scale,
@@ -59,7 +40,7 @@ class StrokeEngine {
         addedSamples: [InputSample],
         predictedSamples: [InputSample]
     ) {
-        savedState.handleInputUpdate(
+        stateCheckpoint.handleInputUpdate(
             addedSamples: addedSamples,
             predictedSamples: predictedSamples)
     }
@@ -67,28 +48,26 @@ class StrokeEngine {
     func update(
         sampleUpdates: [InputSampleUpdate]
     ) {
-        savedState.handleInputUpdate(
+        stateCheckpoint.handleInputUpdate(
             sampleUpdates: sampleUpdates)
     }
     
-    func process() -> Output {
-        var state = savedState
+    func process() -> IncrementalStroke {
+        var state = stateCheckpoint
         
-        var output = Output(
+        var output = IncrementalStroke(
             brush: brush,
-            finalizedStampSprites: [],
-            nonFinalizedStampSprites: [])
+            finalizedStamps: [],
+            nonFinalizedStamps: [])
         
         while true {
             let stepOutput = state.processStep()
             
             if stepOutput.isFinalized {
-                savedState = state
-                output.finalizedStampSprites
-                    += stepOutput.stampSprites
+                stateCheckpoint = state
+                output.finalizedStamps += stepOutput.stamps
             } else {
-                output.nonFinalizedStampSprites
-                    += stepOutput.stampSprites
+                output.nonFinalizedStamps += stepOutput.stamps
             }
             
             if stepOutput.isStrokeEnd {

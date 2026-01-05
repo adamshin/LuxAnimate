@@ -28,7 +28,7 @@ struct StrokeStampGenerator {
         sample s: StrokeSample,
         brush: Brush,
         color: Color,
-        output: inout [BrushStampRenderer.Sprite]
+        output: inout [StrokeStamp]
     ) {
         let position = s.position + s.stampOffset
         
@@ -78,7 +78,8 @@ struct StrokeStampGenerator {
                 alpha: opacity,
                 paddingScale: paddingScale)
             
-            output.append(sprite)
+            let stamp = StrokeStamp(sprite: sprite)
+            output.append(stamp)
         }
     }
     

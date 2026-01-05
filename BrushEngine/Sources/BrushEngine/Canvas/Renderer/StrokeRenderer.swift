@@ -101,22 +101,20 @@ class StrokeRenderer {
     }
     
     func drawIncrementalStroke(
-        strokeEngineOutput s: StrokeEngine.Output
+        _ incrementalStroke: StrokeEngine.IncrementalStroke
     ) {
-//        let totalStampCount =
-//            s.finalizedStamps.count +
-//            s.nonFinalizedStamps.count
-//        print("Drawing \(totalStampCount) stamps")
-        
         let viewportSize = Size(
             Double(canvasWidth),
             Double(canvasHeight))
         
+        let finalizedSprites = incrementalStroke.finalizedStamps.map { $0.sprite }
+        let nonFinalizedSprites = incrementalStroke.nonFinalizedStamps.map { $0.sprite }
+        
         drawStamps(
             target: finalizedStrokeTexture,
             viewportSize: viewportSize,
-            sprites: s.finalizedStampSprites,
-            brush: s.brush)
+            sprites: finalizedSprites,
+            brush: incrementalStroke.brush)
         
         try? textureBlitter.blit(
             from: finalizedStrokeTexture,
@@ -125,8 +123,8 @@ class StrokeRenderer {
         drawStamps(
             target: fullStrokeTexture,
             viewportSize: viewportSize,
-            sprites: s.nonFinalizedStampSprites,
-            brush: s.brush)
+            sprites: nonFinalizedSprites,
+            brush: incrementalStroke.brush)
     }
     
 }

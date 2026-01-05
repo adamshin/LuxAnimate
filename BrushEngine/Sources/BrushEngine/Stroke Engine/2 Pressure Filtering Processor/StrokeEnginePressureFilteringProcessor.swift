@@ -11,8 +11,8 @@ struct StrokeEnginePressureFilteringProcessor {
     private var lastPressure: Double = 0
     
     mutating func process(
-        input: StrokeEngine.ProcessorOutput
-    ) -> StrokeEngine.ProcessorOutput {
+        input: IntermediateSampleBatch
+    ) -> IntermediateSampleBatch {
         
         var output = input
         

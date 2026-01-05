@@ -35,12 +35,12 @@ struct StrokeEngineStrokeStampProcessor {
     // MARK: - Interface
     
     mutating func process(
-        input: StrokeEngine.StrokeSampleProcessorOutput
-    ) -> StrokeEngine.StrokeStampProcessorOutput {
+        input: StrokeSampleBatch
+    ) -> StrokeStampBatch {
         
-        var output: [BrushStampRenderer.Sprite] = []
+        var output: [StrokeStamp] = []
         
-        for sample in input.strokeSamples {
+        for sample in input.samples {
             Self.processStrokeSample(
                 sample: sample,
                 config: config,
@@ -49,7 +49,7 @@ struct StrokeEngineStrokeStampProcessor {
         }
         
         return .init(
-            stampSprites: output,
+            stamps: output,
             isStrokeEnd: input.isStrokeEnd,
             isFinalized: input.isFinalized)
     }
@@ -60,7 +60,7 @@ struct StrokeEngineStrokeStampProcessor {
         sample: StrokeSample,
         config: Config,
         state: inout State,
-        output: inout [BrushStampRenderer.Sprite]
+        output: inout [StrokeStamp]
     ) {
         if let lastSample = state.lastSample {
             processStrokeSegment(
@@ -85,7 +85,7 @@ struct StrokeEngineStrokeStampProcessor {
         endSample: StrokeSample,
         config: Config,
         state: inout State,
-        output: inout [BrushStampRenderer.Sprite]
+        output: inout [StrokeStamp]
     ) {
         let startStrokeDist = startSample.strokeDistance
         let endStrokeDist = endSample.strokeDistance
@@ -123,7 +123,7 @@ struct StrokeEngineStrokeStampProcessor {
         sample: StrokeSample,
         config: Config,
         state: inout State,
-        output: inout [BrushStampRenderer.Sprite]
+        output: inout [StrokeStamp]
     ) {
         createStamps(
             cursorSample: sample,
@@ -136,7 +136,7 @@ struct StrokeEngineStrokeStampProcessor {
         cursorSample: StrokeSample,
         config: Config,
         state: inout State,
-        output: inout [BrushStampRenderer.Sprite]
+        output: inout [StrokeStamp]
     ) {
         state.stampGenerator.generate(
             sample: cursorSample,

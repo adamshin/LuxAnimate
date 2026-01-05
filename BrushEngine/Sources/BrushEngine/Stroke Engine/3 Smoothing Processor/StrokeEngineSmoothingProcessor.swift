@@ -23,7 +23,7 @@ struct StrokeEngineSmoothingProcessor {
     
     private let config: Config
     
-    private var sampleBuffer: [BrushEngine.Sample] = []
+    private var sampleBuffer: [IntermediateSample] = []
     private var isOutputFinalized = true
     
     // MARK: - Init
@@ -58,15 +58,15 @@ struct StrokeEngineSmoothingProcessor {
     // MARK: - Interface
     
     mutating func process(
-        input: StrokeEngine.ProcessorOutput
-    ) -> StrokeEngine.ProcessorOutput {
-        
+        input: IntermediateSampleBatch
+    ) -> IntermediateSampleBatch {
+
         if !input.isFinalized {
             isOutputFinalized = false
         }
         
-        var outputSamples: [Sample] = []
-        
+        var outputSamples: [IntermediateSample] = []
+
         Self.processSamples(
             samples: input.samples,
             strokeEndTime: input.strokeEndTime,
@@ -84,7 +84,7 @@ struct StrokeEngineSmoothingProcessor {
                 outputSamples: &outputSamples)
         }
         
-        return StrokeEngine.ProcessorOutput(
+        return IntermediateSampleBatch(
             samples: outputSamples,
             strokeEndTime: input.strokeEndTime,
             isStrokeEnd: input.isStrokeEnd,
@@ -94,11 +94,11 @@ struct StrokeEngineSmoothingProcessor {
     // MARK: - Internal Logic
     
     private static func processSamples(
-        samples: [Sample],
+        samples: [IntermediateSample],
         strokeEndTime: TimeInterval,
         config: Config,
-        sampleBuffer: inout [Sample],
-        outputSamples: inout [Sample]
+        sampleBuffer: inout [IntermediateSample],
+        outputSamples: inout [IntermediateSample]
     ) {
         for sample in samples {
             addSampleToBuffer(
@@ -118,8 +118,8 @@ struct StrokeEngineSmoothingProcessor {
     private static func processStrokeEnd(
         strokeEndTime: TimeInterval,
         config: Config,
-        sampleBuffer: inout [Sample],
-        outputSamples: inout [Sample]
+        sampleBuffer: inout [IntermediateSample],
+        outputSamples: inout [IntermediateSample]
     ) {
         guard let lastSample = sampleBuffer.last
         else { return }
@@ -142,9 +142,9 @@ struct StrokeEngineSmoothingProcessor {
     }
     
     private static func addSampleToBuffer(
-        sample: Sample,
+        sample: IntermediateSample,
         config: Config,
-        sampleBuffer: inout [Sample]
+        sampleBuffer: inout [IntermediateSample]
     ) {
         sampleBuffer.append(sample)
         
@@ -163,8 +163,8 @@ struct StrokeEngineSmoothingProcessor {
     private static func sample(
         config: Config,
         windowEndTime: TimeInterval,
-        sampleBuffer: [Sample]
-    ) -> BrushEngine.Sample {
+        sampleBuffer: [IntermediateSample]
+    ) -> IntermediateSample {
         
         let resampleTimes = config
             .resampleTimeOffsets
@@ -181,9 +181,9 @@ struct StrokeEngineSmoothingProcessor {
     }
     
     private static func weightedAverageSample(
-        samples: [BrushEngine.Sample],
+        samples: [IntermediateSample],
         weights: [Double]
-    ) -> BrushEngine.Sample {
+    ) -> IntermediateSample {
         
         guard !samples.isEmpty,
             samples.count == weights.count
