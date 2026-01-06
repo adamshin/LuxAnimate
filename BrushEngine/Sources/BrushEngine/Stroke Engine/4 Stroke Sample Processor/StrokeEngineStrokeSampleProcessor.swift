@@ -12,9 +12,11 @@ struct StrokeEngineStrokeSampleProcessor {
     private let strokeSampleGenerator:
         StrokeEngineStrokeSampleGenerator
     
-    private var controlPointSamples: [IntermediateSample]?
-    private var lastStrokeSample: StrokeSample?
+    private var controlPointSamples: [IntermediateSample] = []
     private var finalSampleTime: TimeInterval = 0
+    
+    private var lastStrokeSample: StrokeSample?
+    
     private var isOutputFinalized = true
     
     // MARK: - Init
@@ -76,7 +78,7 @@ struct StrokeEngineStrokeSampleProcessor {
     private mutating func processEndOfSamples(
         output: inout [StrokeSample]
     ) {
-        guard let finalSample = controlPointSamples?.last
+        guard let finalSample = controlPointSamples.last
         else { return }
         
         for _ in 0 ..< 3 {
@@ -90,31 +92,21 @@ struct StrokeEngineStrokeSampleProcessor {
         sample: IntermediateSample,
         output: inout [StrokeSample]
     ) {
-        if var samples = controlPointSamples {
-            samples.removeFirst()
-            samples.append(sample)
-            
-            processSplineSegment(
-                controlPointSamples: samples,
-                output: &output)
+        if controlPointSamples.isEmpty {
+            controlPointSamples = Array(
+                repeating: sample, count: 4)
             
         } else {
-            let samples = Array(
-                repeating: sample,
-                count: 4)
-            
-            processSplineSegment(
-                controlPointSamples: samples,
-                output: &output)
+            controlPointSamples.removeFirst()
+            controlPointSamples.append(sample)
         }
+        
+        processSplineSegment(output: &output)
     }
     
     private mutating func processSplineSegment(
-        controlPointSamples: [IntermediateSample],
         output: inout [StrokeSample]
     ) {
-        self.controlPointSamples = controlPointSamples
-        
         let subSegmentSamples = Self.subSegmentSamples(
             controlPointSamples: controlPointSamples,
             subdivisionCount: segmentSubdivisionCount)
