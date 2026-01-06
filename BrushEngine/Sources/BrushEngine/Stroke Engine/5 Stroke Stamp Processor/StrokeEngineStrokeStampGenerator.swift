@@ -24,8 +24,8 @@ struct StrokeEngineStrokeStampGenerator {
             seed: seed)
     }
     
-    mutating func generate(
-        sample s: StrokeSample,
+    mutating func createStampsAtCursor(
+        cursorSample s: StrokeSample,
         brush: Brush,
         color: Color,
         output: inout [StrokeStamp]
