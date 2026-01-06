@@ -5,29 +5,14 @@ import Render
 
 private let minStampDistance: Double = 1.0
 
-// MARK: - Structs
-
-extension StrokeEngineStrokeStampProcessor {
-    
-    struct Config {
-        let brush: Brush
-        let color: Color
-    }
-    
-    struct State {
-        var nextCursorStrokeDistance: Double = 0
-        var lastSample: StrokeSample?
-        var stampGenerator = StrokeEngineStrokeStampGenerator()
-    }
-    
-}
-
-// MARK: - StrokeEngineStrokeStampProcessor
-
 struct StrokeEngineStrokeStampProcessor {
     
-    private let config: Config
-    private var state = State()
+    private let brush: Brush
+    private let color: Color
+    
+    private var nextCursorStrokeDistance: Double = 0
+    private var lastInputSample: StrokeSample?
+    private var stampGenerator = StrokeEngineStrokeStampGenerator()
     
     // MARK: - Init
     
@@ -35,9 +20,8 @@ struct StrokeEngineStrokeStampProcessor {
         brush: Brush,
         color: Color
     ) {
-        config = Config(
-            brush: brush,
-            color: color)
+        self.brush = brush
+        self.color = color
     }
     
     // MARK: - Interface
@@ -49,50 +33,40 @@ struct StrokeEngineStrokeStampProcessor {
         var output: [StrokeStamp] = []
         
         for sample in input.samples {
-            Self.processStrokeSample(
+            processSample(
                 sample: sample,
-                config: config,
-                state: &state,
                 output: &output)
         }
         
-        return .init(
+        return StrokeStampBatch(
             stamps: output,
             isFinalBatch: input.isFinalBatch,
             isFinalized: input.isFinalized)
     }
     
     // MARK: - Internal Methods
-    
-    private static func processStrokeSample(
+
+    private mutating func processSample(
         sample: StrokeSample,
-        config: Config,
-        state: inout State,
         output: inout [StrokeStamp]
     ) {
-        if let lastSample = state.lastSample {
+        if let lastInputSample {
             processStrokeSegment(
-                startSample: lastSample,
+                startSample: lastInputSample,
                 endSample: sample,
-                config: config,
-                state: &state,
                 output: &output)
         } else {
             processFirstStrokeSample(
                 sample: sample,
-                config: config,
-                state: &state,
                 output: &output)
         }
         
-        state.lastSample = sample
+        lastInputSample = sample
     }
     
-    private static func processStrokeSegment(
+    private mutating func processStrokeSegment(
         startSample: StrokeSample,
         endSample: StrokeSample,
-        config: Config,
-        state: inout State,
         output: inout [StrokeStamp]
     ) {
         let startStrokeDist = startSample.strokeDistance
@@ -102,12 +76,11 @@ struct StrokeEngineStrokeStampProcessor {
         else { return }
         
         while true {
-            guard state.nextCursorStrokeDistance
-                < endStrokeDist
+            guard nextCursorStrokeDistance < endStrokeDist
             else { break }
             
             let t0 = map(
-                state.nextCursorStrokeDistance,
+                nextCursorStrokeDistance,
                 in: (startStrokeDist, endStrokeDist),
                 to: (0, 1))
             let t = clamp(t0, min: 0, max: 1)
@@ -121,50 +94,42 @@ struct StrokeEngineStrokeStampProcessor {
             
             createStamps(
                 cursorSample: cursorSample,
-                config: config,
-                state: &state,
                 output: &output)
         }
     }
     
-    private static func processFirstStrokeSample(
+    private mutating func processFirstStrokeSample(
         sample: StrokeSample,
-        config: Config,
-        state: inout State,
         output: inout [StrokeStamp]
     ) {
         createStamps(
             cursorSample: sample,
-            config: config,
-            state: &state,
             output: &output)
     }
     
-    private static func createStamps(
+    private mutating func createStamps(
         cursorSample: StrokeSample,
-        config: Config,
-        state: inout State,
         output: inout [StrokeStamp]
     ) {
-        state.stampGenerator.generate(
+        stampGenerator.generate(
             sample: cursorSample,
-            brush: config.brush,
-            color: config.color,
+            brush: brush,
+            color: color,
             output: &output)
         
-        state.nextCursorStrokeDistance =
-            nextCursorStrokeDistance(
+        nextCursorStrokeDistance =
+            Self.nextCursorStrokeDistance(
                 cursorSample: cursorSample,
-                config: config)
+                brush: brush)
     }
     
     private static func nextCursorStrokeDistance(
         cursorSample: StrokeSample,
-        config: Config
+        brush: Brush
     ) -> Double {
+        
         let stampSize = cursorSample.stampSize
-        let stampSpacing = config
-            .brush.configuration.stampSpacing
+        let stampSpacing = brush.configuration.stampSpacing
         
         let distance = max(
             stampSize * stampSpacing,

@@ -13,7 +13,7 @@ struct StrokeEngineStrokeSampleProcessor {
     private var controlPointSamples: [IntermediateSample] = []
     private var finalSampleTime: TimeInterval = 0
     
-    private var lastStrokeSample: StrokeSample?
+    private var lastOutputSample: StrokeSample?
     
     private var isOutputFinalized = true
     
@@ -122,16 +122,16 @@ struct StrokeEngineStrokeSampleProcessor {
     ) {
         let strokeDistance: Double
         
-        if let lastStrokeSample {
+        if let lastOutputSample {
             let positionDelta =
                 sample.position -
-                lastStrokeSample.position
+                lastOutputSample.position
             
             let distanceFromLastStrokeSample =
                 positionDelta.length()
             
             strokeDistance =
-                lastStrokeSample.strokeDistance +
+                lastOutputSample.strokeDistance +
                 distanceFromLastStrokeSample
             
         } else {
@@ -147,7 +147,7 @@ struct StrokeEngineStrokeSampleProcessor {
         let strokeSample = strokeSampleOutput.strokeSample
         
         output.append(strokeSample)
-        self.lastStrokeSample = strokeSample
+        self.lastOutputSample = strokeSample
         
         if strokeSampleOutput.isNonFinalized {
             isOutputFinalized = false

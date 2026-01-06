@@ -79,8 +79,9 @@ struct StrokeEngineSmoothingProcessor {
         for sample in samples {
             addSampleToBuffer(sample: sample)
             
-            let outputSample = computeSample(
-                windowEndTime: sample.time)
+            let outputSample =
+                computeWeightedSampleFromBuffer(
+                    windowEndTime: sample.time)
             
             output.append(outputSample)
         }
@@ -100,8 +101,9 @@ struct StrokeEngineSmoothingProcessor {
         while windowEndTime < windowEndTargetTime {
             windowEndTime += tailSampleInterval
             
-            let outputSample = computeSample(
-                windowEndTime: windowEndTime)
+            let outputSample =
+                computeWeightedSampleFromBuffer(
+                    windowEndTime: windowEndTime)
             
             output.append(outputSample)
         }
@@ -124,7 +126,7 @@ struct StrokeEngineSmoothingProcessor {
         sampleBuffer.removeFirst(removeCount)
     }
     
-    private func computeSample(
+    private func computeWeightedSampleFromBuffer(
         windowEndTime: TimeInterval
     ) -> IntermediateSample {
         
