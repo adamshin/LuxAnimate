@@ -57,11 +57,8 @@ struct StrokeEngineStrokeStampGenerator {
             let rotationJitter = rotationJitter(
                 brush: brush)
             
-            size = size
-                * (1 - Double.random(in: 0 ..< 1) * brush.configuration.stampSizeJitter)
-            
-            opacity = opacity
-                * (1 - Double.random(in: 0 ..< 1) * brush.configuration.stampOpacityJitter)
+            size *= 1 - sizeJitter(brush: brush)
+            opacity *= 1 - opacityJitter(brush: brush)
             
             let paddingScale: Double =
                 s.stampSize < paddingSizeThreshold ?
@@ -106,6 +103,22 @@ struct StrokeEngineStrokeStampGenerator {
         
         return rotation
             * brush.configuration.stampRotationJitter
+    }
+    
+    private mutating func sizeJitter(
+        brush: Brush
+    ) -> Double {
+        
+        let v = Double.random(in: 0 ..< 1, using: &rng)
+        return v * brush.configuration.stampSizeJitter
+    }
+
+    private mutating func opacityJitter(
+        brush: Brush
+    ) -> Double {
+        
+        let v = Double.random(in: 0 ..< 1, using: &rng)
+        return v * brush.configuration.stampOpacityJitter
     }
     
 }
