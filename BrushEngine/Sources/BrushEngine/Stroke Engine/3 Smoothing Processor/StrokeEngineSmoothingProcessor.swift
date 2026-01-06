@@ -9,28 +9,17 @@ private let maxResampleCount = 100
 
 private let tailSampleInterval: TimeInterval = 1/60
 
-extension StrokeEngineSmoothingProcessor {
-    
-    struct Config {
-        var windowSize: TimeInterval
-        var resampleTimeOffsets: [Double]
-        var windowWeights: [Double]
-    }
-    
-    struct State {
-        var sampleBuffer: [IntermediateSample] = []
-        var isOutputFinalized = true
-    }
-    
-}
-
 struct StrokeEngineSmoothingProcessor {
-    
-    private let config: Config
-    private var state = State()
-    
+
+    private let windowSize: TimeInterval
+    private let resampleTimeOffsets: [Double]
+    private let windowWeights: [Double]
+
+    private var sampleBuffer: [IntermediateSample] = []
+    private var isOutputFinalized = true
+
     // MARK: - Init
-    
+
     init(
         brush: Brush,
         smoothing: Double
@@ -44,18 +33,13 @@ struct StrokeEngineSmoothingProcessor {
             in: (0, 1),
             to: (baseSmoothing, 1))
         
-        let windowSize = adjustedSmoothing * maxWindowSize
+        windowSize = adjustedSmoothing * maxWindowSize
         
-        let resampleTimeOffsets = Self
+        resampleTimeOffsets = Self
             .resampleTimeOffsets(windowSize: windowSize)
         
-        let windowWeights = Self.windowWeights(
+        windowWeights = Self.windowWeights(
             count: resampleTimeOffsets.count)
-        
-        config = Config(
-            windowSize: windowSize,
-            resampleTimeOffsets: resampleTimeOffsets,
-            windowWeights: windowWeights)
     }
     
     // MARK: - Interface
@@ -65,90 +49,71 @@ struct StrokeEngineSmoothingProcessor {
     ) -> IntermediateSampleBatch {
 
         if !input.isFinalized {
-            state.isOutputFinalized = false
+            isOutputFinalized = false
         }
         
         var output: [IntermediateSample] = []
 
-        Self.processSamples(
+        processSamples(
             samples: input.samples,
-            config: config,
-            state: &state,
             output: &output)
         
         if input.isFinalBatch {
-            state.isOutputFinalized = false
-            
-            Self.processEndOfSamples(
-                config: config,
-                state: &state,
-                output: &output)
+            isOutputFinalized = false
+            processEndOfSamples(output: &output)
         }
         
         return IntermediateSampleBatch(
             samples: output,
             finalSampleTime: input.finalSampleTime,
             isFinalBatch: input.isFinalBatch,
-            isFinalized: state.isOutputFinalized)
+            isFinalized: isOutputFinalized)
     }
     
     // MARK: - Internal Logic
     
-    private static func processSamples(
+    private mutating func processSamples(
         samples: [IntermediateSample],
-        config: Config,
-        state: inout State,
         output: inout [IntermediateSample]
     ) {
         for sample in samples {
-            addSampleToBuffer(
-                sample: sample,
-                config: config,
-                sampleBuffer: &state.sampleBuffer)
+            addSampleToBuffer(sample: sample)
             
-            let newSample = Self.sample(
-                config: config,
-                windowEndTime: sample.time,
-                sampleBuffer: state.sampleBuffer)
+            let outputSample = computeSample(
+                windowEndTime: sample.time)
             
-            output.append(newSample)
+            output.append(outputSample)
         }
     }
     
-    private static func processEndOfSamples(
-        config: Config,
-        state: inout State,
+    private mutating func processEndOfSamples(
         output: inout [IntermediateSample]
     ) {
-        guard let lastSample = state.sampleBuffer.last
+        guard let lastSample = sampleBuffer.last
         else { return }
         
         let windowEndTargetTime =
-            lastSample.time + config.windowSize
+            lastSample.time + windowSize
         
         var windowEndTime = lastSample.time
         
         while windowEndTime < windowEndTargetTime {
             windowEndTime += tailSampleInterval
             
-            let newSample = Self.sample(
-                config: config,
-                windowEndTime: windowEndTime,
-                sampleBuffer: state.sampleBuffer)
+            let outputSample = computeSample(
+                windowEndTime: windowEndTime)
             
-            output.append(newSample)
+            output.append(outputSample)
         }
     }
     
-    private static func addSampleToBuffer(
-        sample: IntermediateSample,
-        config: Config,
-        sampleBuffer: inout [IntermediateSample]
+    private mutating func addSampleToBuffer(
+        sample: IntermediateSample
     ) {
         sampleBuffer.append(sample)
         
         let windowStartTime =
-            sample.time - config.windowSize
+            sample.time - windowSize
         
         let outsideWindowCount = sampleBuffer
             .prefix { $0.time < windowStartTime }
@@ -159,14 +124,11 @@ struct StrokeEngineSmoothingProcessor {
         sampleBuffer.removeFirst(removeCount)
     }
     
-    private static func sample(
-        config: Config,
-        windowEndTime: TimeInterval,
-        sampleBuffer: [IntermediateSample]
+    private func computeSample(
+        windowEndTime: TimeInterval
     ) -> IntermediateSample {
         
-        let resampleTimes = config
-            .resampleTimeOffsets
+        let resampleTimes = resampleTimeOffsets
             .map { windowEndTime + $0 }
         
         let windowSamples =
@@ -174,9 +136,9 @@ struct StrokeEngineSmoothingProcessor {
                 samples: sampleBuffer,
                 resampleTimes: resampleTimes)
         
-        return weightedAverageSample(
+        return Self.weightedAverageSample(
             samples: windowSamples,
-            weights: config.windowWeights)
+            weights: windowWeights)
     }
     
     private static func weightedAverageSample(

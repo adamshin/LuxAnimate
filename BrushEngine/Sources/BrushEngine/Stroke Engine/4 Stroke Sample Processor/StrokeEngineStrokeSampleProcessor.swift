@@ -5,8 +5,6 @@ import Color
 
 private let segmentSubdivisionCount = 10
 
-// MARK: - StrokeEngineStrokeSampleProcessor
-
 struct StrokeEngineStrokeSampleProcessor {
     
     private let strokeSampleGenerator:
