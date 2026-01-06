@@ -2,9 +2,9 @@
 import Foundation
 import Geometry
 
+private let finalizationThreshold = 30
+
 struct StrokeEngineInputQueue {
-    
-    static let finalizationThreshold = 30
     
     private var samples: [BrushEngine.InputSample] = []
     private var predictedSamples: [BrushEngine.InputSample] = []
@@ -23,7 +23,7 @@ struct StrokeEngineInputQueue {
         self.predictedSamples = predictedSamples
         
         let finalizationOverflow =
-            samples.count - Self.finalizationThreshold
+            samples.count - finalizationThreshold
         
         if finalizationOverflow > 0 {
             for i in 0 ..< finalizationOverflow {

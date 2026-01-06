@@ -5,29 +5,17 @@ import Color
 
 private let segmentSubdivisionCount = 10
 
-// MARK: - Structs
-
-extension StrokeEngineStrokeSampleProcessor {
-    
-    struct Config {
-        let strokeSampleGenerator:
-            StrokeEngineStrokeSampleGenerator
-    }
-    
-    struct State {
-        var controlPointSamples: [IntermediateSample]?
-        var lastStrokeSample: StrokeSample?
-        var isOutputFinalized = true
-    }
-    
-}
-
 // MARK: - StrokeEngineStrokeSampleProcessor
 
 struct StrokeEngineStrokeSampleProcessor {
     
-    private let config: Config
-    private var state = State()
+    private let strokeSampleGenerator:
+        StrokeEngineStrokeSampleGenerator
+    
+    private var controlPointSamples: [IntermediateSample]?
+    private var lastStrokeSample: StrokeSample?
+    private var finalSampleTime: TimeInterval = 0
+    private var isOutputFinalized = true
     
     // MARK: - Init
     
@@ -37,11 +25,10 @@ struct StrokeEngineStrokeSampleProcessor {
         scale: Double,
         applyTaper: Bool
     ) {
-        config = Config(
-            strokeSampleGenerator: .init(
-                brush: brush,
-                scale: scale,
-                applyTaper: applyTaper))
+        strokeSampleGenerator = .init(
+            brush: brush,
+            scale: scale,
+            applyTaper: applyTaper)
     }
     
     // MARK: - Interface
@@ -50,141 +37,102 @@ struct StrokeEngineStrokeSampleProcessor {
         input: IntermediateSampleBatch
     ) -> StrokeSampleBatch {
         
+        finalSampleTime = input.finalSampleTime
+        
         if !input.isFinalized {
-            state.isOutputFinalized = false
+            isOutputFinalized = false
         }
         
         var output: [StrokeSample] = []
         
-        Self.processSamples(
+        processSamples(
             samples: input.samples,
-            finalSampleTime: input.finalSampleTime,
-            config: config,
-            state: &state,
             output: &output)
         
         if input.isFinalBatch {
-            state.isOutputFinalized = false
-            
-            Self.processEndOfSamples(
-                finalSampleTime: input.finalSampleTime,
-                config: config,
-                state: &state,
-                output: &output)
+            isOutputFinalized = false
+            processEndOfSamples(output: &output)
         }
         
         return StrokeSampleBatch(
             samples: output,
             isFinalBatch: input.isFinalBatch,
-            isFinalized: state.isOutputFinalized)
+            isFinalized: isOutputFinalized)
     }
     
     // MARK: - Internal Logic
     
-    private static func processSamples(
+    private mutating func processSamples(
         samples: [IntermediateSample],
-        finalSampleTime: TimeInterval,
-        config: Config,
-        state: inout State,
         output: inout [StrokeSample]
     ) {
         for sample in samples {
-            Self.processSample(
+            processSample(
                 sample: sample,
-                finalSampleTime: finalSampleTime,
-                config: config,
-                state: &state,
                 output: &output)
         }
     }
     
-    private static func processEndOfSamples(
-        finalSampleTime: TimeInterval,
-        config: Config,
-        state: inout State,
+    private mutating func processEndOfSamples(
         output: inout [StrokeSample]
     ) {
-        guard let finalSample =
-            state.controlPointSamples?.last
+        guard let finalSample = controlPointSamples?.last
         else { return }
         
         for _ in 0 ..< 3 {
-            Self.processSample(
+            processSample(
                 sample: finalSample,
-                finalSampleTime: finalSampleTime,
-                config: config,
-                state: &state,
                 output: &output)
         }
     }
     
-    private static func processSample(
+    private mutating func processSample(
         sample: IntermediateSample,
-        finalSampleTime: TimeInterval,
-        config: Config,
-        state: inout State,
         output: inout [StrokeSample]
     ) {
-        if var controlPointSamples =
-            state.controlPointSamples
-        {
-            controlPointSamples.removeFirst()
-            controlPointSamples.append(sample)
+        if var samples = controlPointSamples {
+            samples.removeFirst()
+            samples.append(sample)
             
             processSplineSegment(
-                controlPointSamples: controlPointSamples,
-                finalSampleTime: finalSampleTime,
-                config: config,
-                state: &state,
+                controlPointSamples: samples,
                 output: &output)
             
         } else {
-            let controlPointSamples = Array(
+            let samples = Array(
                 repeating: sample,
                 count: 4)
             
             processSplineSegment(
-                controlPointSamples: controlPointSamples,
-                finalSampleTime: finalSampleTime,
-                config: config,
-                state: &state,
+                controlPointSamples: samples,
                 output: &output)
         }
     }
     
-    private static func processSplineSegment(
+    private mutating func processSplineSegment(
         controlPointSamples: [IntermediateSample],
-        finalSampleTime: TimeInterval,
-        config: Config,
-        state: inout State,
         output: inout [StrokeSample]
     ) {
-        state.controlPointSamples = controlPointSamples
+        self.controlPointSamples = controlPointSamples
         
-        let subSegmentSamples = subSegmentSamples(
+        let subSegmentSamples = Self.subSegmentSamples(
             controlPointSamples: controlPointSamples,
             subdivisionCount: segmentSubdivisionCount)
         
         for sample in subSegmentSamples {
             processSubSegmentSample(
                 sample: sample,
-                finalSampleTime: finalSampleTime,
-                config: config,
-                state: &state,
                 output: &output)
         }
     }
     
-    private static func processSubSegmentSample(
+    private mutating func processSubSegmentSample(
         sample: IntermediateSample,
-        finalSampleTime: TimeInterval,
-        config: Config,
-        state: inout State,
         output: inout [StrokeSample]
     ) {
         let strokeDistance: Double
         
-        if let lastStrokeSample = state.lastStrokeSample {
+        if let lastStrokeSample {
             let positionDelta =
                 sample.position -
                 lastStrokeSample.position
@@ -200,8 +148,7 @@ struct StrokeEngineStrokeSampleProcessor {
             strokeDistance = 0
         }
         
-        let strokeSampleOutput = config
-            .strokeSampleGenerator
+        let strokeSampleOutput = strokeSampleGenerator
             .strokeSample(
                 sample: sample,
                 strokeDistance: strokeDistance,
@@ -210,10 +157,10 @@ struct StrokeEngineStrokeSampleProcessor {
         let strokeSample = strokeSampleOutput.strokeSample
         
         output.append(strokeSample)
-        state.lastStrokeSample = strokeSample
+        self.lastStrokeSample = strokeSample
         
         if strokeSampleOutput.isNonFinalized {
-            state.isOutputFinalized = false
+            isOutputFinalized = false
         }
     }
     
