@@ -17,14 +17,17 @@ extension StrokeEngineSmoothingProcessor {
         var windowWeights: [Double]
     }
     
+    struct State {
+        var sampleBuffer: [IntermediateSample] = []
+        var isOutputFinalized = true
+    }
+    
 }
 
 struct StrokeEngineSmoothingProcessor {
     
     private let config: Config
-    
-    private var sampleBuffer: [IntermediateSample] = []
-    private var isOutputFinalized = true
+    private var state = State()
     
     // MARK: - Init
     
@@ -62,31 +65,31 @@ struct StrokeEngineSmoothingProcessor {
     ) -> IntermediateSampleBatch {
 
         if !input.isFinalized {
-            isOutputFinalized = false
+            state.isOutputFinalized = false
         }
         
-        var outputSamples: [IntermediateSample] = []
+        var output: [IntermediateSample] = []
 
         Self.processSamples(
             samples: input.samples,
             config: config,
-            sampleBuffer: &sampleBuffer,
-            outputSamples: &outputSamples)
+            state: &state,
+            output: &output)
         
         if input.isFinalBatch {
-            isOutputFinalized = false
+            state.isOutputFinalized = false
             
-            Self.processSampleTail(
+            Self.processEndOfSamples(
                 config: config,
-                sampleBuffer: &sampleBuffer,
-                outputSamples: &outputSamples)
+                state: &state,
+                output: &output)
         }
         
         return IntermediateSampleBatch(
-            samples: outputSamples,
+            samples: output,
             finalSampleTime: input.finalSampleTime,
             isFinalBatch: input.isFinalBatch,
-            isFinalized: isOutputFinalized)
+            isFinalized: state.isOutputFinalized)
     }
     
     // MARK: - Internal Logic
@@ -94,30 +97,30 @@ struct StrokeEngineSmoothingProcessor {
     private static func processSamples(
         samples: [IntermediateSample],
         config: Config,
-        sampleBuffer: inout [IntermediateSample],
-        outputSamples: inout [IntermediateSample]
+        state: inout State,
+        output: inout [IntermediateSample]
     ) {
         for sample in samples {
             addSampleToBuffer(
                 sample: sample,
                 config: config,
-                sampleBuffer: &sampleBuffer)
+                sampleBuffer: &state.sampleBuffer)
             
             let newSample = Self.sample(
                 config: config,
                 windowEndTime: sample.time,
-                sampleBuffer: sampleBuffer)
+                sampleBuffer: state.sampleBuffer)
             
-            outputSamples.append(newSample)
+            output.append(newSample)
         }
     }
     
-    private static func processSampleTail(
+    private static func processEndOfSamples(
         config: Config,
-        sampleBuffer: inout [IntermediateSample],
-        outputSamples: inout [IntermediateSample]
+        state: inout State,
+        output: inout [IntermediateSample]
     ) {
-        guard let lastSample = sampleBuffer.last
+        guard let lastSample = state.sampleBuffer.last
         else { return }
         
         let windowEndTargetTime =
@@ -131,9 +134,9 @@ struct StrokeEngineSmoothingProcessor {
             let newSample = Self.sample(
                 config: config,
                 windowEndTime: windowEndTime,
-                sampleBuffer: sampleBuffer)
+                sampleBuffer: state.sampleBuffer)
             
-            outputSamples.append(newSample)
+            output.append(newSample)
         }
     }
     
