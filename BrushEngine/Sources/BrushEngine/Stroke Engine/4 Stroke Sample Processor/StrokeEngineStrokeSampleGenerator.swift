@@ -29,8 +29,7 @@ struct StrokeEngineStrokeSampleGenerator {
     private let baseStampSize: Double
     
     private let sizeWobbleGenerator: PerlinNoiseGenerator
-    private let offsetXWobbleGenerator: PerlinNoiseGenerator
-    private let offsetYWobbleGenerator: PerlinNoiseGenerator
+    private let offsetWobbleGenerator: PerlinNoiseGenerator
     
     // MARK: - Init
     
@@ -52,13 +51,8 @@ struct StrokeEngineStrokeSampleGenerator {
             frequency: brush.configuration.wobbleFrequency,
             octaveCount: wobbleOctaveCount,
             persistence: wobblePersistence)
-        
-        offsetXWobbleGenerator = PerlinNoiseGenerator(
-            frequency: brush.configuration.wobbleFrequency,
-            octaveCount: wobbleOctaveCount,
-            persistence: wobblePersistence)
-        
-        offsetYWobbleGenerator = PerlinNoiseGenerator(
+
+        offsetWobbleGenerator = PerlinNoiseGenerator(
             frequency: brush.configuration.wobbleFrequency,
             octaveCount: wobbleOctaveCount,
             persistence: wobblePersistence)
@@ -69,6 +63,7 @@ struct StrokeEngineStrokeSampleGenerator {
     func strokeSample(
         sample: IntermediateSample,
         strokeDistance: Double,
+        tangent: Vector,
         finalSampleTime: TimeInterval
     ) -> Output {
         
@@ -107,18 +102,16 @@ struct StrokeEngineStrokeSampleGenerator {
         
         // Wobble
         let wobbleDistance = strokeDistance / baseStampSize
-        
+
         let sizeWobble = sizeWobbleGenerator
             .value(at: wobbleDistance)
-        let offsetXWobble = offsetXWobbleGenerator
+        let offsetWobble = offsetWobbleGenerator
             .value(at: wobbleDistance)
-        let offsetYWobble = offsetYWobbleGenerator
-            .value(at: wobbleDistance)
-        
+
         let wobbleIntensity = 1
             - brush.configuration.wobblePressureAttenuation
             * pow(pressure, 3)
-        
+
         let wobbleSize = 1
             + sizeWobble
             * brush.configuration.sizeWobble
@@ -160,19 +153,19 @@ struct StrokeEngineStrokeSampleGenerator {
         }
         let stampRotation = r.normalized()
         
-        // Stamp offset
-        let offsetX = offsetXWobble
-            * brush.configuration.offsetWobble
-            * wobbleIntensity
-        
-        let offsetY = offsetYWobble
-            * brush.configuration.offsetWobble
-            * wobbleIntensity
-        
-        var stampOffset = Vector(offsetX, offsetY)
-        if stampOffset.lengthSquared() > 1.0 {
-            stampOffset = stampOffset.normalized()
+        // Stamp offset (perpendicular to stroke direction)
+        let perpendicular: Vector
+        if tangent.lengthSquared() > 0 {
+            perpendicular = tangent.perpendicularClockwise.normalized()
+        } else {
+            perpendicular = .zero
         }
+
+        let offsetMagnitude = offsetWobble
+            * brush.configuration.offsetWobble
+            * wobbleIntensity
+
+        let stampOffset = perpendicular * offsetMagnitude
         
         // Stamp opacity
         let stampOpacity = brush.configuration.stampOpacity
