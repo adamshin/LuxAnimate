@@ -2,84 +2,37 @@
 
 A frame-by-frame animation app for iPad.
 
-## Platform & Tech
+## Platform
 
-- **Platform:** iOS/iPadOS (Swift, UIKit)
-- **Rendering:** Metal for drawing canvas and compositing
-- **Storage:** File-based with JSON manifests, assets stored as separate files
+- iOS/iPadOS, Swift, UIKit
+- Metal for rendering
+- Apple Pencil for drawing
 
 ## Editor Structure
 
-The app has two levels of editing:
+Two levels of editing:
 
-### Main Editor (Project Level)
-- Preview window showing composited scene
-- Timeline for arranging layers (similar to video editors like Final Cut)
-- No drawing tools - this is for composition and timing
-- Currently minimal UI, needs to be built out
-
-### Frame Editor (Layer Level)
-- Opened by selecting a layer from the main editor
-- Drawing tools (brush, eraser) with Apple Pencil support
-- Frame-by-frame animation workflow
-- Timeline for managing frames within the animation layer
+- **Main Editor:** Arrange and composite layers on a timeline (like a video editor). No drawing here.
+- **Frame Editor:** Draw frame-by-frame within an animation layer. Brush/eraser tools, per-layer timeline.
 
 ## Data Model
 
 ```
-Project
-└── Scenes (currently just one per project)
-    └── Layers
-        └── Drawings (sparse - only at keyframes, hold until next)
+Project → Scene → Layers → Drawings
 ```
 
-- **Project.Manifest:** Top-level project metadata, references to scenes
-- **Scene.Manifest:** Frame count, background color, layers with transforms
-- **Drawings:** Each has a frameIndex, fullAssetID (hi-res), thumbnailAssetID
+- Drawings are sparse keyframes that hold until the next keyframe
+- Assets (images) are content-addressed files with UUID filenames
+- JSON manifests describe project structure and reference assets
 
-Assets are content-addressed files (UUIDs) stored in the project directory.
+## Rendering
 
-## Rendering System
+- Each frame is represented as a scene graph (layers, transforms, asset references)
+- Frames are fingerprinted (XXHash) for render caching - identical frames share a fingerprint
+- Metal-based compositing
 
-### Frame Scene Graph
-Each frame is represented as a `FrameSceneGraph` - a snapshot of what to render:
-- Which drawing is visible on each layer at that frame
-- Layer transforms, alpha, compositing order
+## Packages
 
-### Fingerprint-Based Caching
-- Each frame's render manifest is hashed (XXHash) to create a fingerprint
-- Identical frames (e.g., holds) share the same fingerprint
-- Cache lookup: fingerprint → rendered image
-- Automatic invalidation: content changes → new fingerprint
-
-### Render Preview (WIP)
-Scaffolding exists for pre-rendering frame previews for smooth scrubbing. The fingerprint system is implemented; the actual rendering and caching needs completion.
-
-## Undo System
-
-Full undo/redo with 50-level history:
-- Each edit creates a history entry storing the old manifest + orphaned assets
-- Assets moved (not deleted) to history, allowing full restoration
-- Stored in Caches directory
-
-## Key Directories
-
-```
-LuxAnimate/
-├── Models/          # Data structures (Project, Scene, FrameSceneGraph)
-├── Logic/           # Business logic
-│   ├── Project Editing/
-│   ├── Frame Scene Graph/
-│   ├── Render Preview/
-│   └── Brush Library/
-├── Views/
-│   ├── Editor/      # Main project/scene editor
-│   └── Animation Editor/  # Frame editor for drawing
-└── Packages/        # Local Swift packages (BrushEngine, Geometry, etc.)
-```
-
-## Work In Progress
-
-- **Animation Editor 2:** Reworking the frame editor layout with a drawer-based timeline and better tool UI placement. Partially complete - layout done, rendering/tool state commented out.
-- **Main Editor:** Needs preview window and arrangement timeline built out.
-- **Tool Settings UI:** Popup menus for brush settings (size, smoothing). Menu system exists, needs tool-specific content views.
+- **BrushEngine:** Handles brush stroke processing, stamp rendering, and canvas compositing. Includes stroke smoothing, pressure/tilt handling, and various brush behaviors.
+- **Geometry:** Vector/matrix math, SIMD-backed
+- **Color:** Color types and conversions
