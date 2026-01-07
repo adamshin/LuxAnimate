@@ -46,7 +46,7 @@ struct StrokeEngineStrokeStampProcessor {
             isFinalized: input.isFinalized)
     }
     
-    // MARK: - Internal Methods
+    // MARK: - Internal Logic
 
     private mutating func processSample(
         sample: StrokeSample,
