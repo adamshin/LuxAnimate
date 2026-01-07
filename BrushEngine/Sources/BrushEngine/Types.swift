@@ -110,15 +110,16 @@ struct IntermediateSample {
 }
 
 struct StrokeSample {
-    
+
     var position: Vector
     var strokeDistance: Double
-    
+    var tangent: Vector
+
     var stampOffset: Vector
     var stampSize: Double
     var stampRotation: Complex
     var stampOpacity: Double
-    
+
 }
 
 struct StrokeStamp {

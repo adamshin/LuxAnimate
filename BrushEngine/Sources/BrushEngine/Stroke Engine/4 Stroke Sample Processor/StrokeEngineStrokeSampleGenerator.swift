@@ -175,6 +175,7 @@ struct StrokeEngineStrokeSampleGenerator {
         let strokeSample = StrokeSample(
             position: sample.position,
             strokeDistance: strokeDistance,
+            tangent: tangent,
             stampOffset: stampOffset,
             stampSize: stampSize,
             stampRotation: stampRotation,
