@@ -112,8 +112,8 @@ struct IntermediateSample {
 struct StrokeSample {
 
     var position: Vector
-    var strokeDistance: Double
     var tangent: Vector
+    var strokeDistance: Double
 
     var stampOffset: Vector
     var stampSize: Double

@@ -116,22 +116,20 @@ struct StrokeEngineStrokeSampleProcessor {
 
         for subSegmentSample in subSegmentSamples {
             processSubSegmentSample(
-                sample: subSegmentSample.sample,
-                tangent: subSegmentSample.tangent,
+                subSegmentSample,
                 output: &output)
         }
     }
-    
+
     private mutating func processSubSegmentSample(
-        sample: IntermediateSample,
-        tangent: Vector,
+        _ subSegmentSample: SubSegmentSample,
         output: inout [StrokeSample]
     ) {
         let strokeDistance: Double
 
         if let lastOutputSample {
             let positionDelta =
-                sample.position -
+                subSegmentSample.sample.position -
                 lastOutputSample.position
 
             let distanceFromLastStrokeSample =
@@ -147,9 +145,9 @@ struct StrokeEngineStrokeSampleProcessor {
 
         let strokeSampleOutput = strokeSampleGenerator
             .strokeSample(
-                sample: sample,
+                sample: subSegmentSample.sample,
                 strokeDistance: strokeDistance,
-                tangent: tangent,
+                tangent: subSegmentSample.tangent,
                 finalSampleTime: finalSampleTime)
 
         let strokeSample = strokeSampleOutput.strokeSample
