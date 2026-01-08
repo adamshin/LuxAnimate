@@ -20,4 +20,17 @@ struct UniformCubicBSpline {
         return (b0, b1, b2, b3)
     }
     
+    static func basisDerivativeValues(
+        t: Double
+    ) -> (Double, Double, Double, Double) {
+        let t2 = t*t
+        
+        let b0 = (-t2 + 2*t - 1) / 2
+        let b1 = (3*t2 - 4*t) / 2
+        let b2 = (-3*t2 + 2*t + 1) / 2
+        let b3 = t2 / 2
+        
+        return (b0, b1, b2, b3)
+    }
+    
 }

@@ -5,6 +5,11 @@ import Color
 
 private let segmentSubdivisionCount = 10
 
+private struct SubSegmentSample {
+    var sample: IntermediateSample
+    var tangent: Vector
+}
+
 struct StrokeEngineStrokeSampleProcessor {
     
     private let strokeSampleGenerator:
@@ -109,22 +114,22 @@ struct StrokeEngineStrokeSampleProcessor {
             controlPointSamples: controlPointSamples,
             subdivisionCount: segmentSubdivisionCount)
         
-        for sample in subSegmentSamples {
+        for subSegmentSample in subSegmentSamples {
             processSubSegmentSample(
-                sample: sample,
+                subSegmentSample,
                 output: &output)
         }
     }
     
     private mutating func processSubSegmentSample(
-        sample: IntermediateSample,
+        _ subSegmentSample: SubSegmentSample,
         output: inout [StrokeSample]
     ) {
         let strokeDistance: Double
         
         if let lastOutputSample {
             let positionDelta =
-                sample.position -
+                subSegmentSample.sample.position -
                 lastOutputSample.position
             
             let distanceFromLastStrokeSample =
@@ -140,7 +145,8 @@ struct StrokeEngineStrokeSampleProcessor {
         
         let strokeSampleOutput = strokeSampleGenerator
             .strokeSample(
-                sample: sample,
+                sample: subSegmentSample.sample,
+                tangent: subSegmentSample.tangent,
                 strokeDistance: strokeDistance,
                 finalSampleTime: finalSampleTime)
         
@@ -157,7 +163,7 @@ struct StrokeEngineStrokeSampleProcessor {
     private static func subSegmentSamples(
         controlPointSamples: [IntermediateSample],
         subdivisionCount: Int
-    ) -> [IntermediateSample] {
+    ) -> [SubSegmentSample] {
         
         guard controlPointSamples.count == 4 else {
             fatalError()
@@ -169,20 +175,35 @@ struct StrokeEngineStrokeSampleProcessor {
         
         let count = segmentSubdivisionCount
         
-        var output: [IntermediateSample] = []
+        var output: [SubSegmentSample] = []
         output.reserveCapacity(count)
         
         for i in 0 ..< count {
             let t = Double(i) / Double(count)
             
-            let (b0, b1, b2, b3) =
-                UniformCubicBSpline.basisValues(t: t)
+            let (b0, b1, b2, b3) = UniformCubicBSpline
+                .basisValues(t: t)
+            
+            let (d0, d1, d2, d3) = UniformCubicBSpline
+                .basisDerivativeValues(t: t)
             
             let sample = try! interpolate(
                 v0: s0, v1: s1, v2: s2, v3: s3,
                 w0: b0, w1: b1, w2: b2, w3: b3)
             
-            output.append(sample)
+            var tangent =
+                s0.position * d0 +
+                s1.position * d1 +
+                s2.position * d2 +
+                s3.position * d3
+            
+            if tangent.lengthSquared() > 0 {
+                tangent = tangent.normalized()
+            }
+            
+            output.append(SubSegmentSample(
+                sample: sample,
+                tangent: tangent))
         }
         return output
     }

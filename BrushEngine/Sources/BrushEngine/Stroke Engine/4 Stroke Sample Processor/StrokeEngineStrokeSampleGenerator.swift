@@ -29,8 +29,7 @@ struct StrokeEngineStrokeSampleGenerator {
     private let baseStampSize: Double
     
     private let sizeWobbleGenerator: PerlinNoiseGenerator
-    private let offsetXWobbleGenerator: PerlinNoiseGenerator
-    private let offsetYWobbleGenerator: PerlinNoiseGenerator
+    private let offsetWobbleGenerator: PerlinNoiseGenerator
     
     // MARK: - Init
     
@@ -52,13 +51,8 @@ struct StrokeEngineStrokeSampleGenerator {
             frequency: brush.configuration.wobbleFrequency,
             octaveCount: wobbleOctaveCount,
             persistence: wobblePersistence)
-        
-        offsetXWobbleGenerator = PerlinNoiseGenerator(
-            frequency: brush.configuration.wobbleFrequency,
-            octaveCount: wobbleOctaveCount,
-            persistence: wobblePersistence)
-        
-        offsetYWobbleGenerator = PerlinNoiseGenerator(
+
+        offsetWobbleGenerator = PerlinNoiseGenerator(
             frequency: brush.configuration.wobbleFrequency,
             octaveCount: wobbleOctaveCount,
             persistence: wobblePersistence)
@@ -68,6 +62,7 @@ struct StrokeEngineStrokeSampleGenerator {
     
     func strokeSample(
         sample: IntermediateSample,
+        tangent: Vector,
         strokeDistance: Double,
         finalSampleTime: TimeInterval
     ) -> Output {
@@ -110,9 +105,7 @@ struct StrokeEngineStrokeSampleGenerator {
         
         let sizeWobble = sizeWobbleGenerator
             .value(at: wobbleDistance)
-        let offsetXWobble = offsetXWobbleGenerator
-            .value(at: wobbleDistance)
-        let offsetYWobble = offsetYWobbleGenerator
+        let offsetWobble = offsetWobbleGenerator
             .value(at: wobbleDistance)
         
         let wobbleIntensity = 1
@@ -161,18 +154,14 @@ struct StrokeEngineStrokeSampleGenerator {
         let stampRotation = r.normalized()
         
         // Stamp offset
-        let offsetX = offsetXWobble
+        let perpendicular = tangent.perpendicularClockwise
+        
+        let offsetWobbleMagnitude = offsetWobble
             * brush.configuration.offsetWobble
             * wobbleIntensity
         
-        let offsetY = offsetYWobble
-            * brush.configuration.offsetWobble
-            * wobbleIntensity
-        
-        var stampOffset = Vector(offsetX, offsetY)
-        if stampOffset.lengthSquared() > 1.0 {
-            stampOffset = stampOffset.normalized()
-        }
+        let stampOffset =
+            perpendicular * offsetWobbleMagnitude
         
         // Stamp opacity
         let stampOpacity = brush.configuration.stampOpacity
