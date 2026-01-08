@@ -64,7 +64,7 @@ class StrokeRenderer {
         stamps: [StrokeStamp],
         brush: Brush
     ) {
-        let sprites = stamps.map { $0.sprite }
+        let sprites = stamps.lazy.map { $0.sprite }
         
         let commandBuffer = commandQueue
             .makeCommandBuffer()!

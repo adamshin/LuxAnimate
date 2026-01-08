@@ -101,7 +101,7 @@ public struct SpriteRenderer {
         target: MTLTexture,
         viewportSize: Size,
         texture: MTLTexture,
-        sprites: [Sprite],
+        sprites: any Collection<Sprite>,
         blendMode: BlendMode = .normal,
         sampleMode: SampleMode = .linear,
         colorMode: ColorMode = .none
