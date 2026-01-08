@@ -10,6 +10,8 @@ private struct SubSegmentSample {
     var tangent: Vector
 }
 
+/// Generates smooth stroke paths using cubic B-spline interpolation. Takes intermediate samples as control points and outputs stroke samples with computed properties based on brush configuration.
+
 struct StrokeEngineStrokeSampleProcessor {
     
     private let strokeSampleGenerator:

@@ -5,6 +5,8 @@ import Foundation
 private let maxPressureIncreaseRate: Double = 10
 private let maxPressureDecreaseRate: Double = 15
 
+/// Filters sudden jumps in pressure input by limiting the rate of change. Helps eliminate noise at stroke start and end.
+
 struct StrokeEnginePressureFilteringProcessor {
     
     private var lastTime: TimeInterval = 0

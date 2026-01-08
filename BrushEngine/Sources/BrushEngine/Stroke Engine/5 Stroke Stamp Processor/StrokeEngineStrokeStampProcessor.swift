@@ -5,6 +5,8 @@ import Render
 
 private let minStampDistance: Double = 1.0
 
+/// Places renderable stamps along the stroke path with appropriate spacing based on brush configuration.
+
 struct StrokeEngineStrokeStampProcessor {
     
     private let brush: Brush

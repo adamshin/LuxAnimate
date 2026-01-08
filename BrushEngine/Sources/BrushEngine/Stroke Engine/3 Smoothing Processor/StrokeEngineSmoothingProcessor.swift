@@ -9,6 +9,8 @@ private let maxResampleCount = 100
 
 private let tailSampleInterval: TimeInterval = 1/60
 
+/// Applies temporal smoothing to samples using a parabola-shaped weighted averaging window.
+
 struct StrokeEngineSmoothingProcessor {
 
     private let windowSize: TimeInterval

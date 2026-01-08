@@ -4,6 +4,8 @@ import Geometry
 
 private let finalizationThreshold = 30
 
+/// Manages sample input, handling added samples and updates to predicted values. Outputs one sample at a time for downstream processing.
+
 struct StrokeEngineInputQueue {
     
     private var samples: [BrushEngine.InputSample] = []
