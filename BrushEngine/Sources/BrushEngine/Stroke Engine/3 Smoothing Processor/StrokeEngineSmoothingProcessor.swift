@@ -49,13 +49,13 @@ struct StrokeEngineSmoothingProcessor {
     mutating func process(
         input: IntermediateSampleBatch
     ) -> IntermediateSampleBatch {
-
+        
+        var output: [IntermediateSample] = []
+        
         if !input.isFinalized {
             isOutputFinalized = false
         }
         
-        var output: [IntermediateSample] = []
-
         processSamples(
             samples: input.samples,
             output: &output)

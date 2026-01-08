@@ -44,13 +44,13 @@ struct StrokeEngineStrokeSampleProcessor {
         input: IntermediateSampleBatch
     ) -> StrokeSampleBatch {
         
+        var output: [StrokeSample] = []
+        
         finalSampleTime = input.finalSampleTime
         
         if !input.isFinalized {
             isOutputFinalized = false
         }
-        
-        var output: [StrokeSample] = []
         
         processSamples(
             samples: input.samples,
