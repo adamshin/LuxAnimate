@@ -110,16 +110,16 @@ struct IntermediateSample {
 }
 
 struct StrokeSample {
-
+    
     var position: Vector
     var tangent: Vector
     var strokeDistance: Double
-
+    
     var stampOffset: Vector
     var stampSize: Double
     var stampRotation: Complex
     var stampOpacity: Double
-
+    
 }
 
 struct StrokeStamp {
@@ -188,6 +188,7 @@ extension StrokeSample: Interpolatable {
     static var zero: Self {
         .init(
             position: .zero,
+            tangent: .zero,
             strokeDistance: 0,
             stampOffset: .zero,
             stampSize: 0,
@@ -200,6 +201,7 @@ extension StrokeSample: Interpolatable {
         weight w: Double
     ) {
         position       += w * v.position
+        tangent        += w * v.tangent
         strokeDistance += w * v.strokeDistance
         stampOffset    += w * v.stampOffset
         stampSize      += w * v.stampSize

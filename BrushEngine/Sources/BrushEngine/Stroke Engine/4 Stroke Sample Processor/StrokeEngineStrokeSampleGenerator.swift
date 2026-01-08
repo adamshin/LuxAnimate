@@ -62,8 +62,8 @@ struct StrokeEngineStrokeSampleGenerator {
     
     func strokeSample(
         sample: IntermediateSample,
-        strokeDistance: Double,
         tangent: Vector,
+        strokeDistance: Double,
         finalSampleTime: TimeInterval
     ) -> Output {
         
@@ -102,16 +102,16 @@ struct StrokeEngineStrokeSampleGenerator {
         
         // Wobble
         let wobbleDistance = strokeDistance / baseStampSize
-
+        
         let sizeWobble = sizeWobbleGenerator
             .value(at: wobbleDistance)
         let offsetWobble = offsetWobbleGenerator
             .value(at: wobbleDistance)
-
+        
         let wobbleIntensity = 1
             - brush.configuration.wobblePressureAttenuation
             * pow(pressure, 3)
-
+        
         let wobbleSize = 1
             + sizeWobble
             * brush.configuration.sizeWobble
@@ -153,19 +153,15 @@ struct StrokeEngineStrokeSampleGenerator {
         }
         let stampRotation = r.normalized()
         
-        // Stamp offset (perpendicular to stroke direction)
-        let perpendicular: Vector
-        if tangent.lengthSquared() > 0 {
-            perpendicular = tangent.perpendicularClockwise.normalized()
-        } else {
-            perpendicular = .zero
-        }
-
-        let offsetMagnitude = offsetWobble
+        // Stamp offset
+        let perpendicular = tangent.perpendicularClockwise
+        
+        let offsetWobbleMagnitude = offsetWobble
             * brush.configuration.offsetWobble
             * wobbleIntensity
-
-        let stampOffset = perpendicular * offsetMagnitude
+        
+        let stampOffset =
+            perpendicular * offsetWobbleMagnitude
         
         // Stamp opacity
         let stampOpacity = brush.configuration.stampOpacity
