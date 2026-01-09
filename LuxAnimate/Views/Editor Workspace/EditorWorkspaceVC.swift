@@ -6,8 +6,6 @@ import UIKit
 import Metal
 import Geometry
 
-// TODO: Only redraw when scene graph or transform changes
-
 private let minZoomScale: Double = 0.1
 private let maxZoomScale: Double = 30
 
@@ -129,6 +127,9 @@ class EditorWorkspaceVC: UIViewController {
     // MARK: - Render
     
     private func draw() {
+        guard needsDraw else { return }
+        needsDraw = false
+        
         guard let sceneGraph else { return }
         
         guard let drawable =

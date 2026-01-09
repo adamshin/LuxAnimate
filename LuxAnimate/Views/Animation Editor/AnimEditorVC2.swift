@@ -41,8 +41,15 @@ class AnimEditorVC2: UIViewController {
     
     private let workspaceVC = EditorWorkspaceVC()
     
+    // TODO: Move toolbar back to here
+//    private let toolbarVC: AnimEditorToolbarVC
+    
     private let timelineVC: AnimEditorTimelineVC
-    private let frameVC: AnimEditorFrameVC
+    
+    // TODO: Do we need a frame vc? Maybe all frame editing
+    // logic should live in a non-view object, like
+    // AnimFrameEditor.
+//    private let frameVC: AnimEditorFrameVC
     
     // MARK: - State
     
@@ -50,15 +57,26 @@ class AnimEditorVC2: UIViewController {
     private let sceneID: String
     private let layerID: String
     
-    private var state: AnimEditorState
+    // TODO: Reevaluate this. Should maybe be a view model,
+    // with a bit less data.
+//    private var state: AnimEditorState
     
-    private var toolState: AnimEditorToolState?
-    private var frameEditor: AnimFrameEditor?
+    // TODO: Create tool state machine to manage this
+//    private var toolState: AnimEditorToolState?
     
+//    private var frameEditor: AnimFrameEditor?
+    
+    // This makes sense here.
     private let assetLoader: AnimEditorAssetLoader
-    private let editBuilder = AnimEditorEditBuilder()
-    private let workspaceRenderer = EditorWorkspaceRenderer()
     
+    // Should this be here, or in the frame editor? And the
+    // frame editor passes complete edit objects to us? See
+    // comments below. I don't think this class should have
+    // to know about all the possible types of edits that
+    // can happen. There will only be more and more.
+//    private let editBuilder = AnimEditorEditBuilder()
+    
+    // This can stay.
     private let displayLink = WrappedDisplayLink()
     
     // MARK: - Delegate
@@ -83,17 +101,17 @@ class AnimEditorVC2: UIViewController {
         timelineVC = AnimEditorTimelineVC(
             projectID: projectID)
         
-        frameVC = AnimEditorFrameVC()
+//        frameVC = AnimEditorFrameVC()
         
-        state = try AnimEditorState(
-            projectID: projectID,
-            layerID: layerID,
-            projectState: projectState,
-            sceneManifest: sceneManifest,
-            focusedFrameIndex: focusedFrameIndex,
-            onionSkinOn: false,
-            onionSkinConfig: AppConfig.onionSkinConfig,
-            selectedTool: .paint)
+//        state = try AnimEditorState(
+//            projectID: projectID,
+//            layerID: layerID,
+//            projectState: projectState,
+//            sceneManifest: sceneManifest,
+//            focusedFrameIndex: focusedFrameIndex,
+//            onionSkinOn: false,
+//            onionSkinConfig: AppConfig.onionSkinConfig,
+//            selectedTool: .paint)
         
         assetLoader = AnimEditorAssetLoader(
             projectID: projectID)
@@ -103,10 +121,10 @@ class AnimEditorVC2: UIViewController {
         
         workspaceVC.delegate = self
         timelineVC.delegate = self
-        frameVC.delegate = self
+//        frameVC.delegate = self
         
         assetLoader.delegate = self
-        editBuilder.delegate = self
+//        editBuilder.delegate = self
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -132,11 +150,15 @@ class AnimEditorVC2: UIViewController {
         addChild(workspaceVC, to: view)
         addChild(timelineVC, to: view)
         
-        addChild(frameVC,
-            to: timelineVC.remainderContentView)
+//        addChild(frameVC,
+//            to: timelineVC.remainderContentView)
         
-        workspaceVC.setSafeAreaReferenceView(
-            frameVC.contentAreaView)
+        // TODO: We need to set up a new view for this.
+        // Just a view that spans between the toolbar and
+        // timeline area.
+        
+//        workspaceVC.setSafeAreaReferenceView(
+//            frameVC.contentAreaView)
     }
     
     private func setupDisplayLink() {
@@ -153,18 +175,18 @@ class AnimEditorVC2: UIViewController {
 //        toolbarVC.update(
 //            selectedTool: state.selectedTool)
         
-        timelineVC.update(
-            timelineModel: state.timelineModel)
-        timelineVC.update(
-            focusedFrameIndex: state.focusedFrameIndex)
+//        timelineVC.update(
+//            timelineModel: state.timelineModel)
+//        timelineVC.update(
+//            focusedFrameIndex: state.focusedFrameIndex)
         
-        frameVC.update(
-            projectState: state.projectState)
+//        frameVC.update(
+//            projectState: state.projectState)
         
 //        updateToolState(
 //            selectedTool: state.selectedTool)
         
-        updateFrameEditor()
+//        updateFrameEditor()
         
         // TESTING
         setInitialSceneGraph()
@@ -184,6 +206,7 @@ class AnimEditorVC2: UIViewController {
         workspaceVC.setSceneGraph(sceneGraph)
     }
     
+    /*
     private func applyStateUpdate(
         update: AnimEditorState.Update,
         fromFrameEditor: Bool = false,
@@ -230,6 +253,7 @@ class AnimEditorVC2: UIViewController {
             updateFrameEditor()
         }
     }
+     */
     
     // MARK: - Tool State
     
@@ -258,6 +282,7 @@ class AnimEditorVC2: UIViewController {
     
     // MARK: - Frame Editor
     
+    /*
     private func updateFrameEditor() {
         guard let toolState else { return }
         
@@ -277,6 +302,7 @@ class AnimEditorVC2: UIViewController {
             onionSkinConfig: onionSkinConfig,
             editorToolState: toolState)
     }
+     */
     
     // MARK: - Frame
     
@@ -297,6 +323,7 @@ class AnimEditorVC2: UIViewController {
         sceneManifest: Scene.Manifest,
         editContext: Sendable?
     ) {
+        /*
         let fromFrameEditor: Bool =
             if let context = editContext
                 as? AnimEditorVCEditContext2,
@@ -316,6 +343,7 @@ class AnimEditorVC2: UIViewController {
         } catch {
             dismiss()
         }
+         */
     }
     
 }
@@ -333,6 +361,7 @@ extension AnimEditorVC2: EditorWorkspaceVC.Delegate {
     
 }
 
+/*
 extension AnimEditorVC2: AnimEditorFrameVC.Delegate {
     
     func onSelectBack(_ vc: AnimEditorFrameVC) {
@@ -367,6 +396,7 @@ extension AnimEditorVC2: AnimEditorFrameVC.Delegate {
     }
     
 }
+ */
 
 extension AnimEditorVC2: AnimEditorTimelineVC.Delegate {
     
@@ -378,12 +408,12 @@ extension AnimEditorVC2: AnimEditorTimelineVC.Delegate {
         _ vc: AnimEditorTimelineVC,
         _ focusedFrameIndex: Int
     ) {
-        let update = state.update(
-            focusedFrameIndex: focusedFrameIndex)
-        
-        applyStateUpdate(
-            update: update,
-            fromTimeline: true)
+//        let update = state.update(
+//            focusedFrameIndex: focusedFrameIndex)
+//        
+//        applyStateUpdate(
+//            update: update,
+//            fromTimeline: true)
     }
     
     func onSelectPlayPause(
@@ -397,36 +427,36 @@ extension AnimEditorVC2: AnimEditorTimelineVC.Delegate {
         _ vc: AnimEditorTimelineVC,
         frameIndex: Int
     ) {
-        try? editBuilder.createDrawing(
-            state: state,
-            frameIndex: frameIndex)
+//        try? editBuilder.createDrawing(
+//            state: state,
+//            frameIndex: frameIndex)
     }
     
     func onRequestDeleteDrawing(
         _ vc: AnimEditorTimelineVC,
         frameIndex: Int
     ) {
-        try? editBuilder.deleteDrawing(
-            state: state,
-            frameIndex: frameIndex)
+//        try? editBuilder.deleteDrawing(
+//            state: state,
+//            frameIndex: frameIndex)
     }
     
     func onRequestInsertSpacing(
         _ vc: AnimEditorTimelineVC,
         frameIndex: Int
     ) {
-        try? editBuilder.insertSpacing(
-            state: state,
-            frameIndex: frameIndex)
+//        try? editBuilder.insertSpacing(
+//            state: state,
+//            frameIndex: frameIndex)
     }
     
     func onRequestRemoveSpacing(
         _ vc: AnimEditorTimelineVC,
         frameIndex: Int
     ) {
-        try? editBuilder.removeSpacing(
-            state: state,
-            frameIndex: frameIndex)
+//        try? editBuilder.removeSpacing(
+//            state: state,
+//            frameIndex: frameIndex)
     }
     
     func pendingAssetData(
@@ -529,7 +559,7 @@ extension AnimEditorVC2: AnimEditorAssetLoader.Delegate {
     }
     
     func onUpdate(_ l: AnimEditorAssetLoader) {
-        frameEditor?.onAssetLoaderUpdate()
+//        frameEditor?.onAssetLoaderUpdate()
     }
     
 }

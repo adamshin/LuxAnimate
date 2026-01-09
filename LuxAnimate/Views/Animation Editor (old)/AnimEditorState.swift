@@ -3,6 +3,14 @@
 //
 
 import Foundation
+
+// Need to re-evaluate this. There's a lot of stuff
+// inside here. Including tool selection - does that
+// make sense? This might be better conceived as a view
+// model that represents the timeline and selected
+// frame, but not tool state. Maybe not the project edit
+// state either - which really just contains the project
+// manifest plus undo/redo count.
     
 struct AnimEditorState {
     
