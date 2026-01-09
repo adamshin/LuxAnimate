@@ -32,7 +32,7 @@ class EditorWorkspaceVC: UIViewController {
     private let renderer = EditorWorkspaceRenderer()
     
     private var sceneGraph: EditorWorkspaceSceneGraph?
-    private var needsDraw = false
+    private var needsDraw = true
     
     private var safeAreaReferenceView: UIView?
     
