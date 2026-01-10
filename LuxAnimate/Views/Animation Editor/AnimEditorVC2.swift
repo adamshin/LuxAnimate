@@ -39,6 +39,8 @@ class AnimEditorVC2: UIViewController {
     
     // MARK: - View
     
+    private let bodyView = AnimEditorView2()
+    
     private let workspaceVC = EditorWorkspaceVC()
     
     private let toolbarVC: AnimEditor2ToolbarVC
@@ -131,6 +133,10 @@ class AnimEditorVC2: UIViewController {
     
     // MARK: - Lifecycle
     
+    override func loadView() {
+        view = bodyView
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -147,22 +153,17 @@ class AnimEditorVC2: UIViewController {
     private func setupUI() {
         view.backgroundColor = .editorBackground
         
-        addChild(workspaceVC, to: view)
+        addChild(workspaceVC,
+            to: bodyView.workspaceContainer)
         
-        // TODO: Add toolbar. maybe needs a
-        // remainderContentView like other views?
+        addChild(toolbarVC,
+            to: bodyView.toolbarContainer)
         
-        addChild(timelineVC, to: view)
+        addChild(timelineVC,
+            to: bodyView.timelineContainer)
         
-//        addChild(frameVC,
-//            to: timelineVC.remainderContentView)
-        
-        // TODO: We need to set up a new view for this.
-        // Just a view that spans between the toolbar and
-        // timeline area.
-        
-//        workspaceVC.setSafeAreaReferenceView(
-//            frameVC.contentAreaView)
+        workspaceVC.setSafeAreaReferenceView(
+            bodyView.workspaceSafeAreaView)
     }
     
     private func setupDisplayLink() {
@@ -429,7 +430,9 @@ extension AnimEditorVC2: AnimEditorTimelineVC.Delegate {
     
     func onChangeDrawerSize(
         _ vc: AnimEditorTimelineVC
-    ) { }
+    ) {
+        view.layoutIfNeeded()
+    }
     
     func onChangeFocusedFrameIndex(
         _ vc: AnimEditorTimelineVC,

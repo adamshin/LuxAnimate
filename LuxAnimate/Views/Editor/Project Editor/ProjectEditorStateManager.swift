@@ -4,6 +4,11 @@
 
 import Foundation
 
+// TODO: Remove edit context from methods? May not be
+// necessary. Going to track edit transactions inside view
+// controllers with flags or something, removing the need
+// to thread context through every call.
+
 extension ProjectEditorStateManager {
     
     protocol Delegate: AnyObject {

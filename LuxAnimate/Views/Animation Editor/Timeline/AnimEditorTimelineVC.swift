@@ -146,10 +146,6 @@ class AnimEditorTimelineVC: UIViewController {
             expanded, animated: false)
     }
     
-    var remainderContentView: UIView {
-        drawerVC.remainderContentView
-    }
-    
 }
 
 // MARK: - Delegates
