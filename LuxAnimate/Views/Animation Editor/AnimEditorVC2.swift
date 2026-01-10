@@ -8,11 +8,6 @@ import Geometry
 private let contentSize = Size(
     width: 1920, height: 1080)
 
-struct AnimEditorVCEditContext2 {
-    var sender: AnimEditorVC2
-    var isFromFrameEditor: Bool
-}
-
 extension AnimEditorVC2 {
     
     @MainActor
@@ -23,8 +18,7 @@ extension AnimEditorVC2 {
         
         func onRequestSceneEdit(
             _ vc: AnimEditorVC2,
-            sceneEdit: ProjectEditBuilder.SceneEdit,
-            editContext: Sendable?)
+            sceneEdit: ProjectEditBuilder.SceneEdit)
         
         func pendingEditAsset(
             _ vc: AnimEditorVC2,
@@ -276,21 +270,19 @@ class AnimEditorVC2: UIViewController {
     
     func update(
         projectState: ProjectEditManager.State,
-        sceneManifest: Scene.Manifest,
-        editContext: Sendable?
+        sceneManifest: Scene.Manifest
     ) {
-        // We don't care about edit context anymore.
-        // The child view controllers will manage that.
-        
         // When we receive an update, we should update our
         // own state and pass it to all children.
         
-        // I also don't think we need this "update" method
+        // I also don't think we need an "update" method
         // on the state/viewmodel. We can just regenerate it
         // from scratch. Because the focusedFrameIndex and
         // onion skin options are factored out of the
         // content viewmodel now, their updates should
-        // happen through different paths.
+        // happen through different paths. Changes to those
+        // will be triggered from below, not from above, and
+        // won't need a public "update" method.
         
         // TODO: Generate content viewmodel from input.
         // If generation fails, dismiss this view.

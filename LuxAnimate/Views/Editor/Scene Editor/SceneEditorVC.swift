@@ -12,19 +12,12 @@ protocol SceneEditorVCDelegate: AnyObject {
     
     func onRequestEdit(
         _ vc: SceneEditorVC,
-        edit: ProjectEditManager.Edit,
-        editContext: Sendable?)
+        edit: ProjectEditManager.Edit)
     
     func pendingEditAsset(
         assetID: String
     ) -> ProjectEditManager.NewAsset?
     
-}
-
-struct SceneEditorVCEditContext {
-    var sender: SceneEditorVC
-    var sceneManifest: Scene.Manifest
-    var wrappedEditContext: Sendable?
 }
 
 class SceneEditorVC: UIViewController {
@@ -85,8 +78,7 @@ class SceneEditorVC: UIViewController {
         updateState(
             projectState: projectState,
             sceneRef: sceneRef,
-            sceneManifest: sceneManifest,
-            editContext: nil)
+            sceneManifest: sceneManifest)
     }
     
     override var prefersStatusBarHidden: Bool { true }
@@ -104,8 +96,7 @@ class SceneEditorVC: UIViewController {
     // MARK: - Logic
     
     private func updateState(
-        projectState: ProjectEditManager.State,
-        editContext: Sendable?
+        projectState: ProjectEditManager.State
     ) {
         let projectManifest = projectState
             .projectManifest
@@ -118,37 +109,24 @@ class SceneEditorVC: UIViewController {
             return
         }
         
-        if let context = editContext as? SceneEditorVCEditContext,
-            context.sender == self
-        {
+        do {
+            let sceneManifest = try SceneEditorSceneManifestLoader
+                .load(
+                    projectManifest: projectManifest,
+                    sceneID: sceneID)
+            
             updateState(
                 projectState: projectState,
                 sceneRef: sceneRef,
-                sceneManifest: context.sceneManifest,
-                editContext: context.wrappedEditContext)
+                sceneManifest: sceneManifest)
             
-        } else {
-            do {
-                let sceneManifest = try SceneEditorSceneManifestLoader
-                    .load(
-                        projectManifest: projectManifest,
-                        sceneID: sceneID)
-                
-                updateState(
-                    projectState: projectState,
-                    sceneRef: sceneRef,
-                    sceneManifest: sceneManifest,
-                    editContext: nil)
-                
-            } catch { }
-        }
+        } catch { }
     }
     
     private func updateState(
         projectState: ProjectEditManager.State,
         sceneRef: Project.SceneRef,
-        sceneManifest: Scene.Manifest,
-        editContext: Sendable?
+        sceneManifest: Scene.Manifest
     ) {
         self.projectState = projectState
         self.sceneRef = sceneRef
@@ -158,11 +136,10 @@ class SceneEditorVC: UIViewController {
             projectState: projectState,
             sceneRef: sceneRef,
             sceneManifest: sceneManifest)
-        
+
         animEditorVC?.update(
             projectState: projectState,
-            sceneManifest: sceneManifest,
-            editContext: editContext)
+            sceneManifest: sceneManifest)
     }
     
     // MARK: - Editing
@@ -179,13 +156,7 @@ class SceneEditorVC: UIViewController {
             projectManifest: projectManifest,
             sceneEdit: sceneEdit)
         
-        let editContext = SceneEditorVCEditContext(
-            sender: self,
-            sceneManifest: sceneEdit.sceneManifest)
-        
-        delegate?.onRequestEdit(self,
-            edit: edit,
-            editContext: editContext)
+        delegate?.onRequestEdit(self, edit: edit)
     }
     
     private func removeLastLayer() {
@@ -203,13 +174,7 @@ class SceneEditorVC: UIViewController {
             projectManifest: projectManifest,
             sceneEdit: sceneEdit)
         
-        let editContext = SceneEditorVCEditContext(
-            sender: self,
-            sceneManifest: sceneEdit.sceneManifest)
-        
-        delegate?.onRequestEdit(self,
-            edit: edit,
-            editContext: editContext)
+        delegate?.onRequestEdit(self, edit: edit)
     }
     
     // MARK: - Navigation
@@ -250,12 +215,9 @@ class SceneEditorVC: UIViewController {
     // MARK: - Interface
     
     func update(
-        projectState: ProjectEditManager.State,
-        editContext: Sendable?
+        projectState: ProjectEditManager.State
     ) {
-        updateState(
-            projectState: projectState,
-            editContext: editContext)
+        updateState(projectState: projectState)
     }
     
 }
@@ -330,8 +292,7 @@ extension SceneEditorVC: AnimEditorVC2.Delegate {
     
     func onRequestSceneEdit(
         _ vc: AnimEditorVC2,
-        sceneEdit: ProjectEditBuilder.SceneEdit,
-        editContext: Sendable?
+        sceneEdit: ProjectEditBuilder.SceneEdit
     ) {
         do {
             let projectManifest = projectState
@@ -341,14 +302,7 @@ extension SceneEditorVC: AnimEditorVC2.Delegate {
                 projectManifest: projectManifest,
                 sceneEdit: sceneEdit)
             
-            let newEditContext = SceneEditorVCEditContext(
-                sender: self,
-                sceneManifest: sceneEdit.sceneManifest,
-                wrappedEditContext: editContext)
-            
-            delegate?.onRequestEdit(self,
-                edit: edit,
-                editContext: newEditContext)
+            delegate?.onRequestEdit(self, edit: edit)
             
         } catch { }
     }

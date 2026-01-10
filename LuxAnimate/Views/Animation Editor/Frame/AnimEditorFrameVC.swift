@@ -32,8 +32,7 @@ extension AnimEditorFrameVC {
         
         func onRequestSceneEdit(
             _ vc: AnimEditorFrameVC,
-            sceneEdit: ProjectEditBuilder.SceneEdit,
-            editContext: Sendable?)
+            sceneEdit: ProjectEditBuilder.SceneEdit)
         
         func pendingEditAsset(
             _ vc: AnimEditorFrameVC,

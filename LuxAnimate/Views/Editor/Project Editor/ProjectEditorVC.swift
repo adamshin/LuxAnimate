@@ -38,9 +38,7 @@ class ProjectEditorVC: UIViewController {
         
         setupUI()
         
-        update(
-            projectState: stateManager.state,
-            editContext: nil)
+        update(projectState: stateManager.state)
     }
     
     override var prefersStatusBarHidden: Bool { true }
@@ -58,15 +56,10 @@ class ProjectEditorVC: UIViewController {
     // MARK: - Logic
     
     private func update(
-        projectState: ProjectEditManager.State,
-        editContext: Sendable?
+        projectState: ProjectEditManager.State
     ) {
-        contentVC.update(
-            projectState: projectState)
-        
-        sceneEditorVC?.update(
-            projectState: projectState,
-            editContext: editContext)
+        contentVC.update(projectState: projectState)
+        sceneEditorVC?.update(projectState: projectState)
     }
     
     // MARK: - Editing
@@ -81,9 +74,7 @@ class ProjectEditorVC: UIViewController {
             frameCount: 100,
             backgroundColor: .white)
             
-        stateManager.applyEdit(
-            edit: edit,
-            editContext: nil)
+        stateManager.applyEdit(edit: edit)
     }
     
     private func removeLastScene() {
@@ -98,9 +89,7 @@ class ProjectEditorVC: UIViewController {
             projectManifest: projectManifest,
             sceneID: lastSceneRef.id)
         
-        stateManager.applyEdit(
-            edit: edit,
-            editContext: nil)
+        stateManager.applyEdit(edit: edit)
     }
     
     // MARK: - Navigation
@@ -167,12 +156,9 @@ extension ProjectEditorVC: SceneEditorVCDelegate {
     
     func onRequestEdit(
         _ vc: SceneEditorVC,
-        edit: ProjectEditManager.Edit,
-        editContext: Sendable?
+        edit: ProjectEditManager.Edit
     ) {
-        stateManager.applyEdit(
-            edit: edit,
-            editContext: editContext)
+        stateManager.applyEdit(edit: edit)
     }
     
     func pendingEditAsset(
@@ -189,13 +175,10 @@ extension ProjectEditorVC: ProjectEditorStateManager.Delegate {
     
     nonisolated func onUpdateState(
         _ m: ProjectEditorStateManager,
-        state: ProjectEditManager.State,
-        editContext: Sendable?
+        state: ProjectEditManager.State
     ) {
         Task { @MainActor in
-            update(
-                projectState: state,
-                editContext: editContext)
+            update(projectState: state)
         }
     }
     

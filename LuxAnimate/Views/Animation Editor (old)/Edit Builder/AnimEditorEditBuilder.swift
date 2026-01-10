@@ -8,9 +8,6 @@ import Foundation
 // Or should it just return an edit object? Probably the
 // latter.
 
-// We don't need the edit context anymore, so we can remove
-// that here.
-
 extension AnimEditorEditBuilder {
     
     @MainActor
@@ -18,8 +15,7 @@ extension AnimEditorEditBuilder {
         
         func onRequestSceneEdit(
             _ b: AnimEditorEditBuilder,
-            sceneEdit: ProjectEditBuilder.SceneEdit,
-            editContext: Sendable?)
+            sceneEdit: ProjectEditBuilder.SceneEdit)
         
     }
     
@@ -34,8 +30,7 @@ class AnimEditorEditBuilder {
     
     private func apply(
         edit: AnimationLayerContentEditBuilder.Edit,
-        state: AnimEditorState,
-        editContext: Sendable?
+        state: AnimEditorState
     ) throws {
         
         let sceneEdit = try AnimationLayerContentEditBuilder
@@ -46,8 +41,7 @@ class AnimEditorEditBuilder {
         
         delegate?.onRequestSceneEdit(
             self,
-            sceneEdit: sceneEdit,
-            editContext: editContext)
+            sceneEdit: sceneEdit)
     }
     
     // MARK: - Interface
@@ -64,8 +58,7 @@ class AnimEditorEditBuilder {
         
         try apply(
             edit: edit,
-            state: state,
-            editContext: nil)
+            state: state)
     }
     
     func deleteDrawing(
@@ -80,8 +73,7 @@ class AnimEditorEditBuilder {
         
         try apply(
             edit: edit,
-            state: state,
-            editContext: nil)
+            state: state)
     }
     
     func insertSpacing(
@@ -96,8 +88,7 @@ class AnimEditorEditBuilder {
         
         try apply(
             edit: edit,
-            state: state,
-            editContext: nil)
+            state: state)
     }
     
     func removeSpacing(
@@ -112,15 +103,13 @@ class AnimEditorEditBuilder {
         
         try apply(
             edit: edit,
-            state: state,
-            editContext: nil)
+            state: state)
     }
     
     func editDrawing(
         state: AnimEditorState,
         drawingID: String,
-        imageSet: DrawingAssetProcessor.ImageSet,
-        editContext: Sendable?
+        imageSet: DrawingAssetProcessor.ImageSet
     ) throws {
         
         let imageSet = AnimationLayerContentEditBuilder
@@ -136,8 +125,7 @@ class AnimEditorEditBuilder {
         
         try apply(
             edit: edit,
-            state: state,
-            editContext: editContext)
+            state: state)
     }
     
 }

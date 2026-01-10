@@ -4,19 +4,13 @@
 
 import Foundation
 
-// TODO: Remove edit context from methods? May not be
-// necessary. Going to track edit transactions inside view
-// controllers with flags or something, removing the need
-// to thread context through every call.
-
 extension ProjectEditorStateManager {
     
     protocol Delegate: AnyObject {
         
         func onUpdateState(
             _ m: ProjectEditorStateManager,
-            state: ProjectEditManager.State,
-            editContext: Sendable?)
+            state: ProjectEditManager.State)
         
         func onEditError(
             _ m: ProjectEditorStateManager,
@@ -57,8 +51,7 @@ class ProjectEditorStateManager: @unchecked Sendable {
     // MARK: - Internal Logic
     
     private func applyEditInternal(
-        edit: ProjectEditManager.Edit,
-        editContext: Sendable?
+        edit: ProjectEditManager.Edit
     ) {
         // Update state
         state.projectManifest = edit.projectManifest
@@ -72,9 +65,7 @@ class ProjectEditorStateManager: @unchecked Sendable {
         storePendingEditAssets(edit.newAssets)
         
         // Notify delegate
-        delegate?.onUpdateState(self,
-            state: state,
-            editContext: editContext)
+        delegate?.onUpdateState(self, state: state)
         
         // Perform edit
         workQueue.async {
@@ -109,9 +100,8 @@ class ProjectEditorStateManager: @unchecked Sendable {
                 DispatchQueue.main.async {
                     self.state = self.editManager.state
                     
-                    self.delegate?.onUpdateState(self,
-                        state: self.state,
-                        editContext: nil)
+                    self.delegate?.onUpdateState(
+                        self, state: self.state)
                 }
                 
             } catch {
@@ -141,13 +131,8 @@ class ProjectEditorStateManager: @unchecked Sendable {
     
     // MARK: - Interface
     
-    func applyEdit(
-        edit: ProjectEditManager.Edit,
-        editContext: Sendable?
-    ) {
-        applyEditInternal(
-            edit: edit,
-            editContext: editContext)
+    func applyEdit(edit: ProjectEditManager.Edit) {
+        applyEditInternal(edit: edit)
     }
     
     func applyUndo() {

@@ -13,18 +13,12 @@ protocol AnimEditorVCDelegate: AnyObject {
     
     func onRequestSceneEdit(
         _ vc: AnimEditorVC,
-        sceneEdit: ProjectEditBuilder.SceneEdit,
-        editContext: Sendable?)
+        sceneEdit: ProjectEditBuilder.SceneEdit)
     
     func pendingEditAsset(
         assetID: String
     ) -> ProjectEditManager.NewAsset?
     
-}
-
-struct AnimEditorVCEditContext {
-    var sender: AnimEditorVC
-    var isFromFrameEditor: Bool
 }
 
 class AnimEditorVC: UIViewController {
@@ -310,25 +304,15 @@ class AnimEditorVC: UIViewController {
     
     func update(
         projectState: ProjectEditManager.State,
-        sceneManifest: Scene.Manifest,
-        editContext: Sendable?
+        sceneManifest: Scene.Manifest
     ) {
-        let fromFrameEditor: Bool =
-            if let context = editContext
-                as? AnimEditorVCEditContext,
-                context.sender == self,
-                context.isFromFrameEditor
-            { true } else { false }
-        
         do {
             let update = try state.update(
                 projectState: projectState,
                 sceneManifest: sceneManifest)
-            
-            applyStateUpdate(
-                update: update,
-                fromFrameEditor: fromFrameEditor)
-            
+
+            applyStateUpdate(update: update)
+
         } catch {
             dismiss()
         }
@@ -504,15 +488,10 @@ extension AnimEditorVC: AnimFrameEditor.Delegate {
         drawingID: String,
         imageSet: DrawingAssetProcessor.ImageSet
     ) {
-        let editContext = AnimEditorVCEditContext(
-            sender: self,
-            isFromFrameEditor: true)
-        
         try? editBuilder.editDrawing(
             state: state,
             drawingID: drawingID,
-            imageSet: imageSet,
-            editContext: editContext)
+            imageSet: imageSet)
     }
     
 }
@@ -521,13 +500,11 @@ extension AnimEditorVC: AnimEditorEditBuilder.Delegate {
     
     func onRequestSceneEdit(
         _ b: AnimEditorEditBuilder,
-        sceneEdit: ProjectEditBuilder.SceneEdit,
-        editContext: Sendable?
+        sceneEdit: ProjectEditBuilder.SceneEdit
     ) {
         delegate?.onRequestSceneEdit(
             self,
-            sceneEdit: sceneEdit,
-            editContext: editContext)
+            sceneEdit: sceneEdit)
     }
     
 }
