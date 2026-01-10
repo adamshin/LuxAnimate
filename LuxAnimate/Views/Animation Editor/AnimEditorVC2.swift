@@ -41,9 +41,7 @@ class AnimEditorVC2: UIViewController {
     
     private let workspaceVC = EditorWorkspaceVC()
     
-    // TODO: Move toolbar back to here
-//    private let toolbarVC: AnimEditorToolbarVC
-    
+    private let toolbarVC: AnimEditor2ToolbarVC
     private let timelineVC: AnimEditorTimelineVC
     
     // TODO: Do we need a frame vc? Maybe all frame editing
@@ -98,6 +96,8 @@ class AnimEditorVC2: UIViewController {
         self.sceneID = sceneID
         self.layerID = layerID
         
+        toolbarVC = AnimEditor2ToolbarVC()
+        
         timelineVC = AnimEditorTimelineVC(
             projectID: projectID)
         
@@ -120,8 +120,8 @@ class AnimEditorVC2: UIViewController {
         modalPresentationStyle = .fullScreen
         
         workspaceVC.delegate = self
+        toolbarVC.delegate = self
         timelineVC.delegate = self
-//        frameVC.delegate = self
         
         assetLoader.delegate = self
 //        editBuilder.delegate = self
@@ -148,6 +148,10 @@ class AnimEditorVC2: UIViewController {
         view.backgroundColor = .editorBackground
         
         addChild(workspaceVC, to: view)
+        
+        // TODO: Add toolbar. maybe needs a
+        // remainderContentView like other views?
+        
         addChild(timelineVC, to: view)
         
 //        addChild(frameVC,
@@ -357,6 +361,29 @@ extension AnimEditorVC2: EditorWorkspaceVC.Delegate {
     }
     func onSelectRedo(_ vc: EditorWorkspaceVC) {
         delegate?.onRequestRedo(self)
+    }
+    
+}
+
+extension AnimEditorVC2: AnimEditor2ToolbarVC.Delegate {
+    
+    func onSelectBack(_ vc: AnimEditor2ToolbarVC) {
+        dismiss()
+    }
+    
+    func onSelectUndo(_ vc: AnimEditor2ToolbarVC) {
+        delegate?.onRequestUndo(self)
+    }
+    func onSelectRedo(_ vc: AnimEditor2ToolbarVC) {
+        delegate?.onRequestRedo(self)
+    }
+    
+    func onSelectTool(
+        _ vc: AnimEditor2ToolbarVC,
+        tool: AnimEditor2ToolbarVC.Tool,
+        isAlreadySelected: Bool
+    ) {
+        // TODO: Update state machine, update frame editor.
     }
     
 }

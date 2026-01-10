@@ -1,17 +1,17 @@
 //
-//  AnimEditorFrameToolbarToolPickerView.swift
+//  AnimEditor2ToolbarToolPickerView.swift
 //
 
 import UIKit
 
 // MARK: - Tools
 
-private let tools: [AnimEditorFrameVC.Tool] = [
+private let tools: [AnimEditor2ToolbarVC.Tool] = [
     .paint,
     .erase,
 ]
 
-extension AnimEditorFrameVC.Tool {
+extension AnimEditor2ToolbarVC.Tool {
     
     var name: String {
         switch self {
@@ -40,22 +40,22 @@ private let iconConfig = UIImage.SymbolConfiguration(
 
 // MARK: - Delegate
 
-extension AnimEditorFrameToolbarToolPickerView {
+extension AnimEditor2ToolbarToolPickerView {
     
     @MainActor
     protocol Delegate: AnyObject {
         
         func onSelectTool(
-            _ v: AnimEditorFrameToolbarToolPickerView,
-            tool: AnimEditorFrameVC.Tool)
+            _ v: AnimEditor2ToolbarToolPickerView,
+            tool: AnimEditor2ToolbarVC.Tool)
         
     }
     
 }
 
-// MARK: - AnimEditorFrameToolbarToolPickerView
+// MARK: - AnimEditor2ToolbarToolPickerView
 
-class AnimEditorFrameToolbarToolPickerView: UIView {
+class AnimEditor2ToolbarToolPickerView: UIView {
     
     private let toolButtons: [UIButton]
     
@@ -108,7 +108,7 @@ class AnimEditorFrameToolbarToolPickerView: UIView {
     // MARK: - Interface
     
     func update(
-        selectedTool: AnimEditorFrameVC.Tool?
+        selectedTool: AnimEditor2ToolbarVC.Tool?
     ) {
         for (index, button) in toolButtons.enumerated() {
             let isSelected = selectedTool == tools[index]

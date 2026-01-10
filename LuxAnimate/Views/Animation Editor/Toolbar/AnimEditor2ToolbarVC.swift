@@ -1,32 +1,37 @@
 //
-//  AnimEditorFrameToolbarVC.swift
+//  AnimEditor2ToolbarVC.swift
 //
 
 import UIKit
 
-extension AnimEditorFrameToolbarVC {
+extension AnimEditor2ToolbarVC {
     
     @MainActor
     protocol Delegate: AnyObject {
-        func onSelectBack(_ vc: AnimEditorFrameToolbarVC)
+        func onSelectBack(_ vc: AnimEditor2ToolbarVC)
         
-        func onSelectUndo(_ vc: AnimEditorFrameToolbarVC)
-        func onSelectRedo(_ vc: AnimEditorFrameToolbarVC)
+        func onSelectUndo(_ vc: AnimEditor2ToolbarVC)
+        func onSelectRedo(_ vc: AnimEditor2ToolbarVC)
         
         func onSelectTool(
-            _ vc: AnimEditorFrameToolbarVC,
-            tool: AnimEditorFrameVC.Tool,
+            _ vc: AnimEditor2ToolbarVC,
+            tool: Tool,
             isAlreadySelected: Bool)
+    }
+        
+    enum Tool {
+        case paint
+        case erase
     }
     
 }
 
-class AnimEditorFrameToolbarVC: UIViewController {
+class AnimEditor2ToolbarVC: UIViewController {
     
-    private let bodyView = AnimEditorFrameToolbarView()
+    private let bodyView = AnimEditor2ToolbarView()
     
     private let toolPickerVC
-        = AnimEditorFrameToolbarToolPickerVC()
+        = AnimEditor2ToolbarToolPickerVC()
     
     weak var delegate: Delegate?
     
@@ -62,12 +67,12 @@ class AnimEditorFrameToolbarVC: UIViewController {
     }
     
     func update(
-        selectedTool: AnimEditorFrameVC.Tool
+        selectedTool: AnimEditor2ToolbarVC.Tool
     ) {
         toolPickerVC.update(selectedTool: selectedTool)
     }
     
-    var selectedTool: AnimEditorFrameVC.Tool? {
+    var selectedTool: AnimEditor2ToolbarVC.Tool? {
         toolPickerVC.selectedTool
     }
     
@@ -75,27 +80,27 @@ class AnimEditorFrameToolbarVC: UIViewController {
 
 // MARK: - Delegates
 
-extension AnimEditorFrameToolbarVC:
-    AnimEditorFrameToolbarView.Delegate {
+extension AnimEditor2ToolbarVC:
+    AnimEditor2ToolbarView.Delegate {
     
-    func onSelectBack(_ v: AnimEditorFrameToolbarView) {
+    func onSelectBack(_ v: AnimEditor2ToolbarView) {
         delegate?.onSelectBack(self)
     }
-    func onSelectUndo(_ v: AnimEditorFrameToolbarView) {
+    func onSelectUndo(_ v: AnimEditor2ToolbarView) {
         delegate?.onSelectUndo(self)
     }
-    func onSelectRedo(_ v: AnimEditorFrameToolbarView) {
+    func onSelectRedo(_ v: AnimEditor2ToolbarView) {
         delegate?.onSelectRedo(self)
     }
     
 }
 
-extension AnimEditorFrameToolbarVC:
-    AnimEditorFrameToolbarToolPickerVC.Delegate {
+extension AnimEditor2ToolbarVC:
+    AnimEditor2ToolbarToolPickerVC.Delegate {
     
     func onSelectTool(
-        _ v: AnimEditorFrameToolbarToolPickerVC,
-        tool: AnimEditorFrameVC.Tool,
+        _ v: AnimEditor2ToolbarToolPickerVC,
+        tool: AnimEditor2ToolbarVC.Tool,
         isAlreadySelected: Bool
     ) {
         delegate?.onSelectTool(self,

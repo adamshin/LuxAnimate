@@ -4,6 +4,9 @@
 
 import UIKit
 
+// I think this file gets killed. Frame editor logic can
+// live inside a non-UI object.
+
 extension AnimEditorFrameVC {
     
     enum Tool {
@@ -45,7 +48,7 @@ class AnimEditorFrameVC: UIViewController {
     
     private let bodyView = AnimEditorFrameView()
     
-    private let toolbarVC = AnimEditorFrameToolbarVC()
+//    private let toolbarVC = AnimEditor2ToolbarVC()
 //    private let controlsVC = AnimEditorFrameControlsVC()
     
     private let toolStateManager = AnimEditorFrameToolStateManager()
@@ -71,9 +74,9 @@ class AnimEditorFrameVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        toolbarVC.delegate = self
+//        toolbarVC.delegate = self
         
-        addChild(toolbarVC, to: bodyView.toolbarContainer)
+//        addChild(toolbarVC, to: bodyView.toolbarContainer)
 //        addChild(controlsVC, to: bodyView.contentContainer)
         
         setSelectedTool(.paint)
@@ -84,57 +87,57 @@ class AnimEditorFrameVC: UIViewController {
     private func setSelectedTool(
         _ selectedTool: Tool
     ) {
-        toolbarVC.update(selectedTool: selectedTool)
+//        toolbarVC.update(selectedTool: selectedTool)
 //        controlsVC.update(selectedTool: selectedTool)
     }
     
     // MARK: - Interface
     
-    func update(
-        projectState: ProjectEditManager.State
-    ) {
-        toolbarVC.update(
-            projectState: projectState)
-    }
-    
-    var contentAreaView: UIView {
-        bodyView.contentContainer
-    }
-    
-    var selectedTool: Tool? {
-        toolbarVC.selectedTool
-    }
+//    func update(
+//        projectState: ProjectEditManager.State
+//    ) {
+//        toolbarVC.update(
+//            projectState: projectState)
+//    }
+//    
+//    var contentAreaView: UIView {
+//        bodyView.contentContainer
+//    }
+//    
+//    var selectedTool: Tool? {
+//        toolbarVC.selectedTool
+//    }
     
 }
 
 // MARK: - Delegates
 
-extension AnimEditorFrameVC:
-    AnimEditorFrameToolbarVC.Delegate {
-    
-    func onSelectBack(_ vc: AnimEditorFrameToolbarVC) {
-        delegate?.onSelectBack(self)
-    }
-    
-    func onSelectUndo(_ vc: AnimEditorFrameToolbarVC) {
-        delegate?.onRequestUndo(self)
-    }
-    
-    func onSelectRedo(_ vc: AnimEditorFrameToolbarVC) {
-        delegate?.onRequestRedo(self)
-    }
-    
-    func onSelectTool(
-        _ vc: AnimEditorFrameToolbarVC,
-        tool: AnimEditorFrameVC.Tool,
-        isAlreadySelected: Bool
-    ) {
+//extension AnimEditorFrameVC:
+//    AnimEditor2ToolbarVC.Delegate {
+//    
+//    func onSelectBack(_ vc: AnimEditor2ToolbarVC) {
+//        delegate?.onSelectBack(self)
+//    }
+//    
+//    func onSelectUndo(_ vc: AnimEditor2ToolbarVC) {
+//        delegate?.onRequestUndo(self)
+//    }
+//    
+//    func onSelectRedo(_ vc: AnimEditor2ToolbarVC) {
+//        delegate?.onRequestRedo(self)
+//    }
+//    
+//    func onSelectTool(
+//        _ vc: AnimEditor2ToolbarVC,
+//        tool: AnimEditorFrameVC.Tool,
+//        isAlreadySelected: Bool
+//    ) {
 //        if isAlreadySelected {
 //            controlsVC.showExpandedToolControls()
 //        } else {
 //            controlsVC.update(selectedTool: tool)
 //            delegate?.onSelectTool(self, tool: tool)
 //        }
-    }
-    
-}
+//    }
+//    
+//}
