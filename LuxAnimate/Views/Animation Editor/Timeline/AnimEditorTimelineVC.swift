@@ -19,21 +19,27 @@ extension AnimEditorTimelineVC {
         func onSelectPlayPause(
             _ vc: AnimEditorTimelineVC)
         
-        func onRequestCreateDrawing(
-            _ vc: AnimEditorTimelineVC,
-            frameIndex: Int)
+        // TODO: Replace these with a single onRequestEdit
+        // method. Create scene edit objects inside here,
+        // instead of relying on the parent. Need to modify
+        // AnimEditorEditBuilder. Maybe specialize it for
+        // the timeline vc.
         
-        func onRequestDeleteDrawing(
-            _ vc: AnimEditorTimelineVC,
-            frameIndex: Int)
-        
-        func onRequestInsertSpacing(
-            _ vc: AnimEditorTimelineVC,
-            frameIndex: Int)
-        
-        func onRequestRemoveSpacing(
-            _ vc: AnimEditorTimelineVC,
-            frameIndex: Int)
+//        func onRequestCreateDrawing(
+//            _ vc: AnimEditorTimelineVC,
+//            frameIndex: Int)
+//        
+//        func onRequestDeleteDrawing(
+//            _ vc: AnimEditorTimelineVC,
+//            frameIndex: Int)
+//        
+//        func onRequestInsertSpacing(
+//            _ vc: AnimEditorTimelineVC,
+//            frameIndex: Int)
+//        
+//        func onRequestRemoveSpacing(
+//            _ vc: AnimEditorTimelineVC,
+//            frameIndex: Int)
         
         func pendingAssetData(
             _ vc: AnimEditorTimelineVC,
@@ -219,8 +225,9 @@ extension AnimEditorTimelineVC:
     ) {
         let frame = timelineModel.frames[frameIndex]
         if !frame.hasDrawing {
-            delegate?.onRequestCreateDrawing(self,
-                frameIndex: frameIndex)
+            // TODO: Apply edit
+//            delegate?.onRequestCreateDrawing(self,
+//                frameIndex: frameIndex)
         }
     }
     
@@ -270,32 +277,36 @@ extension AnimEditorTimelineVC:
         _ v: AnimEditorTimelineFrameMenuView,
         frameIndex: Int
     ) {
-        delegate?.onRequestCreateDrawing(self,
-            frameIndex: frameIndex)
+        // TODO: Apply edit
+//        delegate?.onRequestCreateDrawing(self,
+//            frameIndex: frameIndex)
     }
     
     func onSelectDeleteDrawing(
         _ v: AnimEditorTimelineFrameMenuView,
         frameIndex: Int
     ) {
-        delegate?.onRequestDeleteDrawing(self,
-            frameIndex: frameIndex)
+        // TODO: Apply edit
+//        delegate?.onRequestDeleteDrawing(self,
+//            frameIndex: frameIndex)
     }
     
     func onSelectInsertSpacing(
         _ v: AnimEditorTimelineFrameMenuView,
         frameIndex: Int
     ) {
-        delegate?.onRequestInsertSpacing(self,
-            frameIndex: frameIndex)
+        // TODO: Apply edit
+//        delegate?.onRequestInsertSpacing(self,
+//            frameIndex: frameIndex)
     }
     
     func onSelectRemoveSpacing(
         _ v: AnimEditorTimelineFrameMenuView,
         frameIndex: Int
     ) {
-        delegate?.onRequestRemoveSpacing(self,
-            frameIndex: frameIndex)
+        // TODO: Apply edit
+//        delegate?.onRequestRemoveSpacing(self,
+//            frameIndex: frameIndex)
     }
     
 }

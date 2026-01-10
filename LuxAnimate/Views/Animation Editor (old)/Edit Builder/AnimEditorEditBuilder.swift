@@ -4,6 +4,13 @@
 
 import Foundation
 
+// TODO: Should this object have a delegate callback?
+// Or should it just return an edit object? Probably the
+// latter.
+
+// We don't need the edit context anymore, so we can remove
+// that here.
+
 extension AnimEditorEditBuilder {
     
     @MainActor

@@ -6,6 +6,11 @@ import UIKit
 
 extension AnimEditor2ToolbarVC {
     
+    enum Tool {
+        case paint
+        case erase
+    }
+    
     @MainActor
     protocol Delegate: AnyObject {
         func onSelectBack(_ vc: AnimEditor2ToolbarVC)
@@ -17,11 +22,6 @@ extension AnimEditor2ToolbarVC {
             _ vc: AnimEditor2ToolbarVC,
             tool: Tool,
             isAlreadySelected: Bool)
-    }
-        
-    enum Tool {
-        case paint
-        case erase
     }
     
 }
@@ -54,12 +54,10 @@ class AnimEditor2ToolbarVC: UIViewController {
     // MARK: - Interface
     
     func update(
-        projectState: ProjectEditManager.State
+        viewModel vm: AnimEditorContentViewModel
     ) {
-        let undoEnabled =
-            projectState.availableUndoCount > 0
-        let redoEnabled =
-            projectState.availableRedoCount > 0
+        let undoEnabled = vm.availableUndoCount > 0
+        let redoEnabled = vm.availableRedoCount > 0
         
         bodyView.update(
             undoEnabled: undoEnabled,

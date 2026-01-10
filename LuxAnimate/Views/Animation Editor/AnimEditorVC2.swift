@@ -42,14 +42,8 @@ class AnimEditorVC2: UIViewController {
     private let bodyView = AnimEditorView2()
     
     private let workspaceVC = EditorWorkspaceVC()
-    
     private let toolbarVC: AnimEditor2ToolbarVC
     private let timelineVC: AnimEditorTimelineVC
-    
-    // TODO: Do we need a frame vc? Maybe all frame editing
-    // logic should live in a non-view object, like
-    // AnimFrameEditor.
-//    private let frameVC: AnimEditorFrameVC
     
     // MARK: - State
     
@@ -57,26 +51,19 @@ class AnimEditorVC2: UIViewController {
     private let sceneID: String
     private let layerID: String
     
-    // TODO: Reevaluate this. Should maybe be a view model,
-    // with a bit less data.
-//    private var state: AnimEditorState
+    private var contentViewModel: AnimEditorContentViewModel
+    private var focusedFrameIndex: Int
     
-    // TODO: Create tool state machine to manage this
-//    private var toolState: AnimEditorToolState?
+    // TODO: Onion skin settings
     
-//    private var frameEditor: AnimFrameEditor?
+    // TODO: Tool state machine
+    // TODO: Frame editor
     
-    // This makes sense here.
     private let assetLoader: AnimEditorAssetLoader
     
-    // Should this be here, or in the frame editor? And the
-    // frame editor passes complete edit objects to us? See
-    // comments below. I don't think this class should have
-    // to know about all the possible types of edits that
-    // can happen. There will only be more and more.
+    // TODO: Put this in the frame editor and timeline vc.
 //    private let editBuilder = AnimEditorEditBuilder()
     
-    // This can stay.
     private let displayLink = WrappedDisplayLink()
     
     // MARK: - Delegate
@@ -97,23 +84,26 @@ class AnimEditorVC2: UIViewController {
         self.projectID = projectID
         self.sceneID = sceneID
         self.layerID = layerID
-        
+
+        self.focusedFrameIndex = focusedFrameIndex
+
         toolbarVC = AnimEditor2ToolbarVC()
         
         timelineVC = AnimEditorTimelineVC(
             projectID: projectID)
         
-//        frameVC = AnimEditorFrameVC()
+        // TODO: Clamp focused frame index to valid range.
+        // Should we pull this logic into a helper function?
+        // We'll be doing the same thing in update().
+        contentViewModel = try AnimEditorContentViewModel(
+            projectID: projectID,
+            layerID: layerID,
+            projectManifest: projectState.projectManifest,
+            sceneManifest: sceneManifest,
+            availableUndoCount: projectState.availableUndoCount,
+            availableRedoCount: projectState.availableRedoCount)
         
-//        state = try AnimEditorState(
-//            projectID: projectID,
-//            layerID: layerID,
-//            projectState: projectState,
-//            sceneManifest: sceneManifest,
-//            focusedFrameIndex: focusedFrameIndex,
-//            onionSkinOn: false,
-//            onionSkinConfig: AppConfig.onionSkinConfig,
-//            selectedTool: .paint)
+        self.focusedFrameIndex = focusedFrameIndex
         
         assetLoader = AnimEditorAssetLoader(
             projectID: projectID)
@@ -126,7 +116,6 @@ class AnimEditorVC2: UIViewController {
         timelineVC.delegate = self
         
         assetLoader.delegate = self
-//        editBuilder.delegate = self
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -143,7 +132,7 @@ class AnimEditorVC2: UIViewController {
         setupUI()
         setupDisplayLink()
         
-        setInitialState()
+        setupInitialState()
     }
     
     override var prefersStatusBarHidden: Bool { true }
@@ -174,7 +163,12 @@ class AnimEditorVC2: UIViewController {
     
     // MARK: - State
     
-    private func setInitialState() {
+    private func setupInitialState() {
+        // TODO: Set up initial tool state
+        
+        // Pass initial state to toolbar, timeline,
+        // frame editor
+        
 //        toolbarVC.update(
 //            projectState: state.projectState)
 //        toolbarVC.update(
@@ -194,23 +188,29 @@ class AnimEditorVC2: UIViewController {
 //        updateFrameEditor()
         
         // TESTING
-        setInitialSceneGraph()
+        setupTestSceneGraph()
     }
     
-    private func setInitialSceneGraph() {
+    private func setupTestSceneGraph() {
+        let layer = EditorWorkspaceSceneGraph.Layer(
+            content: .rect(.init(color: .white)),
+            contentSize: contentSize,
+            transform: .identity,
+            alpha: 1)
+        
         let sceneGraph = EditorWorkspaceSceneGraph(
             contentSize: contentSize,
-            layers: [
-                .init(
-                    content: .rect(.init(color: .white)),
-                    contentSize: contentSize,
-                    transform: .identity,
-                    alpha: 1)
-            ])
+            layers: [layer])
         
         workspaceVC.setSceneGraph(sceneGraph)
     }
     
+    // Shouldn't need all this anymore. We'll have separate
+    // paths for updating viewmodel, tool state, and onion
+    // skin settings. No need to check for "changes". And
+    // no need to check where the update originated from -
+    // child view controllers will account for that with
+    // internal flags when they propagate updates.
     /*
     private func applyStateUpdate(
         update: AnimEditorState.Update,
@@ -260,55 +260,6 @@ class AnimEditorVC2: UIViewController {
     }
      */
     
-    // MARK: - Tool State
-    
-//    private func updateToolState(
-//        selectedTool: AnimEditorState.Tool
-//    ) {
-//        switch selectedTool {
-//        case .paint: enterToolState(AnimEditorPaintToolState())
-//        case .erase: enterToolState(AnimEditorEraseToolState())
-//        }
-//    }
-//    
-//    private func enterToolState(
-//        _ newToolState: AnimEditorToolState
-//    ) {
-//        toolState?.endState(
-//            workspaceVC: workspaceVC,
-//            workspaceControlsVC: workspaceControlsVC)
-//        
-//        toolState = newToolState
-//        
-//        newToolState.beginState(
-//            workspaceVC: workspaceVC,
-//            workspaceControlsVC: workspaceControlsVC)
-//    }
-    
-    // MARK: - Frame Editor
-    
-    /*
-    private func updateFrameEditor() {
-        guard let toolState else { return }
-        
-        let frameEditor = AnimFrameEditor()
-//        frameEditor.delegate = self
-        self.frameEditor = frameEditor
-        
-        let onionSkinConfig: AnimEditorOnionSkinConfig? =
-            state.onionSkinOn ? state.onionSkinConfig : nil
-        
-        frameEditor.begin(
-            projectManifest: state.projectState.projectManifest,
-            sceneManifest: state.sceneManifest,
-            layer: state.layer,
-            layerContent: state.layerContent,
-            frameIndex: state.focusedFrameIndex,
-            onionSkinConfig: onionSkinConfig,
-            editorToolState: toolState)
-    }
-     */
-    
     // MARK: - Frame
     
     private func onFrame() {
@@ -328,27 +279,22 @@ class AnimEditorVC2: UIViewController {
         sceneManifest: Scene.Manifest,
         editContext: Sendable?
     ) {
-        /*
-        let fromFrameEditor: Bool =
-            if let context = editContext
-                as? AnimEditorVCEditContext2,
-                context.sender == self,
-                context.isFromFrameEditor
-            { true } else { false }
+        // We don't care about edit context anymore.
+        // The child view controllers will manage that.
         
-        do {
-            let update = try state.update(
-                projectState: projectState,
-                sceneManifest: sceneManifest)
-            
-            applyStateUpdate(
-                update: update,
-                fromFrameEditor: fromFrameEditor)
-            
-        } catch {
-            dismiss()
-        }
-         */
+        // When we receive an update, we should update our
+        // own state and pass it to all children.
+        
+        // I also don't think we need this "update" method
+        // on the state/viewmodel. We can just regenerate it
+        // from scratch. Because the focusedFrameIndex and
+        // onion skin options are factored out of the
+        // content viewmodel now, their updates should
+        // happen through different paths.
+        
+        // TODO: Generate content viewmodel from input.
+        // If generation fails, dismiss this view.
+        // Pass updated viewmodel to children.
     }
     
 }
@@ -371,7 +317,6 @@ extension AnimEditorVC2: AnimEditor2ToolbarVC.Delegate {
     func onSelectBack(_ vc: AnimEditor2ToolbarVC) {
         dismiss()
     }
-    
     func onSelectUndo(_ vc: AnimEditor2ToolbarVC) {
         delegate?.onRequestUndo(self)
     }
@@ -384,47 +329,10 @@ extension AnimEditorVC2: AnimEditor2ToolbarVC.Delegate {
         tool: AnimEditor2ToolbarVC.Tool,
         isAlreadySelected: Bool
     ) {
-        // TODO: Update state machine, update frame editor.
+        // TODO: Update tool state machine, update frame editor.
     }
     
 }
-
-/*
-extension AnimEditorVC2: AnimEditorFrameVC.Delegate {
-    
-    func onSelectBack(_ vc: AnimEditorFrameVC) {
-        dismiss()
-    }
-    
-    func onRequestUndo(_ vc: AnimEditorFrameVC) {
-        delegate?.onRequestUndo(self)
-    }
-    func onRequestRedo(_ vc: AnimEditorFrameVC) {
-        delegate?.onRequestRedo(self)
-    }
-    
-    func onSelectTool(
-        _ vc: AnimEditorFrameVC,
-        tool: AnimEditorFrameVC.Tool
-    ) {
-        // TODO: Handle tool selection
-    }
-    
-    func onRequestSceneEdit(
-        _ vc: AnimEditorFrameVC,
-        sceneEdit: ProjectEditBuilder.SceneEdit,
-        editContext: Sendable?
-    ) { }
-    
-    func pendingEditAsset(
-        _ vc: AnimEditorFrameVC,
-        assetID: String
-    ) -> ProjectEditManager.NewAsset? {
-        nil
-    }
-    
-}
- */
 
 extension AnimEditorVC2: AnimEditorTimelineVC.Delegate {
     
@@ -438,6 +346,10 @@ extension AnimEditorVC2: AnimEditorTimelineVC.Delegate {
         _ vc: AnimEditorTimelineVC,
         _ focusedFrameIndex: Int
     ) {
+        // TODO: Update focused frame index, clamping to
+        // allowed values. Propagate change to child vcs,
+        // including timeline vc.
+        
 //        let update = state.update(
 //            focusedFrameIndex: focusedFrameIndex)
 //        
@@ -450,8 +362,9 @@ extension AnimEditorVC2: AnimEditorTimelineVC.Delegate {
         _ vc: AnimEditorTimelineVC
     ) { }
     
-    // TODO: Consolidate these methods into a single
-    // 'apply edit' method?
+    // TODO: Consolidate these four methods into a single
+    // 'apply edit' method. Timeline vc should be
+    // responsible for creating the edit objects.
     
     func onRequestCreateDrawing(
         _ vc: AnimEditorTimelineVC,
@@ -496,83 +409,6 @@ extension AnimEditorVC2: AnimEditorTimelineVC.Delegate {
         delegate?
             .pendingEditAsset(self, assetID: assetID)?
             .data
-    }
-    
-}
-
-/*
-extension AnimEditorVC2: AnimFrameEditor.Delegate {
-    
-    func workspaceViewSize(
-        _ e: AnimFrameEditor
-    ) -> Size {
-        Size(workspaceVC.view.bounds.size)
-    }
-    
-    func workspaceTransform(
-        _ e: AnimFrameEditor
-    ) -> EditorWorkspaceTransform {
-        workspaceVC.workspaceTransform()
-    }
-    
-    func setAssetLoaderAssetIDs(
-        _ e: AnimFrameEditor,
-        assetIDs: Set<String>
-    ) {
-        assetLoader.update(assetIDs: assetIDs)
-    }
-    
-    func assetLoaderHasLoadedAssets(
-        _ e: AnimFrameEditor,
-        assetIDs: Set<String>
-    ) -> Bool {
-        assetIDs.isSubset(of: assetLoader.loadedAssets.keys)
-    }
-    
-    func assetLoaderAsset(
-        _ e: AnimFrameEditor,
-        assetID: String
-    ) -> AnimEditorAssetLoader.LoadedAsset? {
-        assetLoader.loadedAssets[assetID]
-    }
-    
-    func setEditInteractionEnabled(
-        _ e: AnimFrameEditor,
-        enabled: Bool
-    ) {
-        toolState?.setEditInteractionEnabled(enabled)
-    }
-    
-    func onEdit(
-        _ e: AnimFrameEditor,
-        drawingID: String,
-        imageSet: DrawingAssetProcessor.ImageSet
-    ) {
-        let editContext = AnimEditorVCEditContext2(
-            sender: self,
-            isFromFrameEditor: true)
-        
-        try? editBuilder.editDrawing(
-            state: state,
-            drawingID: drawingID,
-            imageSet: imageSet,
-            editContext: editContext)
-    }
-    
-}
- */
-
-extension AnimEditorVC2: AnimEditorEditBuilder.Delegate {
-    
-    func onRequestSceneEdit(
-        _ b: AnimEditorEditBuilder,
-        sceneEdit: ProjectEditBuilder.SceneEdit,
-        editContext: Sendable?
-    ) {
-        delegate?.onRequestSceneEdit(
-            self,
-            sceneEdit: sceneEdit,
-            editContext: editContext)
     }
     
 }

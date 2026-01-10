@@ -7,9 +7,9 @@ import UIKit
 class AnimEditorView2: UIView {
     
     let workspaceContainer = UIView()
-    
     let toolbarContainer = UIView()
     let timelineContainer = UIView()
+    
     let workspaceSafeAreaView = PassthroughView()
     
     init() {
@@ -27,7 +27,6 @@ class AnimEditorView2: UIView {
         
         addSubview(workspaceSafeAreaView)
         workspaceSafeAreaView.pinEdges(.horizontal)
-        
         workspaceSafeAreaView.pin(
             .top, to: toolbarContainer, toAnchor: .bottom)
         workspaceSafeAreaView.pin(
