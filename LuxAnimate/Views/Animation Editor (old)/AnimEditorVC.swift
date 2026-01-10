@@ -93,7 +93,7 @@ class AnimEditorVC: UIViewController {
         timelineVC.delegate = self
         
         assetLoader.delegate = self
-        editBuilder.delegate = self
+//        editBuilder.delegate = self
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -398,36 +398,36 @@ extension AnimEditorVC: AnimEditorTimelineVC.Delegate {
         _ vc: AnimEditorTimelineVC,
         frameIndex: Int
     ) {
-        try? editBuilder.createDrawing(
-            state: state,
-            frameIndex: frameIndex)
+//        try? editBuilder.createDrawing(
+//            state: state,
+//            frameIndex: frameIndex)
     }
     
     func onRequestDeleteDrawing(
         _ vc: AnimEditorTimelineVC,
         frameIndex: Int
     ) {
-        try? editBuilder.deleteDrawing(
-            state: state,
-            frameIndex: frameIndex)
+//        try? editBuilder.deleteDrawing(
+//            state: state,
+//            frameIndex: frameIndex)
     }
     
     func onRequestInsertSpacing(
         _ vc: AnimEditorTimelineVC,
         frameIndex: Int
     ) {
-        try? editBuilder.insertSpacing(
-            state: state,
-            frameIndex: frameIndex)
+//        try? editBuilder.insertSpacing(
+//            state: state,
+//            frameIndex: frameIndex)
     }
     
     func onRequestRemoveSpacing(
         _ vc: AnimEditorTimelineVC,
         frameIndex: Int
     ) {
-        try? editBuilder.removeSpacing(
-            state: state,
-            frameIndex: frameIndex)
+//        try? editBuilder.removeSpacing(
+//            state: state,
+//            frameIndex: frameIndex)
     }
     
     func pendingAssetData(
@@ -488,26 +488,26 @@ extension AnimEditorVC: AnimFrameEditor.Delegate {
         drawingID: String,
         imageSet: DrawingAssetProcessor.ImageSet
     ) {
-        try? editBuilder.editDrawing(
-            state: state,
-            drawingID: drawingID,
-            imageSet: imageSet)
+//        try? editBuilder.editDrawing(
+//            state: state,
+//            drawingID: drawingID,
+//            imageSet: imageSet)
     }
     
 }
 
-extension AnimEditorVC: AnimEditorEditBuilder.Delegate {
-    
-    func onRequestSceneEdit(
-        _ b: AnimEditorEditBuilder,
-        sceneEdit: ProjectEditBuilder.SceneEdit
-    ) {
-        delegate?.onRequestSceneEdit(
-            self,
-            sceneEdit: sceneEdit)
-    }
-    
-}
+//extension AnimEditorVC: AnimEditorEditBuilder.Delegate {
+//    
+//    func onRequestSceneEdit(
+//        _ b: AnimEditorEditBuilder,
+//        sceneEdit: ProjectEditBuilder.SceneEdit
+//    ) {
+//        delegate?.onRequestSceneEdit(
+//            self,
+//            sceneEdit: sceneEdit)
+//    }
+//    
+//}
 
 extension AnimEditorVC: AnimEditorAssetLoader.Delegate {
     
