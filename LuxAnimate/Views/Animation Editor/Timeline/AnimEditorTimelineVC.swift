@@ -71,13 +71,7 @@ class AnimEditorTimelineVC: UIViewController {
         super.viewDidLoad()
         
         setupUI()
-        
-        // TODO: Handle initial data update
-        // Maybe we use the same code path as responding to
-        // an update from the parent? Need to update UI etc.
-        
-//        update(timelineModel: timelineModel)
-//        update(focusedFrameIndex: focusedFrameIndex)
+        setupInitialState()
     }
     
     // MARK: - Setup
@@ -94,9 +88,16 @@ class AnimEditorTimelineVC: UIViewController {
         drawerVC.setExpanded(false, animated: false)
     }
     
+    private func setupInitialState() {
+        update(contentViewModel: contentViewModel)
+        update(focusedFrameIndex: focusedFrameIndex)
+    }
+    
     // MARK: - Menu
     
     private func showFrameMenu(frameIndex: Int) {
+        // Does this belong here? Feels more... UI level.
+        // Not business logic. Maybe should split concerns.
         guard let cell = trackVC.cell(at: frameIndex)
         else { return }
         
@@ -198,11 +199,8 @@ class AnimEditorTimelineVC: UIViewController {
     ) {
         self.contentViewModel = contentViewModel
         
-        // Maybe these methods should both take a timeline
-        // model. Easier than picking data out at this level
-        
-//        toolbarVC.setFrameCount(timelineModel.frames.count)
-//        trackVC.setTimelineModel(timelineModel)
+        toolbarVC.update(timelineViewModel: contentViewModel.timelineViewModel)
+        trackVC.update(timelineViewModel: contentViewModel.timelineViewModel)
     }
     
     func update(
@@ -210,9 +208,8 @@ class AnimEditorTimelineVC: UIViewController {
     ) {
         self.focusedFrameIndex = focusedFrameIndex
         
-        // Rename set to update here, for consistency?
-        toolbarVC.setFocusedFrameIndex(focusedFrameIndex)
-        trackVC.setFocusedFrameIndex(focusedFrameIndex)
+        toolbarVC.update(focusedFrameIndex: focusedFrameIndex)
+        trackVC.update(focusedFrameIndex: focusedFrameIndex)
     }
     
     func setExpanded(_ expanded: Bool) {
@@ -248,11 +245,6 @@ extension AnimEditorTimelineVC:
         _ vc: AnimEditorTimelineToolbarVC,
         _ focusedFrameIndex: Int
     ) {
-        self.focusedFrameIndex = focusedFrameIndex
-        trackVC.setFocusedFrameIndex(focusedFrameIndex)
-        
-        // TODO: Set a flag before and after this call to
-        // ignore reentrant updates to focusedFrameIndex.
         delegate?.onChangeFocusedFrameIndex(
             self, focusedFrameIndex)
     }
@@ -263,7 +255,7 @@ extension AnimEditorTimelineVC:
         delegate?.onSelectPlayPause(self)
     }
     
-    func onSelectToggleExpanded(
+    func onSelectExpandToggle(
         _ vc: AnimEditorTimelineToolbarVC
     ) {
         drawerVC.toggleExpanded()
@@ -274,20 +266,15 @@ extension AnimEditorTimelineVC:
 extension AnimEditorTimelineVC:
     AnimEditorTimelineTrackVC.Delegate {
     
-    func onBeginFrameScroll(_ vc: AnimEditorTimelineTrackVC) {
-//        delegate?.onBeginFrameScroll(self)
-    }
-    func onEndFrameScroll(_ vc: AnimEditorTimelineTrackVC) {
-//        delegate?.onEndFrameScroll(self)
-    }
+    func onBeginFrameScroll(
+        _ vc: AnimEditorTimelineTrackVC) { }
+    func onEndFrameScroll(
+        _ vc: AnimEditorTimelineTrackVC) { }
     
     func onChangeFocusedFrameIndex(
         _ vc: AnimEditorTimelineTrackVC,
         _ focusedFrameIndex: Int
     ) {
-        self.focusedFrameIndex = focusedFrameIndex
-        toolbarVC.setFocusedFrameIndex(focusedFrameIndex)
-        
         delegate?.onChangeFocusedFrameIndex(
             self, focusedFrameIndex)
     }

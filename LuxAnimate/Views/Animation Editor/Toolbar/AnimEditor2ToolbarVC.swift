@@ -54,7 +54,7 @@ class AnimEditor2ToolbarVC: UIViewController {
     // MARK: - Interface
     
     func update(
-        viewModel vm: AnimEditorContentViewModel
+        contentViewModel vm: AnimEditorContentViewModel
     ) {
         let undoEnabled = vm.availableUndoCount > 0
         let redoEnabled = vm.availableRedoCount > 0

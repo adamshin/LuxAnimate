@@ -90,8 +90,6 @@ class AnimEditorVC2: UIViewController {
             availableUndoCount: projectState.availableUndoCount,
             availableRedoCount: projectState.availableRedoCount)
         
-        self.focusedFrameIndex = focusedFrameIndex
-        
         toolbarVC = AnimEditor2ToolbarVC()
         
         timelineVC = AnimEditorTimelineVC(
@@ -127,6 +125,7 @@ class AnimEditorVC2: UIViewController {
         setupDisplayLink()
         
         setupInitialState()
+        setupTestSceneGraph()
     }
     
     override var prefersStatusBarHidden: Bool { true }
@@ -155,34 +154,8 @@ class AnimEditorVC2: UIViewController {
         }
     }
     
-    // MARK: - State
-    
     private func setupInitialState() {
-        // TODO: Set up initial tool state
-        
-        // Pass initial state to toolbar, timeline,
-        // frame editor
-        
-//        toolbarVC.update(
-//            projectState: state.projectState)
-//        toolbarVC.update(
-//            selectedTool: state.selectedTool)
-        
-//        timelineVC.update(
-//            timelineModel: state.timelineModel)
-//        timelineVC.update(
-//            focusedFrameIndex: state.focusedFrameIndex)
-        
-//        frameVC.update(
-//            projectState: state.projectState)
-        
-//        updateToolState(
-//            selectedTool: state.selectedTool)
-        
-//        updateFrameEditor()
-        
-        // TESTING
-        setupTestSceneGraph()
+        toolbarVC.update(contentViewModel: contentViewModel)
     }
     
     private func setupTestSceneGraph() {
@@ -199,60 +172,19 @@ class AnimEditorVC2: UIViewController {
         workspaceVC.setSceneGraph(sceneGraph)
     }
     
-    // Shouldn't need all this anymore. We'll have separate
-    // paths for updating viewmodel, tool state, and onion
-    // skin settings. No need to check for "changes". And
-    // no need to check where the update originated from -
-    // child view controllers will account for that with
-    // internal flags when they propagate updates.
-    /*
-    private func applyStateUpdate(
-        update: AnimEditorState.Update,
-        fromFrameEditor: Bool = false,
-        fromTimeline: Bool = false
-    ) {
-        let state = update.state
-        let changes = update.changes
+    // MARK: - Internal State
+    
+    private func internalSetFocusedFrameIndex(_ i: Int) {
+        let frameCount =
+            contentViewModel.sceneManifest.frameCount
         
-        self.state = state
+        focusedFrameIndex = clamp(i,
+            min: 0,
+            max: frameCount - 1)
         
-        if changes.projectState {
-            frameVC.update(
-                projectState: state.projectState)
-        }
-        if changes.selectedTool {
-//            toolbarVC.update(
-//                selectedTool: state.selectedTool)
-        }
-        if changes.onionSkin {
-//            toolbarVC.update(
-//                onionSkinOn: state.onionSkinOn)
-        }
-        
-        if !fromTimeline, changes.timelineModel {
-            timelineVC.update(
-                timelineModel: state.timelineModel)
-        }
-        if !fromTimeline, changes.focusedFrameIndex {
-            timelineVC.update(
-                focusedFrameIndex: state.focusedFrameIndex)
-        }
-        
-        if changes.selectedTool {
-//            updateToolState(
-//                selectedTool: state.selectedTool)
-        }
-        
-        if !fromFrameEditor,
-            changes.projectState ||
-            changes.focusedFrameIndex ||
-            changes.onionSkin ||
-            changes.selectedTool
-        {
-            updateFrameEditor()
-        }
+        timelineVC.update(
+            focusedFrameIndex: focusedFrameIndex)
     }
-     */
     
     // MARK: - Frame
     
@@ -272,21 +204,29 @@ class AnimEditorVC2: UIViewController {
         projectState: ProjectEditManager.State,
         sceneManifest: Scene.Manifest
     ) {
-        // When we receive an update, we should update our
-        // own state and pass it to all children.
-        
-        // I also don't think we need an "update" method
-        // on the state/viewmodel. We can just regenerate it
-        // from scratch. Because the focusedFrameIndex and
-        // onion skin options are factored out of the
-        // content viewmodel now, their updates should
-        // happen through different paths. Changes to those
-        // will be triggered from below, not from above, and
-        // won't need a public "update" method.
-        
-        // TODO: Generate content viewmodel from input.
-        // If generation fails, dismiss this view.
-        // Pass updated viewmodel to children.
+        do {
+            contentViewModel = try AnimEditorContentViewModel(
+                projectManifest: projectState.projectManifest,
+                sceneManifest: sceneManifest,
+                layerID: layerID,
+                availableUndoCount: projectState.availableUndoCount,
+                availableRedoCount: projectState.availableRedoCount)
+            
+            let frameCount =
+                contentViewModel.sceneManifest.frameCount
+            
+            focusedFrameIndex = clamp(focusedFrameIndex,
+                min: 0,
+                max: frameCount - 1)
+            
+            toolbarVC.update(contentViewModel: contentViewModel)
+            timelineVC.update(contentViewModel: contentViewModel)
+            
+            timelineVC.update(focusedFrameIndex: focusedFrameIndex)
+            
+        } catch {
+            dismiss()
+        }
     }
     
 }
@@ -338,16 +278,7 @@ extension AnimEditorVC2: AnimEditorTimelineVC.Delegate {
         _ vc: AnimEditorTimelineVC,
         _ focusedFrameIndex: Int
     ) {
-        // TODO: Update focused frame index, clamping to
-        // allowed values. Propagate change to child vcs,
-        // including timeline vc.
-        
-//        let update = state.update(
-//            focusedFrameIndex: focusedFrameIndex)
-//        
-//        applyStateUpdate(
-//            update: update,
-//            fromTimeline: true)
+        internalSetFocusedFrameIndex(focusedFrameIndex)
     }
     
     func onSelectPlayPause(

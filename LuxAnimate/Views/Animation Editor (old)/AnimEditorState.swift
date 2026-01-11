@@ -34,7 +34,7 @@ struct AnimEditorState {
     
     var selectedTool: Tool
     
-    var timelineModel: AnimEditorTimelineModel
+//    var timelineModel: AnimEditorTimelineModel
     
 }
 
@@ -80,10 +80,10 @@ extension AnimEditorState {
                 focusedFrameIndex: focusedFrameIndex,
                 sceneManifest: sceneManifest)
         
-        let timelineModel = AnimEditorTimelineModel.generate(
-            projectID: projectID,
-            sceneManifest: sceneManifest,
-            layerContent: layerContent)
+//        let timelineModel = AnimEditorTimelineModel.generate(
+//            projectID: projectID,
+//            sceneManifest: sceneManifest,
+//            layerContent: layerContent)
         
         self.projectID = projectID
         self.layerID = layerID
@@ -94,7 +94,7 @@ extension AnimEditorState {
         self.focusedFrameIndex = focusedFrameIndex
         self.onionSkinOn = onionSkinOn
         self.onionSkinConfig = onionSkinConfig
-        self.timelineModel = timelineModel
+//        self.timelineModel = timelineModel
         self.selectedTool = selectedTool
     }
     
@@ -126,10 +126,10 @@ extension AnimEditorState {
                 focusedFrameIndex: focusedFrameIndex,
                 sceneManifest: sceneManifest)
         
-        let timelineModel = AnimEditorTimelineModel.generate(
-            projectID: projectID,
-            sceneManifest: sceneManifest,
-            layerContent: layerContent)
+//        let timelineModel = AnimEditorTimelineModel.generate(
+//            projectID: projectID,
+//            sceneManifest: sceneManifest,
+//            layerContent: layerContent)
         
         var state = self
         state.projectState = projectState
@@ -137,7 +137,7 @@ extension AnimEditorState {
         state.layer = layer
         state.layerContent = layerContent
         state.focusedFrameIndex = focusedFrameIndex
-        state.timelineModel = timelineModel
+//        state.timelineModel = timelineModel
         
         let changes = Changes(
             projectState: true,

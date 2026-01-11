@@ -114,7 +114,7 @@ class AnimEditorTimelineTrackCell: UICollectionViewCell {
     // MARK: - Interface
     
     func updateContent(
-        frame: AnimEditorTimelineModel.Frame
+        frame: AnimEditorTimelineViewModel.Frame
     ) {
         if frame.hasDrawing {
             imageView.backgroundColor = canvasBackgroundColor

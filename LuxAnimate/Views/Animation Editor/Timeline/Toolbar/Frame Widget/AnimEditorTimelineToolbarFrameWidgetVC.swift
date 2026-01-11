@@ -30,12 +30,17 @@ class AnimEditorTimelineToolbarFrameWidgetVC: UIViewController {
         addChild(controlVC, to: view)
     }
     
-    func setFrameCount(_ frameCount: Int) {
-        controlVC.setFrameCount(frameCount)
+    func update(
+        timelineViewModel: AnimEditorTimelineViewModel
+    ) {
+        controlVC.setFrameCount(
+            timelineViewModel.frames.count)
     }
     
-    func setFocusedFrameIndex(_ index: Int) {
-        controlVC.setFocusedFrameIndex(index)
+    func update(
+        focusedFrameIndex: Int
+    ) {
+        controlVC.setFocusedFrameIndex(focusedFrameIndex)
     }
     
 }

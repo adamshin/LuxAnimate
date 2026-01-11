@@ -65,7 +65,7 @@ class AnimEditorTimelineToolbarView: UIView {
         return button
     }()
     
-    let expandButton = {
+    let expandToggleButton = {
         let button = UIButton(type: .system)
         button.tintColor = .editorLabel
         button.pinWidth(to: buttonWidth)
@@ -109,7 +109,7 @@ class AnimEditorTimelineToolbarView: UIView {
         rightStack.pinEdges(.vertical)
         rightStack.pinEdges(.trailing, padding: padding)
         
-        rightStack.addArrangedSubview(expandButton)
+        rightStack.addArrangedSubview(expandToggleButton)
         
         setExpanded(false)
     }
@@ -120,7 +120,7 @@ class AnimEditorTimelineToolbarView: UIView {
         let image = expanded ?
             expandButtonExpandedImage :
             expandButtonCollapsedImage
-        expandButton.setImage(image, for: .normal)
+        expandToggleButton.setImage(image, for: .normal)
     }
     
     func setPlayButtonPlaying(_ playing: Bool) {
