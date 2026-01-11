@@ -28,7 +28,7 @@ class AnimEditorVC: UIViewController {
     private let bodyView = AnimEditorView()
     
     private let workspaceVC = EditorWorkspaceVC()
-    private let toolbarVC = AnimEditorToolbarVC()
+//    private let toolbarVC = AnimEditorToolbarVC()
 //    private let toolControlsVC = AnimEditorToolControlsVC()
     
 //    private let timelineVC: AnimEditorTimelineVC
@@ -89,7 +89,7 @@ class AnimEditorVC: UIViewController {
         modalPresentationStyle = .fullScreen
         
         workspaceVC.delegate = self
-        toolbarVC.delegate = self
+//        toolbarVC.delegate = self
 //        timelineVC.delegate = self
         
         assetLoader.delegate = self
@@ -118,8 +118,8 @@ class AnimEditorVC: UIViewController {
     // MARK: - Setup
     
     private func setupUI() {
-        addChild(workspaceVC, to: bodyView.workspaceContainer)
-        addChild(toolbarVC, to: bodyView.toolbarContainer)
+//        addChild(workspaceVC, to: bodyView.workspaceContainer)
+//        addChild(toolbarVC, to: bodyView.toolbarContainer)
 //        addChild(toolControlsVC, to: bodyView.toolControlsContainer)
         
         // TODO: Proper view structure
@@ -135,12 +135,12 @@ class AnimEditorVC: UIViewController {
     // MARK: - State
     
     private func setInitialState() {
-        toolbarVC.update(
-            projectState: state.projectState)
-        toolbarVC.update(
-            selectedTool: state.selectedTool)
-        toolbarVC.update(
-            onionSkinOn: state.onionSkinOn)
+//        toolbarVC.update(
+//            projectState: state.projectState)
+//        toolbarVC.update(
+//            selectedTool: state.selectedTool)
+//        toolbarVC.update(
+//            onionSkinOn: state.onionSkinOn)
         
 //        timelineVC.update(
 //            timelineModel: state.timelineModel)
@@ -163,18 +163,18 @@ class AnimEditorVC: UIViewController {
         
         self.state = state
         
-        if changes.projectState {
-            toolbarVC.update(
-                projectState: state.projectState)
-        }
-        if changes.selectedTool {
-            toolbarVC.update(
-                selectedTool: state.selectedTool)
-        }
-        if changes.onionSkin {
-            toolbarVC.update(
-                onionSkinOn: state.onionSkinOn)
-        }
+//        if changes.projectState {
+//            toolbarVC.update(
+//                projectState: state.projectState)
+//        }
+//        if changes.selectedTool {
+//            toolbarVC.update(
+//                selectedTool: state.selectedTool)
+//        }
+//        if changes.onionSkin {
+//            toolbarVC.update(
+//                onionSkinOn: state.onionSkinOn)
+//        }
         
         if !fromTimeline, changes.timelineModel {
 //            timelineVC.update(
@@ -333,6 +333,7 @@ extension AnimEditorVC: EditorWorkspaceVC.Delegate {
     
 }
 
+/*
 extension AnimEditorVC: AnimEditorToolbarVCDelegate {
     
     func onSelectBack(_ vc: AnimEditorToolbarVC) {
@@ -371,6 +372,7 @@ extension AnimEditorVC: AnimEditorToolbarVCDelegate {
     }
     
 }
+ */
 
 /*
 extension AnimEditorVC: AnimEditorTimelineVC.Delegate {
