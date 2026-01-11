@@ -1,18 +1,18 @@
 //
-//  AnimEditorVC.swift
+//  OldAnimEditorVC.swift
 //
 
 import UIKit
 import Geometry
 
 @MainActor
-protocol AnimEditorVCDelegate: AnyObject {
+protocol OldAnimEditorVCDelegate: AnyObject {
     
-    func onRequestUndo(_ vc: AnimEditorVC)
-    func onRequestRedo(_ vc: AnimEditorVC)
+    func onRequestUndo(_ vc: OldAnimEditorVC)
+    func onRequestRedo(_ vc: OldAnimEditorVC)
     
     func onRequestSceneEdit(
-        _ vc: AnimEditorVC,
+        _ vc: OldAnimEditorVC,
         sceneEdit: ProjectEditBuilder.SceneEdit)
     
     func pendingEditAsset(
@@ -21,11 +21,11 @@ protocol AnimEditorVCDelegate: AnyObject {
     
 }
 
-class AnimEditorVC: UIViewController {
+class OldAnimEditorVC: UIViewController {
     
     // MARK: - View
     
-    private let bodyView = AnimEditorView()
+//    private let bodyView = AnimEditorView()
     
     private let workspaceVC = EditorWorkspaceVC()
 //    private let toolbarVC = AnimEditorToolbarVC()
@@ -39,7 +39,7 @@ class AnimEditorVC: UIViewController {
     private let sceneID: String
     private let layerID: String
     
-    private var state: AnimEditorState
+//    private var state: AnimEditorState
     
     private var toolState: AnimEditorToolState?
     private var frameEditor: AnimFrameEditor?
@@ -52,7 +52,7 @@ class AnimEditorVC: UIViewController {
     
     // MARK: - Delegate
     
-    weak var delegate: AnimEditorVCDelegate?
+//    weak var delegate: AnimEditorVCDelegate?
     
     // MARK: - Init
     
@@ -72,15 +72,15 @@ class AnimEditorVC: UIViewController {
 //        timelineVC = AnimEditorTimelineVC(
 //            projectID: projectID)
         
-        state = try AnimEditorState(
-            projectID: projectID,
-            layerID: layerID,
-            projectState: projectState,
-            sceneManifest: sceneManifest,
-            focusedFrameIndex: focusedFrameIndex,
-            onionSkinOn: false,
-            onionSkinConfig: AppConfig.onionSkinConfig,
-            selectedTool: .paint)
+//        state = try AnimEditorState(
+//            projectID: projectID,
+//            layerID: layerID,
+//            projectState: projectState,
+//            sceneManifest: sceneManifest,
+//            focusedFrameIndex: focusedFrameIndex,
+//            onionSkinOn: false,
+//            onionSkinConfig: AppConfig.onionSkinConfig,
+//            selectedTool: .paint)
         
         assetLoader = AnimEditorAssetLoader(
             projectID: projectID)
@@ -88,11 +88,11 @@ class AnimEditorVC: UIViewController {
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
         
-        workspaceVC.delegate = self
+//        workspaceVC.delegate = self
 //        toolbarVC.delegate = self
 //        timelineVC.delegate = self
         
-        assetLoader.delegate = self
+//        assetLoader.delegate = self
 //        editBuilder.delegate = self
     }
     
@@ -100,9 +100,9 @@ class AnimEditorVC: UIViewController {
     
     // MARK: - Lifecycle
     
-    override func loadView() {
-        self.view = bodyView
-    }
+//    override func loadView() {
+//        self.view = bodyView
+//    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -127,9 +127,9 @@ class AnimEditorVC: UIViewController {
     }
     
     private func setupDisplayLink() {
-        displayLink.setCallback { [weak self] _ in
-            self?.onFrame()
-        }
+//        displayLink.setCallback { [weak self] _ in
+//            self?.onFrame()
+//        }
     }
     
     // MARK: - State
@@ -147,22 +147,22 @@ class AnimEditorVC: UIViewController {
 //        timelineVC.update(
 //            focusedFrameIndex: state.focusedFrameIndex)
         
-        updateToolState(
-            selectedTool: state.selectedTool)
+//        updateToolState(
+//            selectedTool: state.selectedTool)
         
         updateFrameEditor()
     }
     
-    private func applyStateUpdate(
-        update: AnimEditorState.Update,
-        fromFrameEditor: Bool = false,
-        fromTimeline: Bool = false
-    ) {
-        let state = update.state
-        let changes = update.changes
-        
-        self.state = state
-        
+//    private func applyStateUpdate(
+//        update: AnimEditorState.Update,
+//        fromFrameEditor: Bool = false,
+//        fromTimeline: Bool = false
+//    ) {
+//        let state = update.state
+//        let changes = update.changes
+//        
+//        self.state = state
+//        
 //        if changes.projectState {
 //            toolbarVC.update(
 //                projectState: state.projectState)
@@ -175,51 +175,51 @@ class AnimEditorVC: UIViewController {
 //            toolbarVC.update(
 //                onionSkinOn: state.onionSkinOn)
 //        }
-        
-        if !fromTimeline, changes.timelineModel {
+//        
+//        if !fromTimeline, changes.timelineModel {
 //            timelineVC.update(
 //                timelineModel: state.timelineModel)
-        }
-        if !fromTimeline, changes.focusedFrameIndex {
+//        }
+//        if !fromTimeline, changes.focusedFrameIndex {
 //            timelineVC.update(
 //                focusedFrameIndex: state.focusedFrameIndex)
-        }
-        
-        if changes.selectedTool {
-            updateToolState(
-                selectedTool: state.selectedTool)
-        }
-        
-        if !fromFrameEditor,
-            changes.projectState ||
-            changes.focusedFrameIndex ||
-            changes.onionSkin ||
-            changes.selectedTool
-        {
-            updateFrameEditor()
-        }
-    }
+//        }
+//        
+//        if changes.selectedTool {
+//            updateToolState(
+//                selectedTool: state.selectedTool)
+//        }
+//        
+//        if !fromFrameEditor,
+//            changes.projectState ||
+//            changes.focusedFrameIndex ||
+//            changes.onionSkin ||
+//            changes.selectedTool
+//        {
+//            updateFrameEditor()
+//        }
+//    }
     
     // MARK: - Tool State
     
-    private func updateToolState(
-        selectedTool: AnimEditorState.Tool
-    ) {
-        switch selectedTool {
-        case .paint: enterToolState(AnimEditorPaintToolState())
-        case .erase: enterToolState(AnimEditorEraseToolState())
-        }
-    }
+//    private func updateToolState(
+//        selectedTool: AnimEditorState.Tool
+//    ) {
+//        switch selectedTool {
+//        case .paint: enterToolState(AnimEditorPaintToolState())
+//        case .erase: enterToolState(AnimEditorEraseToolState())
+//        }
+//    }
     
-    private func enterToolState(
-        _ newToolState: AnimEditorToolState
-    ) {
+//    private func enterToolState(
+//        _ newToolState: AnimEditorToolState
+//    ) {
 //        toolState?.endState(
 //            workspaceVC: workspaceVC,
 //            toolControlsVC: toolControlsVC)
-        
-        toolState = newToolState
-        
+//        
+//        toolState = newToolState
+//        
 //        newToolState.beginState(
 //            workspaceVC: workspaceVC,
 //            toolControlsVC: toolControlsVC)
@@ -228,23 +228,23 @@ class AnimEditorVC: UIViewController {
     // MARK: - Frame Editor
     
     private func updateFrameEditor() {
-        guard let toolState else { return }
-        
-        let frameEditor = AnimFrameEditor()
-        frameEditor.delegate = self
-        self.frameEditor = frameEditor
-        
-        let onionSkinConfig: AnimEditorOnionSkinConfig? =
-            state.onionSkinOn ? state.onionSkinConfig : nil
-        
-        frameEditor.begin(
-            projectManifest: state.projectState.projectManifest,
-            sceneManifest: state.sceneManifest,
-            layer: state.layer,
-            layerContent: state.layerContent,
-            frameIndex: state.focusedFrameIndex,
-            onionSkinConfig: onionSkinConfig,
-            editorToolState: toolState)
+//        guard let toolState else { return }
+//        
+//        let frameEditor = AnimFrameEditor()
+//        frameEditor.delegate = self
+//        self.frameEditor = frameEditor
+//        
+//        let onionSkinConfig: AnimEditorOnionSkinConfig? =
+//            state.onionSkinOn ? state.onionSkinConfig : nil
+//        
+//        frameEditor.begin(
+//            projectManifest: state.projectState.projectManifest,
+//            sceneManifest: state.sceneManifest,
+//            layer: state.layer,
+//            layerContent: state.layerContent,
+//            frameIndex: state.focusedFrameIndex,
+//            onionSkinConfig: onionSkinConfig,
+//            editorToolState: toolState)
     }
     
     // MARK: - Frame
@@ -267,15 +267,15 @@ class AnimEditorVC: UIViewController {
 //                    sceneGraph: sceneGraph)
 //            }
 //        }
-    }
+//    }
     
     // MARK: - Render
     
-    private func draw(
-        viewportSize: Size,
-        workspaceTransform: EditorWorkspaceTransform,
-        sceneGraph: EditorWorkspaceSceneGraph
-    ) {
+//    private func draw(
+//        viewportSize: Size,
+//        workspaceTransform: EditorWorkspaceTransform,
+//        sceneGraph: EditorWorkspaceSceneGraph
+//    ) {
 //        guard let drawable = workspaceVC
 //            .metalView.metalLayer.nextDrawable()
 //        else { return }
@@ -292,36 +292,36 @@ class AnimEditorVC: UIViewController {
 //        
 //        commandBuffer.present(drawable)
 //        commandBuffer.commit()
-    }
+//    }
     
     // MARK: - Navigation
     
-    private func dismiss() {
-        dismiss(animated: true)
-    }
+//    private func dismiss() {
+//        dismiss(animated: true)
+//    }
     
     // MARK: - Interface
     
-    func update(
-        projectState: ProjectEditManager.State,
-        sceneManifest: Scene.Manifest
-    ) {
-        do {
-            let update = try state.update(
-                projectState: projectState,
-                sceneManifest: sceneManifest)
-
-            applyStateUpdate(update: update)
-
-        } catch {
-            dismiss()
-        }
-    }
+//    func update(
+//        projectState: ProjectEditManager.State,
+//        sceneManifest: Scene.Manifest
+//    ) {
+//        do {
+//            let update = try state.update(
+//                projectState: projectState,
+//                sceneManifest: sceneManifest)
+//
+//            applyStateUpdate(update: update)
+//
+//        } catch {
+//            dismiss()
+//        }
+//    }
     
 }
 
 // MARK: - Delegates
-
+/*
 extension AnimEditorVC: EditorWorkspaceVC.Delegate {
     
     func onSelectUndo(_ vc: EditorWorkspaceVC) {
@@ -332,7 +332,7 @@ extension AnimEditorVC: EditorWorkspaceVC.Delegate {
     }
     
 }
-
+*/
 /*
 extension AnimEditorVC: AnimEditorToolbarVCDelegate {
     
@@ -444,7 +444,7 @@ extension AnimEditorVC: AnimEditorTimelineVC.Delegate {
     
 }
  */
-
+/*
 extension AnimEditorVC: AnimFrameEditor.Delegate {
     
     func workspaceViewSize(
@@ -499,7 +499,7 @@ extension AnimEditorVC: AnimFrameEditor.Delegate {
     }
     
 }
-
+*/
 //extension AnimEditorVC: AnimEditorEditBuilder.Delegate {
 //    
 //    func onRequestSceneEdit(
@@ -513,6 +513,7 @@ extension AnimEditorVC: AnimFrameEditor.Delegate {
 //    
 //}
 
+/*
 extension AnimEditorVC: AnimEditorAssetLoader.Delegate {
     
     func pendingAssetData(
@@ -529,3 +530,4 @@ extension AnimEditorVC: AnimEditorAssetLoader.Delegate {
     }
     
 }
+*/
