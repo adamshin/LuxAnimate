@@ -1,5 +1,5 @@
 //
-//  AnimEditorTimelineToolbarFrameWidgetControlVC.swift
+//  AnimEditorTimelineToolbarFrameWidget.swift
 //
 
 import UIKit
@@ -16,27 +16,11 @@ private let numberFont = UIFont.monospacedDigitSystemFont(
     ofSize: 17,
     weight: .medium)
 
-
-extension AnimEditorTimelineToolbarFrameWidgetControlVC {
+class AnimEditorTimelineToolbarFrameWidget: UIView {
     
-    @MainActor
-    protocol Delegate: AnyObject {
-        
-        func onChangeFocusedFrameIndex(
-            _ vc: AnimEditorTimelineToolbarFrameWidgetControlVC,
-            _ focusedFrameIndex: Int)
-        
-    }
+    let frameNumberLabel = UILabel()
     
-}
-
-class AnimEditorTimelineToolbarFrameWidgetControlVC: UIViewController {
-    
-    weak var delegate: Delegate?
-    
-    private let frameNumberLabel = UILabel()
-    
-    private let previousFrameButton = {
+    let previousFrameButton = {
         let button = UIButton(type: .system)
         let image = UIImage(
             systemName: "chevron.left",
@@ -47,7 +31,7 @@ class AnimEditorTimelineToolbarFrameWidgetControlVC: UIViewController {
         return button
     }()
     
-    private let nextFrameButton = {
+    let nextFrameButton = {
         let button = UIButton(type: .system)
         let image = UIImage(
             systemName: "chevron.right",
@@ -58,16 +42,17 @@ class AnimEditorTimelineToolbarFrameWidgetControlVC: UIViewController {
         return button
     }()
     
-    private var frameCount = 0
-    private var focusedFrameIndex = 0
+    private var displayedFrameIndex: Int = 0
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    // MARK: - Init
+    
+    init() {
+        super.init(frame: .zero)
         
         let stack = UIStackView()
         stack.axis = .horizontal
         
-        view.addSubview(stack)
+        addSubview(stack)
         stack.pinEdges(.horizontal, padding: 20)
         stack.pinEdges(.vertical)
         
@@ -92,45 +77,22 @@ class AnimEditorTimelineToolbarFrameWidgetControlVC: UIViewController {
         
         stack.addArrangedSubview(nextFrameButton)
         
-        previousFrameButton.addTarget(
-            self, action: #selector(onSelectPreviousFrame))
-        nextFrameButton.addTarget(
-            self, action: #selector(onSelectNextFrame))
-        
         updateFrameLabel()
     }
     
-    @objc private func onSelectPreviousFrame() {
-        onSelectFrame(at: focusedFrameIndex - 1)
-    }
+    required init?(coder: NSCoder) { fatalError() }
     
-    @objc private func onSelectNextFrame() {
-        onSelectFrame(at: focusedFrameIndex + 1)
-    }
-    
-    private func onSelectFrame(at index: Int) {
-        let clampedIndex = clamp(index,
-            min: 0, 
-            max: frameCount - 1)
-        
-        focusedFrameIndex = clampedIndex
-        updateFrameLabel()
-        
-        delegate?.onChangeFocusedFrameIndex(
-            self, clampedIndex)
-    }
-    
-    private func updateFrameLabel() {
-        frameNumberLabel.text = "\(focusedFrameIndex + 1)"
-    }
-    
-    func setFrameCount(_ frameCount: Int) {
-        self.frameCount = frameCount
-    }
+    // MARK: - Interface
     
     func setFocusedFrameIndex(_ index: Int) {
-        self.focusedFrameIndex = index
+        displayedFrameIndex = index
         updateFrameLabel()
+    }
+    
+    // MARK: - Update
+    
+    private func updateFrameLabel() {
+        frameNumberLabel.text = "\(displayedFrameIndex + 1)"
     }
     
 }

@@ -19,7 +19,8 @@ private let playIconConfig = UIImage.SymbolConfiguration(
 
 class AnimEditorTimelineToolbarView: UIView {
     
-    let frameWidgetContainer = UIView()
+    let frameWidget =
+        AnimEditorTimelineToolbarFrameWidget()
     
     let playButton = {
         let button = UIButton(type: .system)
@@ -97,9 +98,9 @@ class AnimEditorTimelineToolbarView: UIView {
         leftStack.addArrangedSubview(loopButton)
         
         // Center content
-        addSubview(frameWidgetContainer)
-        frameWidgetContainer.pin(.centerX)
-        frameWidgetContainer.pinEdges(.vertical)
+        addSubview(frameWidget)
+        frameWidget.pin(.centerX)
+        frameWidget.pinEdges(.vertical)
         
         // Right content
         let rightStack = UIStackView()

@@ -28,8 +28,6 @@
 		661E9F332C9D392A00A75A2F /* AnimEditorOnionSkinConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 661E9F322C9D392A00A75A2F /* AnimEditorOnionSkinConfig.swift */; };
 		66211E8B2BEDDEB0005490C4 /* LayoutInvalidatingFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66211E8A2BEDDEB0005490C4 /* LayoutInvalidatingFlowLayout.swift */; };
 		66211E8D2BEDE491005490C4 /* LibraryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66211E8C2BEDE491005490C4 /* LibraryCell.swift */; };
-		66211E8F2BEEC8B8005490C4 /* AnimEditorTimelineToolbarFrameWidgetVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66211E8E2BEEC8B8005490C4 /* AnimEditorTimelineToolbarFrameWidgetVC.swift */; };
-		66211E962BEF590F005490C4 /* AnimEditorTimelineToolbarFrameWidgetControlVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66211E952BEF590F005490C4 /* AnimEditorTimelineToolbarFrameWidgetControlVC.swift */; };
 		66211EAE2BF3159B005490C4 /* TextureCopier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66211EAD2BF3159B005490C4 /* TextureCopier.swift */; };
 		6622325B2BE0750300C8813F /* AnimEditorDrawerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6622325A2BE0750300C8813F /* AnimEditorDrawerVC.swift */; };
 		662232712BE1B79300C8813F /* AnimEditorToolSidebarSliderBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662232702BE1B79300C8813F /* AnimEditorToolSidebarSliderBar.swift */; };
@@ -43,6 +41,7 @@
 		66392A212D1E655E00B0CC56 /* AnimEditor2ToolbarToolPickerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66392A202D1E655E00B0CC56 /* AnimEditor2ToolbarToolPickerVC.swift */; };
 		663995822D43067400D7F987 /* AnimEditorFrameToolState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663995812D43066E00D7F987 /* AnimEditorFrameToolState.swift */; };
 		663995842D43069200D7F987 /* AnimEditorFramePaintToolState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663995832D43069200D7F987 /* AnimEditorFramePaintToolState.swift */; };
+		663BCF4B2F139FFE004BCC94 /* AnimEditorTimelineToolbarFrameWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663BCF4A2F139FFE004BCC94 /* AnimEditorTimelineToolbarFrameWidget.swift */; };
 		663D40D42C35EA9C004B8591 /* ProjectEditManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663D40D32C35EA9C004B8591 /* ProjectEditManager.swift */; };
 		664120532C7A727E00CF98B8 /* AnimEditorBrushToolControlsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664120522C7A727E00CF98B8 /* AnimEditorBrushToolControlsVC.swift */; };
 		664175B52C7E557300205FEC /* AnimEditorPaintToolState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664175B42C7E557300205FEC /* AnimEditorPaintToolState.swift */; };
@@ -171,8 +170,6 @@
 		661E9F322C9D392A00A75A2F /* AnimEditorOnionSkinConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorOnionSkinConfig.swift; sourceTree = "<group>"; };
 		66211E8A2BEDDEB0005490C4 /* LayoutInvalidatingFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutInvalidatingFlowLayout.swift; sourceTree = "<group>"; };
 		66211E8C2BEDE491005490C4 /* LibraryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryCell.swift; sourceTree = "<group>"; };
-		66211E8E2BEEC8B8005490C4 /* AnimEditorTimelineToolbarFrameWidgetVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorTimelineToolbarFrameWidgetVC.swift; sourceTree = "<group>"; };
-		66211E952BEF590F005490C4 /* AnimEditorTimelineToolbarFrameWidgetControlVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorTimelineToolbarFrameWidgetControlVC.swift; sourceTree = "<group>"; };
 		66211EAD2BF3159B005490C4 /* TextureCopier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextureCopier.swift; sourceTree = "<group>"; };
 		6622325A2BE0750300C8813F /* AnimEditorDrawerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorDrawerVC.swift; sourceTree = "<group>"; };
 		662232702BE1B79300C8813F /* AnimEditorToolSidebarSliderBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorToolSidebarSliderBar.swift; sourceTree = "<group>"; };
@@ -187,6 +184,7 @@
 		66392A202D1E655E00B0CC56 /* AnimEditor2ToolbarToolPickerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditor2ToolbarToolPickerVC.swift; sourceTree = "<group>"; };
 		663995812D43066E00D7F987 /* AnimEditorFrameToolState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorFrameToolState.swift; sourceTree = "<group>"; };
 		663995832D43069200D7F987 /* AnimEditorFramePaintToolState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorFramePaintToolState.swift; sourceTree = "<group>"; };
+		663BCF4A2F139FFE004BCC94 /* AnimEditorTimelineToolbarFrameWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorTimelineToolbarFrameWidget.swift; sourceTree = "<group>"; };
 		663D40D32C35EA9C004B8591 /* ProjectEditManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectEditManager.swift; sourceTree = "<group>"; };
 		664120522C7A727E00CF98B8 /* AnimEditorBrushToolControlsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorBrushToolControlsVC.swift; sourceTree = "<group>"; };
 		664175B42C7E557300205FEC /* AnimEditorPaintToolState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorPaintToolState.swift; sourceTree = "<group>"; };
@@ -387,15 +385,6 @@
 			path = "Edit Builder";
 			sourceTree = "<group>";
 		};
-		66211E902BEF240E005490C4 /* Frame Widget */ = {
-			isa = PBXGroup;
-			children = (
-				66211E8E2BEEC8B8005490C4 /* AnimEditorTimelineToolbarFrameWidgetVC.swift */,
-				66211E952BEF590F005490C4 /* AnimEditorTimelineToolbarFrameWidgetControlVC.swift */,
-			);
-			path = "Frame Widget";
-			sourceTree = "<group>";
-		};
 		66211EA92BF2C747005490C4 /* Gestures */ = {
 			isa = PBXGroup;
 			children = (
@@ -572,9 +561,9 @@
 		6651A9D52C9622B100E3520A /* Toolbar */ = {
 			isa = PBXGroup;
 			children = (
-				66211E902BEF240E005490C4 /* Frame Widget */,
 				6651A9D62C9622E900E3520A /* AnimEditorTimelineToolbarVC.swift */,
 				6651A9D82C96282C00E3520A /* AnimEditorTimelineToolbarView.swift */,
+				663BCF4A2F139FFE004BCC94 /* AnimEditorTimelineToolbarFrameWidget.swift */,
 			);
 			path = Toolbar;
 			sourceTree = "<group>";
@@ -1112,7 +1101,6 @@
 				6681BB212D0A494300AAED6A /* AnimEditor2ToolbarVC.swift in Sources */,
 				66BC14C72C89085400749C7A /* AnimFrameEditorLoadingState.swift in Sources */,
 				6643CAF72BE3431A0094B998 /* EditorMenuDismissGestureRecognizer.swift in Sources */,
-				66211E8F2BEEC8B8005490C4 /* AnimEditorTimelineToolbarFrameWidgetVC.swift in Sources */,
 				66BC14CF2C8924E300749C7A /* AnimFrameEditorWorkspaceSceneGraphGenerator.swift in Sources */,
 				664175B92C7E798900205FEC /* AnimEditorToolSettingsStore.swift in Sources */,
 				661D9F652C941C44008BB9E9 /* AnimEditorAssetLoader.swift in Sources */,
@@ -1156,7 +1144,6 @@
 				664175B52C7E557300205FEC /* AnimEditorPaintToolState.swift in Sources */,
 				66BC14C92C89086D00749C7A /* AnimFrameEditorEditingState.swift in Sources */,
 				661D9F672C943FB5008BB9E9 /* ConcurrencyLimiter.swift in Sources */,
-				66211E962BEF590F005490C4 /* AnimEditorTimelineToolbarFrameWidgetControlVC.swift in Sources */,
 				66D084712BA3CEC300EB8556 /* PassthroughView.swift in Sources */,
 				66A59EAA2C8B973900CF553E /* SceneRenderManifestGenerator.swift in Sources */,
 				664175BC2C7E820F00205FEC /* AnimFrameEditorToolState.swift in Sources */,
@@ -1165,6 +1152,7 @@
 				6643CB082BE488800094B998 /* EditorMenuPositioningView.swift in Sources */,
 				661A24652C86974A0031FE82 /* FrameSceneGraph.swift in Sources */,
 				66D084842BA3FE2E00EB8556 /* LibraryContentVC.swift in Sources */,
+				663BCF4B2F139FFE004BCC94 /* AnimEditorTimelineToolbarFrameWidget.swift in Sources */,
 				6651A9D72C9622E900E3520A /* AnimEditorTimelineToolbarVC.swift in Sources */,
 				664120532C7A727E00CF98B8 /* AnimEditorBrushToolControlsVC.swift in Sources */,
 				6643CAF52BE31CC00094B998 /* ChromeBlurView.swift in Sources */,
