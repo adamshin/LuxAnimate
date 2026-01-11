@@ -20,7 +20,6 @@ extension AnimEditorTimelineViewModel {
     static let empty = Self(frames: [])
     
     init(
-        projectID: String,
         sceneManifest: Scene.Manifest,
         layerContent: Scene.AnimationLayerContent
     ) {

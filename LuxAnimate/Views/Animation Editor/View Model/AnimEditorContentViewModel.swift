@@ -6,19 +6,15 @@ import Foundation
 
 struct AnimEditorContentViewModel {
     
-    var projectID: String
-    var layerID: String
-    
     var projectManifest: Project.Manifest
     var sceneManifest: Scene.Manifest
-    
-    var availableUndoCount: Int
-    var availableRedoCount: Int
-    
     var layer: Scene.Layer
     var layerContent: Scene.AnimationLayerContent
     
     var timelineViewModel: AnimEditorTimelineViewModel
+    
+    var availableUndoCount: Int
+    var availableRedoCount: Int
     
 }
 
@@ -30,16 +26,13 @@ extension AnimEditorContentViewModel {
     }
     
     init(
-        projectID: String,
-        layerID: String,
         projectManifest: Project.Manifest,
         sceneManifest: Scene.Manifest,
+        layerID: String,
         availableUndoCount: Int,
         availableRedoCount: Int
     ) throws {
         
-        self.projectID = projectID
-        self.layerID = layerID
         self.projectManifest = projectManifest
         self.sceneManifest = sceneManifest
         self.availableUndoCount = availableUndoCount
@@ -62,7 +55,6 @@ extension AnimEditorContentViewModel {
         
         self.timelineViewModel =
             AnimEditorTimelineViewModel(
-                projectID: projectID,
                 sceneManifest: sceneManifest,
                 layerContent: layerContent)
     }

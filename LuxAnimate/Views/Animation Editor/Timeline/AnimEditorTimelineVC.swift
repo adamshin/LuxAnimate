@@ -19,27 +19,9 @@ extension AnimEditorTimelineVC {
         func onSelectPlayPause(
             _ vc: AnimEditorTimelineVC)
         
-        // TODO: Replace these with a single onRequestEdit
-        // method. Create scene edit objects inside here,
-        // instead of relying on the parent. Need to modify
-        // AnimEditorEditBuilder. Maybe specialize it for
-        // the timeline vc.
-        
-//        func onRequestCreateDrawing(
-//            _ vc: AnimEditorTimelineVC,
-//            frameIndex: Int)
-//        
-//        func onRequestDeleteDrawing(
-//            _ vc: AnimEditorTimelineVC,
-//            frameIndex: Int)
-//        
-//        func onRequestInsertSpacing(
-//            _ vc: AnimEditorTimelineVC,
-//            frameIndex: Int)
-//        
-//        func onRequestRemoveSpacing(
-//            _ vc: AnimEditorTimelineVC,
-//            frameIndex: Int)
+        func onRequestSceneEdit(
+            _ vc: AnimEditorTimelineVC,
+            sceneEdit: ProjectEditBuilder.SceneEdit)
         
         func pendingAssetData(
             _ vc: AnimEditorTimelineVC,
@@ -60,13 +42,19 @@ class AnimEditorTimelineVC: UIViewController {
     
     private let projectID: String
     
-    private var timelineModel: AnimEditorTimelineModel = .empty
-    private var focusedFrameIndex = 0
+    private var contentViewModel: AnimEditorContentViewModel
+    private var focusedFrameIndex: Int
     
     // MARK: - Init
     
-    init(projectID: String) {
+    init(
+        projectID: String,
+        contentViewModel: AnimEditorContentViewModel,
+        focusedFrameIndex: Int
+    ) {
         self.projectID = projectID
+        self.contentViewModel = contentViewModel
+        self.focusedFrameIndex = focusedFrameIndex
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -84,8 +72,12 @@ class AnimEditorTimelineVC: UIViewController {
         
         setupUI()
         
-        update(timelineModel: timelineModel)
-        update(focusedFrameIndex: focusedFrameIndex)
+        // TODO: Handle initial data update
+        // Maybe we use the same code path as responding to
+        // an update from the parent? Need to update UI etc.
+        
+//        update(timelineModel: timelineModel)
+//        update(focusedFrameIndex: focusedFrameIndex)
     }
     
     // MARK: - Setup
@@ -108,7 +100,9 @@ class AnimEditorTimelineVC: UIViewController {
         guard let cell = trackVC.cell(at: frameIndex)
         else { return }
         
-        let frame = timelineModel.frames[frameIndex]
+        let frame = contentViewModel
+            .timelineViewModel
+            .frames[frameIndex]
         
         let contentView = AnimEditorTimelineFrameMenuView(
             frameIndex: frameIndex,
@@ -127,15 +121,88 @@ class AnimEditorTimelineVC: UIViewController {
         trackVC.setOpenMenuFrameIndex(frameIndex)
     }
     
-    // MARK: - Interface
+    // MARK: - Internal Logic
     
+    private func createDrawing(frameIndex: Int) {
+        do {
+            let vm = contentViewModel
+            
+            let edit = try AnimEditorEditBuilder
+                .createDrawing(
+                    sceneManifest: vm.sceneManifest,
+                    layer: vm.layer,
+                    layerContent: vm.layerContent,
+                    frameIndex: frameIndex)
+            
+            delegate?.onRequestSceneEdit(
+                self, sceneEdit: edit)
+            
+        } catch { }
+    }
+    
+    private func deleteDrawing(frameIndex: Int) {
+        do {
+            let vm = contentViewModel
+            
+            let edit = try AnimEditorEditBuilder
+                .deleteDrawing(
+                    sceneManifest: vm.sceneManifest,
+                    layer: vm.layer,
+                    layerContent: vm.layerContent,
+                    frameIndex: frameIndex)
+            
+            delegate?.onRequestSceneEdit(
+                self, sceneEdit: edit)
+            
+        } catch { }
+    }
+    
+    private func insertSpacing(frameIndex: Int) {
+        do {
+            let vm = contentViewModel
+            
+            let edit = try AnimEditorEditBuilder
+                .insertSpacing(
+                    sceneManifest: vm.sceneManifest,
+                    layer: vm.layer,
+                    layerContent: vm.layerContent,
+                    frameIndex: frameIndex)
+            
+            delegate?.onRequestSceneEdit(
+                self, sceneEdit: edit)
+            
+        } catch { }
+    }
+    
+    private func removeSpacing(frameIndex: Int) {
+        do {
+            let vm = contentViewModel
+            
+            let edit = try AnimEditorEditBuilder
+                .removeSpacing(
+                    sceneManifest: vm.sceneManifest,
+                    layer: vm.layer,
+                    layerContent: vm.layerContent,
+                    frameIndex: frameIndex)
+            
+            delegate?.onRequestSceneEdit(
+                self, sceneEdit: edit)
+            
+        } catch { }
+    }
+    
+    // MARK: - Interface
+
     func update(
-        timelineModel: AnimEditorTimelineModel
+        contentViewModel: AnimEditorContentViewModel
     ) {
-        self.timelineModel = timelineModel
+        self.contentViewModel = contentViewModel
         
-        toolbarVC.setFrameCount(timelineModel.frames.count)
-        trackVC.setTimelineModel(timelineModel)
+        // Maybe these methods should both take a timeline
+        // model. Easier than picking data out at this level
+        
+//        toolbarVC.setFrameCount(timelineModel.frames.count)
+//        trackVC.setTimelineModel(timelineModel)
     }
     
     func update(
@@ -143,13 +210,13 @@ class AnimEditorTimelineVC: UIViewController {
     ) {
         self.focusedFrameIndex = focusedFrameIndex
         
+        // Rename set to update here, for consistency?
         toolbarVC.setFocusedFrameIndex(focusedFrameIndex)
         trackVC.setFocusedFrameIndex(focusedFrameIndex)
     }
     
     func setExpanded(_ expanded: Bool) {
-        drawerVC.setExpanded(
-            expanded, animated: false)
+        drawerVC.setExpanded(expanded, animated: false)
     }
     
 }
@@ -184,15 +251,21 @@ extension AnimEditorTimelineVC:
         self.focusedFrameIndex = focusedFrameIndex
         trackVC.setFocusedFrameIndex(focusedFrameIndex)
         
+        // TODO: Set a flag before and after this call to
+        // ignore reentrant updates to focusedFrameIndex.
         delegate?.onChangeFocusedFrameIndex(
             self, focusedFrameIndex)
     }
     
-    func onSelectPlayPause(_ vc: AnimEditorTimelineToolbarVC) {
+    func onSelectPlayPause(
+        _ vc: AnimEditorTimelineToolbarVC
+    ) {
         delegate?.onSelectPlayPause(self)
     }
     
-    func onSelectToggleExpanded(_ vc: AnimEditorTimelineToolbarVC) {
+    func onSelectToggleExpanded(
+        _ vc: AnimEditorTimelineToolbarVC
+    ) {
         drawerVC.toggleExpanded()
     }
     
@@ -223,11 +296,12 @@ extension AnimEditorTimelineVC:
         _ vc: AnimEditorTimelineTrackVC,
         frameIndex: Int
     ) {
-        let frame = timelineModel.frames[frameIndex]
+        let frame = contentViewModel
+            .timelineViewModel
+            .frames[frameIndex]
+        
         if !frame.hasDrawing {
-            // TODO: Apply edit
-//            delegate?.onRequestCreateDrawing(self,
-//                frameIndex: frameIndex)
+            createDrawing(frameIndex: frameIndex)
         }
     }
     
@@ -243,11 +317,12 @@ extension AnimEditorTimelineVC:
         assetID: String
     ) -> Data? {
         
+        // TODO: Should this go through the asset loader,
+        // or is this ok?
         if let data = delegate?.pendingAssetData(
             self, assetID: assetID)
         {
             return data
-            
         } else {
             let assetURL = FileHelper.shared
                 .projectAssetURL(
@@ -277,36 +352,28 @@ extension AnimEditorTimelineVC:
         _ v: AnimEditorTimelineFrameMenuView,
         frameIndex: Int
     ) {
-        // TODO: Apply edit
-//        delegate?.onRequestCreateDrawing(self,
-//            frameIndex: frameIndex)
+        createDrawing(frameIndex: frameIndex)
     }
-    
+
     func onSelectDeleteDrawing(
         _ v: AnimEditorTimelineFrameMenuView,
         frameIndex: Int
     ) {
-        // TODO: Apply edit
-//        delegate?.onRequestDeleteDrawing(self,
-//            frameIndex: frameIndex)
+        deleteDrawing(frameIndex: frameIndex)
     }
-    
+
     func onSelectInsertSpacing(
         _ v: AnimEditorTimelineFrameMenuView,
         frameIndex: Int
     ) {
-        // TODO: Apply edit
-//        delegate?.onRequestInsertSpacing(self,
-//            frameIndex: frameIndex)
+        insertSpacing(frameIndex: frameIndex)
     }
-    
+
     func onSelectRemoveSpacing(
         _ v: AnimEditorTimelineFrameMenuView,
         frameIndex: Int
     ) {
-        // TODO: Apply edit
-//        delegate?.onRequestRemoveSpacing(self,
-//            frameIndex: frameIndex)
+        removeSpacing(frameIndex: frameIndex)
     }
-    
+
 }

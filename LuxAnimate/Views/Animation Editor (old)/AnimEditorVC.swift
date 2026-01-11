@@ -31,7 +31,7 @@ class AnimEditorVC: UIViewController {
     private let toolbarVC = AnimEditorToolbarVC()
 //    private let toolControlsVC = AnimEditorToolControlsVC()
     
-    private let timelineVC: AnimEditorTimelineVC
+//    private let timelineVC: AnimEditorTimelineVC
     
     // MARK: - State
     
@@ -69,8 +69,8 @@ class AnimEditorVC: UIViewController {
         self.sceneID = sceneID
         self.layerID = layerID
         
-        timelineVC = AnimEditorTimelineVC(
-            projectID: projectID)
+//        timelineVC = AnimEditorTimelineVC(
+//            projectID: projectID)
         
         state = try AnimEditorState(
             projectID: projectID,
@@ -90,7 +90,7 @@ class AnimEditorVC: UIViewController {
         
         workspaceVC.delegate = self
         toolbarVC.delegate = self
-        timelineVC.delegate = self
+//        timelineVC.delegate = self
         
         assetLoader.delegate = self
 //        editBuilder.delegate = self
@@ -123,7 +123,7 @@ class AnimEditorVC: UIViewController {
 //        addChild(toolControlsVC, to: bodyView.toolControlsContainer)
         
         // TODO: Proper view structure
-        addChild(timelineVC, to: bodyView.workspaceContainer)
+//        addChild(timelineVC, to: bodyView.workspaceContainer)
     }
     
     private func setupDisplayLink() {
@@ -142,10 +142,10 @@ class AnimEditorVC: UIViewController {
         toolbarVC.update(
             onionSkinOn: state.onionSkinOn)
         
-        timelineVC.update(
-            timelineModel: state.timelineModel)
-        timelineVC.update(
-            focusedFrameIndex: state.focusedFrameIndex)
+//        timelineVC.update(
+//            timelineModel: state.timelineModel)
+//        timelineVC.update(
+//            focusedFrameIndex: state.focusedFrameIndex)
         
         updateToolState(
             selectedTool: state.selectedTool)
@@ -177,12 +177,12 @@ class AnimEditorVC: UIViewController {
         }
         
         if !fromTimeline, changes.timelineModel {
-            timelineVC.update(
-                timelineModel: state.timelineModel)
+//            timelineVC.update(
+//                timelineModel: state.timelineModel)
         }
         if !fromTimeline, changes.focusedFrameIndex {
-            timelineVC.update(
-                focusedFrameIndex: state.focusedFrameIndex)
+//            timelineVC.update(
+//                focusedFrameIndex: state.focusedFrameIndex)
         }
         
         if changes.selectedTool {
@@ -372,6 +372,7 @@ extension AnimEditorVC: AnimEditorToolbarVCDelegate {
     
 }
 
+/*
 extension AnimEditorVC: AnimEditorTimelineVC.Delegate {
     
     func onChangeDrawerSize(
@@ -440,6 +441,7 @@ extension AnimEditorVC: AnimEditorTimelineVC.Delegate {
     }
     
 }
+ */
 
 extension AnimEditorVC: AnimFrameEditor.Delegate {
     

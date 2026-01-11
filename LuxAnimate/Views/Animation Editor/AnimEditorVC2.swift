@@ -78,26 +78,26 @@ class AnimEditorVC2: UIViewController {
         self.projectID = projectID
         self.sceneID = sceneID
         self.layerID = layerID
-
         self.focusedFrameIndex = focusedFrameIndex
-
-        toolbarVC = AnimEditor2ToolbarVC()
-        
-        timelineVC = AnimEditorTimelineVC(
-            projectID: projectID)
         
         // TODO: Clamp focused frame index to valid range.
         // Should we pull this logic into a helper function?
         // We'll be doing the same thing in update().
-        contentViewModel = try AnimEditorContentViewModel(
-            projectID: projectID,
-            layerID: layerID,
+        self.contentViewModel = try AnimEditorContentViewModel(
             projectManifest: projectState.projectManifest,
             sceneManifest: sceneManifest,
+            layerID: layerID,
             availableUndoCount: projectState.availableUndoCount,
             availableRedoCount: projectState.availableRedoCount)
         
         self.focusedFrameIndex = focusedFrameIndex
+        
+        toolbarVC = AnimEditor2ToolbarVC()
+        
+        timelineVC = AnimEditorTimelineVC(
+            projectID: projectID,
+            contentViewModel: contentViewModel,
+            focusedFrameIndex: focusedFrameIndex)
         
         assetLoader = AnimEditorAssetLoader(
             projectID: projectID)
@@ -354,44 +354,12 @@ extension AnimEditorVC2: AnimEditorTimelineVC.Delegate {
         _ vc: AnimEditorTimelineVC
     ) { }
     
-    // TODO: Consolidate these four methods into a single
-    // 'apply edit' method. Timeline vc should be
-    // responsible for creating the edit objects.
-    
-    func onRequestCreateDrawing(
+    func onRequestSceneEdit(
         _ vc: AnimEditorTimelineVC,
-        frameIndex: Int
+        sceneEdit: ProjectEditBuilder.SceneEdit
     ) {
-//        try? editBuilder.createDrawing(
-//            state: state,
-//            frameIndex: frameIndex)
-    }
-    
-    func onRequestDeleteDrawing(
-        _ vc: AnimEditorTimelineVC,
-        frameIndex: Int
-    ) {
-//        try? editBuilder.deleteDrawing(
-//            state: state,
-//            frameIndex: frameIndex)
-    }
-    
-    func onRequestInsertSpacing(
-        _ vc: AnimEditorTimelineVC,
-        frameIndex: Int
-    ) {
-//        try? editBuilder.insertSpacing(
-//            state: state,
-//            frameIndex: frameIndex)
-    }
-    
-    func onRequestRemoveSpacing(
-        _ vc: AnimEditorTimelineVC,
-        frameIndex: Int
-    ) {
-//        try? editBuilder.removeSpacing(
-//            state: state,
-//            frameIndex: frameIndex)
+        delegate?.onRequestSceneEdit(
+            self, sceneEdit: sceneEdit)
     }
     
     func pendingAssetData(
