@@ -33,7 +33,7 @@ class SceneEditorVC: UIViewController {
     private var sceneRef: Project.SceneRef
     private var sceneManifest: Scene.Manifest
     
-    private weak var animEditorVC: AnimEditorVC2?
+    private weak var animEditorVC: AnimEditorVC?
     
     // MARK: - Init
     
@@ -196,7 +196,7 @@ class SceneEditorVC: UIViewController {
     
     private func showAnimationLayerEditor(layerID: String) {
         do {
-            let vc = try AnimEditorVC2(
+            let vc = try AnimEditorVC(
                 projectID: projectID,
                 sceneID: sceneID,
                 layerID: layerID,
@@ -281,17 +281,17 @@ extension SceneEditorVC: SceneEditorContentVCDelegate {
     
 }
 
-extension SceneEditorVC: AnimEditorVC2.Delegate {
+extension SceneEditorVC: AnimEditorVC.Delegate {
     
-    func onRequestUndo(_ vc: AnimEditorVC2) {
+    func onRequestUndo(_ vc: AnimEditorVC) {
         delegate?.onRequestUndo(self)
     }
-    func onRequestRedo(_ vc: AnimEditorVC2) {
+    func onRequestRedo(_ vc: AnimEditorVC) {
         delegate?.onRequestRedo(self)
     }
     
     func onRequestSceneEdit(
-        _ vc: AnimEditorVC2,
+        _ vc: AnimEditorVC,
         sceneEdit: ProjectEditBuilder.SceneEdit
     ) {
         do {
@@ -308,7 +308,7 @@ extension SceneEditorVC: AnimEditorVC2.Delegate {
     }
     
     func pendingEditAsset(
-        _ vc: AnimEditorVC2,
+        _ vc: AnimEditorVC,
         assetID: String
     ) -> ProjectEditManager.NewAsset? {
         delegate?.pendingEditAsset(assetID: assetID)

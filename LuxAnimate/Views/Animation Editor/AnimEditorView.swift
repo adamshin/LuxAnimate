@@ -1,10 +1,10 @@
 //
-//  AnimEditorView2.swift
+//  AnimEditorView.swift
 //
 
 import UIKit
 
-class AnimEditorView2: UIView {
+class AnimEditorView: UIView {
     
     let workspaceContainer = UIView()
     let toolbarContainer = UIView()

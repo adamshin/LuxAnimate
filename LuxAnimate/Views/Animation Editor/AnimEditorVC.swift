@@ -8,20 +8,20 @@ import Geometry
 private let contentSize = Size(
     width: 1920, height: 1080)
 
-extension AnimEditorVC2 {
+extension AnimEditorVC {
     
     @MainActor
     protocol Delegate: AnyObject {
         
-        func onRequestUndo(_ vc: AnimEditorVC2)
-        func onRequestRedo(_ vc: AnimEditorVC2)
+        func onRequestUndo(_ vc: AnimEditorVC)
+        func onRequestRedo(_ vc: AnimEditorVC)
         
         func onRequestSceneEdit(
-            _ vc: AnimEditorVC2,
+            _ vc: AnimEditorVC,
             sceneEdit: ProjectEditBuilder.SceneEdit)
         
         func pendingEditAsset(
-            _ vc: AnimEditorVC2,
+            _ vc: AnimEditorVC,
             assetID: String
         ) -> ProjectEditManager.NewAsset?
         
@@ -29,11 +29,11 @@ extension AnimEditorVC2 {
     
 }
 
-class AnimEditorVC2: UIViewController {
+class AnimEditorVC: UIViewController {
     
     // MARK: - View
     
-    private let bodyView = AnimEditorView2()
+    private let bodyView = AnimEditorView()
     
     private let workspaceVC = EditorWorkspaceVC()
     private let toolbarVC: AnimEditor2ToolbarVC
@@ -233,7 +233,7 @@ class AnimEditorVC2: UIViewController {
 
 // MARK: - Delegates
 
-extension AnimEditorVC2: EditorWorkspaceVC.Delegate {
+extension AnimEditorVC: EditorWorkspaceVC.Delegate {
     
     func onSelectUndo(_ vc: EditorWorkspaceVC) {
         delegate?.onRequestUndo(self)
@@ -244,7 +244,7 @@ extension AnimEditorVC2: EditorWorkspaceVC.Delegate {
     
 }
 
-extension AnimEditorVC2: AnimEditor2ToolbarVC.Delegate {
+extension AnimEditorVC: AnimEditor2ToolbarVC.Delegate {
     
     func onSelectBack(_ vc: AnimEditor2ToolbarVC) {
         dismiss()
@@ -266,7 +266,7 @@ extension AnimEditorVC2: AnimEditor2ToolbarVC.Delegate {
     
 }
 
-extension AnimEditorVC2: AnimEditorTimelineVC.Delegate {
+extension AnimEditorVC: AnimEditorTimelineVC.Delegate {
     
     func onChangeDrawerSize(
         _ vc: AnimEditorTimelineVC
@@ -304,7 +304,7 @@ extension AnimEditorVC2: AnimEditorTimelineVC.Delegate {
     
 }
 
-extension AnimEditorVC2: AnimEditorAssetLoader.Delegate {
+extension AnimEditorVC: AnimEditorAssetLoader.Delegate {
     
     func pendingAssetData(
         _ l: AnimEditorAssetLoader,
