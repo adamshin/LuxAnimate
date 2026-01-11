@@ -1,10 +1,10 @@
 //
-//  AnimEditorTimelineViewModel.swift
+//  AnimEditorTimelineModel.swift
 //
 
 import Foundation
 
-struct AnimEditorTimelineViewModel {
+struct AnimEditorTimelineModel {
     
     struct Frame {
         var hasDrawing: Bool
@@ -15,7 +15,7 @@ struct AnimEditorTimelineViewModel {
     
 }
 
-extension AnimEditorTimelineViewModel {
+extension AnimEditorTimelineModel {
     
     static let empty = Self(frames: [])
     

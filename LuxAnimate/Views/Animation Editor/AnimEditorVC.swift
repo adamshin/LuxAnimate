@@ -45,7 +45,7 @@ class AnimEditorVC: UIViewController {
     private let sceneID: String
     private let layerID: String
     
-    private var contentViewModel: AnimEditorContentViewModel
+    private var model: AnimEditorModel
     private var focusedFrameIndex: Int
     
     // TODO: Onion skin settings
@@ -83,7 +83,7 @@ class AnimEditorVC: UIViewController {
         // TODO: Clamp focused frame index to valid range.
         // Should we pull this logic into a helper function?
         // We'll be doing the same thing in update().
-        self.contentViewModel = try AnimEditorContentViewModel(
+        self.model = try AnimEditorModel(
             projectManifest: projectState.projectManifest,
             sceneManifest: sceneManifest,
             layerID: layerID,
@@ -94,7 +94,7 @@ class AnimEditorVC: UIViewController {
         
         timelineVC = AnimEditorTimelineVC(
             projectID: projectID,
-            contentViewModel: contentViewModel,
+            model: model,
             focusedFrameIndex: focusedFrameIndex)
         
         assetLoader = AnimEditorAssetLoader(
@@ -155,7 +155,7 @@ class AnimEditorVC: UIViewController {
     }
     
     private func setupInitialState() {
-        toolbarVC.update(contentViewModel: contentViewModel)
+        toolbarVC.update(model: model)
     }
     
     private func setupTestSceneGraph() {
@@ -176,7 +176,7 @@ class AnimEditorVC: UIViewController {
     
     private func internalSetFocusedFrameIndex(_ i: Int) {
         let frameCount =
-            contentViewModel.sceneManifest.frameCount
+            model.sceneManifest.frameCount
         
         focusedFrameIndex = clamp(i,
             min: 0,
@@ -205,22 +205,21 @@ class AnimEditorVC: UIViewController {
         sceneManifest: Scene.Manifest
     ) {
         do {
-            contentViewModel = try AnimEditorContentViewModel(
+            model = try AnimEditorModel(
                 projectManifest: projectState.projectManifest,
                 sceneManifest: sceneManifest,
                 layerID: layerID,
                 availableUndoCount: projectState.availableUndoCount,
                 availableRedoCount: projectState.availableRedoCount)
             
-            let frameCount =
-                contentViewModel.sceneManifest.frameCount
+            let frameCount = model.sceneManifest.frameCount
             
             focusedFrameIndex = clamp(focusedFrameIndex,
                 min: 0,
                 max: frameCount - 1)
             
-            toolbarVC.update(contentViewModel: contentViewModel)
-            timelineVC.update(contentViewModel: contentViewModel)
+            toolbarVC.update(model: model)
+            timelineVC.update(model: model)
             
             timelineVC.update(focusedFrameIndex: focusedFrameIndex)
             

@@ -81,13 +81,14 @@ class AnimEditorTimelineTrackVC: UIViewController {
     
     private let cellRegistration = UICollectionView.CellRegistration<
         AnimEditorTimelineTrackCell,
-        AnimEditorTimelineViewModel.Frame
+        AnimEditorTimelineModel.Frame
     > { cell, indexPath, item in }
     
     private let dot = CircleView()
     
-    private var viewModel: AnimEditorTimelineViewModel = .empty
+    private var model: AnimEditorTimelineModel = .empty
     private var focusedFrameIndex = 0
+    
     private var updateContext: UpdateContext?
     
     private var isScrolling = false
@@ -197,11 +198,11 @@ class AnimEditorTimelineTrackVC: UIViewController {
     }
     
     private func focusFrame(at index: Int, animated: Bool) {
-        guard viewModel.frames.count > 0 else { return }
+        guard model.frames.count > 0 else { return }
         
         let clampedIndex = clamp(index,
             min: 0,
-            max: viewModel.frames.count - 1)
+            max: model.frames.count - 1)
         
         focusedFrameIndex = clampedIndex
         
@@ -234,7 +235,7 @@ class AnimEditorTimelineTrackVC: UIViewController {
             else { continue }
             
             let index = indexPath.item
-            let frame = viewModel.frames[index]
+            let frame = model.frames[index]
             
             cell.updateContent(frame: frame)
         }
@@ -260,7 +261,7 @@ class AnimEditorTimelineTrackVC: UIViewController {
         index: Int,
         animated: Bool
     ) {
-        let frame = viewModel.frames[index]
+        let frame = model.frames[index]
         
         let isFocused = index == focusedFrameIndex
         let isMenuOpen = index == openMenuFrameIndex
@@ -280,12 +281,12 @@ class AnimEditorTimelineTrackVC: UIViewController {
     // MARK: - Interface
     
     func update(
-        timelineViewModel: AnimEditorTimelineViewModel
+        model: AnimEditorTimelineModel
     ) {
-        let oldViewModel = self.viewModel
-        self.viewModel = timelineViewModel
+        let oldModel = self.model
+        self.model = model
         
-        if oldViewModel.frames.count != viewModel.frames.count {
+        if oldModel.frames.count != model.frames.count {
             collectionView.reloadData()
         } else {
             updateVisibleCellsContent()
@@ -340,7 +341,7 @@ extension AnimEditorTimelineTrackVC: UICollectionViewDataSource {
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
     ) -> Int {
-        viewModel.frames.count
+        model.frames.count
     }
     
     func collectionView(
@@ -348,7 +349,7 @@ extension AnimEditorTimelineTrackVC: UICollectionViewDataSource {
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
         
-        let item = viewModel.frames[indexPath.item]
+        let item = model.frames[indexPath.item]
         
         let cell = collectionView.dequeueConfiguredReusableCell(
             using: cellRegistration,
@@ -372,7 +373,7 @@ extension AnimEditorTimelineTrackVC: UICollectionViewDelegate {
         else { return }
         
         let index = indexPath.item
-        let frame = viewModel.frames[index]
+        let frame = model.frames[index]
         
         cell.updateContent(frame: frame)
         

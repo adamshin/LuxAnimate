@@ -42,18 +42,18 @@ class AnimEditorTimelineVC: UIViewController {
     
     private let projectID: String
     
-    private var contentViewModel: AnimEditorContentViewModel
+    private var model: AnimEditorModel
     private var focusedFrameIndex: Int
     
     // MARK: - Init
     
     init(
         projectID: String,
-        contentViewModel: AnimEditorContentViewModel,
+        model: AnimEditorModel,
         focusedFrameIndex: Int
     ) {
         self.projectID = projectID
-        self.contentViewModel = contentViewModel
+        self.model = model
         self.focusedFrameIndex = focusedFrameIndex
         
         super.init(nibName: nil, bundle: nil)
@@ -89,7 +89,7 @@ class AnimEditorTimelineVC: UIViewController {
     }
     
     private func setupInitialState() {
-        update(contentViewModel: contentViewModel)
+        update(model: model)
         update(focusedFrameIndex: focusedFrameIndex)
     }
     
@@ -101,9 +101,7 @@ class AnimEditorTimelineVC: UIViewController {
         guard let cell = trackVC.cell(at: frameIndex)
         else { return }
         
-        let frame = contentViewModel
-            .timelineViewModel
-            .frames[frameIndex]
+        let frame = model.timelineModel.frames[frameIndex]
         
         let contentView = AnimEditorTimelineFrameMenuView(
             frameIndex: frameIndex,
@@ -126,19 +124,17 @@ class AnimEditorTimelineVC: UIViewController {
     
     private func createDrawing(frameIndex: Int) {
         do {
-            let vm = contentViewModel
-            
             let layerContentEdit =
                 try AnimationLayerContentEditBuilder
                     .createDrawing(
-                        layerContent: vm.layerContent,
+                        layerContent: model.layerContent,
                         frameIndex: frameIndex)
             
             let sceneEdit =
                 try AnimationLayerContentEditBuilder
                     .applyAnimationLayerContentEdit(
-                        sceneManifest: vm.sceneManifest,
-                        layer: vm.layer,
+                        sceneManifest: model.sceneManifest,
+                        layer: model.layer,
                         layerContentEdit: layerContentEdit)
             
             delegate?.onRequestSceneEdit(self,
@@ -149,7 +145,7 @@ class AnimEditorTimelineVC: UIViewController {
     
     private func deleteDrawing(frameIndex: Int) {
 //        do {
-//            let vm = contentViewModel
+//            let vm = model
 //            
 //            let edit = try AnimEditorEditBuilder
 //                .deleteDrawing(
@@ -166,7 +162,7 @@ class AnimEditorTimelineVC: UIViewController {
     
     private func insertSpacing(frameIndex: Int) {
 //        do {
-//            let vm = contentViewModel
+//            let vm = model
 //            
 //            let edit = try AnimEditorEditBuilder
 //                .insertSpacing(
@@ -183,7 +179,7 @@ class AnimEditorTimelineVC: UIViewController {
     
     private func removeSpacing(frameIndex: Int) {
 //        do {
-//            let vm = contentViewModel
+//            let vm = model
 //            
 //            let edit = try AnimEditorEditBuilder
 //                .removeSpacing(
@@ -201,12 +197,12 @@ class AnimEditorTimelineVC: UIViewController {
     // MARK: - Interface
 
     func update(
-        contentViewModel: AnimEditorContentViewModel
+        model: AnimEditorModel
     ) {
-        self.contentViewModel = contentViewModel
+        self.model = model
         
-        toolbarVC.update(timelineViewModel: contentViewModel.timelineViewModel)
-        trackVC.update(timelineViewModel: contentViewModel.timelineViewModel)
+        toolbarVC.update(model: model.timelineModel)
+        trackVC.update(model: model.timelineModel)
     }
     
     func update(
@@ -289,9 +285,7 @@ extension AnimEditorTimelineVC:
         _ vc: AnimEditorTimelineTrackVC,
         frameIndex: Int
     ) {
-        let frame = contentViewModel
-            .timelineViewModel
-            .frames[frameIndex]
+        let frame = model.timelineModel.frames[frameIndex]
         
         if !frame.hasDrawing {
             createDrawing(frameIndex: frameIndex)

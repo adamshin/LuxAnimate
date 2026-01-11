@@ -54,10 +54,10 @@ class AnimEditor2ToolbarVC: UIViewController {
     // MARK: - Interface
     
     func update(
-        contentViewModel vm: AnimEditorContentViewModel
+        model: AnimEditorModel
     ) {
-        let undoEnabled = vm.availableUndoCount > 0
-        let redoEnabled = vm.availableRedoCount > 0
+        let undoEnabled = model.availableUndoCount > 0
+        let redoEnabled = model.availableRedoCount > 0
         
         bodyView.update(
             undoEnabled: undoEnabled,

@@ -89,9 +89,9 @@ class AnimEditorTimelineToolbarVC: UIViewController {
     // MARK: - Interface
     
     func update(
-        timelineViewModel: AnimEditorTimelineViewModel
+        model: AnimEditorTimelineModel
     ) {
-        frameCount = timelineViewModel.frames.count
+        frameCount = model.frames.count
     }
 
     func update(

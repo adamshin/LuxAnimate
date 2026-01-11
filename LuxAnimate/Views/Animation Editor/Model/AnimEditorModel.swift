@@ -1,24 +1,24 @@
 //
-//  AnimEditorContentViewModel.swift
+//  AnimEditorModel.swift
 //
 
 import Foundation
 
-struct AnimEditorContentViewModel {
+struct AnimEditorModel {
     
     var projectManifest: Project.Manifest
     var sceneManifest: Scene.Manifest
     var layer: Scene.Layer
     var layerContent: Scene.AnimationLayerContent
     
-    var timelineViewModel: AnimEditorTimelineViewModel
+    var timelineModel: AnimEditorTimelineModel
     
     var availableUndoCount: Int
     var availableRedoCount: Int
     
 }
 
-extension AnimEditorContentViewModel {
+extension AnimEditorModel {
     
     enum InitializationError: Swift.Error {
         case invalidLayerID
@@ -53,10 +53,9 @@ extension AnimEditorContentViewModel {
         self.layer = layer
         self.layerContent = layerContent
         
-        self.timelineViewModel =
-            AnimEditorTimelineViewModel(
-                sceneManifest: sceneManifest,
-                layerContent: layerContent)
+        self.timelineModel = .init(
+            sceneManifest: sceneManifest,
+            layerContent: layerContent)
     }
     
 }
