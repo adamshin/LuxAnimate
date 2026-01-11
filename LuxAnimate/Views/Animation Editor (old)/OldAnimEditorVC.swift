@@ -45,7 +45,7 @@ class OldAnimEditorVC: UIViewController {
     private var frameEditor: AnimFrameEditor?
     
     private let assetLoader: AnimEditorAssetLoader
-    private let editBuilder = AnimEditorEditBuilder()
+//    private let editBuilder = AnimEditorEditBuilder()
     private let workspaceRenderer = EditorWorkspaceRenderer()
     
     private let displayLink = WrappedDisplayLink()

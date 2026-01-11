@@ -128,68 +128,74 @@ class AnimEditorTimelineVC: UIViewController {
         do {
             let vm = contentViewModel
             
-            let edit = try AnimEditorEditBuilder
-                .createDrawing(
-                    sceneManifest: vm.sceneManifest,
-                    layer: vm.layer,
-                    layerContent: vm.layerContent,
-                    frameIndex: frameIndex)
+            let layerContentEdit =
+                try AnimationLayerContentEditBuilder
+                    .createDrawing(
+                        layerContent: vm.layerContent,
+                        frameIndex: frameIndex)
             
-            delegate?.onRequestSceneEdit(
-                self, sceneEdit: edit)
+            let sceneEdit =
+                try AnimationLayerContentEditBuilder
+                    .applyAnimationLayerContentEdit(
+                        sceneManifest: vm.sceneManifest,
+                        layer: vm.layer,
+                        layerContentEdit: layerContentEdit)
+            
+            delegate?.onRequestSceneEdit(self,
+                sceneEdit: sceneEdit)
             
         } catch { }
     }
     
     private func deleteDrawing(frameIndex: Int) {
-        do {
-            let vm = contentViewModel
-            
-            let edit = try AnimEditorEditBuilder
-                .deleteDrawing(
-                    sceneManifest: vm.sceneManifest,
-                    layer: vm.layer,
-                    layerContent: vm.layerContent,
-                    frameIndex: frameIndex)
-            
-            delegate?.onRequestSceneEdit(
-                self, sceneEdit: edit)
-            
-        } catch { }
+//        do {
+//            let vm = contentViewModel
+//            
+//            let edit = try AnimEditorEditBuilder
+//                .deleteDrawing(
+//                    sceneManifest: vm.sceneManifest,
+//                    layer: vm.layer,
+//                    layerContent: vm.layerContent,
+//                    frameIndex: frameIndex)
+//            
+//            delegate?.onRequestSceneEdit(
+//                self, sceneEdit: edit)
+//            
+//        } catch { }
     }
     
     private func insertSpacing(frameIndex: Int) {
-        do {
-            let vm = contentViewModel
-            
-            let edit = try AnimEditorEditBuilder
-                .insertSpacing(
-                    sceneManifest: vm.sceneManifest,
-                    layer: vm.layer,
-                    layerContent: vm.layerContent,
-                    frameIndex: frameIndex)
-            
-            delegate?.onRequestSceneEdit(
-                self, sceneEdit: edit)
-            
-        } catch { }
+//        do {
+//            let vm = contentViewModel
+//            
+//            let edit = try AnimEditorEditBuilder
+//                .insertSpacing(
+//                    sceneManifest: vm.sceneManifest,
+//                    layer: vm.layer,
+//                    layerContent: vm.layerContent,
+//                    frameIndex: frameIndex)
+//            
+//            delegate?.onRequestSceneEdit(
+//                self, sceneEdit: edit)
+//            
+//        } catch { }
     }
     
     private func removeSpacing(frameIndex: Int) {
-        do {
-            let vm = contentViewModel
-            
-            let edit = try AnimEditorEditBuilder
-                .removeSpacing(
-                    sceneManifest: vm.sceneManifest,
-                    layer: vm.layer,
-                    layerContent: vm.layerContent,
-                    frameIndex: frameIndex)
-            
-            delegate?.onRequestSceneEdit(
-                self, sceneEdit: edit)
-            
-        } catch { }
+//        do {
+//            let vm = contentViewModel
+//            
+//            let edit = try AnimEditorEditBuilder
+//                .removeSpacing(
+//                    sceneManifest: vm.sceneManifest,
+//                    layer: vm.layer,
+//                    layerContent: vm.layerContent,
+//                    frameIndex: frameIndex)
+//            
+//            delegate?.onRequestSceneEdit(
+//                self, sceneEdit: edit)
+//            
+//        } catch { }
     }
     
     // MARK: - Interface
