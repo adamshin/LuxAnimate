@@ -290,16 +290,20 @@ extension SceneEditorVC: AnimEditorVC.Delegate {
         delegate?.onRequestRedo(self)
     }
     
-    func onRequestSceneEdit(
+    func onRequestEdit(
         _ vc: AnimEditorVC,
-        sceneEdit: ProjectEditBuilder.SceneEdit
+        layer: Scene.Layer,
+        layerContentEdit: AnimationLayerContentEditBuilder.Edit
     ) {
         do {
-            let projectManifest = projectState
-                .projectManifest
+            let sceneEdit = try AnimationLayerContentEditBuilder
+                .applyAnimationLayerContentEdit(
+                    sceneManifest: sceneManifest,
+                    layer: layer,
+                    layerContentEdit: layerContentEdit)
             
             let edit = try ProjectEditBuilder.applySceneEdit(
-                projectManifest: projectManifest,
+                projectManifest: projectState.projectManifest,
                 sceneEdit: sceneEdit)
             
             delegate?.onRequestEdit(self, edit: edit)

@@ -5,21 +5,21 @@
 import UIKit
 import Geometry
 
-@MainActor
-protocol OldAnimEditorVCDelegate: AnyObject {
-    
-    func onRequestUndo(_ vc: OldAnimEditorVC)
-    func onRequestRedo(_ vc: OldAnimEditorVC)
-    
-    func onRequestSceneEdit(
-        _ vc: OldAnimEditorVC,
-        sceneEdit: ProjectEditBuilder.SceneEdit)
-    
-    func pendingEditAsset(
-        assetID: String
-    ) -> ProjectEditManager.NewAsset?
-    
-}
+//@MainActor
+//protocol OldAnimEditorVCDelegate: AnyObject {
+//    
+//    func onRequestUndo(_ vc: OldAnimEditorVC)
+//    func onRequestRedo(_ vc: OldAnimEditorVC)
+//    
+//    func onRequestEdit(
+//        _ vc: OldAnimEditorVC,
+//        sceneEdit: ProjectEditBuilder.SceneEdit)
+//    
+//    func pendingEditAsset(
+//        assetID: String
+//    ) -> ProjectEditManager.NewAsset?
+//    
+//}
 
 class OldAnimEditorVC: UIViewController {
     

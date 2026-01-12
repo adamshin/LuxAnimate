@@ -19,9 +19,9 @@ extension AnimEditorTimelineVC {
         func onSelectPlayPause(
             _ vc: AnimEditorTimelineVC)
         
-        func onRequestSceneEdit(
+        func onRequestEdit(
             _ vc: AnimEditorTimelineVC,
-            sceneEdit: ProjectEditBuilder.SceneEdit)
+            layerContentEdit: AnimationLayerContentEditBuilder.Edit)
         
         func pendingAssetData(
             _ vc: AnimEditorTimelineVC,
@@ -120,82 +120,56 @@ class AnimEditorTimelineVC: UIViewController {
         trackVC.setOpenMenuFrameIndex(frameIndex)
     }
     
-    // MARK: - Internal Logic
+    // MARK: - Edit
     
     private func createDrawing(frameIndex: Int) {
         do {
-            let layerContentEdit =
-                try AnimationLayerContentEditBuilder
-                    .createDrawing(
-                        layerContent: model.layerContent,
-                        frameIndex: frameIndex)
+            let edit = try AnimationLayerContentEditBuilder
+                .createDrawing(
+                    layerContent: model.layerContent,
+                    frameIndex: frameIndex)
             
-            let sceneEdit =
-                try AnimationLayerContentEditBuilder
-                    .applyAnimationLayerContentEdit(
-                        sceneManifest: model.sceneManifest,
-                        layer: model.layer,
-                        layerContentEdit: layerContentEdit)
-            
-            delegate?.onRequestSceneEdit(self,
-                sceneEdit: sceneEdit)
+            delegate?.onRequestEdit(
+                self, layerContentEdit: edit)
             
         } catch { }
     }
     
     private func deleteDrawing(frameIndex: Int) {
-//        do {
-//            let vm = model
-//            
-//            let edit = try AnimEditorEditBuilder
-//                .deleteDrawing(
-//                    sceneManifest: vm.sceneManifest,
-//                    layer: vm.layer,
-//                    layerContent: vm.layerContent,
-//                    frameIndex: frameIndex)
-//            
-//            delegate?.onRequestSceneEdit(
-//                self, sceneEdit: edit)
-//            
-//        } catch { }
+        let edit = AnimationLayerContentEditBuilder
+            .deleteDrawing(
+                layerContent: model.layerContent,
+                frameIndex: frameIndex)
+        
+        delegate?.onRequestEdit(
+            self, layerContentEdit: edit)
     }
     
     private func insertSpacing(frameIndex: Int) {
-//        do {
-//            let vm = model
-//            
-//            let edit = try AnimEditorEditBuilder
-//                .insertSpacing(
-//                    sceneManifest: vm.sceneManifest,
-//                    layer: vm.layer,
-//                    layerContent: vm.layerContent,
-//                    frameIndex: frameIndex)
-//            
-//            delegate?.onRequestSceneEdit(
-//                self, sceneEdit: edit)
-//            
-//        } catch { }
+        let edit = AnimationLayerContentEditBuilder
+            .insertSpacing(
+                layerContent: model.layerContent,
+                frameIndex: frameIndex)
+        
+        delegate?.onRequestEdit(
+            self, layerContentEdit: edit)
     }
     
     private func removeSpacing(frameIndex: Int) {
-//        do {
-//            let vm = model
-//            
-//            let edit = try AnimEditorEditBuilder
-//                .removeSpacing(
-//                    sceneManifest: vm.sceneManifest,
-//                    layer: vm.layer,
-//                    layerContent: vm.layerContent,
-//                    frameIndex: frameIndex)
-//            
-//            delegate?.onRequestSceneEdit(
-//                self, sceneEdit: edit)
-//            
-//        } catch { }
+        do {
+            let edit = try AnimationLayerContentEditBuilder
+                .removeSpacing(
+                    layerContent: model.layerContent,
+                    frameIndex: frameIndex)
+            
+            delegate?.onRequestEdit(
+                self, layerContentEdit: edit)
+            
+        } catch { }
     }
     
     // MARK: - Interface
-
+    
     func update(
         model: AnimEditorModel
     ) {

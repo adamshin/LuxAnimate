@@ -16,9 +16,10 @@ extension AnimEditorVC {
         func onRequestUndo(_ vc: AnimEditorVC)
         func onRequestRedo(_ vc: AnimEditorVC)
         
-        func onRequestSceneEdit(
+        func onRequestEdit(
             _ vc: AnimEditorVC,
-            sceneEdit: ProjectEditBuilder.SceneEdit)
+            layer: Scene.Layer,
+            layerContentEdit: AnimationLayerContentEditBuilder.Edit)
         
         func pendingEditAsset(
             _ vc: AnimEditorVC,
@@ -284,12 +285,13 @@ extension AnimEditorVC: AnimEditorTimelineVC.Delegate {
         _ vc: AnimEditorTimelineVC
     ) { }
     
-    func onRequestSceneEdit(
+    func onRequestEdit(
         _ vc: AnimEditorTimelineVC,
-        sceneEdit: ProjectEditBuilder.SceneEdit
+        layerContentEdit: AnimationLayerContentEditBuilder.Edit
     ) {
-        delegate?.onRequestSceneEdit(
-            self, sceneEdit: sceneEdit)
+        delegate?.onRequestEdit(self,
+            layer: model.layer,
+            layerContentEdit: layerContentEdit)
     }
     
     func pendingAssetData(
