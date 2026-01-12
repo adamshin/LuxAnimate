@@ -46,7 +46,7 @@
 		664175B92C7E798900205FEC /* AnimEditorToolSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664175B82C7E798900205FEC /* AnimEditorToolSettingsStore.swift */; };
 		664175BC2C7E820F00205FEC /* AnimFrameEditorToolState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664175BB2C7E820F00205FEC /* AnimFrameEditorToolState.swift */; };
 		664175BE2C7E824700205FEC /* AnimFrameEditorPaintToolState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664175BD2C7E824700205FEC /* AnimFrameEditorPaintToolState.swift */; };
-		6642351B2C9508A300FB5DBB /* ProjectEditorStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6642351A2C9508A300FB5DBB /* ProjectEditorStateManager.swift */; };
+		6642351B2C9508A300FB5DBB /* ProjectAsyncEditManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6642351A2C9508A300FB5DBB /* ProjectAsyncEditManager.swift */; };
 		6643CAF52BE31CC00094B998 /* ChromeBlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6643CAF42BE31CC00094B998 /* ChromeBlurView.swift */; };
 		6643CAF72BE3431A0094B998 /* EditorMenuDismissGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6643CAF62BE3431A0094B998 /* EditorMenuDismissGestureRecognizer.swift */; };
 		6643CAFD2BE38AD40094B998 /* AnimEditorToolSidebarCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6643CAFC2BE38AD40094B998 /* AnimEditorToolSidebarCardView.swift */; };
@@ -184,7 +184,7 @@
 		664175B82C7E798900205FEC /* AnimEditorToolSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorToolSettingsStore.swift; sourceTree = "<group>"; };
 		664175BB2C7E820F00205FEC /* AnimFrameEditorToolState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimFrameEditorToolState.swift; sourceTree = "<group>"; };
 		664175BD2C7E824700205FEC /* AnimFrameEditorPaintToolState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimFrameEditorPaintToolState.swift; sourceTree = "<group>"; };
-		6642351A2C9508A300FB5DBB /* ProjectEditorStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectEditorStateManager.swift; sourceTree = "<group>"; };
+		6642351A2C9508A300FB5DBB /* ProjectAsyncEditManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectAsyncEditManager.swift; sourceTree = "<group>"; };
 		6643CAF42BE31CC00094B998 /* ChromeBlurView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromeBlurView.swift; sourceTree = "<group>"; };
 		6643CAF62BE3431A0094B998 /* EditorMenuDismissGestureRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorMenuDismissGestureRecognizer.swift; sourceTree = "<group>"; };
 		6643CAFC2BE38AD40094B998 /* AnimEditorToolSidebarCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorToolSidebarCardView.swift; sourceTree = "<group>"; };
@@ -468,6 +468,7 @@
 			isa = PBXGroup;
 			children = (
 				663D40D32C35EA9C004B8591 /* ProjectEditManager.swift */,
+				6642351A2C9508A300FB5DBB /* ProjectAsyncEditManager.swift */,
 			);
 			path = "Project Edit Manager";
 			sourceTree = "<group>";
@@ -791,7 +792,6 @@
 			children = (
 				66BC01712C38A61100D2E2AD /* ProjectEditorVC.swift */,
 				66E312B52C3A0001006BE399 /* ProjectEditorContentVC.swift */,
-				6642351A2C9508A300FB5DBB /* ProjectEditorStateManager.swift */,
 			);
 			path = "Project Editor";
 			sourceTree = "<group>";
@@ -867,8 +867,8 @@
 				66D084552BA3CDE400EB8556 /* App */,
 				66D0847B2BA3D78900EB8556 /* Library */,
 				663107B02C6ABC0F0028C89C /* Editor */,
-				668A14CF2C7D3D1800D73D36 /* Animation Editor (old) */,
 				6681BB1A2D0A442B00AAED6A /* Animation Editor */,
+				668A14CF2C7D3D1800D73D36 /* Animation Editor (old) */,
 				661A24612C8696CE0031FE82 /* Editor Workspace */,
 				66311CE52BD7898000D53489 /* Shared */,
 				66211EA92BF2C747005490C4 /* Gestures */,
@@ -1085,7 +1085,7 @@
 				66D0846D2BA3CEC300EB8556 /* CGGeometry.swift in Sources */,
 				6651A9DC2C962A2A00E3520A /* AnimEditorTimelineTrackVC.swift in Sources */,
 				66FE7A2C2C21035D00464A82 /* Data.swift in Sources */,
-				6642351B2C9508A300FB5DBB /* ProjectEditorStateManager.swift in Sources */,
+				6642351B2C9508A300FB5DBB /* ProjectAsyncEditManager.swift in Sources */,
 				664B593F2BC5A9AA003FA90E /* AppConfig.swift in Sources */,
 				664C281F2C741062002166D6 /* EditorWorkspaceMetalView.swift in Sources */,
 				66BC14C42C88F46000749C7A /* AnimFrameEditorState.swift in Sources */,

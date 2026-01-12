@@ -1,26 +1,26 @@
 //
-//  ProjectEditorStateManager.swift
+//  ProjectAsyncEditManager.swift
 //
 
 import Foundation
 
-extension ProjectEditorStateManager {
+extension ProjectAsyncEditManager {
     
     protocol Delegate: AnyObject {
         
         func onUpdateState(
-            _ m: ProjectEditorStateManager,
+            _ m: ProjectAsyncEditManager,
             state: ProjectEditManager.State)
         
         func onEditError(
-            _ m: ProjectEditorStateManager,
+            _ m: ProjectAsyncEditManager,
             error: Error)
         
     }
     
 }
 
-class ProjectEditorStateManager: @unchecked Sendable {
+class ProjectAsyncEditManager: @unchecked Sendable {
     
     private let projectID: String
     

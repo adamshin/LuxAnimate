@@ -11,7 +11,7 @@ class ProjectEditorVC: UIViewController {
     
     private let projectID: String
     
-    private let stateManager: ProjectEditorStateManager
+    private let stateManager: ProjectAsyncEditManager
     
     private weak var sceneEditorVC: SceneEditorVC?
     
@@ -20,7 +20,7 @@ class ProjectEditorVC: UIViewController {
     init(projectID: String) throws {
         self.projectID = projectID
         
-        stateManager = try ProjectEditorStateManager(
+        stateManager = try ProjectAsyncEditManager(
             projectID: projectID)
         
         super.init(nibName: nil, bundle: nil)
@@ -171,10 +171,10 @@ extension ProjectEditorVC: SceneEditorVCDelegate {
     
 }
 
-extension ProjectEditorVC: ProjectEditorStateManager.Delegate {
+extension ProjectEditorVC: ProjectAsyncEditManager.Delegate {
     
     nonisolated func onUpdateState(
-        _ m: ProjectEditorStateManager,
+        _ m: ProjectAsyncEditManager,
         state: ProjectEditManager.State
     ) {
         Task { @MainActor in
@@ -183,7 +183,7 @@ extension ProjectEditorVC: ProjectEditorStateManager.Delegate {
     }
     
     nonisolated func onEditError(
-        _ m: ProjectEditorStateManager,
+        _ m: ProjectAsyncEditManager,
         error: Error
     ) { }
     
