@@ -29,7 +29,7 @@ class SceneEditorVC: UIViewController {
     private let projectID: String
     private let sceneID: String
     
-    private var projectState: ProjectEditManager.State
+    private var model: ProjectEditorModel
     private var sceneRef: Project.SceneRef
     private var sceneManifest: Scene.Manifest
     
@@ -40,15 +40,14 @@ class SceneEditorVC: UIViewController {
     init(
         projectID: String,
         sceneID: String,
-        projectState: ProjectEditManager.State
+        model: ProjectEditorModel
     ) throws {
         
         self.projectID = projectID
         self.sceneID = sceneID
-        self.projectState = projectState
+        self.model = model
         
-        let projectManifest = projectState
-            .projectManifest
+        let projectManifest = model.projectManifest
         
         let sceneRef = try Self.sceneRefFromProject(
             projectManifest: projectManifest,

@@ -97,6 +97,7 @@
 		668A14CC2C7D1E2000D73D36 /* AnimEditorEraseToolControlsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668A14CB2C7D1E2000D73D36 /* AnimEditorEraseToolControlsVC.swift */; };
 		668A14D72C7D3EBE00D73D36 /* AnimFrameEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668A14D62C7D3EBE00D73D36 /* AnimFrameEditor.swift */; };
 		668A14D92C7D7BCD00D73D36 /* AnimEditorToolState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668A14D82C7D7BCD00D73D36 /* AnimEditorToolState.swift */; };
+		669ACDD82F16F666000B3A15 /* ProjectEditorModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669ACDD72F16F661000B3A15 /* ProjectEditorModel.swift */; };
 		669E20C82C40A630008546E1 /* SceneEditorVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669E20C72C40A630008546E1 /* SceneEditorVC.swift */; };
 		66A59EA12C8A3F3400CF553E /* FrameRenderManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A59EA02C8A3F3400CF553E /* FrameRenderManifest.swift */; };
 		66A59EAA2C8B973900CF553E /* SceneRenderManifestGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A59EA92C8B973900CF553E /* SceneRenderManifestGenerator.swift */; };
@@ -234,6 +235,7 @@
 		668A14CB2C7D1E2000D73D36 /* AnimEditorEraseToolControlsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorEraseToolControlsVC.swift; sourceTree = "<group>"; };
 		668A14D62C7D3EBE00D73D36 /* AnimFrameEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimFrameEditor.swift; sourceTree = "<group>"; };
 		668A14D82C7D7BCD00D73D36 /* AnimEditorToolState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorToolState.swift; sourceTree = "<group>"; };
+		669ACDD72F16F661000B3A15 /* ProjectEditorModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectEditorModel.swift; sourceTree = "<group>"; };
 		669E20C72C40A630008546E1 /* SceneEditorVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneEditorVC.swift; sourceTree = "<group>"; };
 		66A59EA02C8A3F3400CF553E /* FrameRenderManifest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameRenderManifest.swift; sourceTree = "<group>"; };
 		66A59EA92C8B973900CF553E /* SceneRenderManifestGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneRenderManifestGenerator.swift; sourceTree = "<group>"; };
@@ -792,6 +794,7 @@
 			children = (
 				66BC01712C38A61100D2E2AD /* ProjectEditorVC.swift */,
 				66E312B52C3A0001006BE399 /* ProjectEditorContentVC.swift */,
+				669ACDD72F16F661000B3A15 /* ProjectEditorModel.swift */,
 			);
 			path = "Project Editor";
 			sourceTree = "<group>";
@@ -1146,6 +1149,7 @@
 				662542A32C8BDDFB007D3DFB /* SceneEditBuilder.swift in Sources */,
 				66FE7A2E2C25E05100464A82 /* Array.swift in Sources */,
 				6651A9DE2C962A3200E3520A /* AnimEditorTimelineTrackCell.swift in Sources */,
+				669ACDD82F16F666000B3A15 /* ProjectEditorModel.swift in Sources */,
 				6662D88D2BBD0F3900B4C1D4 /* CanvasMultiGestureRecognizer.swift in Sources */,
 				66E04CDB2C59829D00BD91F4 /* AnimationLayerContentEditBuilder.swift in Sources */,
 				660ABA492C01926A00B5C668 /* ProjectCreator.swift in Sources */,

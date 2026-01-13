@@ -9,8 +9,7 @@ extension ProjectAsyncEditManager {
     protocol Delegate: AnyObject {
         
         func onUpdateState(
-            _ m: ProjectAsyncEditManager,
-            state: ProjectEditManager.State)
+            _ m: ProjectAsyncEditManager)
         
         func onEditError(
             _ m: ProjectAsyncEditManager,
@@ -27,10 +26,12 @@ class ProjectAsyncEditManager: @unchecked Sendable {
     private let editManager: ProjectEditManager
     
     private let workQueue = DispatchQueue(
-        label: "ProjectAsyncEditManager.queue",
+        label: "ProjectAsyncEditManager.workQueue",
         qos: .userInitiated)
     
-    private(set) var state: ProjectEditManager.State
+    private(set) var projectManifest: Project.Manifest
+    private(set) var availableUndoCount: Int
+    private(set) var availableRedoCount: Int
     
     private var pendingEditAssets:
         [String: ProjectEditManager.NewAsset] = [:]
@@ -45,7 +46,9 @@ class ProjectAsyncEditManager: @unchecked Sendable {
         editManager = try ProjectEditManager(
             projectID: projectID)
         
-        state = editManager.state
+        projectManifest = editManager.projectManifest
+        availableUndoCount = editManager.availableUndoCount
+        availableRedoCount = editManager.availableRedoCount
     }
     
     // MARK: - Internal Logic
@@ -54,18 +57,18 @@ class ProjectAsyncEditManager: @unchecked Sendable {
         edit: ProjectEditManager.Edit
     ) {
         // Update state
-        state.projectManifest = edit.projectManifest
+        projectManifest = edit.projectManifest
         
-        state.availableRedoCount = 0
-        state.availableUndoCount = min(
-            state.availableUndoCount + 1,
+        availableRedoCount = 0
+        availableUndoCount = min(
+            self.availableUndoCount + 1,
             ProjectEditManager.editHistoryLimit)
         
         // Store pending assets
         storePendingEditAssets(edit.newAssets)
         
         // Notify delegate
-        delegate?.onUpdateState(self, state: state)
+        delegate?.onUpdateState(self)
         
         // Perform edit
         workQueue.async {
@@ -81,7 +84,8 @@ class ProjectAsyncEditManager: @unchecked Sendable {
             // Remove pending assets
             let newAssetIDs = edit.newAssets.map { $0.id }
             DispatchQueue.main.async {
-                self.removePendingEditAssets(assetIDs: newAssetIDs)
+                self.removePendingEditAssets(
+                    assetIDs: newAssetIDs)
             }
         }
     }
@@ -98,10 +102,14 @@ class ProjectAsyncEditManager: @unchecked Sendable {
                 }
                 
                 DispatchQueue.main.async {
-                    self.state = self.editManager.state
+                    self.projectManifest =
+                        self.editManager.projectManifest
+                    self.availableUndoCount =
+                        self.editManager.availableUndoCount
+                    self.availableRedoCount =
+                        self.editManager.availableRedoCount
                     
-                    self.delegate?.onUpdateState(
-                        self, state: self.state)
+                    self.delegate?.onUpdateState(self)
                 }
                 
             } catch {
@@ -143,9 +151,8 @@ class ProjectAsyncEditManager: @unchecked Sendable {
         applyUndoRedoInternal(undo: false)
     }
     
-    func pendingEditAsset(
-        assetID: String
-    ) -> ProjectEditManager.NewAsset? {
+    func pendingEditAsset(assetID: String)
+    -> ProjectEditManager.NewAsset? {
         pendingEditAssets[assetID]
     }
     

@@ -8,25 +8,24 @@ import Color
 class ProjectEditorVC: UIViewController {
     
     private let contentVC = ProjectEditorContentVC()
+    private weak var sceneEditorVC: SceneEditorVC?
     
     private let projectID: String
     
-    private let stateManager: ProjectAsyncEditManager
-    
-    private weak var sceneEditorVC: SceneEditorVC?
+    private let editManager: ProjectAsyncEditManager
     
     // MARK: - Init
     
     init(projectID: String) throws {
         self.projectID = projectID
         
-        stateManager = try ProjectAsyncEditManager(
+        editManager = try ProjectAsyncEditManager(
             projectID: projectID)
         
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
         
-        stateManager.delegate = self
+        editManager.delegate = self
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -37,8 +36,7 @@ class ProjectEditorVC: UIViewController {
         super.viewDidLoad()
         
         setupUI()
-        
-        update(projectState: stateManager.state)
+        setupInitialState()
     }
     
     override var prefersStatusBarHidden: Bool { true }
@@ -53,20 +51,31 @@ class ProjectEditorVC: UIViewController {
         addChild(navController, to: view)
     }
     
+    private func setupInitialState() {
+        let model = modelFromEditManager()
+        update(model: model)
+    }
+    
     // MARK: - Logic
     
-    private func update(
-        projectState: ProjectEditManager.State
-    ) {
-        contentVC.update(projectState: projectState)
-        sceneEditorVC?.update(projectState: projectState)
+    private func modelFromEditManager()
+    -> ProjectEditorModel {
+        
+        ProjectEditorModel(
+            projectManifest: editManager.projectManifest,
+            availableUndoCount: editManager.availableUndoCount,
+            availableRedoCount: editManager.availableRedoCount)
+    }
+    
+    private func update(model: ProjectEditorModel) {
+        contentVC.update(model: model)
+        sceneEditorVC?.update(model: model)
     }
     
     // MARK: - Editing
     
     private func addScene() {
-        let projectManifest = stateManager
-            .state.projectManifest
+        let projectManifest = editManager.projectManifest
         
         let edit = try! ProjectEditBuilder.createScene(
             projectManifest: projectManifest,
@@ -74,12 +83,11 @@ class ProjectEditorVC: UIViewController {
             frameCount: 100,
             backgroundColor: .white)
             
-        stateManager.applyEdit(edit: edit)
+        editManager.applyEdit(edit: edit)
     }
     
     private func removeLastScene() {
-        let projectManifest = stateManager
-            .state.projectManifest
+        let projectManifest = editManager.projectManifest
         
         guard let lastSceneRef = projectManifest
             .content.sceneRefs.last
@@ -89,17 +97,19 @@ class ProjectEditorVC: UIViewController {
             projectManifest: projectManifest,
             sceneID: lastSceneRef.id)
         
-        stateManager.applyEdit(edit: edit)
+        editManager.applyEdit(edit: edit)
     }
     
     // MARK: - Navigation
     
     private func showSceneEditor(sceneID: String) {
         do {
+            let model = modelFromEditManager()
+            
             let vc = try SceneEditorVC(
                 projectID: projectID,
                 sceneID: sceneID,
-                projectState: stateManager.state)
+                model: model)
             
             vc.delegate = self
             sceneEditorVC = vc
@@ -128,11 +138,11 @@ extension ProjectEditorVC: ProjectEditorContentVCDelegate {
     }
     
     func onSelectUndo(_ vc: ProjectEditorContentVC) {
-        stateManager.applyUndo()
+        editManager.applyUndo()
     }
     
     func onSelectRedo(_ vc: ProjectEditorContentVC) {
-        stateManager.applyRedo()
+        editManager.applyRedo()
     }
     
     func onSelectScene(
@@ -147,25 +157,25 @@ extension ProjectEditorVC: ProjectEditorContentVCDelegate {
 extension ProjectEditorVC: SceneEditorVCDelegate {
     
     func onRequestUndo(_ vc: SceneEditorVC) {
-        stateManager.applyUndo()
+        editManager.applyUndo()
     }
     
     func onRequestRedo(_ vc: SceneEditorVC) {
-        stateManager.applyRedo()
+        editManager.applyRedo()
     }
     
     func onRequestEdit(
         _ vc: SceneEditorVC,
         edit: ProjectEditManager.Edit
     ) {
-        stateManager.applyEdit(edit: edit)
+        editManager.applyEdit(edit: edit)
     }
     
     func pendingEditAsset(
         assetID: String
     ) -> ProjectEditManager.NewAsset? {
         
-        stateManager.pendingEditAsset(
+        editManager.pendingEditAsset(
             assetID: assetID)
     }
     
@@ -174,11 +184,11 @@ extension ProjectEditorVC: SceneEditorVCDelegate {
 extension ProjectEditorVC: ProjectAsyncEditManager.Delegate {
     
     nonisolated func onUpdateState(
-        _ m: ProjectAsyncEditManager,
-        state: ProjectEditManager.State
+        _ m: ProjectAsyncEditManager
     ) {
         Task { @MainActor in
-            update(projectState: state)
+            let model = modelFromEditManager()
+            update(model: model)
         }
     }
     
