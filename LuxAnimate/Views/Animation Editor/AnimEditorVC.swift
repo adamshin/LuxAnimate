@@ -71,8 +71,7 @@ class AnimEditorVC: UIViewController {
         projectID: String,
         sceneID: String,
         layerID: String,
-        projectState: ProjectEditManager.State,
-        sceneManifest: Scene.Manifest,
+        sceneEditorModel: SceneEditorModel,
         focusedFrameIndex: Int
     ) throws {
         
@@ -85,11 +84,11 @@ class AnimEditorVC: UIViewController {
         // Should we pull this logic into a helper function?
         // We'll be doing the same thing in update().
         self.model = try AnimEditorModel(
-            projectManifest: projectState.projectManifest,
-            sceneManifest: sceneManifest,
+            projectManifest: sceneEditorModel.projectManifest,
+            sceneManifest: sceneEditorModel.sceneManifest,
             layerID: layerID,
-            availableUndoCount: projectState.availableUndoCount,
-            availableRedoCount: projectState.availableRedoCount)
+            availableUndoCount: sceneEditorModel.availableUndoCount,
+            availableRedoCount: sceneEditorModel.availableRedoCount)
         
         toolbarVC = AnimEditor2ToolbarVC()
         
@@ -202,16 +201,15 @@ class AnimEditorVC: UIViewController {
     // MARK: - Interface
     
     func update(
-        projectState: ProjectEditManager.State,
-        sceneManifest: Scene.Manifest
+        sceneEditorModel: SceneEditorModel
     ) {
         do {
             model = try AnimEditorModel(
-                projectManifest: projectState.projectManifest,
-                sceneManifest: sceneManifest,
+                projectManifest: sceneEditorModel.projectManifest,
+                sceneManifest: sceneEditorModel.sceneManifest,
                 layerID: layerID,
-                availableUndoCount: projectState.availableUndoCount,
-                availableRedoCount: projectState.availableRedoCount)
+                availableUndoCount: sceneEditorModel.availableUndoCount,
+                availableRedoCount: sceneEditorModel.availableRedoCount)
             
             let frameCount = model.sceneManifest.frameCount
             

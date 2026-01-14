@@ -60,7 +60,7 @@ class OldAnimEditorVC: UIViewController {
         projectID: String,
         sceneID: String,
         layerID: String,
-        projectState: ProjectEditManager.State,
+//        projectState: ProjectEditManager.State,
         sceneManifest: Scene.Manifest,
         focusedFrameIndex: Int
     ) throws {

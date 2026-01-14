@@ -24,9 +24,8 @@ class ProjectEditorContentVC: UIViewController {
     
     weak var delegate: ProjectEditorContentVCDelegate?
     
-    private var projectManifest: Project.Manifest?
-    private var availableUndoCount = 0
-    private var availableRedoCount = 0
+    // TODO: Make this non-optional, with a placeholder empty value?
+    private var model: ProjectEditorModel?
     
     private lazy var backButton = UIBarButtonItem(
         title: "Back", style: .done,
@@ -87,25 +86,21 @@ class ProjectEditorContentVC: UIViewController {
         delegate?.onSelectRedo(self)
     }
     
-    func update(
-        projectState state: ProjectEditManager.State
-    ) {
-        projectManifest = state.projectManifest
-        availableUndoCount = state.availableUndoCount
-        availableRedoCount = state.availableRedoCount
+    func update(model: ProjectEditorModel) {
+        self.model = model
         
         updateButtons()
         tableView.reloadData()
     }
     
     private func updateButtons() {
-        guard let projectManifest else { return }
+        guard let model else { return }
         
         removeSceneButton.isEnabled =
-            projectManifest.content.sceneRefs.count > 0
+            model.projectManifest.content.sceneRefs.count > 0
         
-        undoButton.isEnabled = availableUndoCount > 0
-        redoButton.isEnabled = availableRedoCount > 0
+        undoButton.isEnabled = model.availableUndoCount > 0
+        redoButton.isEnabled = model.availableRedoCount > 0
     }
     
 }
@@ -128,7 +123,7 @@ extension ProjectEditorContentVC: UITableViewDataSource {
         case 0: 
             3
         case 1:
-            projectManifest?.content.sceneRefs.count ?? 0
+            model?.projectManifest.content.sceneRefs.count ?? 0
         default:
             0
         }
@@ -143,18 +138,18 @@ extension ProjectEditorContentVC: UITableViewDataSource {
             UITableViewCell.self,
             for: indexPath)
         
-        guard let projectManifest else { return cell }
+        guard let model else { return cell }
         
         switch indexPath.section {
         case 0:
             switch indexPath.row {
             case 0:
-                cell.textLabel?.text = projectManifest.name
+                cell.textLabel?.text = model.projectManifest.name
                 
             case 1:
-                let viewportSize = projectManifest
+                let viewportSize = model.projectManifest
                     .content.metadata.viewportSize
-                let framesPerSecond = projectManifest
+                let framesPerSecond = model.projectManifest
                     .content.metadata.framesPerSecond
                 
                 cell.textLabel?.text = """
@@ -164,9 +159,9 @@ extension ProjectEditorContentVC: UITableViewDataSource {
                     """
                 
             case 2:
-                let sceneCount = projectManifest
+                let sceneCount = model.projectManifest
                     .content.sceneRefs.count
-                let assetCount = projectManifest
+                let assetCount = model.projectManifest
                     .assetIDs.count
                 
                 let sceneText = "\(sceneCount) \(sceneCount == 1 ? "scene" : "scenes")"
@@ -200,8 +195,8 @@ extension ProjectEditorContentVC: UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         
         if indexPath.section == 1 {
-            guard let projectManifest else { return }
-            let sceneRef = projectManifest.content.sceneRefs[indexPath.row]
+            guard let model else { return }
+            let sceneRef = model.projectManifest.content.sceneRefs[indexPath.row]
             delegate?.onSelectScene(self, sceneID: sceneRef.id)
         }
     }

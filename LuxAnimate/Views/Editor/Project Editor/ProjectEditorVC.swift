@@ -56,7 +56,7 @@ class ProjectEditorVC: UIViewController {
         update(model: model)
     }
     
-    // MARK: - Logic
+    // MARK: - Model
     
     private func modelFromEditManager()
     -> ProjectEditorModel {
@@ -67,9 +67,11 @@ class ProjectEditorVC: UIViewController {
             availableRedoCount: editManager.availableRedoCount)
     }
     
+    // MARK: - Logic
+    
     private func update(model: ProjectEditorModel) {
         contentVC.update(model: model)
-        sceneEditorVC?.update(model: model)
+        sceneEditorVC?.update(projectEditorModel: model)
     }
     
     // MARK: - Editing
@@ -109,7 +111,7 @@ class ProjectEditorVC: UIViewController {
             let vc = try SceneEditorVC(
                 projectID: projectID,
                 sceneID: sceneID,
-                model: model)
+                projectEditorModel: model)
             
             vc.delegate = self
             sceneEditorVC = vc
