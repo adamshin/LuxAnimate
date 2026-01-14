@@ -8,9 +8,11 @@ extension ProjectAsyncEditManager {
     
     protocol Delegate: AnyObject {
         
+        @MainActor
         func onUpdateState(
             _ m: ProjectAsyncEditManager)
         
+        @MainActor
         func onEditError(
             _ m: ProjectAsyncEditManager,
             error: Error)
@@ -19,7 +21,7 @@ extension ProjectAsyncEditManager {
     
 }
 
-class ProjectAsyncEditManager {
+class ProjectAsyncEditManager: @unchecked Sendable {
     
     private let projectID: String
     
@@ -53,6 +55,7 @@ class ProjectAsyncEditManager {
     
     // MARK: - Internal Logic
     
+    @MainActor
     private func applyEditInternal(
         edit: ProjectEditManager.Edit
     ) {
@@ -75,7 +78,7 @@ class ProjectAsyncEditManager {
             do {
                 try self.editManager.applyEdit(edit)
             } catch {
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     self.delegate?.onEditError(
                         self, error: error)
                 }
@@ -83,7 +86,7 @@ class ProjectAsyncEditManager {
             
             // Remove pending assets
             let newAssetIDs = edit.newAssets.map { $0.id }
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self.removePendingEditAssets(
                     assetIDs: newAssetIDs)
             }
@@ -101,7 +104,7 @@ class ProjectAsyncEditManager {
                     try self.editManager.applyRedo()
                 }
                 
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     self.projectManifest =
                         self.editManager.projectManifest
                     self.availableUndoCount =
@@ -113,7 +116,7 @@ class ProjectAsyncEditManager {
                 }
                 
             } catch {
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     self.delegate?.onEditError(
                         self, error: error)
                 }
@@ -139,6 +142,7 @@ class ProjectAsyncEditManager {
     
     // MARK: - Interface
     
+    @MainActor
     func applyEdit(edit: ProjectEditManager.Edit) {
         applyEditInternal(edit: edit)
     }
