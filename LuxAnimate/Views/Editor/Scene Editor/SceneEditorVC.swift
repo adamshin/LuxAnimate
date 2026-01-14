@@ -20,18 +20,28 @@ protocol SceneEditorVCDelegate: AnyObject {
     
 }
 
+extension SceneEditorVC {
+    
+    struct UpdateContext {
+        var pendingEditSceneManifest: Scene.Manifest
+    }
+    
+}
+
 class SceneEditorVC: UIViewController {
     
     weak var delegate: SceneEditorVCDelegate?
     
     private let contentVC = SceneEditorContentVC()
     
+    private weak var animEditorVC: AnimEditorVC?
+    
     private let projectID: String
     private let sceneID: String
     
     private var model: SceneEditorModel
     
-    private weak var animEditorVC: AnimEditorVC?
+    private var updateContext: UpdateContext?
     
     // MARK: - Init
     
@@ -45,8 +55,9 @@ class SceneEditorVC: UIViewController {
         self.sceneID = sceneID
         
         model = try Self.model(
+            sceneID: sceneID,
             projectEditorModel: projectEditorModel,
-            sceneID: sceneID)
+            overrideSceneManifest: nil)
         
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
@@ -79,7 +90,7 @@ class SceneEditorVC: UIViewController {
         update(model: model)
     }
     
-    // MARK: - Logic
+    // MARK: - Update
     
     // TODO: Make this data flow more logically clear?
     // Need to handle initial data as well as updates.
@@ -88,6 +99,15 @@ class SceneEditorVC: UIViewController {
         
         contentVC.update(model: model)
         animEditorVC?.update(sceneEditorModel: model)
+    }
+    
+    private func withUpdateContext(
+        _ updateContext: UpdateContext,
+        _ block: () -> Void
+    ) {
+        self.updateContext = updateContext
+        block()
+        self.updateContext = nil
     }
     
     // MARK: - Editing
@@ -103,7 +123,11 @@ class SceneEditorVC: UIViewController {
                 projectManifest: model.projectManifest,
                 sceneEdit: sceneEdit)
         
-        delegate?.onRequestEdit(self, edit: edit)
+        withUpdateContext(.init(
+            pendingEditSceneManifest: sceneEdit.sceneManifest))
+        {
+            delegate?.onRequestEdit(self, edit: edit)
+        }
     }
     
     private func removeLastLayer() {
@@ -121,7 +145,11 @@ class SceneEditorVC: UIViewController {
                 projectManifest: model.projectManifest,
                 sceneEdit: sceneEdit)
         
-        delegate?.onRequestEdit(self, edit: edit)
+        withUpdateContext(.init(
+            pendingEditSceneManifest: sceneEdit.sceneManifest))
+        {
+            delegate?.onRequestEdit(self, edit: edit)
+        }
     }
     
     // MARK: - Navigation
@@ -163,12 +191,14 @@ class SceneEditorVC: UIViewController {
     
     func update(projectEditorModel: ProjectEditorModel) {
         guard let model = try? Self.model(
+            sceneID: sceneID,
             projectEditorModel: projectEditorModel,
-            sceneID: sceneID)
+            overrideSceneManifest: updateContext?.pendingEditSceneManifest)
         else {
             dismiss()
             return
         }
+        
         update(model: model)
     }
     
@@ -183,8 +213,9 @@ extension SceneEditorVC {
     }
     
     static func model(
+        sceneID: String,
         projectEditorModel m: ProjectEditorModel,
-        sceneID: String
+        overrideSceneManifest: Scene.Manifest?
     ) throws -> SceneEditorModel {
         
         guard let sceneRef = m.projectManifest
@@ -194,10 +225,16 @@ extension SceneEditorVC {
             throw SceneRefError.invalidSceneID
         }
         
-        let sceneManifest =
-            try SceneEditorSceneManifestLoader.load(
-                projectManifest: m.projectManifest,
-                sceneID: sceneID)
+        let sceneManifest: Scene.Manifest
+        
+        if let overrideSceneManifest {
+            sceneManifest = overrideSceneManifest
+        } else {
+            sceneManifest =
+                try SceneEditorSceneManifestLoader.load(
+                    projectManifest: m.projectManifest,
+                    sceneID: sceneID)
+        }
         
         return SceneEditorModel(
             projectManifest: m.projectManifest,

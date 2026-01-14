@@ -185,16 +185,14 @@ extension ProjectEditorVC: SceneEditorVCDelegate {
 
 extension ProjectEditorVC: ProjectAsyncEditManager.Delegate {
     
-    nonisolated func onUpdateState(
+    func onUpdateState(
         _ m: ProjectAsyncEditManager
     ) {
-        Task { @MainActor in
-            let model = modelFromEditManager()
-            update(model: model)
-        }
+        let model = modelFromEditManager()
+        update(model: model)
     }
     
-    nonisolated func onEditError(
+    func onEditError(
         _ m: ProjectAsyncEditManager,
         error: Error
     ) { }

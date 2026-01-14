@@ -278,6 +278,17 @@ class AnimEditorTimelineTrackVC: UIViewController {
             withAnimation: animated)
     }
     
+    // MARK: - Update
+    
+    private func withUpdateContext(
+        _ updateContext: UpdateContext,
+        _ block: () -> Void
+    ) {
+        self.updateContext = updateContext
+        block()
+        self.updateContext = nil
+    }
+    
     // MARK: - Interface
     
     func update(
@@ -391,14 +402,13 @@ extension AnimEditorTimelineTrackVC: UICollectionViewDelegate {
             if focusedFrameIndex != frameIndex {
                 focusedFrameIndex = frameIndex
                 
-                updateContext = .init(
-                    ignoreFlags: .init(
-                        focusedFrameIndex: true))
-                
-                delegate?.onChangeFocusedFrameIndex(
-                    self, frameIndex)
-                
-                updateContext = nil
+                withUpdateContext(
+                    .init(ignoreFlags:
+                        .init(focusedFrameIndex: true)))
+                {
+                    delegate?.onChangeFocusedFrameIndex(
+                        self, frameIndex)
+                }
             }
         }
     }
@@ -491,14 +501,13 @@ extension AnimEditorTimelineTrackVC:
         } else {
             focusFrame(at: frameIndex, animated: true)
             
-            updateContext = .init(
-                ignoreFlags: .init(
-                    focusedFrameIndex: true))
-            
-            delegate?.onChangeFocusedFrameIndex(
-                self, focusedFrameIndex)
-            
-            updateContext = nil
+            withUpdateContext(
+                .init(ignoreFlags:
+                    .init(focusedFrameIndex: true)))
+            {
+                delegate?.onChangeFocusedFrameIndex(
+                    self, focusedFrameIndex)
+            }
         }
     }
     

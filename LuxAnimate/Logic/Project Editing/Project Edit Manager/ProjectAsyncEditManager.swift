@@ -19,7 +19,7 @@ extension ProjectAsyncEditManager {
     
 }
 
-class ProjectAsyncEditManager: @unchecked Sendable {
+class ProjectAsyncEditManager {
     
     private let projectID: String
     
