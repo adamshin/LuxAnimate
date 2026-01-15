@@ -192,6 +192,17 @@ extension ProjectEditorContentVC: UITableViewDelegate {
     
     func tableView(
         _ tableView: UITableView,
+        titleForHeaderInSection section: Int
+    ) -> String? {
+        switch section {
+        case 0: "Project Info"
+        case 1: "Scenes"
+        default: nil
+        }
+    }
+    
+    func tableView(
+        _ tableView: UITableView,
         didSelectRowAt indexPath: IndexPath
     ) {
         tableView.deselectRow(at: indexPath, animated: true)

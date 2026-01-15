@@ -191,6 +191,17 @@ extension SceneEditorContentVC: UITableViewDelegate {
     
     func tableView(
         _ tableView: UITableView,
+        titleForHeaderInSection section: Int
+    ) -> String? {
+        switch section {
+        case 0: "Scene Info"
+        case 1: "Layers"
+        default: nil
+        }
+    }
+    
+    func tableView(
+        _ tableView: UITableView,
         didSelectRowAt indexPath: IndexPath
     ) {
         tableView.deselectRow(at: indexPath, animated: true)
