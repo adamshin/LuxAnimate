@@ -12,8 +12,7 @@ protocol SceneEditorVCDelegate: AnyObject {
     
     func onRequestEdit(
         _ vc: SceneEditorVC,
-        edit: ProjectEditManager.Edit,
-        editContext: Sendable?)
+        edit: ProjectEditManager.Edit)
     
     func pendingEditAsset(
         assetID: String
@@ -21,10 +20,12 @@ protocol SceneEditorVCDelegate: AnyObject {
     
 }
 
-struct SceneEditorVCEditContext {
-    var sender: SceneEditorVC
-    var sceneManifest: Scene.Manifest
-    var wrappedEditContext: Sendable?
+extension SceneEditorVC {
+    
+    struct UpdateContext {
+        var pendingEditSceneManifest: Scene.Manifest
+    }
+    
 }
 
 class SceneEditorVC: UIViewController {
@@ -33,41 +34,30 @@ class SceneEditorVC: UIViewController {
     
     private let contentVC = SceneEditorContentVC()
     
+    private weak var animEditorVC: AnimEditorVC?
+    
     private let projectID: String
     private let sceneID: String
     
-    private var projectState: ProjectEditManager.State
-    private var sceneRef: Project.SceneRef
-    private var sceneManifest: Scene.Manifest
+    private var model: SceneEditorModel
     
-    private weak var animEditorVC: AnimEditorVC2?
+    private var updateContext: UpdateContext?
     
     // MARK: - Init
     
     init(
         projectID: String,
         sceneID: String,
-        projectState: ProjectEditManager.State
+        projectEditorModel: ProjectEditorModel
     ) throws {
         
         self.projectID = projectID
         self.sceneID = sceneID
-        self.projectState = projectState
         
-        let projectManifest = projectState
-            .projectManifest
-        
-        let sceneRef = try Self.sceneRefFromProject(
-            projectManifest: projectManifest,
-            sceneID: sceneID)
-        
-        let sceneManifest = try SceneEditorSceneManifestLoader
-            .load(
-                projectManifest: projectManifest,
-                sceneID: sceneID)
-        
-        self.sceneRef = sceneRef
-        self.sceneManifest = sceneManifest
+        model = try Self.model(
+            sceneID: sceneID,
+            projectEditorModel: projectEditorModel,
+            overrideSceneManifest: nil)
         
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
@@ -81,12 +71,7 @@ class SceneEditorVC: UIViewController {
         super.viewDidLoad()
         
         setupUI()
-        
-        updateState(
-            projectState: projectState,
-            sceneRef: sceneRef,
-            sceneManifest: sceneManifest,
-            editContext: nil)
+        setupInitialState()
     }
     
     override var prefersStatusBarHidden: Bool { true }
@@ -101,115 +86,70 @@ class SceneEditorVC: UIViewController {
         addChild(navController, to: view)
     }
     
-    // MARK: - Logic
-    
-    private func updateState(
-        projectState: ProjectEditManager.State,
-        editContext: Sendable?
-    ) {
-        let projectManifest = projectState
-            .projectManifest
-        
-        guard let sceneRef = try? Self.sceneRefFromProject(
-            projectManifest: projectManifest,
-            sceneID: sceneID)
-        else {
-            dismiss()
-            return
-        }
-        
-        if let context = editContext as? SceneEditorVCEditContext,
-            context.sender == self
-        {
-            updateState(
-                projectState: projectState,
-                sceneRef: sceneRef,
-                sceneManifest: context.sceneManifest,
-                editContext: context.wrappedEditContext)
-            
-        } else {
-            do {
-                let sceneManifest = try SceneEditorSceneManifestLoader
-                    .load(
-                        projectManifest: projectManifest,
-                        sceneID: sceneID)
-                
-                updateState(
-                    projectState: projectState,
-                    sceneRef: sceneRef,
-                    sceneManifest: sceneManifest,
-                    editContext: nil)
-                
-            } catch { }
-        }
+    private func setupInitialState() {
+        update(model: model)
     }
     
-    private func updateState(
-        projectState: ProjectEditManager.State,
-        sceneRef: Project.SceneRef,
-        sceneManifest: Scene.Manifest,
-        editContext: Sendable?
+    // MARK: - Update
+    
+    // TODO: Make this data flow more logically clear?
+    // Need to handle initial data as well as updates.
+    private func update(model: SceneEditorModel) {
+        self.model = model
+        
+        contentVC.update(model: model)
+        animEditorVC?.update(sceneEditorModel: model)
+    }
+    
+    private func withUpdateContext(
+        _ updateContext: UpdateContext,
+        _ block: () -> Void
     ) {
-        self.projectState = projectState
-        self.sceneRef = sceneRef
-        self.sceneManifest = sceneManifest
-        
-        contentVC.update(
-            projectState: projectState,
-            sceneRef: sceneRef,
-            sceneManifest: sceneManifest)
-        
-        animEditorVC?.update(
-            projectState: projectState,
-            sceneManifest: sceneManifest,
-            editContext: editContext)
+        self.updateContext = updateContext
+        block()
+        self.updateContext = nil
     }
     
     // MARK: - Editing
     
     private func addLayer() {
-        let projectManifest = projectState
-            .projectManifest
+        let sceneEdit =
+            SceneEditBuilder.createAnimationLayer(
+                sceneManifest: model.sceneManifest,
+                drawingCount: 1)
         
-        let sceneEdit = SceneEditBuilder.createAnimationLayer(
-            sceneManifest: sceneManifest,
-            drawingCount: 1)
+        let edit =
+            try! ProjectEditBuilder.applySceneEdit(
+                projectManifest: model.projectManifest,
+                sceneEdit: sceneEdit)
         
-        let edit = try! ProjectEditBuilder.applySceneEdit(
-            projectManifest: projectManifest,
-            sceneEdit: sceneEdit)
-        
-        let editContext = SceneEditorVCEditContext(
-            sender: self,
-            sceneManifest: sceneEdit.sceneManifest)
-        
-        delegate?.onRequestEdit(self,
-            edit: edit,
-            editContext: editContext)
+        withUpdateContext(.init(
+            pendingEditSceneManifest: sceneEdit.sceneManifest))
+        {
+            delegate?.onRequestEdit(self, edit: edit)
+        }
     }
     
     private func removeLastLayer() {
-        guard let lastLayer = sceneManifest.layers.last
+        guard let lastLayer =
+            model.sceneManifest.layers.last
         else { return }
         
-        let projectManifest = projectState
-            .projectManifest
+        let sceneEdit =
+            try! SceneEditBuilder.deleteLayer(
+                sceneManifest: model.sceneManifest,
+                layerID: lastLayer.id)
         
-        let sceneEdit = try! SceneEditBuilder.deleteLayer(
-            sceneManifest: sceneManifest,
-            layerID: lastLayer.id)
+        let edit =
+            try! ProjectEditBuilder.applySceneEdit(
+                projectManifest: model.projectManifest,
+                sceneEdit: sceneEdit)
         
-        let edit = try! ProjectEditBuilder.applySceneEdit(
-            projectManifest: projectManifest,
-            sceneEdit: sceneEdit)
-        
-        let editContext = SceneEditorVCEditContext(
-            sender: self,
-            sceneManifest: sceneEdit.sceneManifest)
-        
-        delegate?.onRequestEdit(self,
-            edit: edit,
-            editContext: editContext)
+        withUpdateContext(.init(
+            pendingEditSceneManifest: sceneEdit.sceneManifest))
+        {
+            delegate?.onRequestEdit(self, edit: edit)
+        }
     }
     
     // MARK: - Navigation
@@ -219,8 +159,9 @@ class SceneEditorVC: UIViewController {
     }
     
     private func showLayerEditor(layerID: String) {
-        guard let layer = sceneManifest.layers
-            .first(where: { $0.id == layerID })
+        guard let layer =
+            model.sceneManifest.layers
+                .first(where: { $0.id == layerID })
         else { return }
         
         switch layer.content {
@@ -231,12 +172,11 @@ class SceneEditorVC: UIViewController {
     
     private func showAnimationLayerEditor(layerID: String) {
         do {
-            let vc = try AnimEditorVC2(
+            let vc = try AnimEditorVC(
                 projectID: projectID,
                 sceneID: sceneID,
                 layerID: layerID,
-                projectState: projectState,
-                sceneManifest: sceneManifest,
+                sceneEditorModel: model,
                 focusedFrameIndex: 0)
             
             vc.delegate = self
@@ -249,18 +189,22 @@ class SceneEditorVC: UIViewController {
     
     // MARK: - Interface
     
-    func update(
-        projectState: ProjectEditManager.State,
-        editContext: Sendable?
-    ) {
-        updateState(
-            projectState: projectState,
-            editContext: editContext)
+    func update(projectEditorModel: ProjectEditorModel) {
+        guard let model = try? Self.model(
+            sceneID: sceneID,
+            projectEditorModel: projectEditorModel,
+            overrideSceneManifest: updateContext?.pendingEditSceneManifest)
+        else {
+            dismiss()
+            return
+        }
+        
+        update(model: model)
     }
     
 }
 
-// MARK: - Scene Ref
+// MARK: - Model
 
 extension SceneEditorVC {
     
@@ -268,18 +212,36 @@ extension SceneEditorVC {
         case invalidSceneID
     }
     
-    static func sceneRefFromProject(
-        projectManifest: Project.Manifest,
-        sceneID: String
-    ) throws -> Project.SceneRef {
+    static func model(
+        sceneID: String,
+        projectEditorModel m: ProjectEditorModel,
+        overrideSceneManifest: Scene.Manifest?
+    ) throws -> SceneEditorModel {
         
-        guard let sceneRef = projectManifest
+        guard let sceneRef = m.projectManifest
             .content.sceneRefs
             .first(where: { $0.id == sceneID })
         else {
             throw SceneRefError.invalidSceneID
         }
-        return sceneRef
+        
+        let sceneManifest: Scene.Manifest
+        
+        if let overrideSceneManifest {
+            sceneManifest = overrideSceneManifest
+        } else {
+            sceneManifest =
+                try SceneEditorSceneManifestLoader.load(
+                    projectManifest: m.projectManifest,
+                    sceneID: sceneID)
+        }
+        
+        return SceneEditorModel(
+            projectManifest: m.projectManifest,
+            sceneRef: sceneRef,
+            sceneManifest: sceneManifest,
+            availableUndoCount: m.availableUndoCount,
+            availableRedoCount: m.availableRedoCount)
     }
     
 }
@@ -319,42 +281,42 @@ extension SceneEditorVC: SceneEditorContentVCDelegate {
     
 }
 
-extension SceneEditorVC: AnimEditorVC2Delegate {
+extension SceneEditorVC: AnimEditorVC.Delegate {
     
-    func onRequestUndo(_ vc: AnimEditorVC2) {
+    func onRequestUndo(_ vc: AnimEditorVC) {
         delegate?.onRequestUndo(self)
     }
-    func onRequestRedo(_ vc: AnimEditorVC2) {
+    func onRequestRedo(_ vc: AnimEditorVC) {
         delegate?.onRequestRedo(self)
     }
     
-    func onRequestSceneEdit(
-        _ vc: AnimEditorVC2,
-        sceneEdit: ProjectEditBuilder.SceneEdit,
-        editContext: Sendable?
+    func onRequestEdit(
+        _ vc: AnimEditorVC,
+        layer: Scene.Layer,
+        layerContentEdit: AnimationLayerContentEditBuilder.Edit
     ) {
         do {
-            let projectManifest = projectState
-                .projectManifest
+            let sceneEdit = try AnimationLayerContentEditBuilder
+                .applyAnimationLayerContentEdit(
+                    sceneManifest: model.sceneManifest,
+                    layer: layer,
+                    layerContentEdit: layerContentEdit)
             
             let edit = try ProjectEditBuilder.applySceneEdit(
-                projectManifest: projectManifest,
+                projectManifest: model.projectManifest,
                 sceneEdit: sceneEdit)
             
-            let newEditContext = SceneEditorVCEditContext(
-                sender: self,
-                sceneManifest: sceneEdit.sceneManifest,
-                wrappedEditContext: editContext)
-            
-            delegate?.onRequestEdit(self,
-                edit: edit,
-                editContext: newEditContext)
+            withUpdateContext(.init(
+                pendingEditSceneManifest: sceneEdit.sceneManifest))
+            {
+                delegate?.onRequestEdit(self, edit: edit)
+            }
             
         } catch { }
     }
     
     func pendingEditAsset(
-        _ vc: AnimEditorVC2,
+        _ vc: AnimEditorVC,
         assetID: String
     ) -> ProjectEditManager.NewAsset? {
         delegate?.pendingEditAsset(assetID: assetID)

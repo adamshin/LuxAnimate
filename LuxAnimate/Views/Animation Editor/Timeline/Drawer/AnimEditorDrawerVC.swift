@@ -17,7 +17,7 @@ protocol AnimEditorDrawerVCDelegate: AnyObject {
         _ vc: AnimEditorDrawerVC,
         _ expanded: Bool)
     
-    func onChangeContentAreaSize(
+    func onChangeDrawerSize(
         _ vc: AnimEditorDrawerVC)
     
 }
@@ -26,9 +26,12 @@ class AnimEditorDrawerVC: UIViewController {
     
     weak var delegate: AnimEditorDrawerVCDelegate?
     
-    let remainderContentView = PassthroughView()
+//    let remainderContentView = PassthroughView()
     
+    // Modifying the drawer to not include a remainder
+    // content view. So we may not need this view anymore.
     let drawerContentView = UIView()
+    
     let toolbar = AnimEditorDrawerToolbar()
     let collapsibleContentView = UIView()
     
@@ -51,14 +54,15 @@ class AnimEditorDrawerVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.addSubview(remainderContentView)
-        remainderContentView.pinEdges([.horizontal, .top])
+//        view.addSubview(remainderContentView)
+//        remainderContentView.pinEdges([.horizontal, .top])
         
         view.addSubview(drawerContentView)
-        drawerContentView.pinEdges([.horizontal, .bottom])
-        drawerContentView.pin(.top,
-            to: remainderContentView,
-            toAnchor: .bottom)
+//        drawerContentView.pinEdges([.horizontal, .bottom])
+//        drawerContentView.pin(.top,
+//            to: remainderContentView,
+//            toAnchor: .bottom)
+        drawerContentView.pinEdges()
         
         let blurView = ChromeBlurView()
         drawerContentView.addSubview(blurView)
@@ -124,7 +128,7 @@ class AnimEditorDrawerVC: UIViewController {
                 expanded ? separatorColor : .clear
             
             self.view.layoutIfNeeded()
-            self.delegate?.onChangeContentAreaSize(self)
+            self.delegate?.onChangeDrawerSize(self)
         }
         
         if animated {

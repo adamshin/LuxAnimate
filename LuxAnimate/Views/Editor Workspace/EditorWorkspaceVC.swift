@@ -9,32 +9,42 @@ import Geometry
 private let minZoomScale: Double = 0.1
 private let maxZoomScale: Double = 30
 
-@MainActor
-protocol EditorWorkspaceVCDelegate: AnyObject {
+extension EditorWorkspaceVC {
     
-    func onSelectUndo(_ vc: EditorWorkspaceVC)
-    func onSelectRedo(_ vc: EditorWorkspaceVC)
+    @MainActor
+    protocol Delegate: AnyObject {
+        func onSelectUndo(_ vc: EditorWorkspaceVC)
+        func onSelectRedo(_ vc: EditorWorkspaceVC)
+    }
     
 }
 
 class EditorWorkspaceVC: UIViewController {
     
-    weak var delegate: EditorWorkspaceVCDelegate?
+    weak var delegate: Delegate?
     
-    let metalView = EditorWorkspaceMetalView()
+    private let metalView = EditorWorkspaceMetalView()
     private let overlayView = EditorWorkspaceOverlayView()
     
-    private let workspaceTransformManager = EditorWorkspaceTransformManager()
+    private let transformManager =
+        EditorWorkspaceTransformManager()
+    
+    private let renderer = EditorWorkspaceRenderer()
+    
+    private var sceneGraph: EditorWorkspaceSceneGraph?
+    private var needsDraw = true
+    
+    private var safeAreaReferenceView: UIView?
     
     // MARK: - Init
     
     init() {
         super.init(nibName: nil, bundle: nil)
         
-        workspaceTransformManager.delegate = self
-        workspaceTransformManager.setMinScale(minZoomScale)
-        workspaceTransformManager.setMaxScale(maxZoomScale)
-        workspaceTransformManager.fitContentToViewport()
+        transformManager.delegate = self
+        transformManager.setMinScale(minZoomScale)
+        transformManager.setMaxScale(maxZoomScale)
+        transformManager.fitContentToViewport()
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -57,69 +67,156 @@ class EditorWorkspaceVC: UIViewController {
         metalView.frame = view.bounds
         overlayView.frame = view.bounds
         
-        workspaceTransformManager.setViewportSize(
-            Size(
-                metalView.bounds.width,
-                metalView.bounds.height))
+        updateLayout()
+    }
+    
+    // MARK: - Layout
+    
+    private func updateLayout() {
+        guard let presentationLayer =
+            view.layer.presentation()
+        else { return }
+        
+        updateViewportSize(
+            presentationLayer: presentationLayer)
+        
+        updateViewportSafeAreaInsets(
+            presentationLayer: presentationLayer)
+    }
+    
+    private func updateViewportSize(
+        presentationLayer: CALayer
+    ) {
+        transformManager.setViewportSize(Size(
+            presentationLayer.bounds.width,
+            presentationLayer.bounds.height))
+    }
+    
+    private func updateViewportSafeAreaInsets(
+        presentationLayer: CALayer
+    ) {
+        guard let safeAreaReferenceView
+        else { return }
+        
+        guard let safeAreaReferenceLayer =
+            safeAreaReferenceView.layer.presentation()
+        else { return }
+        
+        let safeAreaFrame = safeAreaReferenceLayer
+            .convert(
+                safeAreaReferenceLayer.bounds,
+                to: presentationLayer)
+        
+        var insets = EditorWorkspaceTransformManager
+            .SafeAreaInsets.zero
+        
+        insets.left = safeAreaFrame.minX
+        insets.top = safeAreaFrame.minY
+        
+        insets.right =
+            presentationLayer.bounds.width
+            - safeAreaFrame.maxX
+        
+        insets.bottom =
+            presentationLayer.bounds.height
+            - safeAreaFrame.maxY
+        
+        transformManager.setViewportSafeAreaInsets(insets)
+    }
+    
+    // MARK: - Render
+    
+    private func draw() {
+        guard needsDraw else { return }
+        needsDraw = false
+        
+        guard let sceneGraph else { return }
+        
+        guard let drawable =
+            metalView.metalLayer.nextDrawable()
+        else { return }
+        
+        guard let presentationLayer =
+            metalView.metalLayer.presentation()
+        else { return }
+        
+        let viewportSize = Size(
+            presentationLayer.bounds.width,
+            presentationLayer.bounds.height)
+        
+        let workspaceTransform =
+            transformManager.transform()
+        
+        renderer.draw(
+            drawable: drawable,
+            viewportSize: viewportSize,
+            workspaceTransform: workspaceTransform,
+            sceneGraph: sceneGraph)
     }
     
     // MARK: - Interface
     
+    func setSceneGraph(
+        _ sceneGraph: EditorWorkspaceSceneGraph
+    ) {
+        self.sceneGraph = sceneGraph
+        
+        transformManager.setContentSize(
+            sceneGraph.contentSize)
+        
+        needsDraw = true
+    }
+    
     func onFrame() {
-        workspaceTransformManager.onFrame()
+        updateLayout()
+        transformManager.onFrame()
+        
+        autoreleasepool {
+            draw()
+        }
     }
     
-    func setContentSize(_ contentSize: Size) {
-        workspaceTransformManager
-            .setContentSize(contentSize)
+    func addOverlayGestureRecognizer(
+        _ g: UIGestureRecognizer
+    ) {
+        overlayView.addOverlayGestureRecognizer(g)
     }
     
-    func addToolGestureRecognizer(_ g: UIGestureRecognizer) {
-        overlayView.addToolGestureRecognizer(g)
-    }
-    
-    func removeAllToolGestureRecognizers() {
-        overlayView.removeAllToolGestureRecognizers()
-    }
-    
-    func viewportSize() -> Size {
-        Size(
-            metalView.bounds.width,
-            metalView.bounds.height)
+    func removeAllOverlayGestureRecognizers() {
+        overlayView.removeAllOverlayGestureRecognizers()
     }
     
     func workspaceTransform() -> EditorWorkspaceTransform {
-        workspaceTransformManager.transform()
+        transformManager.transform()
+    }
+    
+    func setSafeAreaReferenceView(_ v: UIView) {
+        safeAreaReferenceView = v
+        updateLayout()
     }
     
 }
 
 // MARK: - Delegates
 
-extension EditorWorkspaceVC: EditorWorkspaceTransformManagerDelegate {
+extension EditorWorkspaceVC:
+    EditorWorkspaceMetalView.Delegate {
     
-    func onUpdateTransform(
-        _ m: EditorWorkspaceTransformManager
-    ) { 
-        // TODO: Report to delegate that we need draw?
+    func onRequestDraw(
+        _ view: EditorWorkspaceMetalView
+    ) {
+        needsDraw = true
     }
     
 }
 
-extension EditorWorkspaceVC: EditorWorkspaceMetalViewDelegate {
-    
-    func onRequestDraw(_ view: EditorWorkspaceMetalView) {
-        // TODO: Report to delegate that we need draw?
-    }
-    
-}
-
-extension EditorWorkspaceVC: EditorWorkspaceOverlayViewDelegate {
+extension EditorWorkspaceVC:
+    EditorWorkspaceOverlayView.Delegate {
     
     func onBeginWorkspaceTransformGesture(
         _ v: EditorWorkspaceOverlayView
     ) {
-        workspaceTransformManager.handleBeginTransformGesture()
+        transformManager.handleBeginTransformGesture()
     }
     
     func onUpdateWorkspaceTransformGesture(
@@ -129,7 +226,7 @@ extension EditorWorkspaceVC: EditorWorkspaceOverlayViewDelegate {
         rotation: Double,
         scale: Double
     ) {
-        workspaceTransformManager.handleUpdateTransformGesture(
+        transformManager.handleUpdateTransformGesture(
             initialAnchorPosition: initialAnchorPosition,
             translation: translation,
             rotation: rotation,
@@ -141,7 +238,7 @@ extension EditorWorkspaceVC: EditorWorkspaceOverlayViewDelegate {
         finalAnchorPosition: Vector,
         pinchFlickIn: Bool
     ) {
-        workspaceTransformManager.handleEndTransformGesture(
+        transformManager.handleEndTransformGesture(
             finalAnchorPosition: finalAnchorPosition,
             pinchFlickIn: pinchFlickIn)
     }
@@ -152,6 +249,17 @@ extension EditorWorkspaceVC: EditorWorkspaceOverlayViewDelegate {
     
     func onSelectRedo(_ v: EditorWorkspaceOverlayView) {
         delegate?.onSelectRedo(self)
+    }
+    
+}
+
+extension EditorWorkspaceVC:
+    EditorWorkspaceTransformManager.Delegate {
+    
+    func onUpdateTransform(
+        _ m: EditorWorkspaceTransformManager
+    ) {
+        needsDraw = true
     }
     
 }

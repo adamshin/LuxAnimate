@@ -8,16 +8,25 @@ import Geometry
 import Color
 import Render
 
-private let backgroundColor = Color(UIColor.editorBackground)
+// MARK: - Config
+
+private let backgroundColor = Color(
+    UIColor.editorBackground)
+
 private let scalePixelateThreshold: Double = 1.0
+
+// MARK: - EditorWorkspaceRenderer
 
 struct EditorWorkspaceRenderer {
     
     private let spriteRenderer: SpriteRenderer
     private let blankTexture: MTLTexture
     
+    // MARK: - Init
+    
     init(
-        pixelFormat: MTLPixelFormat = AppConfig.metalLayerPixelFormat
+        pixelFormat: MTLPixelFormat =
+            AppConfig.metalLayerPixelFormat
     ) {
         spriteRenderer = SpriteRenderer(
             pixelFormat: pixelFormat,
@@ -26,27 +35,52 @@ struct EditorWorkspaceRenderer {
         blankTexture = createBlankTexture(color: .white)!
     }
     
+    // MARK: - Draw
+    
     func draw(
-        target: MTLTexture,
-        commandBuffer: MTLCommandBuffer,
+        drawable: CAMetalDrawable,
         viewportSize: Size,
         workspaceTransform: EditorWorkspaceTransform,
         sceneGraph: EditorWorkspaceSceneGraph
     ) {
-        // Transform
-        let viewportTransform = Matrix3(translation: Vector(
-            viewportSize.width / 2,
-            viewportSize.height / 2))
+        let target = drawable.texture
+        
+        let viewportTransform = Matrix3(
+            translation: Vector(
+                viewportSize.width / 2,
+                viewportSize.height / 2))
         
         let contentTransform =
             viewportTransform *
             workspaceTransform.matrix()
         
-        // Pixelation
         let pixelate =
             workspaceTransform.scale >
             scalePixelateThreshold
         
+        let commandBuffer = MetalInterface.shared
+            .commandQueue.makeCommandBuffer()!
+        
+        drawSceneGraph(
+            target: target,
+            commandBuffer: commandBuffer,
+            viewportSize: viewportSize,
+            contentTransform: contentTransform,
+            pixelate: pixelate,
+            sceneGraph: sceneGraph)
+        
+        commandBuffer.present(drawable)
+        commandBuffer.commit()
+    }
+    
+    private func drawSceneGraph(
+        target: MTLTexture,
+        commandBuffer: MTLCommandBuffer,
+        viewportSize: Size,
+        contentTransform: Matrix3,
+        pixelate: Bool,
+        sceneGraph: EditorWorkspaceSceneGraph
+    ) {
         // Background color
         ClearColorRenderer.drawClearColor(
             commandBuffer: commandBuffer,
@@ -55,26 +89,43 @@ struct EditorWorkspaceRenderer {
         
         // Layers
         for layer in sceneGraph.layers {
-            switch layer.content {
-            case .image(let content):
-                drawImageLayer(
-                    target: target,
-                    commandBuffer: commandBuffer,
-                    viewportSize: viewportSize,
-                    contentTransform: contentTransform,
-                    layer: layer,
-                    content: content,
-                    pixelate: pixelate)
-                
-            case .rect(let content):
-                drawRectLayer(
-                    target: target,
-                    commandBuffer: commandBuffer,
-                    viewportSize: viewportSize,
-                    contentTransform: contentTransform,
-                    layer: layer,
-                    content: content)
-            }
+            drawLayer(
+                target: target,
+                commandBuffer: commandBuffer,
+                viewportSize: viewportSize,
+                contentTransform: contentTransform,
+                pixelate: pixelate,
+                layer: layer)
+        }
+    }
+    
+    private func drawLayer(
+        target: MTLTexture,
+        commandBuffer: MTLCommandBuffer,
+        viewportSize: Size,
+        contentTransform: Matrix3,
+        pixelate: Bool,
+        layer: EditorWorkspaceSceneGraph.Layer
+    ) {
+        switch layer.content {
+        case .image(let content):
+            drawImageLayer(
+                target: target,
+                commandBuffer: commandBuffer,
+                viewportSize: viewportSize,
+                contentTransform: contentTransform,
+                pixelate: pixelate,
+                layer: layer,
+                content: content)
+            
+        case .rect(let content):
+            drawRectLayer(
+                target: target,
+                commandBuffer: commandBuffer,
+                viewportSize: viewportSize,
+                contentTransform: contentTransform,
+                layer: layer,
+                content: content)
         }
     }
     
@@ -83,9 +134,9 @@ struct EditorWorkspaceRenderer {
         commandBuffer: MTLCommandBuffer,
         viewportSize: Size,
         contentTransform: Matrix3,
+        pixelate: Bool,
         layer: EditorWorkspaceSceneGraph.Layer,
-        content: EditorWorkspaceSceneGraph.ImageLayerContent,
-        pixelate: Bool
+        content: EditorWorkspaceSceneGraph.ImageLayerContent
     ) {
         guard let texture = content.texture else { return }
         
@@ -139,22 +190,41 @@ struct EditorWorkspaceRenderer {
     
 }
 
-private func createBlankTexture(color: Color) -> MTLTexture? {
-    let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(
-        pixelFormat: .rgba8Unorm,
-        width: 1,
-        height: 1,
-        mipmapped: false)
-    textureDescriptor.usage = [.shaderRead, .shaderWrite]
+// MARK: - Utilities
+
+private func createBlankTexture(
+    color: Color
+) -> MTLTexture? {
+    
+    let textureDescriptor =
+        MTLTextureDescriptor.texture2DDescriptor(
+            pixelFormat: .rgba8Unorm,
+            width: 1,
+            height: 1,
+            mipmapped: false)
+    
+    textureDescriptor.usage = [
+        .shaderRead,
+        .shaderWrite
+    ]
     
     guard let texture = MetalInterface.shared.device
         .makeTexture(descriptor: textureDescriptor)
     else { return nil }
     
     let region = MTLRegionMake2D(0, 0, 1, 1)
-    var c = simd_uchar4(color.r, color.g, color.b, color.a)
     
-    texture.replace(region: region, mipmapLevel: 0, withBytes: &c, bytesPerRow: 4)
+    var c = simd_uchar4(
+        color.r,
+        color.g,
+        color.b,
+        color.a)
+    
+    texture.replace(
+        region: region,
+        mipmapLevel: 0,
+        withBytes: &c,
+        bytesPerRow: 4)
     
     return texture
 }

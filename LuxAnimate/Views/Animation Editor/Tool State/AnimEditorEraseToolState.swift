@@ -6,78 +6,60 @@ import UIKit
 import BrushEngine
 
 @MainActor
-protocol AnimEditorEraseToolStateDelegate:
-    BrushGestureRecognizer.GestureDelegate { }
-
 class AnimEditorEraseToolState: AnimEditorToolState {
     
-    weak var delegate: AnimEditorEraseToolStateDelegate? {
-        didSet {
-            brushGestureRecognizer.gestureDelegate = delegate
-        }
-    }
-    
-    private let brushGestureRecognizer = BrushGestureRecognizer()
-    private let controlsVC = AnimEditorEraseToolControlsVC()
+    let controlsVC = AnimEditorPaintToolControlsVC()
+    let brushGestureRecognizer = BrushGestureRecognizer()
     
     private(set) var brush: BrushEngine.Brush?
     private(set) var scale: Double
     private(set) var smoothing: Double
     
     init() {
+        // TODO: Allow user to pick brushes
         brush = try? BrushLibraryManager.loadBrush(
             id: AppConfig.eraseBrushID)
         
-        scale = AnimEditorToolSettingsStore
-            .eraseToolScale
-        smoothing = AnimEditorToolSettingsStore
-            .eraseToolSmoothing
+        scale = AnimEditorToolSettingsStore.eraseToolScale
+        smoothing = AnimEditorToolSettingsStore.eraseToolSmoothing
         
         controlsVC.delegate = self
-        controlsVC.scale = scale
-        controlsVC.smoothing = smoothing
+        controlsVC.setScale(scale)
+        controlsVC.setSmoothing(smoothing)
     }
     
-    func beginState(
-        workspaceVC: EditorWorkspaceVC,
-        toolControlsVC: AnimEditorToolControlsVC
-    ) {
-        workspaceVC.addToolGestureRecognizer(
-            brushGestureRecognizer)
-        
-        toolControlsVC.show(controlsVC)
+    var workspaceControlsVC: UIViewController? {
+        controlsVC
     }
     
-    func endState(
-        workspaceVC: EditorWorkspaceVC,
-        toolControlsVC: AnimEditorToolControlsVC
-    ) {
-        workspaceVC.removeAllToolGestureRecognizers()
-        toolControlsVC.show(nil)
+    var workspaceGestureRecognizers: [UIGestureRecognizer] {
+        [brushGestureRecognizer]
     }
     
     func setEditInteractionEnabled(_ enabled: Bool) {
         brushGestureRecognizer.isEnabled = enabled
     }
     
-    func toggleToolExpandedOptionsVisible() {
-        // TODO
+}
+
+extension AnimEditorEraseToolState:
+    AnimEditorPaintToolControlsVC.Delegate {
+    
+    func onChangeScale(
+        _ vc: AnimEditorPaintToolControlsVC,
+        _ value: Double
+    ) {
+        AnimEditorToolSettingsStore.eraseToolScale = value
+        scale = value
+    }
+    
+    func onChangeSmoothing(
+        _ vc: AnimEditorPaintToolControlsVC,
+        _ value: Double
+    ) {
+        AnimEditorToolSettingsStore.eraseToolSmoothing = value
+        smoothing = value
     }
     
 }
 
-// MARK: - Delegates
-
-extension AnimEditorEraseToolState: AnimEditorEraseToolControlsVCDelegate {
-    
-    func onChangeScale(_ vc: AnimEditorEraseToolControlsVC) {
-        scale = controlsVC.scale
-        AnimEditorToolSettingsStore
-            .eraseToolScale = scale
-    }
-    func onChangeSmoothing(_ vc: AnimEditorEraseToolControlsVC) {
-        smoothing = controlsVC.smoothing
-        AnimEditorToolSettingsStore.eraseToolSmoothing = smoothing
-    }
-    
-}

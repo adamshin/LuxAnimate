@@ -1,39 +1,40 @@
 //
-//  AnimFrameEditorToolState.swift
+//  AnimFrameEditSessionToolState.swift
 //
 
 import Metal
 import Geometry
 
 @MainActor
-protocol AnimFrameEditorToolStateDelegate: AnyObject {
+protocol AnimFrameEditSessionToolStateDelegate: AnyObject {
     
     func workspaceViewSize(
-        _ s: AnimFrameEditorToolState
+        _ s: AnimFrameEditSessionToolState
     ) -> Size
     
     func workspaceTransform(
-        _ s: AnimFrameEditorToolState
+        _ s: AnimFrameEditSessionToolState
     ) -> EditorWorkspaceTransform
     
     func layerContentSize(
-        _ s: AnimFrameEditorToolState
+        _ s: AnimFrameEditSessionToolState
     ) -> Size
     
     func layerTransform(
-        _ s: AnimFrameEditorToolState
+        _ s: AnimFrameEditSessionToolState
     ) -> Matrix3
     
-    func onEdit(
-        _ s: AnimFrameEditorToolState,
+    func onRequestEdit(
+        _ s: AnimFrameEditSessionToolState,
         imageSet: DrawingAssetProcessor.ImageSet)
     
 }
 
 @MainActor
-protocol AnimFrameEditorToolState: AnyObject {
+protocol AnimFrameEditSessionToolState: AnyObject {
     
-    var delegate: AnimFrameEditorToolStateDelegate? { get set }
+    var delegate: AnimFrameEditSessionToolStateDelegate?
+    { get set }
     
     func onFrame()
     
@@ -41,3 +42,4 @@ protocol AnimFrameEditorToolState: AnyObject {
     func setDrawingCanvasTextureContents(_ texture: MTLTexture)
     
 }
+

@@ -2,7 +2,7 @@
 //  AnimFrameEditor.swift
 //
 
-import Metal
+import Foundation
 import Geometry
 
 extension AnimFrameEditor {
@@ -10,37 +10,35 @@ extension AnimFrameEditor {
     @MainActor
     protocol Delegate: AnyObject {
         
-        func workspaceViewSize(
-            _ e: AnimFrameEditor
-        ) -> Size
+        func workspaceViewSize(_ e: AnimFrameEditor)
+        -> Size
         
-        func workspaceTransform(
-            _ e: AnimFrameEditor
-        ) -> EditorWorkspaceTransform
+        func workspaceTransform(_ e: AnimFrameEditor)
+        -> EditorWorkspaceTransform
         
-        func setAssetLoaderAssetIDs(
+        func loadAssets(
             _ e: AnimFrameEditor,
             assetIDs: Set<String>)
         
-        func assetLoaderHasLoadedAssets(
+        func hasLoadedAssets(
             _ e: AnimFrameEditor,
             assetIDs: Set<String>
         ) -> Bool
         
-        func assetLoaderAsset(
+        func asset(
             _ e: AnimFrameEditor,
             assetID: String
         ) -> AnimEditorAssetLoader.LoadedAsset?
         
-        func setEditInteractionEnabled(
-            _ e: AnimFrameEditor,
-            enabled: Bool)
-        
-        func onEdit(
+        func onRequestEdit(
             _ e: AnimFrameEditor,
             drawingID: String,
             imageSet: DrawingAssetProcessor.ImageSet)
         
+    }
+    
+    struct UpdateContext {
+        var ignoreUpdate: Bool
     }
     
 }
@@ -48,116 +46,103 @@ extension AnimFrameEditor {
 @MainActor
 class AnimFrameEditor {
     
-    private var state: AnimFrameEditorState?
+    private var editSession: AnimFrameEditSession?
+    
+    private var updateContext: UpdateContext?
     
     weak var delegate: Delegate?
     
-    // MARK: - State
+    // MARK: - Update Context
     
-    private func enterState(_ newState: AnimFrameEditorState) {
-        state = newState
-        newState.delegate = self
-        newState.beginState()
+    private func withUpdateContext(
+        _ updateContext: UpdateContext,
+        _ block: () -> Void
+    ) {
+        self.updateContext = updateContext
+        block()
+        self.updateContext = nil
     }
     
     // MARK: - Interface
     
-    func begin(
-        projectManifest: Project.Manifest,
-        sceneManifest: Scene.Manifest,
-        layer: Scene.Layer,
-        layerContent: Scene.AnimationLayerContent,
-        frameIndex: Int,
-        onionSkinConfig: AnimEditorOnionSkinConfig?,
-        editorToolState: AnimEditorToolState
-    ) { 
-        let state = AnimFrameEditorLoadingState(
-            projectManifest: projectManifest,
-            sceneManifest: sceneManifest,
-            layer: layer,
-            layerContent: layerContent,
-            frameIndex: frameIndex,
-            onionSkinConfig: onionSkinConfig,
-            editorToolState: editorToolState)
+    func update(
+        model: AnimEditorModel,
+        focusedFrameIndex: Int,
+        editorToolState: AnimEditorToolState?
+    ) {
+        if let updateContext, updateContext.ignoreUpdate {
+            return
+        }
         
-        enterState(state)
+        editSession = AnimFrameEditSession(
+            projectManifest: model.projectManifest,
+            sceneManifest: model.sceneManifest,
+            layer: model.layer,
+            layerContent: model.layerContent,
+            frameIndex: focusedFrameIndex,
+            editorToolState: editorToolState,
+            delegate: self)
     }
     
     func onFrame() -> EditorWorkspaceSceneGraph? {
-        state?.onFrame()
+        editSession?.onFrame()
     }
     
     func onAssetLoaderUpdate() {
-        state?.onAssetLoaderUpdate()
+        editSession?.onAssetLoaderUpdate()
     }
     
 }
 
 // MARK: - Delegates
 
-extension AnimFrameEditor: AnimFrameEditorStateDelegate {
-    
-    func changeState(
-        _ s: AnimFrameEditorState,
-        newState: AnimFrameEditorState
-    ) {
-        enterState(newState)
-    }
-    
-    func setAssetLoaderAssetIDs(
-        _ s: AnimFrameEditorState,
-        assetIDs: Set<String>
-    ) {
-        delegate?.setAssetLoaderAssetIDs(
-            self, assetIDs: assetIDs)
-    }
-    
-    func assetLoaderHasLoadedAssets(
-        _ s: AnimFrameEditorState,
-        assetIDs: Set<String>
-    ) -> Bool {
-        delegate?.assetLoaderHasLoadedAssets(
-            self, assetIDs: assetIDs)
-        ?? false
-    }
-    
-    func assetLoaderAsset(
-        _ s: AnimFrameEditorState,
-        assetID: String
-    ) -> AnimEditorAssetLoader.LoadedAsset? {
-        delegate?.assetLoaderAsset(
-            self, assetID: assetID)
-    }
+extension AnimFrameEditor: AnimFrameEditSession.Delegate {
     
     func workspaceViewSize(
-        _ s: AnimFrameEditorState
-    ) -> Size {
+        _ s: AnimFrameEditSession
+    ) -> Geometry.Size {
         delegate?.workspaceViewSize(self) ?? .zero
     }
     
     func workspaceTransform(
-        _ s: AnimFrameEditorState
+        _ s: AnimFrameEditSession
     ) -> EditorWorkspaceTransform {
         delegate?.workspaceTransform(self) ?? .identity
     }
     
-    func setEditInteractionEnabled(
-        _ s: any AnimFrameEditorState,
-        enabled: Bool
+    func loadAssets(
+        _ s: AnimFrameEditSession,
+        assetIDs: Set<String>
     ) {
-        delegate?.setEditInteractionEnabled(
-            self, enabled: enabled)
+        delegate?.loadAssets(self, assetIDs: assetIDs)
     }
     
-    func onEdit(
-        _ s: AnimFrameEditorState,
+    func hasLoadedAssets(
+        _ s: AnimFrameEditSession,
+        assetIDs: Set<String>
+    ) -> Bool {
+        delegate?.hasLoadedAssets(
+            self, assetIDs: assetIDs) ?? false
+    }
+    
+    func asset(
+        _ s: AnimFrameEditSession,
+        assetID: String
+    ) -> AnimEditorAssetLoader.LoadedAsset? {
+        delegate?.asset(self, assetID: assetID)
+    }
+    
+    func onRequestEdit(
+        _ s: AnimFrameEditSession,
         drawingID: String,
         imageSet: DrawingAssetProcessor.ImageSet
     ) {
-        delegate?.onEdit(
-            self,
-            drawingID: drawingID,
-            imageSet: imageSet)
+        withUpdateContext(.init(ignoreUpdate: true)) {
+            delegate?.onRequestEdit(
+                self,
+                drawingID: drawingID,
+                imageSet: imageSet)
+        }
     }
     
 }

@@ -8,7 +8,9 @@ class AnimEditorView: UIView {
     
     let workspaceContainer = UIView()
     let toolbarContainer = UIView()
-    let toolControlsContainer = PassthroughView()
+    let timelineContainer = UIView()
+    
+    let workspaceSafeAreaView = PassthroughView()
     
     init() {
         super.init(frame: .zero)
@@ -20,8 +22,15 @@ class AnimEditorView: UIView {
         addSubview(toolbarContainer)
         toolbarContainer.pinEdges([.horizontal, .top])
         
-        addSubview(toolControlsContainer)
-        toolControlsContainer.pinEdges()
+        addSubview(timelineContainer)
+        timelineContainer.pinEdges([.horizontal, .bottom])
+        
+        addSubview(workspaceSafeAreaView)
+        workspaceSafeAreaView.pinEdges(.horizontal)
+        workspaceSafeAreaView.pin(
+            .top, to: toolbarContainer, toAnchor: .bottom)
+        workspaceSafeAreaView.pin(
+            .bottom, to: timelineContainer, toAnchor: .top)
     }
     
     required init?(coder: NSCoder) { fatalError() }
