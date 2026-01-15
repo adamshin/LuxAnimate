@@ -18,7 +18,7 @@ class AnimEditorEraseToolState: AnimEditorToolState {
     init() {
         // TODO: Allow user to pick brushes
         brush = try? BrushLibraryManager.loadBrush(
-            id: "round")
+            id: AppConfig.eraseBrushID)
         
         scale = AnimEditorToolSettingsStore.eraseToolScale
         smoothing = AnimEditorToolSettingsStore.eraseToolSmoothing

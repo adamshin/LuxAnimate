@@ -90,6 +90,7 @@ class AnimEditorVC: UIViewController {
             model: model)
         
         toolbarVC = AnimEditor2ToolbarVC()
+        toolbarVC.update(model: model)
         
         timelineVC = AnimEditorTimelineVC(
             projectID: projectID,
@@ -157,13 +158,10 @@ class AnimEditorVC: UIViewController {
     }
     
     private func setupInitialState() {
-        toolbarVC.update(model: model)
-        toolbarVC.update(selectedTool: .paint)
+        let initialTool: AnimEditor2ToolbarVC.Tool = .paint
         
-        toolStateMachine.setToolState(
-            AnimEditorPaintToolState())
-        
-        updateFrameEditor()
+        toolbarVC.update(selectedTool: initialTool)
+        updateInternal(selectedToolbarTool: initialTool)
     }
     
     // MARK: - Internal State
