@@ -40,6 +40,10 @@ class AnimEditorPaintToolState: AnimEditorToolState {
         brushGestureRecognizer.isEnabled = enabled
     }
     
+    func toggleExpandedControls() {
+        // TODO: Toggle brush picker menu
+    }
+    
 }
 
 extension AnimEditorPaintToolState:

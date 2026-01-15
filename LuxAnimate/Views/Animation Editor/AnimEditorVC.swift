@@ -305,10 +305,11 @@ extension AnimEditorVC: AnimEditor2ToolbarVC.Delegate {
         tool: AnimEditor2ToolbarVC.Tool,
         isAlreadySelected: Bool
     ) {
-        // TODO: If tool is already selected, toggle
-        // expanded tool UI.
-        
-        updateInternal(selectedToolbarTool: tool)
+        if isAlreadySelected {
+            toolStateMachine.toggleExpandedControls()
+        } else {
+            updateInternal(selectedToolbarTool: tool)
+        }
     }
     
 }

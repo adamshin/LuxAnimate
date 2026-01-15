@@ -11,5 +11,6 @@ protocol AnimEditorToolState: AnyObject {
     var workspaceGestureRecognizers: [UIGestureRecognizer] { get }
     
     func setEditInteractionEnabled(_ enabled: Bool)
+    func toggleExpandedControls()
     
 }

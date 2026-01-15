@@ -45,4 +45,8 @@ class AnimEditorToolStateMachine {
         toolState?.setEditInteractionEnabled(enabled)
     }
     
+    func toggleExpandedControls() {
+        toolState?.toggleExpandedControls()
+    }
+    
 }
