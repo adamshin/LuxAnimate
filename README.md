@@ -11,3 +11,5 @@ A frame-by-frame animation app for iPad and Apple Pencil.
 5. Move to a new frame position.
 6. Tap the plus button to add a new frame, and draw again.
 6. Scroll across the timeline to preview your animation.
+
+![LuxAnimate Demo](docs/demo.gif)
