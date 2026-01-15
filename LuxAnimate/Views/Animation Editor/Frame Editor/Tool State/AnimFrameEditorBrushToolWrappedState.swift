@@ -89,7 +89,15 @@ class AnimFrameEditorBrushToolWrappedState {
         canvas.setTextureContents(texture)
     }
     
-    func beginStroke(
+}
+
+// MARK: - Delegates
+
+extension AnimFrameEditorBrushToolWrappedState:
+    BrushGestureRecognizer.GestureDelegate {
+                                                    
+    func onBeginStroke(
+        _ g: BrushGestureRecognizer,
         quickTap: Bool
     ) {
         guard let delegate,
@@ -108,7 +116,8 @@ class AnimFrameEditorBrushToolWrappedState {
             quickTap: quickTap)
     }
     
-    func updateStroke(
+    func onUpdateStroke(
+        _ g: BrushGestureRecognizer,
         addedSamples: [BrushGestureRecognizer.Sample],
         predictedSamples: [BrushGestureRecognizer.Sample]
     ) {
@@ -132,7 +141,8 @@ class AnimFrameEditorBrushToolWrappedState {
             predictedSamples: predictedSamples)
     }
     
-    func updateStroke(
+    func onUpdateStroke(
+        _ g: BrushGestureRecognizer,
         sampleUpdates: [BrushGestureRecognizer.SampleUpdate]
     ) {
         guard let delegate else { return }
@@ -151,17 +161,15 @@ class AnimFrameEditorBrushToolWrappedState {
             sampleUpdates: sampleUpdates)
     }
     
-    func endStroke() {
+    func onEndStroke(_ g: BrushGestureRecognizer) {
         canvas.endStroke()
     }
 
-    func cancelStroke() {
+    func onCancelStroke(_ g: BrushGestureRecognizer) {
         canvas.cancelStroke()
     }
     
 }
-
-// MARK: - Delegates
 
 extension AnimFrameEditorBrushToolWrappedState:
     BrushEngine.Canvas.Delegate {

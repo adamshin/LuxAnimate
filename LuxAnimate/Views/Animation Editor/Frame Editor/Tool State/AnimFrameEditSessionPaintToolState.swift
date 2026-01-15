@@ -27,8 +27,9 @@ class AnimFrameEditSessionPaintToolState:
             canvasSize: drawingCanvasSize,
             brushMode: .paint)
         
-        // TODO: Figure out communication between states
-//        editorToolState.delegate = self
+        editorToolState.brushGestureRecognizer
+            .gestureDelegate = wrappedState
+        
         wrappedState.delegate = self
     }
     
@@ -111,50 +112,3 @@ extension AnimFrameEditSessionPaintToolState:
     }
     
 }
-
-// TODO: Figure out communication between this tool state and editor tool state
-
-/*
-extension AnimFrameEditorPaintToolState:
-    AnimEditorPaintToolStateDelegate {
-    
-    func onBeginStroke(
-        _ g: BrushGestureRecognizer,
-        quickTap: Bool
-    ) {
-        internalState.beginStroke(
-            quickTap: quickTap)
-    }
-    
-    func onUpdateStroke(
-        _ g: BrushGestureRecognizer,
-        addedSamples: [BrushGestureRecognizer.Sample],
-        predictedSamples: [BrushGestureRecognizer.Sample]
-    ) {
-        internalState.updateStroke(
-            addedSamples: addedSamples,
-            predictedSamples: predictedSamples)
-    }
-    
-    func onUpdateStroke(
-        _ g: BrushGestureRecognizer,
-        sampleUpdates: [BrushGestureRecognizer.SampleUpdate]
-    ) {
-        internalState.updateStroke(
-            sampleUpdates: sampleUpdates)
-    }
-
-    func onEndStroke(
-        _ g: BrushGestureRecognizer
-    ) {
-        internalState.endStroke()
-    }
-
-    func onCancelStroke(
-        _ g: BrushGestureRecognizer
-    ) {
-        internalState.cancelStroke()
-    }
-    
-}
-*/

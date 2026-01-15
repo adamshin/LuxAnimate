@@ -5,18 +5,11 @@
 import UIKit
 import BrushEngine
 
-// TODO: Figure out how to communicate between
-// AnimEditorToolState and tool state inside frame editor.
-// Frame editor will be recreated whenever the user moves
-// between frames, and will own the brush engine instance.
-
-// Need to pass on input events and tool settings.
-
 @MainActor
 class AnimEditorPaintToolState: AnimEditorToolState {
     
-    private let controlsVC = AnimEditorPaintToolControlsVC()
-    private let brushGestureRecognizer = BrushGestureRecognizer()
+    let controlsVC = AnimEditorPaintToolControlsVC()
+    let brushGestureRecognizer = BrushGestureRecognizer()
     
     private(set) var brush: BrushEngine.Brush?
     private(set) var scale: Double
