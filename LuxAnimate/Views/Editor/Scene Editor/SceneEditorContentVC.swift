@@ -90,6 +90,8 @@ class SceneEditorContentVC: UIViewController {
         self.model = model
         self.assetCount = model.sceneManifest.assetIDs().count
         
+        navigationItem.title = model.sceneRef.name
+        
         updateButtons()
         tableView.reloadData()
     }
@@ -122,7 +124,7 @@ extension SceneEditorContentVC: UITableViewDataSource {
     ) -> Int {
         switch section {
         case 0:
-            2
+            1
         case 1:
             model?.sceneManifest.layers.count ?? 0
         default:
@@ -143,11 +145,10 @@ extension SceneEditorContentVC: UITableViewDataSource {
         
         switch indexPath.section {
         case 0:
+            cell.accessoryType = .none
+            
             switch indexPath.row {
             case 0:
-                cell.textLabel?.text = model.sceneRef.name
-                
-            case 1:
                 let layerCount = model.sceneManifest.layers.count
                 
                 let layerText = "\(layerCount) \(layerCount == 1 ? "layer" : "layers")"
@@ -170,6 +171,7 @@ extension SceneEditorContentVC: UITableViewDataSource {
                 layerContentText = "\(drawingCount) \(drawingCount == 1 ? "drawing" : "drawings")"
             }
             
+            cell.accessoryType = .disclosureIndicator
             cell.textLabel?.text = """
                 Layer \(indexPath.row + 1)\
                 \u{2002}\u{2022}\u{2002}\

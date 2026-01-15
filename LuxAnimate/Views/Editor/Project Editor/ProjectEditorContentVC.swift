@@ -89,6 +89,8 @@ class ProjectEditorContentVC: UIViewController {
     func update(model: ProjectEditorModel) {
         self.model = model
         
+        navigationItem.title = model.projectManifest.name
+        
         updateButtons()
         tableView.reloadData()
     }
@@ -121,7 +123,7 @@ extension ProjectEditorContentVC: UITableViewDataSource {
     ) -> Int {
         switch section {
         case 0: 
-            3
+            2
         case 1:
             model?.projectManifest.content.sceneRefs.count ?? 0
         default:
@@ -142,11 +144,10 @@ extension ProjectEditorContentVC: UITableViewDataSource {
         
         switch indexPath.section {
         case 0:
+            cell.accessoryType = .none
+            
             switch indexPath.row {
             case 0:
-                cell.textLabel?.text = model.projectManifest.name
-                
-            case 1:
                 let viewportSize = model.projectManifest
                     .content.metadata.viewportSize
                 let framesPerSecond = model.projectManifest
@@ -158,7 +159,7 @@ extension ProjectEditorContentVC: UITableViewDataSource {
                     \(framesPerSecond) fps
                     """
                 
-            case 2:
+            case 1:
                 let sceneCount = model.projectManifest
                     .content.sceneRefs.count
                 let assetCount = model.projectManifest
@@ -175,6 +176,7 @@ extension ProjectEditorContentVC: UITableViewDataSource {
             }
             
         case 1:
+            cell.accessoryType = .disclosureIndicator
             cell.textLabel?.text = "Scene \(indexPath.row + 1)"
             
         default:
