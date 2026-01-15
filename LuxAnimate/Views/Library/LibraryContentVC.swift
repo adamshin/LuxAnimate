@@ -52,6 +52,16 @@ class LibraryContentVC: UIViewController {
         title: "Create Project", style: .plain,
         target: self, action: #selector(onSelectCreate))
     
+    private lazy var emptyLabel: UILabel = {
+        let label = UILabel()
+        label.text = "No Projects.\n\nTap “Create Project” to get started!"
+        label.textColor = .secondaryLabel
+        label.font = .systemFont(ofSize: 20, weight: .medium)
+        label.textAlignment = .center
+        label.numberOfLines = 0
+        return label
+    }()
+    
     private var items: [Item] = []
     
     // MARK: - Lifecycle
@@ -70,6 +80,9 @@ class LibraryContentVC: UIViewController {
         collectionView.alwaysBounceVertical = true
         collectionView.dataSource = self
         collectionView.delegate = self
+        
+        view.addSubview(emptyLabel)
+        emptyLabel.pinCenter()
         
         navigationItem.title = "Library"
         navigationItem.rightBarButtonItem = createButton
@@ -158,6 +171,7 @@ class LibraryContentVC: UIViewController {
     func update(items: [Item]) {
         self.items = items
         collectionView.reloadData()
+        emptyLabel.isHidden = !items.isEmpty
     }
     
 }
