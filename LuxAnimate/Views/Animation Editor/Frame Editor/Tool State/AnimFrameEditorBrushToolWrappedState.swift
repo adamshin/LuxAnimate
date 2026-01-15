@@ -1,5 +1,5 @@
 //
-//  AnimFrameEditorBrushToolInternalState.swift
+//  AnimFrameEditorBrushToolWrappedState.swift
 //
 
 import UIKit
@@ -9,53 +9,53 @@ import Color
 import BrushEngine
 
 @MainActor
-protocol AnimFrameEditorBrushToolInternalStateDelegate: AnyObject {
+protocol AnimFrameEditorBrushToolWrappedStateDelegate: AnyObject {
     
     func brush(
-        _ s: AnimFrameEditorBrushToolInternalState
+        _ s: AnimFrameEditorBrushToolWrappedState
     ) -> BrushEngine.Brush?
     
     func color(
-        _ s: AnimFrameEditorBrushToolInternalState
+        _ s: AnimFrameEditorBrushToolWrappedState
     ) -> Color
     
     func scale(
-        _ s: AnimFrameEditorBrushToolInternalState
+        _ s: AnimFrameEditorBrushToolWrappedState
     ) -> Double
     
     func smoothing(
-        _ s: AnimFrameEditorBrushToolInternalState
+        _ s: AnimFrameEditorBrushToolWrappedState
     ) -> Double
     
     func workspaceViewSize(
-        _ s: AnimFrameEditorBrushToolInternalState
+        _ s: AnimFrameEditorBrushToolWrappedState
     ) -> Size
     
     func workspaceTransform(
-        _ s: AnimFrameEditorBrushToolInternalState
+        _ s: AnimFrameEditorBrushToolWrappedState
     ) -> EditorWorkspaceTransform
     
     func layerContentSize(
-        _ s: AnimFrameEditorBrushToolInternalState
+        _ s: AnimFrameEditorBrushToolWrappedState
     ) -> Size
     
     func layerTransform(
-        _ s: AnimFrameEditorBrushToolInternalState
+        _ s: AnimFrameEditorBrushToolWrappedState
     ) -> Matrix3
     
     func onUpdateCanvasTexture(
-        _ s: AnimFrameEditorBrushToolInternalState)
+        _ s: AnimFrameEditorBrushToolWrappedState)
     
-    func onEdit(
-        _ s: AnimFrameEditorBrushToolInternalState,
+    func onRequestEdit(
+        _ s: AnimFrameEditorBrushToolWrappedState,
         imageSet: DrawingAssetProcessor.ImageSet)
     
 }
 
 @MainActor
-class AnimFrameEditorBrushToolInternalState {
+class AnimFrameEditorBrushToolWrappedState {
     
-    weak var delegate: AnimFrameEditorBrushToolInternalStateDelegate?
+    weak var delegate: AnimFrameEditorBrushToolWrappedStateDelegate?
     
     private let canvas: BrushEngine.Canvas
     
@@ -89,7 +89,15 @@ class AnimFrameEditorBrushToolInternalState {
         canvas.setTextureContents(texture)
     }
     
-    func beginStroke(
+}
+
+// MARK: - Delegates
+
+extension AnimFrameEditorBrushToolWrappedState:
+    BrushGestureRecognizer.GestureDelegate {
+                                                    
+    func onBeginStroke(
+        _ g: BrushGestureRecognizer,
         quickTap: Bool
     ) {
         guard let delegate,
@@ -108,7 +116,8 @@ class AnimFrameEditorBrushToolInternalState {
             quickTap: quickTap)
     }
     
-    func updateStroke(
+    func onUpdateStroke(
+        _ g: BrushGestureRecognizer,
         addedSamples: [BrushGestureRecognizer.Sample],
         predictedSamples: [BrushGestureRecognizer.Sample]
     ) {
@@ -132,7 +141,8 @@ class AnimFrameEditorBrushToolInternalState {
             predictedSamples: predictedSamples)
     }
     
-    func updateStroke(
+    func onUpdateStroke(
+        _ g: BrushGestureRecognizer,
         sampleUpdates: [BrushGestureRecognizer.SampleUpdate]
     ) {
         guard let delegate else { return }
@@ -151,19 +161,17 @@ class AnimFrameEditorBrushToolInternalState {
             sampleUpdates: sampleUpdates)
     }
     
-    func endStroke() {
+    func onEndStroke(_ g: BrushGestureRecognizer) {
         canvas.endStroke()
     }
 
-    func cancelStroke() {
+    func onCancelStroke(_ g: BrushGestureRecognizer) {
         canvas.cancelStroke()
     }
     
 }
 
-// MARK: - Delegates
-
-extension AnimFrameEditorBrushToolInternalState:
+extension AnimFrameEditorBrushToolWrappedState:
     BrushEngine.Canvas.Delegate {
     
     func onUpdateTexture(_ c: Canvas) {
@@ -179,7 +187,8 @@ extension AnimFrameEditorBrushToolInternalState:
             let imageSet = try drawingAssetProcessor
                 .generate(sourceTexture: texture)
             
-            delegate?.onEdit(self, imageSet: imageSet)
+            delegate?.onRequestEdit(
+                self, imageSet: imageSet)
             
         } catch { }
     }

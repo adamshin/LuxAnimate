@@ -13,14 +13,19 @@ private let rotationSnapThreshold: Double =
 private let shortSnapDuration: TimeInterval = 1.0
 private let longSnapDuration: TimeInterval = 1.1
 
-@MainActor
-protocol EditorWorkspaceTransformManagerDelegate: AnyObject {
+
+extension EditorWorkspaceTransformManager {
     
-    func onUpdateTransform(
-        _ m: EditorWorkspaceTransformManager)
+    @MainActor
+    protocol Delegate: AnyObject {
+        
+        func onUpdateTransform(
+            _ m: EditorWorkspaceTransformManager)
+        
+    }
     
 }
-
+    
 @MainActor
 class EditorWorkspaceTransformManager {
     
@@ -40,7 +45,7 @@ class EditorWorkspaceTransformManager {
         var duration: TimeInterval
     }
     
-    weak var delegate: EditorWorkspaceTransformManagerDelegate?
+    weak var delegate: Delegate?
     
     private var baseTransform: EditorWorkspaceTransform = .identity
     private var activeGestureTransform: EditorWorkspaceTransform?

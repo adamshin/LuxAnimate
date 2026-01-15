@@ -5,6 +5,9 @@
 import Metal
 import MetalKit
 
+// TODO: Make loadedAssets private and add convenience
+// methods for access, checking if assets are loaded?
+
 extension AnimEditorAssetLoader {
     
     @MainActor

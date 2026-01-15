@@ -16,7 +16,7 @@ extension AnimEditorTimelineToolbarVC {
         func onSelectPlayPause(
             _ vc: AnimEditorTimelineToolbarVC)
         
-        func onSelectToggleExpanded(
+        func onSelectExpandToggle(
             _ vc: AnimEditorTimelineToolbarVC)
         
     }
@@ -28,11 +28,9 @@ class AnimEditorTimelineToolbarVC: UIViewController {
     weak var delegate: Delegate?
     
     private let bodyView = AnimEditorTimelineToolbarView()
-    
-    private let frameWidgetVC =
-        AnimEditorTimelineToolbarFrameWidgetVC()
-    
+
     private var frameCount = 0
+    private var focusedFrameIndex = 0
     
     // MARK: - Lifecycle
     
@@ -49,40 +47,59 @@ class AnimEditorTimelineToolbarVC: UIViewController {
             self, action: #selector(onSelectLastFrame))
         bodyView.playButton.addTarget(
             self, action: #selector(onSelectPlayPause))
-        bodyView.expandButton.addTarget(
-            self, action: #selector(onSelectExpand))
+        bodyView.expandToggleButton.addTarget(
+            self, action: #selector(onSelectExpandToggle))
         
-        frameWidgetVC.delegate = self
-        addChild(frameWidgetVC, to: bodyView.frameWidgetContainer)
+        bodyView.frameWidget.previousFrameButton.addTarget(
+            self, action: #selector(onSelectPreviousFrame))
+        bodyView.frameWidget.nextFrameButton.addTarget(
+            self, action: #selector(onSelectNextFrame))
     }
     
     // MARK: - Handlers
     
     @objc private func onSelectFirstFrame() {
-        let frameIndex = 0
-        frameWidgetVC.setFocusedFrameIndex(frameIndex)
-        
         delegate?.onChangeFocusedFrameIndex(
-            self, frameIndex)
+            self, 0)
     }
     
     @objc private func onSelectLastFrame() {
-        let frameIndex = frameCount - 1
-        frameWidgetVC.setFocusedFrameIndex(frameIndex)
-        
         delegate?.onChangeFocusedFrameIndex(
-            self, frameIndex)
+            self, frameCount - 1)
+    }
+    
+    @objc private func onSelectPreviousFrame() {
+        delegate?.onChangeFocusedFrameIndex(
+            self, focusedFrameIndex - 1)
+    }
+    
+    @objc private func onSelectNextFrame() {
+        delegate?.onChangeFocusedFrameIndex(
+            self, focusedFrameIndex + 1)
     }
     
     @objc private func onSelectPlayPause() {
         delegate?.onSelectPlayPause(self)
     }
     
-    @objc private func onSelectExpand() {
-        delegate?.onSelectToggleExpanded(self)
+    @objc private func onSelectExpandToggle() {
+        delegate?.onSelectExpandToggle(self)
     }
     
     // MARK: - Interface
+    
+    func update(
+        model: AnimEditorTimelineModel
+    ) {
+        frameCount = model.frames.count
+    }
+
+    func update(
+        focusedFrameIndex: Int
+    ) {
+        self.focusedFrameIndex = focusedFrameIndex
+        bodyView.frameWidget.setFocusedFrameIndex(focusedFrameIndex)
+    }
     
     func setPlaying(_ playing: Bool) {
 //        frameWidgetVC.setPlaying(playing)
@@ -91,28 +108,6 @@ class AnimEditorTimelineToolbarVC: UIViewController {
     
     func setExpanded(_ expanded: Bool) {
         bodyView.setExpanded(expanded)
-    }
-    
-    func setFrameCount(_ frameCount: Int) {
-        self.frameCount = frameCount
-        frameWidgetVC.setFrameCount(frameCount)
-    }
-    
-    func setFocusedFrameIndex(_ index: Int) {
-        frameWidgetVC.setFocusedFrameIndex(index)
-    }
-    
-}
-
-extension AnimEditorTimelineToolbarVC:
-    AnimEditorTimelineToolbarFrameWidgetVC.Delegate {
-    
-    func onChangeFocusedFrameIndex(
-        _ vc: AnimEditorTimelineToolbarFrameWidgetVC,
-        _ focusedFrameIndex: Int
-    ) {
-        delegate?.onChangeFocusedFrameIndex(
-            self, focusedFrameIndex)
     }
     
 }

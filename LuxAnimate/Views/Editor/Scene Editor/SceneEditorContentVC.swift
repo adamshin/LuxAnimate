@@ -24,12 +24,8 @@ class SceneEditorContentVC: UIViewController {
     
     weak var delegate: SceneEditorContentVCDelegate?
     
-    private var sceneRef: Project.SceneRef?
-    private var sceneManifest: Scene.Manifest?
+    private var model: SceneEditorModel?
     private var assetCount = 0
-    
-    private var availableUndoCount = 0
-    private var availableRedoCount = 0
     
     private lazy var backButton = UIBarButtonItem(
         title: "Back", style: .done,
@@ -90,30 +86,22 @@ class SceneEditorContentVC: UIViewController {
         delegate?.onSelectRedo(self)
     }
     
-    func update(
-        projectState: ProjectEditManager.State,
-        sceneRef: Project.SceneRef,
-        sceneManifest: Scene.Manifest
-    ) {
-        self.sceneRef = sceneRef
-        self.sceneManifest = sceneManifest
-        assetCount = sceneManifest.assetIDs().count
-        
-        self.availableUndoCount = projectState.availableUndoCount
-        self.availableRedoCount = projectState.availableRedoCount
+    func update(model: SceneEditorModel) {
+        self.model = model
+        self.assetCount = model.sceneManifest.assetIDs().count
         
         updateButtons()
         tableView.reloadData()
     }
     
     private func updateButtons() {
-        guard let sceneManifest else { return }
+        guard let model else { return }
         
         removeLayerButton.isEnabled =
-            sceneManifest.layers.count > 0
+            model.sceneManifest.layers.count > 0
         
-        undoButton.isEnabled = availableUndoCount > 0
-        redoButton.isEnabled = availableRedoCount > 0
+        undoButton.isEnabled = model.availableUndoCount > 0
+        redoButton.isEnabled = model.availableRedoCount > 0
     }
     
 }
@@ -136,7 +124,7 @@ extension SceneEditorContentVC: UITableViewDataSource {
         case 0:
             2
         case 1:
-            sceneManifest?.layers.count ?? 0
+            model?.sceneManifest.layers.count ?? 0
         default:
             0
         }
@@ -151,19 +139,16 @@ extension SceneEditorContentVC: UITableViewDataSource {
             UITableViewCell.self,
             for: indexPath)
         
-        guard
-            let sceneRef,
-            let sceneManifest
-        else { return cell }
+        guard let model else { return cell }
         
         switch indexPath.section {
         case 0:
             switch indexPath.row {
             case 0:
-                cell.textLabel?.text = sceneRef.name
+                cell.textLabel?.text = model.sceneRef.name
                 
             case 1:
-                let layerCount = sceneManifest.layers.count
+                let layerCount = model.sceneManifest.layers.count
                 
                 let layerText = "\(layerCount) \(layerCount == 1 ? "layer" : "layers")"
                 
@@ -176,7 +161,7 @@ extension SceneEditorContentVC: UITableViewDataSource {
             }
             
         case 1:
-            let layer = sceneManifest.layers[indexPath.row]
+            let layer = model.sceneManifest.layers[indexPath.row]
             
             let layerContentText: String
             switch layer.content {
@@ -209,8 +194,8 @@ extension SceneEditorContentVC: UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         
         if indexPath.section == 1 {
-            guard let sceneManifest else { return }
-            let layer = sceneManifest.layers[indexPath.row]
+            guard let model else { return }
+            let layer = model.sceneManifest.layers[indexPath.row]
             delegate?.onSelectLayer(self, layerID: layer.id)
         }
     }

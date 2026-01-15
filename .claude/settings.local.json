@@ -5,7 +5,9 @@
       "Bash(cat:*)",
       "Bash(find:*)",
       "Bash(claude feedback:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(ls:*)",
+      "Bash(git log:*)"
     ]
   }
 }

@@ -7,12 +7,6 @@ import FileCoding
 
 extension ProjectEditManager {
     
-    struct State {
-        var projectManifest: Project.Manifest
-        var availableUndoCount: Int
-        var availableRedoCount: Int
-    }
-    
     struct Edit {
         var projectManifest: Project.Manifest
         var newAssets: [NewAsset]
@@ -31,7 +25,9 @@ class ProjectEditManager {
     
     private let projectID: String
     
-    private(set) var state: State
+    private(set) var projectManifest: Project.Manifest
+    private(set) var availableUndoCount: Int
+    private(set) var availableRedoCount: Int
     
     private let fileManager = FileManager.default
     
@@ -47,28 +43,26 @@ class ProjectEditManager {
         let projectManifestData = try Data(
             contentsOf: projectManifestURL)
         
-        let projectManifest = try JSONFileDecoder
+        projectManifest = try JSONFileDecoder
             .shared.decode(
                 Project.Manifest.self,
                 from: projectManifestData)
         
-        state = State(
-            projectManifest: projectManifest,
-            availableUndoCount: 0,
-            availableRedoCount: 0)
+        availableUndoCount = 0
+        availableRedoCount = 0
         
         // Edit history
         try createEditHistoryDirectoriesIfNeeded()
         
-        state.availableUndoCount = undoEntryCount()
-        state.availableRedoCount = redoEntryCount()
+        availableUndoCount = undoEntryCount()
+        availableRedoCount = redoEntryCount()
     }
     
     // MARK: - Edit History
     
     private func projectEditHistoryDirectoryURL() -> URL {
-        FileHelper.shared.projectEditHistoryDirectoryURL(
-            for: projectID)
+        FileHelper.shared
+            .projectEditHistoryDirectoryURL(for: projectID)
     }
     
     private func undoHistoryDirectoryURL() -> URL {
@@ -96,15 +90,17 @@ class ProjectEditManager {
     private func editHistoryEntryCount(
         in directoryURL: URL
     ) -> Int {
-        let contents = try? fileManager.contentsOfDirectory(
-            at: directoryURL,
-            includingPropertiesForKeys: [],
-            options: [.skipsHiddenFiles])
+        let contents = try? fileManager
+            .contentsOfDirectory(
+                at: directoryURL,
+                includingPropertiesForKeys: [],
+                options: [.skipsHiddenFiles])
         
         return contents?.count ?? 0
     }
     
-    private func createEditHistoryDirectoriesIfNeeded() throws {
+    private func createEditHistoryDirectoriesIfNeeded()
+    throws {
         let urls = [
             projectEditHistoryDirectoryURL(),
             undoHistoryDirectoryURL(),
@@ -131,17 +127,17 @@ class ProjectEditManager {
             includingPropertiesForKeys: [],
             options: [.skipsHiddenFiles])
         
-        var urlsAndIndexes: [(URL, Int)] = urls.compactMap { url in
-            guard let index = Int(url.lastPathComponent)
-            else { return nil }
-            
-            return (url, index)
-        }
+        var urlsAndIndexes: [(URL, Int)] =
+            urls.compactMap { url in
+                guard let index = Int(url.lastPathComponent)
+                else { return nil }
+                
+                return (url, index)
+            }
         
-        urlsAndIndexes.sort(
-            using: KeyPathComparator(
-                \.1,
-                 order: increment ? .reverse : .forward))
+        urlsAndIndexes.sort(using: KeyPathComparator(
+            \.1,
+             order: increment ? .reverse : .forward))
         
         for (url, index) in urlsAndIndexes {
             let newIndex = increment ? index + 1 : index - 1
@@ -216,18 +212,20 @@ class ProjectEditManager {
         in containingDirectoryURL: URL
     ) -> URL? {
         
-        guard let urls = try? fileManager.contentsOfDirectory(
-            at: containingDirectoryURL,
-            includingPropertiesForKeys: [],
-            options: [.skipsHiddenFiles])
+        guard let urls = try? fileManager
+            .contentsOfDirectory(
+                at: containingDirectoryURL,
+                includingPropertiesForKeys: [],
+                options: [.skipsHiddenFiles])
         else { return nil }
         
-        let urlsAndIndexes: [(URL, Int)] = urls.compactMap { url in
-            guard let index = Int(url.lastPathComponent)
-            else { return nil }
-            
-            return (url, index)
-        }
+        let urlsAndIndexes: [(URL, Int)] = urls
+            .compactMap { url in
+                guard let index = Int(url.lastPathComponent)
+                else { return nil }
+                
+                return (url, index)
+            }
         
         return urlsAndIndexes.min { $0.1 < $1.1 }?.0
     }
@@ -292,7 +290,7 @@ class ProjectEditManager {
     ) throws {
         
         // Setup
-        let oldProjectManifest = state.projectManifest
+        let oldProjectManifest = projectManifest
         let newProjectManifest = edit.projectManifest
         let newAssets = edit.newAssets
         
@@ -329,13 +327,16 @@ class ProjectEditManager {
         
         // Write new project manifest
         let newProjectManifestData = try
-            JSONFileEncoder.shared.encode(newProjectManifest)
+            JSONFileEncoder.shared
+                .encode(newProjectManifest)
         
-        try newProjectManifestData.write(to: projectManifestURL)
+        try newProjectManifestData
+            .write(to: projectManifestURL)
         
-        // Find assets referenced in the old manifest but not the
-        // new one. Move these to the new history entry
-        let diffAssetIDs = oldAssetIDs.subtracting(newAssetIDs)
+        // Find assets referenced in the old manifest but
+        // not the new one. Move these to the new entry.
+        let diffAssetIDs = oldAssetIDs
+            .subtracting(newAssetIDs)
         
         for diffAssetID in diffAssetIDs {
             try moveAssetInProjectToEditHistoryEntry(
@@ -343,11 +344,10 @@ class ProjectEditManager {
                 entryURL: entryURL)
         }
         
-        // Update state
-        state = State(
-            projectManifest: newProjectManifest,
-            availableUndoCount: undoEntryCount(),
-            availableRedoCount: redoEntryCount())
+        // Update properties
+        projectManifest = newProjectManifest
+        availableUndoCount = undoEntryCount()
+        availableRedoCount = redoEntryCount()
     }
     
     private func consumeHistoryEntryInternal(
@@ -361,14 +361,16 @@ class ProjectEditManager {
             redoHistoryDirectoryURL() :
             undoHistoryDirectoryURL()
         
-        guard let consumedHistoryEntryURL = firstEditHistoryEntryURL(
-            in: consumedEntryContainingDirectoryURL)
+        guard let consumedHistoryEntryURL =
+            firstEditHistoryEntryURL(
+                in: consumedEntryContainingDirectoryURL)
         else { return }
         
         // Setup
-        let currentProjectManifest = state.projectManifest
+        let currentProjectManifest = projectManifest
         
-        let projectURL = FileHelper.shared.projectURL(for: projectID)
+        let projectURL = FileHelper.shared
+            .projectURL(for: projectID)
         
         let projectManifestURL = FileHelper.shared
             .projectManifestURL(for: projectID)
@@ -379,15 +381,17 @@ class ProjectEditManager {
         let consumedProjectManifestData = try Data(
             contentsOf: consumedProjectManifestURL)
         
-        let consumedProjectManifest = try JSONFileDecoder.shared.decode(
-            Project.Manifest.self,
-            from: consumedProjectManifestData)
+        let consumedProjectManifest = try JSONFileDecoder
+            .shared.decode(
+                Project.Manifest.self,
+                from: consumedProjectManifestData)
         
         // Create new history entry
-        let createdHistoryEntryURL = try pushNewEditHistoryEntry(
-            in: createdEntryContainingDirectoryURL)
+        let createdHistoryEntryURL = try
+            pushNewEditHistoryEntry(
+                in: createdEntryContainingDirectoryURL)
         
-        // Copy current project manifest to new history entry
+        // Copy current project manifest to new entry
         let createdHistoryEntryProjectManifestURL = createdHistoryEntryURL
             .appending(path: FileHelper.projectManifestFileName)
         
@@ -396,18 +400,22 @@ class ProjectEditManager {
             to: createdHistoryEntryProjectManifestURL)
         
         // Move asset files from consumed entry to project
-        let consumedEntryFileURLs = try fileManager.contentsOfDirectory(
-            at: consumedHistoryEntryURL,
-            includingPropertiesForKeys: nil)
-            
+        let consumedEntryFileURLs = try fileManager
+            .contentsOfDirectory(
+                at: consumedHistoryEntryURL,
+                includingPropertiesForKeys: nil)
+        
         for fileURL in consumedEntryFileURLs {
             let fileName = fileURL.lastPathComponent
-            if fileName == FileHelper.projectManifestFileName { continue }
+            if fileName == FileHelper
+                .projectManifestFileName
+            { continue }
             
             let destinationURL = projectURL
                 .appendingPathComponent(fileName)
             
-            try fileManager.moveItem(at: fileURL, to: destinationURL)
+            try fileManager
+                .moveItem(at: fileURL, to: destinationURL)
         }
         
         // Replace project manifest with consumed entry manifest
@@ -423,12 +431,13 @@ class ProjectEditManager {
         try popFirstEditHistoryEntry(
             in: consumedEntryContainingDirectoryURL)
         
-        // Find assets referenced in the old manifest but not the
-        // new one. Move these to the new history entry directory
+        // Find assets referenced in the old manifest but
+        // not the new one. Move these to the entry.
         let oldAssetIDs = currentProjectManifest.assetIDs
         let newAssetIDs = consumedProjectManifest.assetIDs
         
-        let diffAssetIDs = oldAssetIDs.subtracting(newAssetIDs)
+        let diffAssetIDs = oldAssetIDs
+            .subtracting(newAssetIDs)
         
         for diffAssetID in diffAssetIDs {
             try moveAssetInProjectToEditHistoryEntry(
@@ -437,24 +446,23 @@ class ProjectEditManager {
         }
         
         // Update state
-        state = State(
-            projectManifest: consumedProjectManifest,
-            availableUndoCount: undoEntryCount(),
-            availableRedoCount: redoEntryCount())
+        projectManifest = consumedProjectManifest
+        availableUndoCount = undoEntryCount()
+        availableRedoCount = redoEntryCount()
     }
     
     // MARK: - Interface
     
     func applyEdit(_ edit: Edit) throws {
-        try self.applyEditInternal(edit)
+        try applyEditInternal(edit)
     }
     
     func applyUndo() throws {
-        try self.consumeHistoryEntryInternal(undo: true)
+        try consumeHistoryEntryInternal(undo: true)
     }
     
     func applyRedo() throws {
-        try self.consumeHistoryEntryInternal(undo: false)
+        try consumeHistoryEntryInternal(undo: false)
     }
     
 }

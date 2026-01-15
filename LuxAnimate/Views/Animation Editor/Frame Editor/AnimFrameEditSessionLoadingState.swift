@@ -1,10 +1,11 @@
 //
-//  AnimFrameEditorLoadingState.swift
+//  AnimFrameEditSessionLoadingState.swift
 //
 
-import Metal
+import Foundation
 
-class AnimFrameEditorLoadingState: AnimFrameEditorState {
+class AnimFrameEditSessionLoadingState:
+    AnimFrameEditSessionState {
     
     enum Error: Swift.Error {
         case invalidLayerID
@@ -16,8 +17,7 @@ class AnimFrameEditorLoadingState: AnimFrameEditorState {
     private let layer: Scene.Layer
     private let layerContent: Scene.AnimationLayerContent
     private let frameIndex: Int
-    private let onionSkinConfig: AnimEditorOnionSkinConfig?
-    private let editorToolState: AnimEditorToolState
+    private let editorToolState: AnimEditorToolState?
     
     private let frameSceneGraph: FrameSceneGraph
     
@@ -31,7 +31,7 @@ class AnimFrameEditorLoadingState: AnimFrameEditorState {
     
     private var loadStartTime: TimeInterval = 0
     
-    weak var delegate: AnimFrameEditorStateDelegate?
+    weak var delegate: AnimFrameEditSessionStateDelegate?
     
     // MARK: - Init
     
@@ -41,15 +41,13 @@ class AnimFrameEditorLoadingState: AnimFrameEditorState {
         layer: Scene.Layer,
         layerContent: Scene.AnimationLayerContent,
         frameIndex: Int,
-        onionSkinConfig: AnimEditorOnionSkinConfig?,
-        editorToolState: AnimEditorToolState
+        editorToolState: AnimEditorToolState?
     ) {
         self.projectManifest = projectManifest
         self.sceneManifest = sceneManifest
         self.layer = layer
         self.layerContent = layerContent
         self.frameIndex = frameIndex
-        self.onionSkinConfig = onionSkinConfig
         self.editorToolState = editorToolState
         
         frameSceneGraph = FrameSceneGraphGenerator.generate(
@@ -61,7 +59,7 @@ class AnimFrameEditorLoadingState: AnimFrameEditorState {
             .activeDrawingManifest(
                 layerContent: layerContent,
                 frameIndex: frameIndex,
-                onionSkinConfig: onionSkinConfig)
+                onionSkinConfig: nil)
         
         assetManifest = AnimFrameEditorHelper
             .assetManifest(
@@ -73,14 +71,13 @@ class AnimFrameEditorLoadingState: AnimFrameEditorState {
     
     // MARK: - Logic
     
-    private func enterEditingState() {
-        let newState = AnimFrameEditorEditingState(
+    private func beginActiveState() {
+        let newState = AnimFrameEditSessionActiveState(
             projectManifest: projectManifest,
             sceneManifest: sceneManifest,
             layer: layer,
             layerContent: layerContent,
             frameIndex: frameIndex,
-            onionSkinConfig: onionSkinConfig,
             editorToolState: editorToolState,
             frameSceneGraph: frameSceneGraph,
             activeDrawingManifest: activeDrawingManifest,
@@ -91,20 +88,21 @@ class AnimFrameEditorLoadingState: AnimFrameEditorState {
     
     // MARK: - Interface
     
-    func beginState() {
-        delegate?.setEditInteractionEnabled(
-            self, enabled: false)
+    func begin() {
+//        delegate?.setEditInteractionEnabled(
+//            self, enabled: false)
         
         loadStartTime = ProcessInfo.processInfo.systemUptime
         
-        delegate?.setAssetLoaderAssetIDs(
-            self, assetIDs: assetIDsToLoad)
+        delegate?.loadAssets(self, assetIDs: assetIDsToLoad)
     }
+    
+    func onFrame() -> EditorWorkspaceSceneGraph? { nil }
     
     func onAssetLoaderUpdate() {
         guard let delegate else { return }
         
-        if delegate.assetLoaderHasLoadedAssets(
+        if delegate.hasLoadedAssets(
             self, assetIDs: assetIDsToLoad)
         {
 //            let loadEndTime = ProcessInfo.processInfo.systemUptime
@@ -112,10 +110,8 @@ class AnimFrameEditorLoadingState: AnimFrameEditorState {
 //            let loadTimeMs = Int(loadTime * 1000)
 //            print("Loaded assets. \(loadTimeMs) ms")
             
-            enterEditingState()
+            beginActiveState()
         }
     }
-    
-    func onFrame() -> EditorWorkspaceSceneGraph? { nil }
     
 }

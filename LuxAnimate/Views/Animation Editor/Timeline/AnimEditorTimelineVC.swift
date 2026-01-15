@@ -9,7 +9,7 @@ extension AnimEditorTimelineVC {
     @MainActor
     protocol Delegate: AnyObject {
         
-        func onChangeContentAreaSize(
+        func onChangeDrawerSize(
             _ vc: AnimEditorTimelineVC)
         
         func onChangeFocusedFrameIndex(
@@ -19,21 +19,9 @@ extension AnimEditorTimelineVC {
         func onSelectPlayPause(
             _ vc: AnimEditorTimelineVC)
         
-        func onRequestCreateDrawing(
+        func onRequestEdit(
             _ vc: AnimEditorTimelineVC,
-            frameIndex: Int)
-        
-        func onRequestDeleteDrawing(
-            _ vc: AnimEditorTimelineVC,
-            frameIndex: Int)
-        
-        func onRequestInsertSpacing(
-            _ vc: AnimEditorTimelineVC,
-            frameIndex: Int)
-        
-        func onRequestRemoveSpacing(
-            _ vc: AnimEditorTimelineVC,
-            frameIndex: Int)
+            layerContentEdit: AnimationLayerContentEditBuilder.Edit)
         
         func pendingAssetData(
             _ vc: AnimEditorTimelineVC,
@@ -54,13 +42,19 @@ class AnimEditorTimelineVC: UIViewController {
     
     private let projectID: String
     
-    private var timelineModel: AnimEditorTimelineModel = .empty
-    private var focusedFrameIndex = 0
+    private var model: AnimEditorModel
+    private var focusedFrameIndex: Int
     
     // MARK: - Init
     
-    init(projectID: String) {
+    init(
+        projectID: String,
+        model: AnimEditorModel,
+        focusedFrameIndex: Int
+    ) {
         self.projectID = projectID
+        self.model = model
+        self.focusedFrameIndex = focusedFrameIndex
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -77,9 +71,7 @@ class AnimEditorTimelineVC: UIViewController {
         super.viewDidLoad()
         
         setupUI()
-        
-        update(timelineModel: timelineModel)
-        update(focusedFrameIndex: focusedFrameIndex)
+        setupInitialState()
     }
     
     // MARK: - Setup
@@ -93,16 +85,23 @@ class AnimEditorTimelineVC: UIViewController {
         addChild(toolbarVC, to: drawerVC.toolbar)
         addChild(trackVC, to: drawerVC.collapsibleContentView)
         
-        drawerVC.setExpanded(false, animated: false)
+        drawerVC.setExpanded(true, animated: false)
+    }
+    
+    private func setupInitialState() {
+        update(model: model)
+        update(focusedFrameIndex: focusedFrameIndex)
     }
     
     // MARK: - Menu
     
     private func showFrameMenu(frameIndex: Int) {
+        // Does this belong here? Feels more... UI level.
+        // Not business logic. Maybe should split concerns.
         guard let cell = trackVC.cell(at: frameIndex)
         else { return }
         
-        let frame = timelineModel.frames[frameIndex]
+        let frame = model.timelineModel.frames[frameIndex]
         
         let contentView = AnimEditorTimelineFrameMenuView(
             frameIndex: frameIndex,
@@ -121,15 +120,63 @@ class AnimEditorTimelineVC: UIViewController {
         trackVC.setOpenMenuFrameIndex(frameIndex)
     }
     
+    // MARK: - Edit
+    
+    private func createDrawing(frameIndex: Int) {
+        do {
+            let edit = try AnimationLayerContentEditBuilder
+                .createDrawing(
+                    layerContent: model.layerContent,
+                    frameIndex: frameIndex)
+            
+            delegate?.onRequestEdit(
+                self, layerContentEdit: edit)
+            
+        } catch { }
+    }
+    
+    private func deleteDrawing(frameIndex: Int) {
+        let edit = AnimationLayerContentEditBuilder
+            .deleteDrawing(
+                layerContent: model.layerContent,
+                frameIndex: frameIndex)
+        
+        delegate?.onRequestEdit(
+            self, layerContentEdit: edit)
+    }
+    
+    private func insertSpacing(frameIndex: Int) {
+        let edit = AnimationLayerContentEditBuilder
+            .insertSpacing(
+                layerContent: model.layerContent,
+                frameIndex: frameIndex)
+        
+        delegate?.onRequestEdit(
+            self, layerContentEdit: edit)
+    }
+    
+    private func removeSpacing(frameIndex: Int) {
+        do {
+            let edit = try AnimationLayerContentEditBuilder
+                .removeSpacing(
+                    layerContent: model.layerContent,
+                    frameIndex: frameIndex)
+            
+            delegate?.onRequestEdit(
+                self, layerContentEdit: edit)
+            
+        } catch { }
+    }
+    
     // MARK: - Interface
     
     func update(
-        timelineModel: AnimEditorTimelineModel
+        model: AnimEditorModel
     ) {
-        self.timelineModel = timelineModel
+        self.model = model
         
-        toolbarVC.setFrameCount(timelineModel.frames.count)
-        trackVC.setTimelineModel(timelineModel)
+        toolbarVC.update(model: model.timelineModel)
+        trackVC.update(model: model.timelineModel)
     }
     
     func update(
@@ -137,17 +184,12 @@ class AnimEditorTimelineVC: UIViewController {
     ) {
         self.focusedFrameIndex = focusedFrameIndex
         
-        toolbarVC.setFocusedFrameIndex(focusedFrameIndex)
-        trackVC.setFocusedFrameIndex(focusedFrameIndex)
+        toolbarVC.update(focusedFrameIndex: focusedFrameIndex)
+        trackVC.update(focusedFrameIndex: focusedFrameIndex)
     }
     
     func setExpanded(_ expanded: Bool) {
-        drawerVC.setExpanded(
-            expanded, animated: false)
-    }
-    
-    var remainderContentView: UIView {
-        drawerVC.remainderContentView
+        drawerVC.setExpanded(expanded, animated: false)
     }
     
 }
@@ -164,10 +206,10 @@ extension AnimEditorTimelineVC:
         toolbarVC.setExpanded(expanded)
     }
     
-    func onChangeContentAreaSize(
+    func onChangeDrawerSize(
         _ vc: AnimEditorDrawerVC
     ) {
-        delegate?.onChangeContentAreaSize(self)
+        delegate?.onChangeDrawerSize(self)
     }
     
 }
@@ -179,18 +221,19 @@ extension AnimEditorTimelineVC:
         _ vc: AnimEditorTimelineToolbarVC,
         _ focusedFrameIndex: Int
     ) {
-        self.focusedFrameIndex = focusedFrameIndex
-        trackVC.setFocusedFrameIndex(focusedFrameIndex)
-        
         delegate?.onChangeFocusedFrameIndex(
             self, focusedFrameIndex)
     }
     
-    func onSelectPlayPause(_ vc: AnimEditorTimelineToolbarVC) {
+    func onSelectPlayPause(
+        _ vc: AnimEditorTimelineToolbarVC
+    ) {
         delegate?.onSelectPlayPause(self)
     }
     
-    func onSelectToggleExpanded(_ vc: AnimEditorTimelineToolbarVC) {
+    func onSelectExpandToggle(
+        _ vc: AnimEditorTimelineToolbarVC
+    ) {
         drawerVC.toggleExpanded()
     }
     
@@ -199,20 +242,15 @@ extension AnimEditorTimelineVC:
 extension AnimEditorTimelineVC:
     AnimEditorTimelineTrackVC.Delegate {
     
-    func onBeginFrameScroll(_ vc: AnimEditorTimelineTrackVC) {
-//        delegate?.onBeginFrameScroll(self)
-    }
-    func onEndFrameScroll(_ vc: AnimEditorTimelineTrackVC) {
-//        delegate?.onEndFrameScroll(self)
-    }
+    func onBeginFrameScroll(
+        _ vc: AnimEditorTimelineTrackVC) { }
+    func onEndFrameScroll(
+        _ vc: AnimEditorTimelineTrackVC) { }
     
     func onChangeFocusedFrameIndex(
         _ vc: AnimEditorTimelineTrackVC,
         _ focusedFrameIndex: Int
     ) {
-        self.focusedFrameIndex = focusedFrameIndex
-        toolbarVC.setFocusedFrameIndex(focusedFrameIndex)
-        
         delegate?.onChangeFocusedFrameIndex(
             self, focusedFrameIndex)
     }
@@ -221,10 +259,10 @@ extension AnimEditorTimelineVC:
         _ vc: AnimEditorTimelineTrackVC,
         frameIndex: Int
     ) {
-        let frame = timelineModel.frames[frameIndex]
+        let frame = model.timelineModel.frames[frameIndex]
+        
         if !frame.hasDrawing {
-            delegate?.onRequestCreateDrawing(self,
-                frameIndex: frameIndex)
+            createDrawing(frameIndex: frameIndex)
         }
     }
     
@@ -240,11 +278,12 @@ extension AnimEditorTimelineVC:
         assetID: String
     ) -> Data? {
         
+        // TODO: Should this go through the asset loader,
+        // or is this ok?
         if let data = delegate?.pendingAssetData(
             self, assetID: assetID)
         {
             return data
-            
         } else {
             let assetURL = FileHelper.shared
                 .projectAssetURL(
@@ -274,32 +313,28 @@ extension AnimEditorTimelineVC:
         _ v: AnimEditorTimelineFrameMenuView,
         frameIndex: Int
     ) {
-        delegate?.onRequestCreateDrawing(self,
-            frameIndex: frameIndex)
+        createDrawing(frameIndex: frameIndex)
     }
-    
+
     func onSelectDeleteDrawing(
         _ v: AnimEditorTimelineFrameMenuView,
         frameIndex: Int
     ) {
-        delegate?.onRequestDeleteDrawing(self,
-            frameIndex: frameIndex)
+        deleteDrawing(frameIndex: frameIndex)
     }
-    
+
     func onSelectInsertSpacing(
         _ v: AnimEditorTimelineFrameMenuView,
         frameIndex: Int
     ) {
-        delegate?.onRequestInsertSpacing(self,
-            frameIndex: frameIndex)
+        insertSpacing(frameIndex: frameIndex)
     }
-    
+
     func onSelectRemoveSpacing(
         _ v: AnimEditorTimelineFrameMenuView,
         frameIndex: Int
     ) {
-        delegate?.onRequestRemoveSpacing(self,
-            frameIndex: frameIndex)
+        removeSpacing(frameIndex: frameIndex)
     }
-    
+
 }

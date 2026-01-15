@@ -1,19 +1,21 @@
 //
-//  AnimFrameEditorEditingState.swift
+//  AnimFrameEditSessionActiveState.swift
 //
 
-import Metal
+import Foundation
 import Geometry
+import Metal
 
-class AnimFrameEditorEditingState: AnimFrameEditorState {
+class AnimFrameEditSessionActiveState:
+    AnimFrameEditSessionState {
     
     private let projectManifest: Project.Manifest
     private let sceneManifest: Scene.Manifest
     private let layer: Scene.Layer
     private let layerContent: Scene.AnimationLayerContent
     private let frameIndex: Int
-    private let onionSkinConfig: AnimEditorOnionSkinConfig?
-    private let editorToolState: AnimEditorToolState
+//    private let onionSkinConfig: AnimEditorOnionSkinConfig?
+    private let editorToolState: AnimEditorToolState?
     
     private let frameSceneGraph: FrameSceneGraph
     
@@ -23,15 +25,15 @@ class AnimFrameEditorEditingState: AnimFrameEditorState {
     private let assetManifest:
         AnimFrameEditorHelper.AssetManifest
     
-    private let toolState: AnimFrameEditorToolState?
+    private let toolState: AnimFrameEditSessionToolState?
     
-    private let workspaceSceneGraphGenerator 
+    private let workspaceSceneGraphGenerator
         = AnimFrameEditorWorkspaceSceneGraphGenerator()
     
     private var workspaceSceneGraph:
         EditorWorkspaceSceneGraph?
     
-    weak var delegate: AnimFrameEditorStateDelegate?
+    weak var delegate: AnimFrameEditSessionStateDelegate?
     
     // MARK: - Init
     
@@ -41,8 +43,7 @@ class AnimFrameEditorEditingState: AnimFrameEditorState {
         layer: Scene.Layer,
         layerContent: Scene.AnimationLayerContent,
         frameIndex: Int,
-        onionSkinConfig: AnimEditorOnionSkinConfig?,
-        editorToolState: AnimEditorToolState,
+        editorToolState: AnimEditorToolState?,
         frameSceneGraph: FrameSceneGraph,
         activeDrawingManifest: AnimFrameEditorHelper.ActiveDrawingManifest,
         assetManifest: AnimFrameEditorHelper.AssetManifest
@@ -52,7 +53,6 @@ class AnimFrameEditorEditingState: AnimFrameEditorState {
         self.layer = layer
         self.layerContent = layerContent
         self.frameIndex = frameIndex
-        self.onionSkinConfig = onionSkinConfig
         self.editorToolState = editorToolState
         
         self.frameSceneGraph = frameSceneGraph
@@ -61,18 +61,22 @@ class AnimFrameEditorEditingState: AnimFrameEditorState {
         
         let drawingCanvasSize = layer.contentSize
         
-        switch editorToolState {
-        case let state as AnimEditorPaintToolState:
-            toolState = AnimFrameEditorPaintToolState(
-                editorToolState: state,
-                drawingCanvasSize: drawingCanvasSize)
-            
-        case let state as AnimEditorEraseToolState:
-            toolState = AnimFrameEditorEraseToolState(
-                editorToolState: state,
-                drawingCanvasSize: drawingCanvasSize)
-            
-        default:
+        if let editorToolState {
+            switch editorToolState {
+            case let state as AnimEditorPaintToolState:
+                toolState = AnimFrameEditSessionPaintToolState(
+                    editorToolState: state,
+                    drawingCanvasSize: drawingCanvasSize)
+                
+            case let state as AnimEditorEraseToolState:
+                toolState = AnimFrameEditSessionEraseToolState(
+                    editorToolState: state,
+                    drawingCanvasSize: drawingCanvasSize)
+                
+            default:
+                toolState = nil
+            }
+        } else {
             toolState = nil
         }
         toolState?.delegate = self
@@ -97,19 +101,19 @@ class AnimFrameEditorEditingState: AnimFrameEditorState {
                 frameSceneGraph: frameSceneGraph,
                 activeDrawingManifest: activeDrawingManifest,
                 activeDrawingTexture: activeDrawingTexture,
-                onionSkinConfig: onionSkinConfig)
+                onionSkinConfig: nil)
     }
     
     // MARK: - Interface
     
-    func beginState() {
-        delegate?.setEditInteractionEnabled(
-            self, enabled: true)
+    func begin() {
+//        delegate?.setEditInteractionEnabled(
+//            self, enabled: true)
         
         if let activeDrawing = activeDrawingManifest.activeDrawing,
             let fullAssetID = activeDrawing.fullAssetID
         {
-            let activeDrawingAsset = delegate?.assetLoaderAsset(
+            let activeDrawingAsset = delegate?.asset(
                 self, assetID: fullAssetID)
             
             if let texture = activeDrawingAsset?.texture {
@@ -120,56 +124,56 @@ class AnimFrameEditorEditingState: AnimFrameEditorState {
         updateWorkspaceSceneGraph()
     }
     
-    func onAssetLoaderUpdate() { }
-    
     func onFrame() -> EditorWorkspaceSceneGraph? {
         toolState?.onFrame()
         
-//        updateWorkspaceSceneGraph()
+        updateWorkspaceSceneGraph()
         
         return workspaceSceneGraph
     }
+    
+    func onAssetLoaderUpdate() { }
     
 }
 
 // MARK: - Delegates
 
-extension AnimFrameEditorEditingState: 
-    AnimFrameEditorToolStateDelegate {
+extension AnimFrameEditSessionActiveState:
+    AnimFrameEditSessionToolStateDelegate {
     
     func workspaceViewSize(
-        _ s: AnimFrameEditorToolState
+        _ s: AnimFrameEditSessionToolState
     ) -> Size {
         delegate?.workspaceViewSize(self) ?? .zero
     }
     
     func workspaceTransform(
-        _ s: AnimFrameEditorToolState
+        _ s: AnimFrameEditSessionToolState
     ) -> EditorWorkspaceTransform {
         delegate?.workspaceTransform(self) ?? .identity
     }
     
     func layerContentSize(
-        _ s: AnimFrameEditorToolState
+        _ s: AnimFrameEditSessionToolState
     ) -> Size {
         Size(layer.contentSize)
     }
     
     func layerTransform(
-        _ s: AnimFrameEditorToolState
+        _ s: AnimFrameEditSessionToolState
     ) -> Matrix3 {
         layer.transform
     }
     
-    func onEdit(
-        _ s: AnimFrameEditorToolState,
+    func onRequestEdit(
+        _ s: AnimFrameEditSessionToolState,
         imageSet: DrawingAssetProcessor.ImageSet
     ) {
         guard let activeDrawing = activeDrawingManifest
             .activeDrawing
         else { return }
         
-        delegate?.onEdit(
+        delegate?.onRequestEdit(
             self,
             drawingID: activeDrawing.id,
             imageSet: imageSet)
@@ -177,7 +181,7 @@ extension AnimFrameEditorEditingState:
     
 }
 
-extension AnimFrameEditorEditingState: 
+extension AnimFrameEditSessionActiveState:
     AnimFrameEditorWorkspaceSceneGraphGeneratorDelegate {
     
     func assetTexture(
@@ -185,8 +189,7 @@ extension AnimFrameEditorEditingState:
         assetID: String
     ) -> MTLTexture? {
         
-        let asset = delegate?.assetLoaderAsset(
-            self, assetID: assetID)
+        let asset = delegate?.asset(self, assetID: assetID)
         
         return asset?.texture
     }

@@ -4,6 +4,9 @@
 
 import UIKit
 
+// TODO: Factor out presentation (collection view, etc)
+// and business logic (view model, update context)?
+
 private let trackHeight: CGFloat = 64
 private let trackTopInset: CGFloat = 32
 private let trackBottomInset: CGFloat = 20
@@ -47,6 +50,13 @@ extension AnimEditorTimelineTrackVC {
         
     }
     
+    struct UpdateContext {
+        struct IgnoreFlags {
+            var focusedFrameIndex: Bool
+        }
+        var ignoreFlags: IgnoreFlags
+    }
+    
 }
 
 class AnimEditorTimelineTrackVC: UIViewController {
@@ -74,6 +84,8 @@ class AnimEditorTimelineTrackVC: UIViewController {
     
     private var model: AnimEditorTimelineModel = .empty
     private var focusedFrameIndex = 0
+    
+    private var updateContext: UpdateContext?
     
     private var isScrolling = false
     private var isScrollDrivingFocusedFrame = false
@@ -161,17 +173,6 @@ class AnimEditorTimelineTrackVC: UIViewController {
             right: hInset)
     }
     
-    private func recalculateFocusedFrame() {
-        guard let frameIndex = currentFocusedFrameIndex()
-        else { return }
-        
-        if focusedFrameIndex != frameIndex {
-            focusedFrameIndex = frameIndex
-            delegate?.onChangeFocusedFrameIndex(
-                self, frameIndex)
-        }
-    }
-    
     private func currentFocusedFrameIndex() -> Int? {
         collectionView.layoutIfNeeded()
         
@@ -193,6 +194,8 @@ class AnimEditorTimelineTrackVC: UIViewController {
     }
     
     private func focusFrame(at index: Int, animated: Bool) {
+        guard model.frames.count > 0 else { return }
+        
         let clampedIndex = clamp(index,
             min: 0,
             max: model.frames.count - 1)
@@ -271,9 +274,22 @@ class AnimEditorTimelineTrackVC: UIViewController {
             withAnimation: animated)
     }
     
+    // MARK: - Update
+    
+    private func withUpdateContext(
+        _ updateContext: UpdateContext,
+        _ block: () -> Void
+    ) {
+        self.updateContext = updateContext
+        block()
+        self.updateContext = nil
+    }
+    
     // MARK: - Interface
     
-    func setTimelineModel(_ model: AnimEditorTimelineModel) {
+    func update(
+        model: AnimEditorTimelineModel
+    ) {
         let oldModel = self.model
         self.model = model
         
@@ -285,8 +301,14 @@ class AnimEditorTimelineTrackVC: UIViewController {
         }
     }
     
-    func setFocusedFrameIndex(_ frameIndex: Int) {
-        focusFrame(at: frameIndex, animated: false)
+    func update(
+        focusedFrameIndex: Int
+    ) {
+        if let updateContext,
+            updateContext.ignoreFlags.focusedFrameIndex
+        { return }
+        
+        focusFrame(at: focusedFrameIndex, animated: false)
     }
     
     func setOpenMenuFrameIndex(_ frameIndex: Int?) {
@@ -326,7 +348,6 @@ extension AnimEditorTimelineTrackVC: UICollectionViewDataSource {
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
     ) -> Int {
-        
         model.frames.count
     }
     
@@ -371,7 +392,20 @@ extension AnimEditorTimelineTrackVC: UICollectionViewDelegate {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if isScrollDrivingFocusedFrame {
-            recalculateFocusedFrame()
+            guard let frameIndex = currentFocusedFrameIndex()
+            else { return }
+            
+            if focusedFrameIndex != frameIndex {
+                focusedFrameIndex = frameIndex
+                
+                withUpdateContext(
+                    .init(ignoreFlags:
+                        .init(focusedFrameIndex: true)))
+                {
+                    delegate?.onChangeFocusedFrameIndex(
+                        self, frameIndex)
+                }
+            }
         }
     }
     
@@ -462,7 +496,14 @@ extension AnimEditorTimelineTrackVC:
             delegate?.onSelectFocusedFrame(self, frameIndex: frameIndex)
         } else {
             focusFrame(at: frameIndex, animated: true)
-            delegate?.onChangeFocusedFrameIndex(self, focusedFrameIndex)
+            
+            withUpdateContext(
+                .init(ignoreFlags:
+                    .init(focusedFrameIndex: true)))
+            {
+                delegate?.onChangeFocusedFrameIndex(
+                    self, focusedFrameIndex)
+            }
         }
     }
     

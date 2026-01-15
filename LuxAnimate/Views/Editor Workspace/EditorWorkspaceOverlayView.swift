@@ -5,32 +5,36 @@
 import UIKit
 import Geometry
 
-@MainActor
-protocol EditorWorkspaceOverlayViewDelegate: AnyObject {
+extension EditorWorkspaceOverlayView {
     
-    func onBeginWorkspaceTransformGesture(
-        _ v: EditorWorkspaceOverlayView)
-    
-    func onUpdateWorkspaceTransformGesture(
-        _ v: EditorWorkspaceOverlayView,
-        initialAnchorPosition: Vector,
-        translation: Vector,
-        rotation: Double,
-        scale: Double)
-    
-    func onEndWorkspaceTransformGesture(
-        _ v: EditorWorkspaceOverlayView,
-        finalAnchorPosition: Vector,
-        pinchFlickIn: Bool)
-    
-    func onSelectUndo(_ v: EditorWorkspaceOverlayView)
-    func onSelectRedo(_ v: EditorWorkspaceOverlayView)
+    @MainActor
+    protocol Delegate: AnyObject {
+        
+        func onBeginWorkspaceTransformGesture(
+            _ v: EditorWorkspaceOverlayView)
+        
+        func onUpdateWorkspaceTransformGesture(
+            _ v: EditorWorkspaceOverlayView,
+            initialAnchorPosition: Vector,
+            translation: Vector,
+            rotation: Double,
+            scale: Double)
+        
+        func onEndWorkspaceTransformGesture(
+            _ v: EditorWorkspaceOverlayView,
+            finalAnchorPosition: Vector,
+            pinchFlickIn: Bool)
+        
+        func onSelectUndo(_ v: EditorWorkspaceOverlayView)
+        func onSelectRedo(_ v: EditorWorkspaceOverlayView)
+        
+    }
     
 }
 
 class EditorWorkspaceOverlayView: UIView {
     
-    weak var delegate: EditorWorkspaceOverlayViewDelegate?
+    weak var delegate: Delegate?
     
     private let multiGesture = CanvasMultiGestureRecognizer()
     private let panGesture = UIPanGestureRecognizer()
@@ -38,7 +42,7 @@ class EditorWorkspaceOverlayView: UIView {
     private let undoGesture = MultiFingerTapGestureRecognizer(touchCount: 2)
     private let redoGesture = MultiFingerTapGestureRecognizer(touchCount: 3)
     
-    private var toolGestureRecognizers: [UIGestureRecognizer] = []
+    private var overlayGestureRecognizers: [UIGestureRecognizer] = []
     
     // MARK: - Init
     
@@ -98,16 +102,16 @@ class EditorWorkspaceOverlayView: UIView {
     
     // MARK: - Interface
     
-    func addToolGestureRecognizer(_ g: UIGestureRecognizer) {
+    func addOverlayGestureRecognizer(_ g: UIGestureRecognizer) {
         addGestureRecognizer(g)
-        toolGestureRecognizers.append(g)
+        overlayGestureRecognizers.append(g)
     }
     
-    func removeAllToolGestureRecognizers() {
-        for g in toolGestureRecognizers {
+    func removeAllOverlayGestureRecognizers() {
+        for g in overlayGestureRecognizers {
             removeGestureRecognizer(g)
         }
-        toolGestureRecognizers = []
+        overlayGestureRecognizers = []
     }
     
 }
