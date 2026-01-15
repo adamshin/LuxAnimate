@@ -18,7 +18,7 @@ protocol AnimFrameEditSessionStateDelegate: AnyObject {
     func workspaceTransform(_ s: AnimFrameEditSessionState)
     -> EditorWorkspaceTransform
     
-    func onRequestLoadAssets(
+    func loadAssets(
         _ s: AnimFrameEditSessionState,
         assetIDs: Set<String>)
     
@@ -42,7 +42,8 @@ protocol AnimFrameEditSessionStateDelegate: AnyObject {
 @MainActor
 protocol AnimFrameEditSessionState: AnyObject {
     
-    var delegate: AnimFrameEditSessionStateDelegate? { get set }
+    var delegate: AnimFrameEditSessionStateDelegate?
+    { get set }
     
     func begin()
     

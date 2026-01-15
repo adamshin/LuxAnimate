@@ -409,7 +409,7 @@ extension AnimEditorVC: AnimFrameEditor.Delegate {
         workspaceVC.workspaceTransform()
     }
     
-    func onRequestLoadAssets(
+    func loadAssets(
         _ e: AnimFrameEditor, assetIDs: Set<String>
     ) {
         assetLoader.update(assetIDs: assetIDs)

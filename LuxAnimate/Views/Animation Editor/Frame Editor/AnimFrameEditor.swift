@@ -16,7 +16,7 @@ extension AnimFrameEditor {
         func workspaceTransform(_ e: AnimFrameEditor)
         -> EditorWorkspaceTransform
         
-        func onRequestLoadAssets(
+        func loadAssets(
             _ e: AnimFrameEditor,
             assetIDs: Set<String>)
         
@@ -110,12 +110,11 @@ extension AnimFrameEditor: AnimFrameEditSession.Delegate {
         delegate?.workspaceTransform(self) ?? .identity
     }
     
-    func onRequestLoadAssets(
+    func loadAssets(
         _ s: AnimFrameEditSession,
         assetIDs: Set<String>
     ) {
-        delegate?.onRequestLoadAssets(
-            self, assetIDs: assetIDs)
+        delegate?.loadAssets(self, assetIDs: assetIDs)
     }
     
     func hasLoadedAssets(
