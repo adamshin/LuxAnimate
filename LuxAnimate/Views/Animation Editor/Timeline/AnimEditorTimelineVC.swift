@@ -85,7 +85,7 @@ class AnimEditorTimelineVC: UIViewController {
         addChild(toolbarVC, to: drawerVC.toolbar)
         addChild(trackVC, to: drawerVC.collapsibleContentView)
         
-        drawerVC.setExpanded(false, animated: false)
+        drawerVC.setExpanded(true, animated: false)
     }
     
     private func setupInitialState() {
