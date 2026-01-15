@@ -14,8 +14,8 @@ extension AnimEditorToolStateMachine {
         
         func toolStateDidBegin(
             _ machine: AnimEditorToolStateMachine,
-            workspaceOverlayGestureRecognizers: [UIGestureRecognizer],
-            toolControlsVC: UIViewController?)
+            workspaceControlsVC: UIViewController?,
+            workspaceGestureRecognizers: [UIGestureRecognizer])
         
     }
     
@@ -35,10 +35,9 @@ class AnimEditorToolStateMachine {
         
         currentToolState = toolState
         
-        delegate?.toolStateDidBegin(
-            self,
-            workspaceOverlayGestureRecognizers: toolState.workspaceOverlayGestureRecognizers,
-            toolControlsVC: toolState.toolControlsVC)
+        delegate?.toolStateDidBegin(self,
+            workspaceControlsVC: toolState.workspaceControlsVC,
+            workspaceGestureRecognizers: toolState.workspaceGestureRecognizers)
     }
     
     func setEditInteractionEnabled(_ enabled: Bool) {

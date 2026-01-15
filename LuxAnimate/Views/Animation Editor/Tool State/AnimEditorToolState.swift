@@ -7,8 +7,8 @@ import UIKit
 @MainActor
 protocol AnimEditorToolState: AnyObject {
     
-    var workspaceOverlayGestureRecognizers: [UIGestureRecognizer] { get }
-    var toolControlsVC: UIViewController? { get }
+    var workspaceControlsVC: UIViewController? { get }
+    var workspaceGestureRecognizers: [UIGestureRecognizer] { get }
     
     func setEditInteractionEnabled(_ enabled: Bool)
     

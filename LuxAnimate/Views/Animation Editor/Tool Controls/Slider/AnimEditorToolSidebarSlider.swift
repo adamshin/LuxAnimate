@@ -10,7 +10,7 @@ extension AnimEditorToolSidebarSlider {
     protocol Delegate: AnyObject {
         
         func onChangeValue(
-            _ v: AnimEditorToolSidebarSlider)
+            _ slider: AnimEditorToolSidebarSlider)
         
     }
     

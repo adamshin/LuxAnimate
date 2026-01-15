@@ -7,15 +7,15 @@ import Foundation
 struct AnimEditorToolSettingsStore {
     
     enum Setting: String {
-        case brushScale
-        case brushSmoothing
+        case paintScale
+        case paintSmoothing
         case eraseScale
         case eraseSmoothing
         
         var defaultValue: Double {
             switch self {
-            case .brushScale: 0.2
-            case .brushSmoothing: 0
+            case .paintScale: 0.2
+            case .paintSmoothing: 0
             case .eraseScale: 0.2
             case .eraseSmoothing: 0
             }
@@ -44,14 +44,14 @@ struct AnimEditorToolSettingsStore {
         defaults.set(value, forKey: setting.key)
     }
     
-    static var brushToolScale: Double {
-        get { getDouble(for: .brushScale) }
-        set { setDouble(newValue, for: .brushScale) }
+    static var paintToolScale: Double {
+        get { getDouble(for: .paintScale) }
+        set { setDouble(newValue, for: .paintScale) }
     }
     
-    static var brushToolSmoothing: Double {
-        get { getDouble(for: .brushSmoothing) }
-        set { setDouble(newValue, for: .brushSmoothing) }
+    static var paintToolSmoothing: Double {
+        get { getDouble(for: .paintSmoothing) }
+        set { setDouble(newValue, for: .paintSmoothing) }
     }
     
     static var eraseToolScale: Double {
@@ -63,4 +63,5 @@ struct AnimEditorToolSettingsStore {
         get { getDouble(for: .eraseSmoothing) }
         set { setDouble(newValue, for: .eraseSmoothing) }
     }
+    
 }

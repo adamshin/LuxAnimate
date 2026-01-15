@@ -337,14 +337,13 @@ extension AnimEditorVC:
     
     func toolStateDidBegin(
         _ machine: AnimEditorToolStateMachine,
-        workspaceOverlayGestureRecognizers: [UIGestureRecognizer],
-        toolControlsVC: UIViewController?
+        workspaceControlsVC: UIViewController?,
+        workspaceGestureRecognizers: [UIGestureRecognizer]
     ) {
-        for g in workspaceOverlayGestureRecognizers {
+        for g in workspaceGestureRecognizers {
             workspaceVC.addOverlayGestureRecognizer(g)
         }
-        
-        toolControlsContainerVC.show(toolControlsVC)
+        toolControlsContainerVC.show(workspaceControlsVC)
     }
     
 }

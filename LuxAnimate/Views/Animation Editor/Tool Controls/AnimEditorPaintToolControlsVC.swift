@@ -1,5 +1,5 @@
 //
-//  AnimEditorBrushToolControlsVC.swift
+//  AnimEditorPaintToolControlsVC.swift
 //
 
 import UIKit
@@ -7,8 +7,23 @@ import UIKit
 private let scaleGamma: Double = 2.0
 private let smoothingGamma: Double = 1.5
 
-class AnimEditorBrushToolControlsVC:
-    UIViewController {
+extension AnimEditorPaintToolControlsVC {
+    
+    @MainActor
+    protocol Delegate: AnyObject {
+        
+        func onChangeScale(
+            _ vc: AnimEditorPaintToolControlsVC,
+            _ value: Double)
+        func onChangeSmoothing(
+            _ vc: AnimEditorPaintToolControlsVC,
+            _ value: Double)
+        
+    }
+    
+}
+
+class AnimEditorPaintToolControlsVC: UIViewController {
     
     private let scaleSlider =
         AnimEditorToolSidebarSlider(
@@ -22,6 +37,8 @@ class AnimEditorBrushToolControlsVC:
             gamma: smoothingGamma,
             valueDisplayMode: .percent(minValue: 0))
     
+    weak var delegate: Delegate?
+    
     override func loadView() {
         view = PassthroughView()
     }
@@ -29,14 +46,6 @@ class AnimEditorBrushToolControlsVC:
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        
-        scaleSlider.value =
-            AnimEditorToolSettingsStore
-                .brushToolScale
-        
-        smoothingSlider.value =
-            AnimEditorToolSettingsStore
-                .brushToolSmoothing
     }
     
     private func setupUI() {
@@ -53,22 +62,27 @@ class AnimEditorBrushToolControlsVC:
         smoothingSlider.delegate = self
     }
     
+    func setScale(_ value: Double) {
+        scaleSlider.value = value
+    }
+    func setSmoothing(_ value: Double) {
+        smoothingSlider.value = value
+    }
+    
 }
 
-extension AnimEditorBrushToolControlsVC:
+extension AnimEditorPaintToolControlsVC:
     AnimEditorToolSidebarSlider.Delegate {
     
     func onChangeValue(
-        _ v: AnimEditorToolSidebarSlider
+        _ slider: AnimEditorToolSidebarSlider
     ) {
-        switch v {
+        switch slider {
         case scaleSlider:
-            AnimEditorToolSettingsStore
-                .brushToolScale = v.value
+            delegate?.onChangeScale(self, slider.value)
             
         case smoothingSlider:
-            AnimEditorToolSettingsStore
-                .brushToolSmoothing = v.value
+            delegate?.onChangeSmoothing(self, slider.value)
             
         default:
             break

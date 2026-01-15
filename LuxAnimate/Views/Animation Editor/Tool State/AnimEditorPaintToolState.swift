@@ -15,9 +15,8 @@ import BrushEngine
 @MainActor
 class AnimEditorPaintToolState: AnimEditorToolState {
     
+    private let controlsVC = AnimEditorPaintToolControlsVC()
     private let brushGestureRecognizer = BrushGestureRecognizer()
-    
-    // TODO: Controls view controller
     
     private(set) var brush: BrushEngine.Brush?
     private(set) var scale: Double
@@ -28,27 +27,45 @@ class AnimEditorPaintToolState: AnimEditorToolState {
         brush = try? BrushLibraryManager.loadBrush(
             id: AppConfig.paintBrushIDs.first!)
         
-        scale = AnimEditorToolSettingsStore
-            .brushToolScale
-        smoothing = AnimEditorToolSettingsStore
-            .brushToolSmoothing
+        scale = AnimEditorToolSettingsStore.paintToolScale
+        smoothing = AnimEditorToolSettingsStore.paintToolSmoothing
         
-//        controlsVC.delegate = self
-//        controlsVC.scale = scale
-//        controlsVC.smoothing = smoothing
+        controlsVC.delegate = self
+        controlsVC.setScale(scale)
+        controlsVC.setSmoothing(smoothing)
     }
     
-    var workspaceOverlayGestureRecognizers: [UIGestureRecognizer] {
+    var workspaceControlsVC: UIViewController? {
+        controlsVC
+    }
+    
+    var workspaceGestureRecognizers: [UIGestureRecognizer] {
         [brushGestureRecognizer]
-    }
-    
-    var toolControlsVC: UIViewController? {
-        // TODO: Return controls VC
-        nil
     }
     
     func setEditInteractionEnabled(_ enabled: Bool) {
         brushGestureRecognizer.isEnabled = enabled
+    }
+    
+}
+
+extension AnimEditorPaintToolState:
+    AnimEditorPaintToolControlsVC.Delegate {
+    
+    func onChangeScale(
+        _ vc: AnimEditorPaintToolControlsVC,
+        _ value: Double
+    ) {
+        AnimEditorToolSettingsStore
+            .paintToolScale = value
+    }
+    
+    func onChangeSmoothing(
+        _ vc: AnimEditorPaintToolControlsVC,
+        _ value: Double
+    ) {
+        AnimEditorToolSettingsStore
+            .paintToolSmoothing = value
     }
     
 }
