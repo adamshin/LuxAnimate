@@ -6,10 +6,10 @@ import UIKit
 
 @MainActor
 protocol AnimEditorToolState: AnyObject {
-
-    func begin(workspaceVC: EditorWorkspaceVC)
-    func end(workspaceVC: EditorWorkspaceVC)
-
+    
+    var workspaceOverlayGestureRecognizers: [UIGestureRecognizer] { get }
+    var toolControlsVC: UIViewController? { get }
+    
     func setEditInteractionEnabled(_ enabled: Bool)
-
+    
 }

@@ -583,7 +583,7 @@
 			path = "Multi Finger Tap";
 			sourceTree = "<group>";
 		};
-		665F68892D123EA7004E5E70 /* Frame */ = {
+		665F68892D123EA7004E5E70 /* Frame (old) */ = {
 			isa = PBXGroup;
 			children = (
 				663995802D43066400D7F987 /* Tool State */,
@@ -592,7 +592,7 @@
 				665F688A2D123EB0004E5E70 /* AnimEditorFrameVC.swift */,
 				66392A1E2D1E5D0000B0CC56 /* AnimEditorFrameView.swift */,
 			);
-			path = Frame;
+			path = "Frame (old)";
 			sourceTree = "<group>";
 		};
 		66637A922CA23D8000EA88ED /* Brush Gesture */ = {
@@ -671,10 +671,10 @@
 				6681BB1F2D0A493600AAED6A /* Toolbar */,
 				6651A9D42C961FEF00E3520A /* Timeline */,
 				669ACDDB2F18A0E4000B3A15 /* Tool State */,
-				665F68892D123EA7004E5E70 /* Frame */,
 				6678A9BF2C8398ED00838EA3 /* Asset Loader */,
 				667131222F1219D7009BE03B /* Model */,
 				668A14D42C7D3E3800D73D36 /* Shared */,
+				665F68892D123EA7004E5E70 /* Frame (old) */,
 				6681BB1B2D0A444300AAED6A /* AnimEditorVC.swift */,
 				6671311C2F11FA13009BE03B /* AnimEditorView.swift */,
 			);

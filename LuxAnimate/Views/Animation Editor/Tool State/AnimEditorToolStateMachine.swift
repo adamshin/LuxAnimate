@@ -9,8 +9,13 @@ extension AnimEditorToolStateMachine {
     @MainActor
     protocol Delegate: AnyObject {
         
-        func workspaceVC(_ s: AnimEditorToolStateMachine)
-        -> EditorWorkspaceVC
+        func toolStateDidEnd(
+            _ machine: AnimEditorToolStateMachine)
+        
+        func toolStateDidBegin(
+            _ machine: AnimEditorToolStateMachine,
+            workspaceOverlayGestureRecognizers: [UIGestureRecognizer],
+            toolControlsVC: UIViewController?)
         
     }
     
@@ -18,23 +23,26 @@ extension AnimEditorToolStateMachine {
 
 @MainActor
 class AnimEditorToolStateMachine {
-
+    
     weak var delegate: Delegate?
-
-    private var currentToolState: AnimEditorToolState?
-
+    
+    private(set) var currentToolState: AnimEditorToolState?
+    
     func setToolState(_ toolState: AnimEditorToolState) {
-        guard let delegate else { return }
+        if currentToolState != nil {
+            delegate?.toolStateDidEnd(self)
+        }
         
-        let workspaceVC = delegate.workspaceVC(self)
-        
-        currentToolState?.end(workspaceVC: workspaceVC)
         currentToolState = toolState
-        toolState.begin(workspaceVC: workspaceVC)
+        
+        delegate?.toolStateDidBegin(
+            self,
+            workspaceOverlayGestureRecognizers: toolState.workspaceOverlayGestureRecognizers,
+            toolControlsVC: toolState.toolControlsVC)
     }
-
+    
     func setEditInteractionEnabled(_ enabled: Bool) {
         currentToolState?.setEditInteractionEnabled(enabled)
     }
-
+    
 }

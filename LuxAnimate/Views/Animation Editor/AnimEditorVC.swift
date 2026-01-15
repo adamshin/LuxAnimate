@@ -39,18 +39,18 @@ class AnimEditorVC: UIViewController {
     private let workspaceVC = EditorWorkspaceVC()
     private let toolbarVC: AnimEditor2ToolbarVC
     private let timelineVC: AnimEditorTimelineVC
+    private let toolControlsContainerVC = PassthroughContainerViewController()
     
     // MARK: - State
-
+    
     private let projectID: String
     private let sceneID: String
     private let layerID: String
-
+    
     private var model: AnimEditorModel
     private var focusedFrameIndex: Int
-
-    private let toolStateMachine
-        = AnimEditorToolStateMachine()
+    
+    private let toolStateMachine = AnimEditorToolStateMachine()
     
     private let assetLoader: AnimEditorAssetLoader
     
@@ -134,14 +134,10 @@ class AnimEditorVC: UIViewController {
     private func setupUI() {
         view.backgroundColor = .editorBackground
         
-        addChild(workspaceVC,
-            to: bodyView.workspaceContainer)
-        
-        addChild(toolbarVC,
-            to: bodyView.toolbarContainer)
-        
-        addChild(timelineVC,
-            to: bodyView.timelineContainer)
+        addChild(workspaceVC, to: bodyView.workspaceContainer)
+        addChild(toolbarVC, to: bodyView.toolbarContainer)
+        addChild(timelineVC, to: bodyView.timelineContainer)
+        addChild(toolControlsContainerVC, to: bodyView.workspaceSafeAreaView)
         
         workspaceVC.setSafeAreaReferenceView(
             bodyView.workspaceSafeAreaView)
@@ -178,11 +174,11 @@ class AnimEditorVC: UIViewController {
     
     private func internalSetFocusedFrameIndex(_ i: Int) {
         let frameCount =
-            model.sceneManifest.frameCount
+        model.sceneManifest.frameCount
         
         focusedFrameIndex = clamp(i,
-            min: 0,
-            max: frameCount - 1)
+                                  min: 0,
+                                  max: frameCount - 1)
         
         timelineVC.update(
             focusedFrameIndex: focusedFrameIndex)
@@ -216,8 +212,8 @@ class AnimEditorVC: UIViewController {
             let frameCount = model.sceneManifest.frameCount
             
             focusedFrameIndex = clamp(focusedFrameIndex,
-                min: 0,
-                max: frameCount - 1)
+                                      min: 0,
+                                      max: frameCount - 1)
             
             toolbarVC.update(model: model)
             timelineVC.update(model: model)
@@ -265,9 +261,9 @@ extension AnimEditorVC: AnimEditor2ToolbarVC.Delegate {
         case .paint: AnimEditorPaintToolState()
         case .erase: AnimEditorPaintToolState()
         }
-
+        
         toolStateMachine.setToolState(toolState)
-
+        
         // TODO: Update frame editor.
     }
     
@@ -297,8 +293,8 @@ extension AnimEditorVC: AnimEditorTimelineVC.Delegate {
         layerContentEdit: AnimationLayerContentEditBuilder.Edit
     ) {
         delegate?.onRequestEdit(self,
-            layer: model.layer,
-            layerContentEdit: layerContentEdit)
+                                layer: model.layer,
+                                layerContentEdit: layerContentEdit)
     }
     
     func pendingAssetData(
@@ -313,7 +309,7 @@ extension AnimEditorVC: AnimEditorTimelineVC.Delegate {
 }
 
 extension AnimEditorVC: AnimEditorAssetLoader.Delegate {
-
+    
     func pendingAssetData(
         _ l: AnimEditorAssetLoader,
         assetID: String
@@ -322,18 +318,33 @@ extension AnimEditorVC: AnimEditorAssetLoader.Delegate {
             .pendingEditAsset(self, assetID: assetID)?
             .data
     }
-
+    
     func onUpdate(_ l: AnimEditorAssetLoader) {
-//        frameEditor?.onAssetLoaderUpdate()
+        //        frameEditor?.onAssetLoaderUpdate()
     }
-
+    
 }
 
-extension AnimEditorVC: AnimEditorToolStateMachine.Delegate {
+extension AnimEditorVC:
+    AnimEditorToolStateMachine.Delegate {
     
-    func workspaceVC(_ s: AnimEditorToolStateMachine)
-    -> EditorWorkspaceVC {
-        workspaceVC
+    func toolStateDidEnd(
+        _ machine: AnimEditorToolStateMachine
+    ) {
+        workspaceVC.removeAllOverlayGestureRecognizers()
+        toolControlsContainerVC.show(nil)
+    }
+    
+    func toolStateDidBegin(
+        _ machine: AnimEditorToolStateMachine,
+        workspaceOverlayGestureRecognizers: [UIGestureRecognizer],
+        toolControlsVC: UIViewController?
+    ) {
+        for g in workspaceOverlayGestureRecognizers {
+            workspaceVC.addOverlayGestureRecognizer(g)
+        }
+        
+        toolControlsContainerVC.show(toolControlsVC)
     }
     
 }
