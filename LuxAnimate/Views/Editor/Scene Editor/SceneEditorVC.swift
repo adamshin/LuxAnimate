@@ -306,7 +306,11 @@ extension SceneEditorVC: AnimEditorVC.Delegate {
                 projectManifest: model.projectManifest,
                 sceneEdit: sceneEdit)
             
-            delegate?.onRequestEdit(self, edit: edit)
+            withUpdateContext(.init(
+                pendingEditSceneManifest: sceneEdit.sceneManifest))
+            {
+                delegate?.onRequestEdit(self, edit: edit)
+            }
             
         } catch { }
     }
