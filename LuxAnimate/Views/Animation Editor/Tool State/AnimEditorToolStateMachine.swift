@@ -26,22 +26,23 @@ class AnimEditorToolStateMachine {
     
     weak var delegate: Delegate?
     
-    private(set) var currentToolState: AnimEditorToolState?
+    private(set) var toolState: AnimEditorToolState?
     
-    func setToolState(_ toolState: AnimEditorToolState) {
-        if currentToolState != nil {
+    func setToolState(_ newToolState: AnimEditorToolState) {
+        if toolState != nil {
             delegate?.toolStateDidEnd(self)
         }
         
-        currentToolState = toolState
+        toolState = newToolState
         
-        delegate?.toolStateDidBegin(self,
-            workspaceControlsVC: toolState.workspaceControlsVC,
-            workspaceGestureRecognizers: toolState.workspaceGestureRecognizers)
+        delegate?.toolStateDidBegin(
+            self,
+            workspaceControlsVC: newToolState.workspaceControlsVC,
+            workspaceGestureRecognizers: newToolState.workspaceGestureRecognizers)
     }
     
     func setEditInteractionEnabled(_ enabled: Bool) {
-        currentToolState?.setEditInteractionEnabled(enabled)
+        toolState?.setEditInteractionEnabled(enabled)
     }
     
 }

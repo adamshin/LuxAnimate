@@ -37,9 +37,11 @@ class AnimEditorVC: UIViewController {
     private let bodyView = AnimEditorView()
     
     private let workspaceVC = EditorWorkspaceVC()
+    private let workspaceControlsContainerVC
+        = PassthroughContainerViewController()
+    
     private let toolbarVC: AnimEditor2ToolbarVC
     private let timelineVC: AnimEditorTimelineVC
-    private let toolControlsContainerVC = PassthroughContainerViewController()
     
     // MARK: - State
     
@@ -50,12 +52,12 @@ class AnimEditorVC: UIViewController {
     private var model: AnimEditorModel
     private var focusedFrameIndex: Int
     
+    // TODO: Onion skin settings
+    
     private let toolStateMachine = AnimEditorToolStateMachine()
+    private let frameEditor = AnimFrameEditor()
     
     private let assetLoader: AnimEditorAssetLoader
-    
-    // TODO: Frame editor
-    // TODO: Onion skin settings
     
     private let displayLink = WrappedDisplayLink()
     
@@ -76,17 +78,16 @@ class AnimEditorVC: UIViewController {
         self.projectID = projectID
         self.sceneID = sceneID
         self.layerID = layerID
-        self.focusedFrameIndex = focusedFrameIndex
         
-        // TODO: Clamp focused frame index to valid range.
-        // Should we pull this logic into a helper function?
-        // We'll be doing the same thing in update().
-        self.model = try AnimEditorModel(
-            projectManifest: sceneEditorModel.projectManifest,
-            sceneManifest: sceneEditorModel.sceneManifest,
-            layerID: layerID,
-            availableUndoCount: sceneEditorModel.availableUndoCount,
-            availableRedoCount: sceneEditorModel.availableRedoCount)
+        let model = try Self.createModel(
+            sceneEditorModel: sceneEditorModel,
+            layerID: layerID)
+        
+        self.model = model
+        
+        self.focusedFrameIndex = Self.clampedFrameIndex(
+            index: focusedFrameIndex,
+            model: model)
         
         toolbarVC = AnimEditor2ToolbarVC()
         
@@ -106,6 +107,7 @@ class AnimEditorVC: UIViewController {
         timelineVC.delegate = self
         
         toolStateMachine.delegate = self
+        frameEditor.delegate = self
         assetLoader.delegate = self
     }
     
@@ -122,9 +124,7 @@ class AnimEditorVC: UIViewController {
         
         setupUI()
         setupDisplayLink()
-        
         setupInitialState()
-        setupTestSceneGraph()
     }
     
     override var prefersStatusBarHidden: Bool { true }
@@ -132,12 +132,19 @@ class AnimEditorVC: UIViewController {
     // MARK: - Setup
     
     private func setupUI() {
-        view.backgroundColor = .editorBackground
+        addChild(
+            workspaceVC,
+            to: bodyView.workspaceContainer)
+        addChild(
+            workspaceControlsContainerVC,
+            to: bodyView.workspaceSafeAreaView)
         
-        addChild(workspaceVC, to: bodyView.workspaceContainer)
-        addChild(toolbarVC, to: bodyView.toolbarContainer)
-        addChild(timelineVC, to: bodyView.timelineContainer)
-        addChild(toolControlsContainerVC, to: bodyView.workspaceSafeAreaView)
+        addChild(
+            toolbarVC,
+            to: bodyView.toolbarContainer)
+        addChild(
+            timelineVC,
+            to: bodyView.timelineContainer)
         
         workspaceVC.setSafeAreaReferenceView(
             bodyView.workspaceSafeAreaView)
@@ -151,42 +158,82 @@ class AnimEditorVC: UIViewController {
     
     private func setupInitialState() {
         toolbarVC.update(model: model)
+        toolbarVC.update(selectedTool: .paint)
         
         toolStateMachine.setToolState(
             AnimEditorPaintToolState())
-    }
-    
-    private func setupTestSceneGraph() {
-        let layer = EditorWorkspaceSceneGraph.Layer(
-            content: .rect(.init(color: .white)),
-            contentSize: contentSize,
-            transform: .identity,
-            alpha: 1)
         
-        let sceneGraph = EditorWorkspaceSceneGraph(
-            contentSize: contentSize,
-            layers: [layer])
-        
-        workspaceVC.setSceneGraph(sceneGraph)
+        updateFrameEditor()
     }
     
     // MARK: - Internal State
     
-    private func internalSetFocusedFrameIndex(_ i: Int) {
-        let frameCount =
-        model.sceneManifest.frameCount
+    private func updateInternal(
+        sceneEditorModel: SceneEditorModel
+    ) {
+        do {
+            model = try Self.createModel(
+                sceneEditorModel: sceneEditorModel,
+                layerID: layerID)
+            
+            focusedFrameIndex = Self.clampedFrameIndex(
+                index: focusedFrameIndex,
+                model: model)
+            
+            toolbarVC.update(model: model)
+            
+            timelineVC.update(model: model)
+            timelineVC.update(
+                focusedFrameIndex: focusedFrameIndex)
+            
+            updateFrameEditor()
+            
+        } catch {
+            dismiss()
+        }
+    }
+    
+    private func updateInternal(
+        selectedToolbarTool tool: AnimEditor2ToolbarVC.Tool
+    ) {
+        let toolState: AnimEditorToolState = switch tool {
+        case .paint: AnimEditorPaintToolState()
+        case .erase: AnimEditorPaintToolState()
+        }
         
-        focusedFrameIndex = clamp(i,
-                                  min: 0,
-                                  max: frameCount - 1)
+        toolStateMachine.setToolState(toolState)
+        
+        updateFrameEditor()
+    }
+    
+    private func updateInternal(
+        focusedFrameIndex newFocusedFrameIndex: Int
+    ) {
+        focusedFrameIndex = Self.clampedFrameIndex(
+            index: newFocusedFrameIndex,
+            model: model)
         
         timelineVC.update(
             focusedFrameIndex: focusedFrameIndex)
+        
+        updateFrameEditor()
+    }
+    
+    private func updateFrameEditor() {
+        frameEditor.update(
+            model: model,
+            focusedFrameIndex: focusedFrameIndex,
+            editorToolState: toolStateMachine.toolState)
     }
     
     // MARK: - Frame
     
     private func onFrame() {
+        let sceneGraph = frameEditor.onFrame()
+        
+        if let sceneGraph {
+            workspaceVC.setSceneGraph(sceneGraph)
+        }
         workspaceVC.onFrame()
     }
     
@@ -198,31 +245,34 @@ class AnimEditorVC: UIViewController {
     
     // MARK: - Interface
     
-    func update(
-        sceneEditorModel: SceneEditorModel
-    ) {
-        do {
-            model = try AnimEditorModel(
-                projectManifest: sceneEditorModel.projectManifest,
-                sceneManifest: sceneEditorModel.sceneManifest,
-                layerID: layerID,
-                availableUndoCount: sceneEditorModel.availableUndoCount,
-                availableRedoCount: sceneEditorModel.availableRedoCount)
-            
-            let frameCount = model.sceneManifest.frameCount
-            
-            focusedFrameIndex = clamp(focusedFrameIndex,
-                                      min: 0,
-                                      max: frameCount - 1)
-            
-            toolbarVC.update(model: model)
-            timelineVC.update(model: model)
-            
-            timelineVC.update(focusedFrameIndex: focusedFrameIndex)
-            
-        } catch {
-            dismiss()
-        }
+    func update(sceneEditorModel: SceneEditorModel) {
+        updateInternal(sceneEditorModel: sceneEditorModel)
+    }
+    
+}
+
+// MARK: - Helpers
+
+extension AnimEditorVC {
+    
+    private static func createModel(
+        sceneEditorModel sm: SceneEditorModel,
+        layerID: String
+    ) throws -> AnimEditorModel {
+        
+        try AnimEditorModel(
+            projectManifest: sm.projectManifest,
+            sceneManifest: sm.sceneManifest,
+            layerID: layerID,
+            availableUndoCount: sm.availableUndoCount,
+            availableRedoCount: sm.availableRedoCount)
+    }
+    
+    private static func clampedFrameIndex(
+        index: Int, model: AnimEditorModel
+    ) -> Int {
+        let frameCount = model.sceneManifest.frameCount
+        return clamp(index, min: 0, max: frameCount - 1)
     }
     
 }
@@ -257,14 +307,10 @@ extension AnimEditorVC: AnimEditor2ToolbarVC.Delegate {
         tool: AnimEditor2ToolbarVC.Tool,
         isAlreadySelected: Bool
     ) {
-        let toolState: AnimEditorToolState = switch tool {
-        case .paint: AnimEditorPaintToolState()
-        case .erase: AnimEditorPaintToolState()
-        }
+        // TODO: If tool is already selected, toggle
+        // expanded tool UI.
         
-        toolStateMachine.setToolState(toolState)
-        
-        // TODO: Update frame editor.
+        updateInternal(selectedToolbarTool: tool)
     }
     
 }
@@ -281,7 +327,7 @@ extension AnimEditorVC: AnimEditorTimelineVC.Delegate {
         _ vc: AnimEditorTimelineVC,
         _ focusedFrameIndex: Int
     ) {
-        internalSetFocusedFrameIndex(focusedFrameIndex)
+        updateInternal(focusedFrameIndex: focusedFrameIndex)
     }
     
     func onSelectPlayPause(
@@ -292,9 +338,10 @@ extension AnimEditorVC: AnimEditorTimelineVC.Delegate {
         _ vc: AnimEditorTimelineVC,
         layerContentEdit: AnimationLayerContentEditBuilder.Edit
     ) {
-        delegate?.onRequestEdit(self,
-                                layer: model.layer,
-                                layerContentEdit: layerContentEdit)
+        delegate?.onRequestEdit(
+            self,
+            layer: model.layer,
+            layerContentEdit: layerContentEdit)
     }
     
     func pendingAssetData(
@@ -320,7 +367,7 @@ extension AnimEditorVC: AnimEditorAssetLoader.Delegate {
     }
     
     func onUpdate(_ l: AnimEditorAssetLoader) {
-        //        frameEditor?.onAssetLoaderUpdate()
+        frameEditor.onAssetLoaderUpdate()
     }
     
 }
@@ -332,7 +379,7 @@ extension AnimEditorVC:
         _ machine: AnimEditorToolStateMachine
     ) {
         workspaceVC.removeAllOverlayGestureRecognizers()
-        toolControlsContainerVC.show(nil)
+        workspaceControlsContainerVC.show(nil)
     }
     
     func toolStateDidBegin(
@@ -343,7 +390,68 @@ extension AnimEditorVC:
         for g in workspaceGestureRecognizers {
             workspaceVC.addOverlayGestureRecognizer(g)
         }
-        toolControlsContainerVC.show(workspaceControlsVC)
+        
+        workspaceControlsContainerVC
+            .show(workspaceControlsVC)
+    }
+    
+}
+
+extension AnimEditorVC: AnimFrameEditor.Delegate {
+    
+    func workspaceViewSize(_ e: AnimFrameEditor)
+    -> Size {
+        Size(workspaceVC.view.bounds.size)
+    }
+    
+    func workspaceTransform(_ e: AnimFrameEditor)
+    -> EditorWorkspaceTransform {
+        workspaceVC.workspaceTransform()
+    }
+    
+    func onRequestLoadAssets(
+        _ e: AnimFrameEditor, assetIDs: Set<String>
+    ) {
+        assetLoader.update(assetIDs: assetIDs)
+    }
+    
+    func hasLoadedAssets(
+        _ e: AnimFrameEditor, assetIDs: Set<String>
+    ) -> Bool {
+        let loadedAssetIDs = assetLoader.loadedAssets.keys
+        return assetIDs.isSubset(of: loadedAssetIDs)
+    }
+    
+    func asset(
+        _ e: AnimFrameEditor, assetID: String
+    ) -> AnimEditorAssetLoader.LoadedAsset? {
+        assetLoader.loadedAssets[assetID]
+    }
+    
+    func onRequestEdit(
+        _ e: AnimFrameEditor,
+        drawingID: String,
+        imageSet: DrawingAssetProcessor.ImageSet
+    ) {
+        let imageSet = AnimationLayerContentEditBuilder
+            .DrawingImageSet(
+                full: imageSet.full,
+                thumbnail: imageSet.thumbnail)
+        
+        do {
+            let layerContentEdit = try
+                AnimationLayerContentEditBuilder
+                    .editDrawing(
+                        layerContent: model.layerContent,
+                        drawingID: drawingID,
+                        imageSet: imageSet)
+            
+            delegate?.onRequestEdit(
+                self,
+                layer: model.layer,
+                layerContentEdit: layerContentEdit)
+            
+        } catch { }
     }
     
 }

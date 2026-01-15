@@ -50,10 +50,6 @@ extension AnimEditorTimelineTrackVC {
         
     }
     
-}
-
-extension AnimEditorTimelineTrackVC {
-    
     struct UpdateContext {
         struct IgnoreFlags {
             var focusedFrameIndex: Bool

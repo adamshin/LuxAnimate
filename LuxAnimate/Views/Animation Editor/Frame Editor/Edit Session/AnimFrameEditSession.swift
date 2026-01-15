@@ -1,117 +1,115 @@
 //
-//  AnimFrameEditor.swift
+//  AnimFrameEditSession.swift
 //
 
 import Foundation
 import Geometry
 
-extension AnimFrameEditor {
+extension AnimFrameEditSession {
     
     @MainActor
     protocol Delegate: AnyObject {
         
-        func workspaceViewSize(_ e: AnimFrameEditor)
+        func workspaceViewSize(_ s: AnimFrameEditSession)
         -> Size
         
-        func workspaceTransform(_ e: AnimFrameEditor)
+        func workspaceTransform(_ s: AnimFrameEditSession)
         -> EditorWorkspaceTransform
         
         func onRequestLoadAssets(
-            _ e: AnimFrameEditor,
+            _ s: AnimFrameEditSession,
             assetIDs: Set<String>)
         
         func hasLoadedAssets(
-            _ e: AnimFrameEditor,
+            _ s: AnimFrameEditSession,
             assetIDs: Set<String>
         ) -> Bool
         
         func asset(
-            _ e: AnimFrameEditor,
+            _ s: AnimFrameEditSession,
             assetID: String
         ) -> AnimEditorAssetLoader.LoadedAsset?
         
         func onRequestEdit(
-            _ e: AnimFrameEditor,
+            _ s: AnimFrameEditSession,
             drawingID: String,
             imageSet: DrawingAssetProcessor.ImageSet)
         
     }
     
-    struct UpdateContext {
-        var ignoreUpdate: Bool
-    }
-    
 }
 
 @MainActor
-class AnimFrameEditor {
+class AnimFrameEditSession {
     
-    private var editSession: AnimFrameEditSession?
+    private var state: AnimFrameEditSessionState?
     
-    private var updateContext: UpdateContext?
+    private weak var delegate: Delegate?
     
-    weak var delegate: Delegate?
+    // MARK: - Init
     
-    // MARK: - Update Context
-    
-    private func withUpdateContext(
-        _ updateContext: UpdateContext,
-        _ block: () -> Void
+    init(
+        projectManifest: Project.Manifest,
+        sceneManifest: Scene.Manifest,
+        layer: Scene.Layer,
+        layerContent: Scene.AnimationLayerContent,
+        frameIndex: Int,
+        editorToolState: AnimEditorToolState?,
+        delegate: Delegate?
     ) {
-        self.updateContext = updateContext
-        block()
-        self.updateContext = nil
+        self.delegate = delegate
+        
+        // TODO: Begin loading state
+    }
+    
+    // MARK: - State
+    
+    private func beginState(
+        _ newState: AnimFrameEditSessionState
+    ) {
+        state = newState
+        newState.delegate = self
+        newState.begin()
     }
     
     // MARK: - Interface
     
-    func update(
-        model: AnimEditorModel,
-        focusedFrameIndex: Int,
-        editorToolState: AnimEditorToolState?
-    ) {
-        if let updateContext, updateContext.ignoreUpdate {
-            return
-        }
-        
-        editSession = AnimFrameEditSession(
-            projectManifest: model.projectManifest,
-            sceneManifest: model.sceneManifest,
-            layer: model.layer,
-            layerContent: model.layerContent,
-            frameIndex: focusedFrameIndex,
-            editorToolState: editorToolState,
-            delegate: self)
-    }
-    
     func onFrame() -> EditorWorkspaceSceneGraph? {
-        editSession?.onFrame()
+        state?.onFrame()
     }
     
     func onAssetLoaderUpdate() {
-        editSession?.onAssetLoaderUpdate()
+        state?.onAssetLoaderUpdate()
     }
     
 }
 
 // MARK: - Delegates
 
-extension AnimFrameEditor: AnimFrameEditSession.Delegate {
+extension AnimFrameEditSession:
+    AnimFrameEditSessionStateDelegate {
+    
+    func changeState(
+        _ s: AnimFrameEditSessionState,
+        newState: AnimFrameEditSessionState
+    ) {
+        beginState(newState)
+    }
     
     func workspaceViewSize(
-        _ s: AnimFrameEditSession
+        _ s: AnimFrameEditSessionState
     ) -> Geometry.Size {
         delegate?.workspaceViewSize(self) ?? .zero
     }
     
     func workspaceTransform(
-        _ s: AnimFrameEditSession
+        _ s: AnimFrameEditSessionState
     ) -> EditorWorkspaceTransform {
         delegate?.workspaceTransform(self) ?? .identity
     }
     
     func onRequestLoadAssets(
-        _ s: AnimFrameEditSession,
+        _ s: AnimFrameEditSessionState,
         assetIDs: Set<String>
     ) {
         delegate?.onRequestLoadAssets(
@@ -119,7 +117,7 @@ extension AnimFrameEditor: AnimFrameEditSession.Delegate {
     }
     
     func hasLoadedAssets(
-        _ s: AnimFrameEditSession,
+        _ s: AnimFrameEditSessionState,
         assetIDs: Set<String>
     ) -> Bool {
         delegate?.hasLoadedAssets(
@@ -127,14 +125,14 @@ extension AnimFrameEditor: AnimFrameEditSession.Delegate {
     }
     
     func asset(
-        _ s: AnimFrameEditSession,
+        _ s: AnimFrameEditSessionState,
         assetID: String
     ) -> AnimEditorAssetLoader.LoadedAsset? {
         delegate?.asset(self, assetID: assetID)
     }
     
     func onRequestEdit(
-        _ s: AnimFrameEditSession,
+        _ s: AnimFrameEditSessionState,
         drawingID: String,
         imageSet: DrawingAssetProcessor.ImageSet
     ) {
