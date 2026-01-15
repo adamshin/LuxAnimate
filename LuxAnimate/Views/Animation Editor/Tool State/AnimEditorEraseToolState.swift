@@ -49,6 +49,13 @@ class AnimEditorEraseToolState: AnimEditorToolState {
 extension AnimEditorEraseToolState:
     AnimEditorPaintToolControlsVC.Delegate {
     
+    func onSelectBrush(
+        _ vc: AnimEditorPaintToolControlsVC,
+        id: String
+    ) {
+//        setBrush(id: id)
+    }
+    
     func onChangeScale(
         _ vc: AnimEditorPaintToolControlsVC,
         _ value: Double

@@ -16,16 +16,18 @@ class AnimEditorPaintToolState: AnimEditorToolState {
     private(set) var smoothing: Double
     
     init() {
-        // TODO: Allow user to pick brushes
-        brush = try? BrushLibraryManager.loadBrush(
-            id: AppConfig.paintBrushIDs.first!)
-        
         scale = AnimEditorToolSettingsStore.paintToolScale
         smoothing = AnimEditorToolSettingsStore.paintToolSmoothing
         
         controlsVC.delegate = self
         controlsVC.setScale(scale)
         controlsVC.setSmoothing(smoothing)
+        
+        setBrush(id: AppConfig.paintBrushIDs.first!)
+    }
+    
+    func setBrush(id: String) {
+        brush = try? BrushLibraryManager.loadBrush(id: id)
     }
     
     var workspaceControlsVC: UIViewController? {
@@ -41,13 +43,20 @@ class AnimEditorPaintToolState: AnimEditorToolState {
     }
     
     func toggleExpandedControls() {
-        // TODO: Toggle brush picker menu
+        controlsVC.toggleExpandedControls()
     }
     
 }
 
 extension AnimEditorPaintToolState:
     AnimEditorPaintToolControlsVC.Delegate {
+    
+    func onSelectBrush(
+        _ vc: AnimEditorPaintToolControlsVC,
+        id: String
+    ) {
+        setBrush(id: id)
+    }
     
     func onChangeScale(
         _ vc: AnimEditorPaintToolControlsVC,

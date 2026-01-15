@@ -1,5 +1,5 @@
 //
-//  AnimEditorPaintToolControlsVC.swift
+//  AnimEditorPaintToolSidebarControlsView.swift
 //
 
 import UIKit
@@ -7,53 +7,50 @@ import UIKit
 private let scaleGamma: Double = 2.0
 private let smoothingGamma: Double = 1.5
 
-extension AnimEditorPaintToolControlsVC {
+extension AnimEditorPaintToolSidebarControlsView {
     
     @MainActor
     protocol Delegate: AnyObject {
         
         func onChangeScale(
-            _ vc: AnimEditorPaintToolControlsVC,
+            _ view: AnimEditorPaintToolSidebarControlsView,
             _ value: Double)
         func onChangeSmoothing(
-            _ vc: AnimEditorPaintToolControlsVC,
+            _ view: AnimEditorPaintToolSidebarControlsView,
             _ value: Double)
         
     }
     
 }
 
-class AnimEditorPaintToolControlsVC: UIViewController {
+class AnimEditorPaintToolSidebarControlsView: UIView {
     
     private let scaleSlider =
-        AnimEditorToolSidebarSlider(
-            title: "Size",
-            gamma: scaleGamma,
-            valueDisplayMode: .percent(minValue: 1))
+    AnimEditorToolSidebarSlider(
+        title: "Size",
+        gamma: scaleGamma,
+        valueDisplayMode: .percent(minValue: 1))
     
     private let smoothingSlider =
-        AnimEditorToolSidebarSlider(
-            title: "Smoothing",
-            gamma: smoothingGamma,
-            valueDisplayMode: .percent(minValue: 0))
+    AnimEditorToolSidebarSlider(
+        title: "Smoothing",
+        gamma: smoothingGamma,
+        valueDisplayMode: .percent(minValue: 0))
     
     weak var delegate: Delegate?
     
-    override func loadView() {
-        view = PassthroughView()
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         setupUI()
     }
+    
+    required init?(coder: NSCoder) { fatalError() }
     
     private func setupUI() {
         let stack = UIStackView()
         stack.axis = .vertical
-        view.addSubview(stack)
-        stack.pinEdges(.leading)
-        stack.pin(.centerY)
+        addSubview(stack)
+        stack.pinEdges()
         
         stack.addArrangedSubview(scaleSlider)
         stack.addArrangedSubview(smoothingSlider)
@@ -65,13 +62,14 @@ class AnimEditorPaintToolControlsVC: UIViewController {
     func setScale(_ value: Double) {
         scaleSlider.value = value
     }
+    
     func setSmoothing(_ value: Double) {
         smoothingSlider.value = value
     }
     
 }
 
-extension AnimEditorPaintToolControlsVC:
+extension AnimEditorPaintToolSidebarControlsView:
     AnimEditorToolSidebarSlider.Delegate {
     
     func onChangeValue(
