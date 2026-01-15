@@ -56,6 +56,8 @@ extension AnimEditorPaintToolState:
         _ vc: AnimEditorPaintToolControlsVC,
         _ value: Double
     ) {
+        scale = value
+        
         AnimEditorToolSettingsStore
             .paintToolScale = value
     }
@@ -64,6 +66,8 @@ extension AnimEditorPaintToolState:
         _ vc: AnimEditorPaintToolControlsVC,
         _ value: Double
     ) {
+        smoothing = value
+        
         AnimEditorToolSettingsStore
             .paintToolSmoothing = value
     }
