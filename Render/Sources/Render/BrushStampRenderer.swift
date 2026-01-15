@@ -102,7 +102,7 @@ public struct BrushStampRenderer {
         viewportSize: Size,
         shapeTexture: MTLTexture,
         grainTexture: MTLTexture?,
-        sprites: [Sprite],
+        sprites: any Collection<Sprite>,
         blendMode: BlendMode = .normal,
         sampleMode: SampleMode = .linear,
         colorMode: ColorMode = .none

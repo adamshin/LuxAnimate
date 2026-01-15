@@ -3,16 +3,6 @@ import Foundation
 import Color
 import Render
 
-extension StrokeEngineState {
-    
-    struct StepOutput {
-        var stampSprites: [BrushStampRenderer.Sprite]
-        var isStrokeEnd: Bool
-        var isFinalized: Bool
-    }
-    
-}
-
 struct StrokeEngineState {
     
     private var inputQueue:
@@ -77,7 +67,7 @@ struct StrokeEngineState {
     }
     
     mutating func processStep()
-    -> StepOutput {
+    -> StrokeStampBatch {
         
         let o1 = inputQueue.processNextSample()
         let o2 = pressureFilteringProcessor.process(input: o1)
@@ -85,11 +75,7 @@ struct StrokeEngineState {
         let o4 = strokeSampleProcessor.process(input: o3)
         let o5 = strokeStampProcessor.process(input: o4)
         
-        let out = o5
-        return StepOutput(
-            stampSprites: out.stampSprites,
-            isStrokeEnd: out.isStrokeEnd,
-            isFinalized: out.isFinalized)
+        return o5
     }
     
 }

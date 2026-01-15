@@ -9,7 +9,7 @@ private let maxStampCount = 16
 
 private let paddingSizeThreshold: Double = 20
 
-struct StrokeStampGenerator {
+struct StrokeEngineStrokeStampGenerator {
     
     private let unitCircleRandomPointGenerator
         = UnitCircleRandomPointGenerator()
@@ -24,11 +24,11 @@ struct StrokeStampGenerator {
             seed: seed)
     }
     
-    mutating func generate(
-        sample s: StrokeSample,
+    mutating func createStampsAtCursor(
+        cursorSample s: StrokeSample,
         brush: Brush,
         color: Color,
-        output: inout [BrushStampRenderer.Sprite]
+        output: inout [StrokeStamp]
     ) {
         let position = s.position + s.stampOffset
         
@@ -57,11 +57,8 @@ struct StrokeStampGenerator {
             let rotationJitter = rotationJitter(
                 brush: brush)
             
-            size = size
-                * (1 - Double.random(in: 0 ..< 1) * brush.configuration.stampSizeJitter)
-            
-            opacity = opacity
-                * (1 - Double.random(in: 0 ..< 1) * brush.configuration.stampOpacityJitter)
+            size *= 1 - sizeJitter(brush: brush)
+            opacity *= 1 - opacityJitter(brush: brush)
             
             let paddingScale: Double =
                 s.stampSize < paddingSizeThreshold ?
@@ -78,7 +75,8 @@ struct StrokeStampGenerator {
                 alpha: opacity,
                 paddingScale: paddingScale)
             
-            output.append(sprite)
+            let stamp = StrokeStamp(sprite: sprite)
+            output.append(stamp)
         }
     }
     
@@ -105,6 +103,22 @@ struct StrokeStampGenerator {
         
         return rotation
             * brush.configuration.stampRotationJitter
+    }
+    
+    private mutating func sizeJitter(
+        brush: Brush
+    ) -> Double {
+        
+        let v = Double.random(in: 0 ..< 1, using: &rng)
+        return v * brush.configuration.stampSizeJitter
+    }
+
+    private mutating func opacityJitter(
+        brush: Brush
+    ) -> Double {
+        
+        let v = Double.random(in: 0 ..< 1, using: &rng)
+        return v * brush.configuration.stampOpacityJitter
     }
     
 }

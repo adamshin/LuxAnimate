@@ -12,7 +12,7 @@ private let maxTaperTime: TimeInterval = 0.2
 private let wobbleOctaveCount = 2
 private let wobblePersistence: Double = 0.5
 
-extension StrokeSampleGenerator {
+extension StrokeEngineStrokeSampleGenerator {
     
     struct Output {
         var strokeSample: StrokeSample
@@ -21,7 +21,7 @@ extension StrokeSampleGenerator {
     
 }
 
-struct StrokeSampleGenerator {
+struct StrokeEngineStrokeSampleGenerator {
     
     private let brush: Brush
     private let applyTaper: Bool
@@ -29,8 +29,7 @@ struct StrokeSampleGenerator {
     private let baseStampSize: Double
     
     private let sizeWobbleGenerator: PerlinNoiseGenerator
-    private let offsetXWobbleGenerator: PerlinNoiseGenerator
-    private let offsetYWobbleGenerator: PerlinNoiseGenerator
+    private let offsetWobbleGenerator: PerlinNoiseGenerator
     
     // MARK: - Init
     
@@ -52,13 +51,8 @@ struct StrokeSampleGenerator {
             frequency: brush.configuration.wobbleFrequency,
             octaveCount: wobbleOctaveCount,
             persistence: wobblePersistence)
-        
-        offsetXWobbleGenerator = PerlinNoiseGenerator(
-            frequency: brush.configuration.wobbleFrequency,
-            octaveCount: wobbleOctaveCount,
-            persistence: wobblePersistence)
-        
-        offsetYWobbleGenerator = PerlinNoiseGenerator(
+
+        offsetWobbleGenerator = PerlinNoiseGenerator(
             frequency: brush.configuration.wobbleFrequency,
             octaveCount: wobbleOctaveCount,
             persistence: wobblePersistence)
@@ -67,9 +61,10 @@ struct StrokeSampleGenerator {
     // MARK: - Interface
     
     func strokeSample(
-        sample: Sample,
+        sample: IntermediateSample,
+        tangent: Vector,
         strokeDistance: Double,
-        strokeEndTime: TimeInterval
+        finalSampleTime: TimeInterval
     ) -> Output {
         
         // Pressure
@@ -99,7 +94,7 @@ struct StrokeSampleGenerator {
                 brush: brush,
                 applyTaper: applyTaper,
                 sampleTime: sample.time,
-                strokeEndTime: strokeEndTime)
+                finalSampleTime: finalSampleTime)
         
         let taperSize = 1
             - (1 - taperAmount)
@@ -110,9 +105,7 @@ struct StrokeSampleGenerator {
         
         let sizeWobble = sizeWobbleGenerator
             .value(at: wobbleDistance)
-        let offsetXWobble = offsetXWobbleGenerator
-            .value(at: wobbleDistance)
-        let offsetYWobble = offsetYWobbleGenerator
+        let offsetWobble = offsetWobbleGenerator
             .value(at: wobbleDistance)
         
         let wobbleIntensity = 1
@@ -161,18 +154,14 @@ struct StrokeSampleGenerator {
         let stampRotation = r.normalized()
         
         // Stamp offset
-        let offsetX = offsetXWobble
+        let perpendicular = tangent.perpendicularClockwise
+        
+        let offsetWobbleMagnitude = offsetWobble
             * brush.configuration.offsetWobble
             * wobbleIntensity
         
-        let offsetY = offsetYWobble
-            * brush.configuration.offsetWobble
-            * wobbleIntensity
-        
-        var stampOffset = Vector(offsetX, offsetY)
-        if stampOffset.lengthSquared() > 1.0 {
-            stampOffset = stampOffset.normalized()
-        }
+        let stampOffset =
+            perpendicular * offsetWobbleMagnitude
         
         // Stamp opacity
         let stampOpacity = brush.configuration.stampOpacity
@@ -200,7 +189,7 @@ struct StrokeSampleGenerator {
         brush: Brush,
         applyTaper: Bool,
         sampleTime: TimeInterval,
-        strokeEndTime: TimeInterval
+        finalSampleTime: TimeInterval
     ) -> (Double, Bool) {
         
         let roundness = brush.configuration.taperRoundness
@@ -215,29 +204,29 @@ struct StrokeSampleGenerator {
             taperTime = taperLength * maxTaperTime
         }
         
-        let normalizedDistanceToStart =
+        let normalizedTimeDistanceToStart =
             sampleTime / taperTime
         
-        let normalizedDistanceToEnd =
-            (strokeEndTime - sampleTime)
+        let normalizedTimeDistanceToEnd =
+            (finalSampleTime - sampleTime)
             / taperTime
         
         let taperStartAmount: Double
         let taperEndAmount: Double
         let isInTaperEnd: Bool
         
-        if normalizedDistanceToStart < 1 {
+        if normalizedTimeDistanceToStart < 1 {
             taperStartAmount = taperAmount(
                 roundness: roundness,
-                distance: normalizedDistanceToStart)
+                distance: normalizedTimeDistanceToStart)
         } else {
             taperStartAmount = 1
         }
         
-        if normalizedDistanceToEnd < 1 {
+        if normalizedTimeDistanceToEnd < 1 {
             taperEndAmount = taperAmount(
                 roundness: roundness,
-                distance: normalizedDistanceToEnd)
+                distance: normalizedTimeDistanceToEnd)
             isInTaperEnd = true
         } else {
             taperEndAmount = 1

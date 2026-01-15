@@ -5,28 +5,24 @@ import Color
 
 private let segmentSubdivisionCount = 10
 
-// MARK: - Structs
-
-extension StrokeEngineStrokeSampleProcessor {
-    
-    struct Config {
-        let strokeSampleGenerator: StrokeSampleGenerator
-    }
-    
-    struct State {
-        var lastControlPointSamples: [Sample]?
-        var lastStrokeSample: StrokeSample?
-        var isOutputFinalized = true
-    }
-    
+private struct SubSegmentSample {
+    var sample: IntermediateSample
+    var tangent: Vector
 }
 
-// MARK: - StrokeEngineStrokeSampleProcessor
+/// Generates smooth stroke paths using cubic B-spline interpolation. Takes intermediate samples as control points and outputs stroke samples with computed properties based on brush configuration.
 
 struct StrokeEngineStrokeSampleProcessor {
     
-    private let config: Config
-    private var state = State()
+    private let strokeSampleGenerator:
+        StrokeEngineStrokeSampleGenerator
+    
+    private var controlPointSamples: [IntermediateSample] = []
+    private var finalSampleTime: TimeInterval = 0
+    
+    private var lastOutputSample: StrokeSample?
+    
+    private var isOutputFinalized = true
     
     // MARK: - Init
     
@@ -36,166 +32,140 @@ struct StrokeEngineStrokeSampleProcessor {
         scale: Double,
         applyTaper: Bool
     ) {
-        let strokeSampleGenerator = StrokeSampleGenerator(
+        strokeSampleGenerator = .init(
             brush: brush,
             scale: scale,
             applyTaper: applyTaper)
-        
-        config = Config(
-            strokeSampleGenerator: strokeSampleGenerator)
     }
     
     // MARK: - Interface
     
     mutating func process(
-        input: StrokeEngine.ProcessorOutput
-    ) -> StrokeEngine.StrokeSampleProcessorOutput {
-        
-        if !input.isFinalized {
-            state.isOutputFinalized = false
-        }
+        input: IntermediateSampleBatch
+    ) -> StrokeSampleBatch {
         
         var output: [StrokeSample] = []
         
-        for sample in input.samples {
-            Self.processSample(
-                sample: sample,
-                strokeEndTime: input.strokeEndTime,
-                config: config,
-                state: &state,
-                output: &output)
+        finalSampleTime = input.finalSampleTime
+        
+        if !input.isFinalized {
+            isOutputFinalized = false
         }
         
-        if input.isStrokeEnd,
-            let lastControlPointSample =
-                state.lastControlPointSamples?.last
-        {
-            state.isOutputFinalized = false
-            
-            for _ in 0 ..< 3 {
-                Self.processSample(
-                    sample: lastControlPointSample,
-                    strokeEndTime: input.strokeEndTime,
-                    config: config,
-                    state: &state,
-                    output: &output)
-            }
+        processSamples(
+            samples: input.samples,
+            output: &output)
+        
+        if input.isFinalBatch {
+            isOutputFinalized = false
+            processEndOfSamples(output: &output)
         }
         
-        return .init(
-            strokeSamples: output,
-            isStrokeEnd: input.isStrokeEnd,
-            isFinalized: state.isOutputFinalized)
+        return StrokeSampleBatch(
+            samples: output,
+            isFinalBatch: input.isFinalBatch,
+            isFinalized: isOutputFinalized)
     }
     
     // MARK: - Internal Logic
     
-    private static func processSample(
-        sample: Sample,
-        strokeEndTime: TimeInterval,
-        config: Config,
-        state: inout State,
+    private mutating func processSamples(
+        samples: [IntermediateSample],
         output: inout [StrokeSample]
     ) {
-        if let lastControlPointSamples =
-            state.lastControlPointSamples
-        {
-            var controlPointSamples =
-                lastControlPointSamples
-            
-            controlPointSamples.removeFirst()
-            controlPointSamples.append(sample)
-            
-            processSegment(
-                controlPointSamples: controlPointSamples,
-                strokeEndTime: strokeEndTime,
-                config: config,
-                state: &state,
-                output: &output)
-            
-        } else {
-            let controlPointSamples = Array(
-                repeating: sample,
-                count: 4)
-            
-            processSegment(
-                controlPointSamples: controlPointSamples,
-                strokeEndTime: strokeEndTime,
-                config: config,
-                state: &state,
+        for sample in samples {
+            processSample(
+                sample: sample,
                 output: &output)
         }
     }
     
-    private static func processSegment(
-        controlPointSamples: [Sample],
-        strokeEndTime: TimeInterval,
-        config: Config,
-        state: inout State,
+    private mutating func processEndOfSamples(
         output: inout [StrokeSample]
     ) {
-        state.lastControlPointSamples = controlPointSamples
+        guard let finalSample = controlPointSamples.last
+        else { return }
         
-        let subSegmentSamples = subSegmentSamples(
+        for _ in 0 ..< 3 {
+            processSample(
+                sample: finalSample,
+                output: &output)
+        }
+    }
+    
+    private mutating func processSample(
+        sample: IntermediateSample,
+        output: inout [StrokeSample]
+    ) {
+        if controlPointSamples.isEmpty {
+            controlPointSamples = Array(
+                repeating: sample, count: 4)
+            
+        } else {
+            controlPointSamples.removeFirst()
+            controlPointSamples.append(sample)
+        }
+        
+        processSplineSegment(output: &output)
+    }
+    
+    private mutating func processSplineSegment(
+        output: inout [StrokeSample]
+    ) {
+        let subSegmentSamples = Self.subSegmentSamples(
             controlPointSamples: controlPointSamples,
             subdivisionCount: segmentSubdivisionCount)
         
-        for sample in subSegmentSamples {
+        for subSegmentSample in subSegmentSamples {
             processSubSegmentSample(
-                sample: sample,
-                strokeEndTime: strokeEndTime,
-                config: config,
-                state: &state,
+                subSegmentSample,
                 output: &output)
         }
     }
     
-    private static func processSubSegmentSample(
-        sample: Sample,
-        strokeEndTime: TimeInterval,
-        config: Config,
-        state: inout State,
+    private mutating func processSubSegmentSample(
+        _ subSegmentSample: SubSegmentSample,
         output: inout [StrokeSample]
     ) {
         let strokeDistance: Double
         
-        if let lastStrokeSample = state.lastStrokeSample {
+        if let lastOutputSample {
             let positionDelta =
-                sample.position -
-                lastStrokeSample.position
+                subSegmentSample.sample.position -
+                lastOutputSample.position
             
             let distanceFromLastStrokeSample =
                 positionDelta.length()
             
             strokeDistance =
-                lastStrokeSample.strokeDistance +
+                lastOutputSample.strokeDistance +
                 distanceFromLastStrokeSample
             
         } else {
             strokeDistance = 0
         }
         
-        let strokeSampleOutput = config
-            .strokeSampleGenerator
+        let strokeSampleOutput = strokeSampleGenerator
             .strokeSample(
-                sample: sample,
+                sample: subSegmentSample.sample,
+                tangent: subSegmentSample.tangent,
                 strokeDistance: strokeDistance,
-                strokeEndTime: strokeEndTime)
+                finalSampleTime: finalSampleTime)
         
         let strokeSample = strokeSampleOutput.strokeSample
         
         output.append(strokeSample)
-        state.lastStrokeSample = strokeSample
+        self.lastOutputSample = strokeSample
         
         if strokeSampleOutput.isNonFinalized {
-            state.isOutputFinalized = false
+            isOutputFinalized = false
         }
     }
     
     private static func subSegmentSamples(
-        controlPointSamples: [Sample],
+        controlPointSamples: [IntermediateSample],
         subdivisionCount: Int
-    ) -> [Sample] {
+    ) -> [SubSegmentSample] {
         
         guard controlPointSamples.count == 4 else {
             fatalError()
@@ -207,20 +177,35 @@ struct StrokeEngineStrokeSampleProcessor {
         
         let count = segmentSubdivisionCount
         
-        var output: [Sample] = []
+        var output: [SubSegmentSample] = []
         output.reserveCapacity(count)
         
         for i in 0 ..< count {
             let t = Double(i) / Double(count)
             
-            let (b0, b1, b2, b3) =
-                UniformCubicBSpline.basisValues(t: t)
+            let (b0, b1, b2, b3) = UniformCubicBSpline
+                .basisValues(t: t)
+            
+            let (d0, d1, d2, d3) = UniformCubicBSpline
+                .basisDerivativeValues(t: t)
             
             let sample = try! interpolate(
                 v0: s0, v1: s1, v2: s2, v3: s3,
                 w0: b0, w1: b1, w2: b2, w3: b3)
             
-            output.append(sample)
+            var tangent =
+                s0.position * d0 +
+                s1.position * d1 +
+                s2.position * d2 +
+                s3.position * d3
+            
+            if tangent.lengthSquared() > 0 {
+                tangent = tangent.normalized()
+            }
+            
+            output.append(SubSegmentSample(
+                sample: sample,
+                tangent: tangent))
         }
         return output
     }

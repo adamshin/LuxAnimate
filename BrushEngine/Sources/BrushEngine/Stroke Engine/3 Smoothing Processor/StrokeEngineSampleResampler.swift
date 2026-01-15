@@ -1,7 +1,7 @@
 
 import Foundation
 
-struct SampleResampler {
+struct StrokeEngineSampleResampler {
     
     enum Error: Swift.Error {
         case emptyInput
@@ -24,14 +24,14 @@ struct SampleResampler {
     /// first/last sample.
     
     static func resample(
-        samples: [Sample],
+        samples: [IntermediateSample],
         resampleTimes: [TimeInterval]
-    ) throws -> [Sample] {
+    ) throws -> [IntermediateSample] {
 
         guard !samples.isEmpty, !resampleTimes.isEmpty
         else { throw Error.emptyInput }
         
-        var result = [Sample]()
+        var result = [IntermediateSample]()
         result.reserveCapacity(resampleTimes.count)
         
         // Handle resample times before first sample

@@ -9,25 +9,19 @@ private let maxResampleCount = 100
 
 private let tailSampleInterval: TimeInterval = 1/60
 
-extension StrokeEngineSmoothingProcessor {
-    
-    struct Config {
-        var windowSize: TimeInterval
-        var resampleTimeOffsets: [Double]
-        var windowWeights: [Double]
-    }
-    
-}
+/// Applies temporal smoothing to samples using a parabola-shaped weighted averaging window.
 
 struct StrokeEngineSmoothingProcessor {
-    
-    private let config: Config
-    
-    private var sampleBuffer: [BrushEngine.Sample] = []
+
+    private let windowSize: TimeInterval
+    private let resampleTimeOffsets: [Double]
+    private let windowWeights: [Double]
+
+    private var sampleBuffer: [IntermediateSample] = []
     private var isOutputFinalized = true
-    
+
     // MARK: - Init
-    
+
     init(
         brush: Brush,
         smoothing: Double
@@ -41,115 +35,89 @@ struct StrokeEngineSmoothingProcessor {
             in: (0, 1),
             to: (baseSmoothing, 1))
         
-        let windowSize = adjustedSmoothing * maxWindowSize
+        windowSize = adjustedSmoothing * maxWindowSize
         
-        let resampleTimeOffsets = Self
+        resampleTimeOffsets = Self
             .resampleTimeOffsets(windowSize: windowSize)
         
-        let windowWeights = Self.windowWeights(
+        windowWeights = Self.windowWeights(
             count: resampleTimeOffsets.count)
-        
-        config = Config(
-            windowSize: windowSize,
-            resampleTimeOffsets: resampleTimeOffsets,
-            windowWeights: windowWeights)
     }
     
     // MARK: - Interface
     
     mutating func process(
-        input: StrokeEngine.ProcessorOutput
-    ) -> StrokeEngine.ProcessorOutput {
+        input: IntermediateSampleBatch
+    ) -> IntermediateSampleBatch {
+        
+        var output: [IntermediateSample] = []
         
         if !input.isFinalized {
             isOutputFinalized = false
         }
         
-        var outputSamples: [Sample] = []
-        
-        Self.processSamples(
+        processSamples(
             samples: input.samples,
-            strokeEndTime: input.strokeEndTime,
-            config: config,
-            sampleBuffer: &sampleBuffer,
-            outputSamples: &outputSamples)
+            output: &output)
         
-        if input.isStrokeEnd {
+        if input.isFinalBatch {
             isOutputFinalized = false
-            
-            Self.processStrokeEnd(
-                strokeEndTime: input.strokeEndTime,
-                config: config,
-                sampleBuffer: &sampleBuffer,
-                outputSamples: &outputSamples)
+            processEndOfSamples(output: &output)
         }
         
-        return StrokeEngine.ProcessorOutput(
-            samples: outputSamples,
-            strokeEndTime: input.strokeEndTime,
-            isStrokeEnd: input.isStrokeEnd,
+        return IntermediateSampleBatch(
+            samples: output,
+            finalSampleTime: input.finalSampleTime,
+            isFinalBatch: input.isFinalBatch,
             isFinalized: isOutputFinalized)
     }
     
     // MARK: - Internal Logic
     
-    private static func processSamples(
-        samples: [Sample],
-        strokeEndTime: TimeInterval,
-        config: Config,
-        sampleBuffer: inout [Sample],
-        outputSamples: inout [Sample]
+    private mutating func processSamples(
+        samples: [IntermediateSample],
+        output: inout [IntermediateSample]
     ) {
         for sample in samples {
-            addSampleToBuffer(
-                sample: sample,
-                config: config,
-                sampleBuffer: &sampleBuffer)
+            addSampleToBuffer(sample: sample)
             
-            let newSample = Self.sample(
-                config: config,
-                windowEndTime: sample.time,
-                sampleBuffer: sampleBuffer)
+            let outputSample =
+                computeWeightedSampleFromBuffer(
+                    windowEndTime: sample.time)
             
-            outputSamples.append(newSample)
+            output.append(outputSample)
         }
     }
     
-    private static func processStrokeEnd(
-        strokeEndTime: TimeInterval,
-        config: Config,
-        sampleBuffer: inout [Sample],
-        outputSamples: inout [Sample]
+    private mutating func processEndOfSamples(
+        output: inout [IntermediateSample]
     ) {
         guard let lastSample = sampleBuffer.last
         else { return }
         
         let windowEndTargetTime =
-            lastSample.time + config.windowSize
+            lastSample.time + windowSize
         
         var windowEndTime = lastSample.time
         
         while windowEndTime < windowEndTargetTime {
             windowEndTime += tailSampleInterval
             
-            let newSample = Self.sample(
-                config: config,
-                windowEndTime: windowEndTime,
-                sampleBuffer: sampleBuffer)
+            let outputSample =
+                computeWeightedSampleFromBuffer(
+                    windowEndTime: windowEndTime)
             
-            outputSamples.append(newSample)
+            output.append(outputSample)
         }
     }
     
-    private static func addSampleToBuffer(
-        sample: Sample,
-        config: Config,
-        sampleBuffer: inout [Sample]
+    private mutating func addSampleToBuffer(
+        sample: IntermediateSample
     ) {
         sampleBuffer.append(sample)
         
         let windowStartTime =
-            sample.time - config.windowSize
+            sample.time - windowSize
         
         let outsideWindowCount = sampleBuffer
             .prefix { $0.time < windowStartTime }
@@ -160,30 +128,27 @@ struct StrokeEngineSmoothingProcessor {
         sampleBuffer.removeFirst(removeCount)
     }
     
-    private static func sample(
-        config: Config,
-        windowEndTime: TimeInterval,
-        sampleBuffer: [Sample]
-    ) -> BrushEngine.Sample {
+    private func computeWeightedSampleFromBuffer(
+        windowEndTime: TimeInterval
+    ) -> IntermediateSample {
         
-        let resampleTimes = config
-            .resampleTimeOffsets
+        let resampleTimes = resampleTimeOffsets
             .map { windowEndTime + $0 }
         
         let windowSamples =
-            try! SampleResampler.resample(
+            try! StrokeEngineSampleResampler.resample(
                 samples: sampleBuffer,
                 resampleTimes: resampleTimes)
         
-        return weightedAverageSample(
+        return Self.weightedAverageSample(
             samples: windowSamples,
-            weights: config.windowWeights)
+            weights: windowWeights)
     }
     
     private static func weightedAverageSample(
-        samples: [BrushEngine.Sample],
+        samples: [IntermediateSample],
         weights: [Double]
-    ) -> BrushEngine.Sample {
+    ) -> IntermediateSample {
         
         guard !samples.isEmpty,
             samples.count == weights.count

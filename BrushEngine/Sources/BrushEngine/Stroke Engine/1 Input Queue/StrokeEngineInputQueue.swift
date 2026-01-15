@@ -2,14 +2,16 @@
 import Foundation
 import Geometry
 
+private let finalizationThreshold = 30
+
+/// Manages sample input, handling added samples and updates to predicted values. Outputs one sample at a time for downstream processing.
+
 struct StrokeEngineInputQueue {
-    
-    static let finalizationThreshold = 30
     
     private var samples: [BrushEngine.InputSample] = []
     private var predictedSamples: [BrushEngine.InputSample] = []
     
-    private var lastSampleTime: TimeInterval = 0
+    private var finalSampleTime: TimeInterval = 0
     
     private var isOutputFinalized = true
     
@@ -23,7 +25,7 @@ struct StrokeEngineInputQueue {
         self.predictedSamples = predictedSamples
         
         let finalizationOverflow =
-            samples.count - Self.finalizationThreshold
+            samples.count - finalizationThreshold
         
         if finalizationOverflow > 0 {
             for i in 0 ..< finalizationOverflow {
@@ -34,13 +36,11 @@ struct StrokeEngineInputQueue {
             }
         }
         
-        if let lastSample =
+        if let finalSample =
             predictedSamples.last ?? samples.last
         {
-            lastSampleTime = lastSample.time
+            finalSampleTime = finalSample.time
         }
-        
-//        print("Input queue sample count: \(samples.count)")
     }
     
     mutating func handleInputUpdate(
@@ -59,7 +59,7 @@ struct StrokeEngineInputQueue {
     }
     
     mutating func processNextSample()
-    -> StrokeEngine.ProcessorOutput {
+    -> IntermediateSampleBatch {
         
         if let s = samples.first {
             samples.removeFirst()
@@ -69,27 +69,27 @@ struct StrokeEngineInputQueue {
             }
             
             let sample = Self.convert(inputSample: s)
-            return StrokeEngine.ProcessorOutput(
+            return IntermediateSampleBatch(
                 samples: [sample],
-                strokeEndTime: lastSampleTime,
-                isStrokeEnd: false,
+                finalSampleTime: finalSampleTime,
+                isFinalBatch: false,
                 isFinalized: isOutputFinalized)
             
         } else if let s = predictedSamples.first {
             predictedSamples.removeFirst()
             
             let sample = Self.convert(inputSample: s)
-            return StrokeEngine.ProcessorOutput(
+            return IntermediateSampleBatch(
                 samples: [sample],
-                strokeEndTime: lastSampleTime,
-                isStrokeEnd: false,
+                finalSampleTime: finalSampleTime,
+                isFinalBatch: false,
                 isFinalized: false)
         }
         
-        return StrokeEngine.ProcessorOutput(
+        return IntermediateSampleBatch(
             samples: [],
-            strokeEndTime: lastSampleTime,
-            isStrokeEnd: true,
+            finalSampleTime: finalSampleTime,
+            isFinalBatch: true,
             isFinalized: false)
     }
     
@@ -97,12 +97,12 @@ struct StrokeEngineInputQueue {
     
     private static func convert(
         inputSample s: InputSample
-    ) -> Sample {
+    ) -> IntermediateSample {
         
         let azimuth = Complex(s.azimuth.x, s.azimuth.y)
         let roll = Complex(length: 1, phase: -s.roll)
         
-        return Sample(
+        return IntermediateSample(
             time: s.time,
             position: s.position,
             pressure: s.pressure,

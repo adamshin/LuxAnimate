@@ -121,10 +121,9 @@ public class Canvas {
     public func endStroke() {
         guard let strokeEngine else { return }
         
-        let strokeEngineOutput = strokeEngine.process()
+        let incrementalStroke = strokeEngine.process()
         
-        strokeRenderer.drawIncrementalStroke(
-            strokeEngineOutput: strokeEngineOutput)
+        strokeRenderer.drawIncrementalStroke(incrementalStroke)
         
         renderer.draw(
             baseTexture: baseTexture,
@@ -162,10 +161,9 @@ public class Canvas {
     public func onFrame() {
         guard let strokeEngine else { return }
         
-        let strokeEngineOutput = strokeEngine.process()
+        let incrementalStroke = strokeEngine.process()
         
-        strokeRenderer.drawIncrementalStroke(
-            strokeEngineOutput: strokeEngineOutput)
+        strokeRenderer.drawIncrementalStroke(incrementalStroke)
         
         renderer.draw(
             baseTexture: baseTexture,
