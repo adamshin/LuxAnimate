@@ -612,6 +612,7 @@
 				669ACDE42F18AF7F000B3A15 /* Tool Controls */,
 				669ACDDB2F18A0E4000B3A15 /* Tool State */,
 				6678A9BF2C8398ED00838EA3 /* Asset Loader */,
+				668A14D52C7D3EB500D73D36 /* Frame Editor */,
 				667131222F1219D7009BE03B /* Model */,
 				668A14D42C7D3E3800D73D36 /* Shared */,
 				6681BB1B2D0A444300AAED6A /* AnimEditorVC.swift */,
@@ -642,7 +643,6 @@
 		668A14CF2C7D3D1800D73D36 /* Animation Editor (old) */ = {
 			isa = PBXGroup;
 			children = (
-				668A14D52C7D3EB500D73D36 /* Frame Editor */,
 				6619CB612C791E9700458B79 /* OldAnimEditorVC.swift */,
 			);
 			path = "Animation Editor (old)";
