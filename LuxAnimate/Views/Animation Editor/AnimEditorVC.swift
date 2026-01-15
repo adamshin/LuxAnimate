@@ -41,23 +41,21 @@ class AnimEditorVC: UIViewController {
     private let timelineVC: AnimEditorTimelineVC
     
     // MARK: - State
-    
+
     private let projectID: String
     private let sceneID: String
     private let layerID: String
-    
+
     private var model: AnimEditorModel
     private var focusedFrameIndex: Int
-    
-    // TODO: Onion skin settings
-    
-    // TODO: Tool state machine
-    // TODO: Frame editor
+
+    private let toolStateMachine
+        = AnimEditorToolStateMachine()
     
     private let assetLoader: AnimEditorAssetLoader
     
-    // TODO: Put this in the frame editor and timeline vc.
-//    private let editBuilder = AnimEditorEditBuilder()
+    // TODO: Frame editor
+    // TODO: Onion skin settings
     
     private let displayLink = WrappedDisplayLink()
     
@@ -107,6 +105,7 @@ class AnimEditorVC: UIViewController {
         toolbarVC.delegate = self
         timelineVC.delegate = self
         
+        toolStateMachine.delegate = self
         assetLoader.delegate = self
     }
     
@@ -156,6 +155,9 @@ class AnimEditorVC: UIViewController {
     
     private func setupInitialState() {
         toolbarVC.update(model: model)
+        
+        toolStateMachine.setToolState(
+            AnimEditorPaintToolState())
     }
     
     private func setupTestSceneGraph() {
@@ -259,7 +261,14 @@ extension AnimEditorVC: AnimEditor2ToolbarVC.Delegate {
         tool: AnimEditor2ToolbarVC.Tool,
         isAlreadySelected: Bool
     ) {
-        // TODO: Update tool state machine, update frame editor.
+        let toolState: AnimEditorToolState = switch tool {
+        case .paint: AnimEditorPaintToolState()
+        case .erase: AnimEditorPaintToolState()
+        }
+
+        toolStateMachine.setToolState(toolState)
+
+        // TODO: Update frame editor.
     }
     
 }
@@ -304,7 +313,7 @@ extension AnimEditorVC: AnimEditorTimelineVC.Delegate {
 }
 
 extension AnimEditorVC: AnimEditorAssetLoader.Delegate {
-    
+
     func pendingAssetData(
         _ l: AnimEditorAssetLoader,
         assetID: String
@@ -313,9 +322,18 @@ extension AnimEditorVC: AnimEditorAssetLoader.Delegate {
             .pendingEditAsset(self, assetID: assetID)?
             .data
     }
-    
+
     func onUpdate(_ l: AnimEditorAssetLoader) {
 //        frameEditor?.onAssetLoaderUpdate()
+    }
+
+}
+
+extension AnimEditorVC: AnimEditorToolStateMachine.Delegate {
+    
+    func workspaceVC(_ s: AnimEditorToolStateMachine)
+    -> EditorWorkspaceVC {
+        workspaceVC
     }
     
 }

@@ -59,18 +59,18 @@ class AnimFrameEditorEditingState: AnimFrameEditorState {
         self.activeDrawingManifest = activeDrawingManifest
         self.assetManifest = assetManifest
         
-        let drawingCanvasSize = layer.contentSize
+//        let drawingCanvasSize = layer.contentSize
         
         switch editorToolState {
-        case let state as AnimEditorPaintToolState:
-            toolState = AnimFrameEditorPaintToolState(
-                editorToolState: state,
-                drawingCanvasSize: drawingCanvasSize)
-            
-        case let state as AnimEditorEraseToolState:
-            toolState = AnimFrameEditorEraseToolState(
-                editorToolState: state,
-                drawingCanvasSize: drawingCanvasSize)
+//        case let state as AnimEditorPaintToolState:
+//            toolState = AnimFrameEditorPaintToolState(
+//                editorToolState: state,
+//                drawingCanvasSize: drawingCanvasSize)
+//            
+//        case let state as AnimEditorEraseToolState:
+//            toolState = AnimFrameEditorEraseToolState(
+//                editorToolState: state,
+//                drawingCanvasSize: drawingCanvasSize)
             
         default:
             toolState = nil

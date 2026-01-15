@@ -6,12 +6,12 @@ import UIKit
 import BrushEngine
 
 @MainActor
-protocol AnimEditorPaintToolStateDelegate:
+protocol OldAnimEditorPaintToolStateDelegate:
     BrushGestureRecognizer.GestureDelegate { }
 
-class AnimEditorPaintToolState: AnimEditorToolState {
+class OldAnimEditorPaintToolState: OldAnimEditorToolState {
     
-    weak var delegate: AnimEditorPaintToolStateDelegate? {
+    weak var delegate: OldAnimEditorPaintToolStateDelegate? {
         didSet {
             brushGestureRecognizer.gestureDelegate = delegate
         }

@@ -8,6 +8,12 @@ import Geometry
 import Color
 import BrushEngine
 
+// TODO: Instead of wrapping this internal state inside
+// two container objects, just have AnimFrameEditorPaintTool
+// be its own thing, and give it a mode flag (paint/erase).
+
+/*
+
 @MainActor
 protocol AnimFrameEditorBrushToolInternalStateDelegate: AnyObject {
     
@@ -185,3 +191,5 @@ extension AnimFrameEditorBrushToolInternalState:
     }
     
 }
+ 
+*/

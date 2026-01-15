@@ -2,6 +2,8 @@
 //  AnimFrameEditorPaintToolState.swift
 //
 
+/*
+ 
 import UIKit
 import Geometry
 import Color
@@ -154,3 +156,5 @@ extension AnimFrameEditorPaintToolState:
     }
     
 }
+ 
+*/

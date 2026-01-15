@@ -5,7 +5,7 @@
 import UIKit
 
 @MainActor
-protocol AnimEditorToolState: AnyObject {
+protocol OldAnimEditorToolState: AnyObject {
     
     func beginState(
         workspaceVC: EditorWorkspaceVC,

@@ -6,12 +6,12 @@ import UIKit
 import BrushEngine
 
 @MainActor
-protocol AnimEditorEraseToolStateDelegate:
+protocol OldAnimEditorEraseToolStateDelegate:
     BrushGestureRecognizer.GestureDelegate { }
 
-class AnimEditorEraseToolState: AnimEditorToolState {
+class OldAnimEditorEraseToolState: OldAnimEditorToolState {
     
-    weak var delegate: AnimEditorEraseToolStateDelegate? {
+    weak var delegate: OldAnimEditorEraseToolStateDelegate? {
         didSet {
             brushGestureRecognizer.gestureDelegate = delegate
         }
