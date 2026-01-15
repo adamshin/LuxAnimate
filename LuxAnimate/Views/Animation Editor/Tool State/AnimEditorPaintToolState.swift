@@ -49,20 +49,16 @@ extension AnimEditorPaintToolState:
         _ vc: AnimEditorPaintToolControlsVC,
         _ value: Double
     ) {
+        AnimEditorToolSettingsStore.paintToolScale = value
         scale = value
-        
-        AnimEditorToolSettingsStore
-            .paintToolScale = value
     }
     
     func onChangeSmoothing(
         _ vc: AnimEditorPaintToolControlsVC,
         _ value: Double
     ) {
+        AnimEditorToolSettingsStore.paintToolSmoothing = value
         smoothing = value
-        
-        AnimEditorToolSettingsStore
-            .paintToolSmoothing = value
     }
     
 }

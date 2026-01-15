@@ -198,7 +198,7 @@ class AnimEditorVC: UIViewController {
     ) {
         let toolState: AnimEditorToolState = switch tool {
         case .paint: AnimEditorPaintToolState()
-        case .erase: AnimEditorPaintToolState()
+        case .erase: AnimEditorEraseToolState()
         }
         
         toolStateMachine.setToolState(toolState)

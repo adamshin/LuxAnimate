@@ -68,6 +68,11 @@ class AnimFrameEditSessionActiveState:
                     editorToolState: state,
                     drawingCanvasSize: drawingCanvasSize)
                 
+            case let state as AnimEditorEraseToolState:
+                toolState = AnimFrameEditSessionEraseToolState(
+                    editorToolState: state,
+                    drawingCanvasSize: drawingCanvasSize)
+                
             default:
                 toolState = nil
             }

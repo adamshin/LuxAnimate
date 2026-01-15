@@ -94,6 +94,8 @@
 		669ACDF62F18ED31000B3A15 /* AnimFrameEditSessionToolState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669ACDF52F18ED31000B3A15 /* AnimFrameEditSessionToolState.swift */; };
 		669ACDF82F18EDCB000B3A15 /* AnimFrameEditSessionPaintToolState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669ACDF72F18EDCB000B3A15 /* AnimFrameEditSessionPaintToolState.swift */; };
 		669ACDFA2F18EE57000B3A15 /* AnimFrameEditorBrushToolWrappedState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669ACDF92F18EE57000B3A15 /* AnimFrameEditorBrushToolWrappedState.swift */; };
+		669ACDFC2F18F7F3000B3A15 /* AnimEditorEraseToolState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669ACDFB2F18F7F3000B3A15 /* AnimEditorEraseToolState.swift */; };
+		669ACDFE2F18F8F9000B3A15 /* AnimFrameEditSessionEraseToolState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669ACDFD2F18F8F9000B3A15 /* AnimFrameEditSessionEraseToolState.swift */; };
 		669E20C82C40A630008546E1 /* SceneEditorVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669E20C72C40A630008546E1 /* SceneEditorVC.swift */; };
 		66A59EA12C8A3F3400CF553E /* FrameRenderManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A59EA02C8A3F3400CF553E /* FrameRenderManifest.swift */; };
 		66A59EAA2C8B973900CF553E /* SceneRenderManifestGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A59EA92C8B973900CF553E /* SceneRenderManifestGenerator.swift */; };
@@ -225,6 +227,8 @@
 		669ACDF52F18ED31000B3A15 /* AnimFrameEditSessionToolState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimFrameEditSessionToolState.swift; sourceTree = "<group>"; };
 		669ACDF72F18EDCB000B3A15 /* AnimFrameEditSessionPaintToolState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimFrameEditSessionPaintToolState.swift; sourceTree = "<group>"; };
 		669ACDF92F18EE57000B3A15 /* AnimFrameEditorBrushToolWrappedState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimFrameEditorBrushToolWrappedState.swift; sourceTree = "<group>"; };
+		669ACDFB2F18F7F3000B3A15 /* AnimEditorEraseToolState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorEraseToolState.swift; sourceTree = "<group>"; };
+		669ACDFD2F18F8F9000B3A15 /* AnimFrameEditSessionEraseToolState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimFrameEditSessionEraseToolState.swift; sourceTree = "<group>"; };
 		669E20C72C40A630008546E1 /* SceneEditorVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneEditorVC.swift; sourceTree = "<group>"; };
 		66A59EA02C8A3F3400CF553E /* FrameRenderManifest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameRenderManifest.swift; sourceTree = "<group>"; };
 		66A59EA92C8B973900CF553E /* SceneRenderManifestGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneRenderManifestGenerator.swift; sourceTree = "<group>"; };
@@ -651,9 +655,10 @@
 		669ACDDB2F18A0E4000B3A15 /* Tool State */ = {
 			isa = PBXGroup;
 			children = (
+				669ACDDE2F18A14C000B3A15 /* AnimEditorToolStateMachine.swift */,
 				669ACDDC2F18A131000B3A15 /* AnimEditorToolState.swift */,
 				669ACDE02F18A155000B3A15 /* AnimEditorPaintToolState.swift */,
-				669ACDDE2F18A14C000B3A15 /* AnimEditorToolStateMachine.swift */,
+				669ACDFB2F18F7F3000B3A15 /* AnimEditorEraseToolState.swift */,
 			);
 			path = "Tool State";
 			sourceTree = "<group>";
@@ -686,6 +691,7 @@
 			children = (
 				669ACDF52F18ED31000B3A15 /* AnimFrameEditSessionToolState.swift */,
 				669ACDF72F18EDCB000B3A15 /* AnimFrameEditSessionPaintToolState.swift */,
+				669ACDFD2F18F8F9000B3A15 /* AnimFrameEditSessionEraseToolState.swift */,
 				669ACDF92F18EE57000B3A15 /* AnimFrameEditorBrushToolWrappedState.swift */,
 			);
 			path = "Tool State";
@@ -1016,6 +1022,7 @@
 				661D9F652C941C44008BB9E9 /* AnimEditorAssetLoader.swift in Sources */,
 				6651A9D92C96282C00E3520A /* AnimEditorTimelineToolbarView.swift in Sources */,
 				66D0846C2BA3CEC300EB8556 /* Layout.swift in Sources */,
+				669ACDFC2F18F7F3000B3A15 /* AnimEditorEraseToolState.swift in Sources */,
 				6613C1F42BE2E72E0019E667 /* EditorMenuCardView.swift in Sources */,
 				669ACDDA2F170C5C000B3A15 /* SceneEditorModel.swift in Sources */,
 				66D084822BA3FDFC00EB8556 /* LibraryManager.swift in Sources */,
@@ -1068,6 +1075,7 @@
 				669ACDE12F18A15D000B3A15 /* AnimEditorPaintToolState.swift in Sources */,
 				6643CB062BE483030094B998 /* EditorMenuView.swift in Sources */,
 				66D084772BA3CEC300EB8556 /* ContainerViewController.swift in Sources */,
+				669ACDFE2F18F8F9000B3A15 /* AnimFrameEditSessionEraseToolState.swift in Sources */,
 				669ACDDF2F18A14C000B3A15 /* AnimEditorToolStateMachine.swift in Sources */,
 				669ACDF62F18ED31000B3A15 /* AnimFrameEditSessionToolState.swift in Sources */,
 				66040DBB2D31ADCB00CB750A /* AnimEditorToolSidebarSliderPopupView.swift in Sources */,
