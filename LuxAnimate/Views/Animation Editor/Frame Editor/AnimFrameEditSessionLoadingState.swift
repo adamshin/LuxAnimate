@@ -17,7 +17,7 @@ class AnimFrameEditSessionLoadingState:
     private let layer: Scene.Layer
     private let layerContent: Scene.AnimationLayerContent
     private let frameIndex: Int
-    private let editorToolState: AnimEditorToolState
+    private let editorToolState: AnimEditorToolState?
     
     private let frameSceneGraph: FrameSceneGraph
     
@@ -41,7 +41,7 @@ class AnimFrameEditSessionLoadingState:
         layer: Scene.Layer,
         layerContent: Scene.AnimationLayerContent,
         frameIndex: Int,
-        editorToolState: AnimEditorToolState
+        editorToolState: AnimEditorToolState?
     ) {
         self.projectManifest = projectManifest
         self.sceneManifest = sceneManifest

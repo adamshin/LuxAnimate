@@ -15,7 +15,7 @@ class AnimFrameEditSessionActiveState:
     private let layerContent: Scene.AnimationLayerContent
     private let frameIndex: Int
 //    private let onionSkinConfig: AnimEditorOnionSkinConfig?
-    private let editorToolState: AnimEditorToolState
+    private let editorToolState: AnimEditorToolState?
     
     private let frameSceneGraph: FrameSceneGraph
     
@@ -43,7 +43,7 @@ class AnimFrameEditSessionActiveState:
         layer: Scene.Layer,
         layerContent: Scene.AnimationLayerContent,
         frameIndex: Int,
-        editorToolState: AnimEditorToolState,
+        editorToolState: AnimEditorToolState?,
         frameSceneGraph: FrameSceneGraph,
         activeDrawingManifest: AnimFrameEditorHelper.ActiveDrawingManifest,
         assetManifest: AnimFrameEditorHelper.AssetManifest
@@ -61,18 +61,17 @@ class AnimFrameEditSessionActiveState:
         
         let drawingCanvasSize = layer.contentSize
         
-        switch editorToolState {
-        case let state as AnimEditorPaintToolState:
-            toolState = AnimFrameEditSessionPaintToolState(
-                editorToolState: state,
-                drawingCanvasSize: drawingCanvasSize)
-
-//        case let state as AnimEditorEraseToolState:
-//            toolState = AnimFrameEditSessionPaintToolState(
-//                editorToolState: state,
-//                drawingCanvasSize: drawingCanvasSize)
-            
-        default:
+        if let editorToolState {
+            switch editorToolState {
+            case let state as AnimEditorPaintToolState:
+                toolState = AnimFrameEditSessionPaintToolState(
+                    editorToolState: state,
+                    drawingCanvasSize: drawingCanvasSize)
+                
+            default:
+                toolState = nil
+            }
+        } else {
             toolState = nil
         }
         toolState?.delegate = self

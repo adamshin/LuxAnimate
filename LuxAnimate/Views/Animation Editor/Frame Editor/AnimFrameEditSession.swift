@@ -59,7 +59,15 @@ class AnimFrameEditSession {
     ) {
         self.delegate = delegate
         
-        // TODO: Begin loading state
+        let loadingState = AnimFrameEditSessionLoadingState(
+            projectManifest: projectManifest,
+            sceneManifest: sceneManifest,
+            layer: layer,
+            layerContent: layerContent,
+            frameIndex: frameIndex,
+            editorToolState: editorToolState)
+        
+        beginState(loadingState)
     }
     
     // MARK: - State
