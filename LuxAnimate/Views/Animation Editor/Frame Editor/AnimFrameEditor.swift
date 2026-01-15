@@ -137,10 +137,12 @@ extension AnimFrameEditor: AnimFrameEditSession.Delegate {
         drawingID: String,
         imageSet: DrawingAssetProcessor.ImageSet
     ) {
-        delegate?.onRequestEdit(
-            self,
-            drawingID: drawingID,
-            imageSet: imageSet)
+        withUpdateContext(.init(ignoreUpdate: true)) {
+            delegate?.onRequestEdit(
+                self,
+                drawingID: drawingID,
+                imageSet: imageSet)
+        }
     }
     
 }

@@ -1,8 +1,6 @@
 //
-//  AnimFrameEditorPaintToolState.swift
+//  AnimFrameEditSessionPaintToolState.swift
 //
-
-/*
  
 import UIKit
 import Geometry
@@ -11,12 +9,13 @@ import BrushEngine
 
 private let brushColor = AppConfig.paintBrushColor
 
-class AnimFrameEditorPaintToolState: AnimFrameEditorToolState {
+class AnimFrameEditSessionPaintToolState:
+    AnimFrameEditSessionToolState {
     
-    weak var delegate: AnimFrameEditorToolStateDelegate?
+    weak var delegate: AnimFrameEditSessionToolStateDelegate?
     
     private let editorToolState: AnimEditorPaintToolState
-    private let internalState: AnimFrameEditorBrushToolInternalState
+    private let wrappedState: AnimFrameEditorBrushToolWrappedState
     
     init(
         editorToolState: AnimEditorPaintToolState,
@@ -24,96 +23,98 @@ class AnimFrameEditorPaintToolState: AnimFrameEditorToolState {
     ) {
         self.editorToolState = editorToolState
         
-        internalState = AnimFrameEditorBrushToolInternalState(
+        wrappedState = AnimFrameEditorBrushToolWrappedState(
             canvasSize: drawingCanvasSize,
             brushMode: .paint)
         
-        editorToolState.delegate = self
-        internalState.delegate = self
+        // TODO: Figure out communication between states
+//        editorToolState.delegate = self
+        wrappedState.delegate = self
     }
     
     func onFrame() {
-        internalState.onFrame()
+        wrappedState.onFrame()
     }
     
     func drawingCanvasTexture() -> MTLTexture {
-        internalState.canvasTexture
+        wrappedState.canvasTexture
     }
     
     func setDrawingCanvasTextureContents(_ texture: MTLTexture) {
-        internalState.setCanvasTextureContents(texture)
+        wrappedState.setCanvasTextureContents(texture)
     }
     
 }
 
 // MARK: - Delegates
 
-extension AnimFrameEditorPaintToolState:
-    AnimFrameEditorBrushToolInternalStateDelegate
+extension AnimFrameEditSessionPaintToolState:
+    AnimFrameEditorBrushToolWrappedStateDelegate
 {
-    
     func brush(
-        _ s: AnimFrameEditorBrushToolInternalState
+        _ s: AnimFrameEditorBrushToolWrappedState
     ) -> BrushEngine.Brush? {
         editorToolState.brush
     }
     
     func color(
-        _ s: AnimFrameEditorBrushToolInternalState
+        _ s: AnimFrameEditorBrushToolWrappedState
     ) -> Color {
         brushColor
     }
     
     func scale(
-        _ s: AnimFrameEditorBrushToolInternalState
+        _ s: AnimFrameEditorBrushToolWrappedState
     ) -> Double {
         editorToolState.scale
     }
     
     func smoothing(
-        _ s: AnimFrameEditorBrushToolInternalState
+        _ s: AnimFrameEditorBrushToolWrappedState
     ) -> Double {
         editorToolState.smoothing
     }
     
     func workspaceViewSize(
-        _ s: AnimFrameEditorBrushToolInternalState
+        _ s: AnimFrameEditorBrushToolWrappedState
     ) -> Size {
         delegate?.workspaceViewSize(self) ?? .zero
     }
     
     func workspaceTransform(
-        _ s: AnimFrameEditorBrushToolInternalState
+        _ s: AnimFrameEditorBrushToolWrappedState
     ) -> EditorWorkspaceTransform {
         delegate?.workspaceTransform(self) ?? .identity
     }
     
     func layerContentSize(
-        _ s: AnimFrameEditorBrushToolInternalState
+        _ s: AnimFrameEditorBrushToolWrappedState
     ) -> Size {
         delegate?.layerContentSize(self) ?? .zero
     }
     
     func layerTransform(
-        _ s: AnimFrameEditorBrushToolInternalState
+        _ s: AnimFrameEditorBrushToolWrappedState
     ) -> Matrix3 {
         delegate?.layerTransform(self) ?? .identity
     }
     
     func onUpdateCanvasTexture(
-        _ s: AnimFrameEditorBrushToolInternalState
+        _ s: AnimFrameEditorBrushToolWrappedState
     ) { }
     
-    func onEdit(
-        _ s: AnimFrameEditorBrushToolInternalState,
+    func onRequestEdit(
+        _ s: AnimFrameEditorBrushToolWrappedState,
         imageSet: DrawingAssetProcessor.ImageSet
     ) {
-        delegate?.onEdit(
-            self, imageSet: imageSet)
+        delegate?.onRequestEdit(self, imageSet: imageSet)
     }
     
 }
 
+// TODO: Figure out communication between this tool state and editor tool state
+
+/*
 extension AnimFrameEditorPaintToolState:
     AnimEditorPaintToolStateDelegate {
     
@@ -156,5 +157,4 @@ extension AnimFrameEditorPaintToolState:
     }
     
 }
- 
 */
