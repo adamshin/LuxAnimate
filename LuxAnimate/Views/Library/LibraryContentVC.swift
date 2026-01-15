@@ -49,7 +49,7 @@ class LibraryContentVC: UIViewController {
     }
     
     private lazy var createButton = UIBarButtonItem(
-        image: UIImage(systemName: "plus"), style: .plain,
+        title: "Create Project", style: .plain,
         target: self, action: #selector(onSelectCreate))
     
     private var items: [Item] = []
