@@ -98,6 +98,8 @@
 		669ACDFE2F18F8F9000B3A15 /* AnimFrameEditSessionEraseToolState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669ACDFD2F18F8F9000B3A15 /* AnimFrameEditSessionEraseToolState.swift */; };
 		669ACE022F199302000B3A15 /* AnimEditorPaintToolSidebarControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669ACE012F1992FC000B3A15 /* AnimEditorPaintToolSidebarControlsView.swift */; };
 		669ACE042F199310000B3A15 /* AnimEditorPaintToolExpandedControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669ACE032F199310000B3A15 /* AnimEditorPaintToolExpandedControlsView.swift */; };
+		669ACE072F1B4A78000B3A15 /* AnimEditorPaintToolExpandedControlsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669ACE052F1B4A78000B3A15 /* AnimEditorPaintToolExpandedControlsVC.swift */; };
+		669ACE082F1B4A78000B3A15 /* AnimEditorPaintToolSidebarControlsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669ACE062F1B4A78000B3A15 /* AnimEditorPaintToolSidebarControlsVC.swift */; };
 		669E20C82C40A630008546E1 /* SceneEditorVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669E20C72C40A630008546E1 /* SceneEditorVC.swift */; };
 		66A59EA12C8A3F3400CF553E /* FrameRenderManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A59EA02C8A3F3400CF553E /* FrameRenderManifest.swift */; };
 		66A59EAA2C8B973900CF553E /* SceneRenderManifestGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A59EA92C8B973900CF553E /* SceneRenderManifestGenerator.swift */; };
@@ -233,6 +235,8 @@
 		669ACDFD2F18F8F9000B3A15 /* AnimFrameEditSessionEraseToolState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimFrameEditSessionEraseToolState.swift; sourceTree = "<group>"; };
 		669ACE012F1992FC000B3A15 /* AnimEditorPaintToolSidebarControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorPaintToolSidebarControlsView.swift; sourceTree = "<group>"; };
 		669ACE032F199310000B3A15 /* AnimEditorPaintToolExpandedControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorPaintToolExpandedControlsView.swift; sourceTree = "<group>"; };
+		669ACE052F1B4A78000B3A15 /* AnimEditorPaintToolExpandedControlsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorPaintToolExpandedControlsVC.swift; sourceTree = "<group>"; };
+		669ACE062F1B4A78000B3A15 /* AnimEditorPaintToolSidebarControlsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimEditorPaintToolSidebarControlsVC.swift; sourceTree = "<group>"; };
 		669E20C72C40A630008546E1 /* SceneEditorVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneEditorVC.swift; sourceTree = "<group>"; };
 		66A59EA02C8A3F3400CF553E /* FrameRenderManifest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameRenderManifest.swift; sourceTree = "<group>"; };
 		66A59EA92C8B973900CF553E /* SceneRenderManifestGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneRenderManifestGenerator.swift; sourceTree = "<group>"; };
@@ -705,7 +709,9 @@
 			isa = PBXGroup;
 			children = (
 				669ACDE52F18AFC4000B3A15 /* AnimEditorPaintToolControlsVC.swift */,
+				669ACE062F1B4A78000B3A15 /* AnimEditorPaintToolSidebarControlsVC.swift */,
 				669ACE012F1992FC000B3A15 /* AnimEditorPaintToolSidebarControlsView.swift */,
+				669ACE052F1B4A78000B3A15 /* AnimEditorPaintToolExpandedControlsVC.swift */,
 				669ACE032F199310000B3A15 /* AnimEditorPaintToolExpandedControlsView.swift */,
 			);
 			path = Paint;
@@ -1136,6 +1142,8 @@
 				6681BB1C2D0A444300AAED6A /* AnimEditorVC.swift in Sources */,
 				6651A9E02C962B0F00E3520A /* AnimEditorTimelineVC.swift in Sources */,
 				6671311D2F11FA13009BE03B /* AnimEditorView.swift in Sources */,
+				669ACE072F1B4A78000B3A15 /* AnimEditorPaintToolExpandedControlsVC.swift in Sources */,
+				669ACE082F1B4A78000B3A15 /* AnimEditorPaintToolSidebarControlsVC.swift in Sources */,
 				66211E8D2BEDE491005490C4 /* LibraryCell.swift in Sources */,
 				669ACDE62F18AFC4000B3A15 /* AnimEditorPaintToolControlsVC.swift in Sources */,
 				66B2BE422BCB55FF0072AC1B /* PixelSize.swift in Sources */,

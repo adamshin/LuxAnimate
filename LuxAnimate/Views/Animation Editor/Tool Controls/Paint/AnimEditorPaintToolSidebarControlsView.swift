@@ -23,7 +23,7 @@ extension AnimEditorPaintToolSidebarControlsView {
     
 }
 
-class AnimEditorPaintToolSidebarControlsView: UIView {
+class AnimEditorPaintToolSidebarControlsView: PassthroughView {
     
     private let scaleSlider =
     AnimEditorToolSidebarSlider(
@@ -50,7 +50,8 @@ class AnimEditorPaintToolSidebarControlsView: UIView {
         let stack = UIStackView()
         stack.axis = .vertical
         addSubview(stack)
-        stack.pinEdges()
+        stack.pinEdges(.leading)
+        stack.pin(.centerY)
         
         stack.addArrangedSubview(scaleSlider)
         stack.addArrangedSubview(smoothingSlider)

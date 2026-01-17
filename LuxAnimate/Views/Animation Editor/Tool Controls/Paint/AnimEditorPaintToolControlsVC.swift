@@ -25,10 +25,10 @@ extension AnimEditorPaintToolControlsVC {
 
 class AnimEditorPaintToolControlsVC: UIViewController {
     
-    private let sidebarControlsView = AnimEditorPaintToolSidebarControlsView()
-    private let expandedControlsView = AnimEditorPaintToolExpandedControlsView()
+    private let sidebarControlsVC = AnimEditorPaintToolSidebarControlsVC()
+    private let expandedControlsVC = AnimEditorPaintToolExpandedControlsVC()
     
-    private var isShowingExpandedControls = false
+    private var isExpandedControlsVisible = false
     
     weak var delegate: Delegate?
     
@@ -42,47 +42,49 @@ class AnimEditorPaintToolControlsVC: UIViewController {
     }
     
     private func setupUI() {
-        view.addSubview(sidebarControlsView)
-        sidebarControlsView.pinEdges(.leading)
-        sidebarControlsView.pin(.centerY)
+        addChild(sidebarControlsVC, to: view)
+        addChild(expandedControlsVC, to: view)
         
-        view.addSubview(expandedControlsView)
-        expandedControlsView.pinEdges(.leading)
-        expandedControlsView.pin(.centerY)
-        expandedControlsView.isHidden = true
+        sidebarControlsVC.delegate = self
+        expandedControlsVC.delegate = self
         
-        sidebarControlsView.delegate = self
-        expandedControlsView.delegate = self
+        setExpandedControlsVisible(false)
+    }
+    
+    private func setExpandedControlsVisible(
+        _ isExpandedControlsVisible: Bool
+    ) {
+        self.isExpandedControlsVisible = isExpandedControlsVisible
+        sidebarControlsVC.view.isHidden = isExpandedControlsVisible
+        expandedControlsVC.view.isHidden = !isExpandedControlsVisible
     }
     
     func setScale(_ value: Double) {
-        sidebarControlsView.setScale(value)
+        sidebarControlsVC.setScale(value)
     }
     
     func setSmoothing(_ value: Double) {
-        sidebarControlsView.setSmoothing(value)
+        sidebarControlsVC.setSmoothing(value)
     }
     
     func toggleExpandedControls() {
-        isShowingExpandedControls.toggle()
-        sidebarControlsView.isHidden = isShowingExpandedControls
-        expandedControlsView.isHidden = !isShowingExpandedControls
+        setExpandedControlsVisible(!isExpandedControlsVisible)
     }
     
 }
 
 extension AnimEditorPaintToolControlsVC:
-    AnimEditorPaintToolSidebarControlsView.Delegate {
+    AnimEditorPaintToolSidebarControlsVC.Delegate {
     
     func onChangeScale(
-        _ view: AnimEditorPaintToolSidebarControlsView,
+        _ vc: AnimEditorPaintToolSidebarControlsVC,
         _ value: Double
     ) {
         delegate?.onChangeScale(self, value)
     }
     
     func onChangeSmoothing(
-        _ view: AnimEditorPaintToolSidebarControlsView,
+        _ vc: AnimEditorPaintToolSidebarControlsVC,
         _ value: Double
     ) {
         delegate?.onChangeSmoothing(self, value)
@@ -91,13 +93,14 @@ extension AnimEditorPaintToolControlsVC:
 }
 
 extension AnimEditorPaintToolControlsVC:
-    AnimEditorPaintToolExpandedControlsView.Delegate {
+    AnimEditorPaintToolExpandedControlsVC.Delegate {
     
     func onSelectBrush(
-        _ view: AnimEditorPaintToolExpandedControlsView,
+        _ vc: AnimEditorPaintToolExpandedControlsVC,
         id: String
     ) {
         delegate?.onSelectBrush(self, id: id)
+        toggleExpandedControls()
     }
     
 }

@@ -4,6 +4,12 @@
 
 import UIKit
 
+private let outsidePadding: CGFloat = 12
+private let menuWidth: CGFloat = 240
+private let rowHeight: CGFloat = 48
+private let labelHPadding: CGFloat = 20
+private let fontSize: CGFloat = 17
+
 extension AnimEditorPaintToolExpandedControlsView {
     
     @MainActor
@@ -17,7 +23,7 @@ extension AnimEditorPaintToolExpandedControlsView {
     
 }
 
-class AnimEditorPaintToolExpandedControlsView: UIView {
+class AnimEditorPaintToolExpandedControlsView: PassthroughView {
     
     weak var delegate: Delegate?
     
@@ -29,29 +35,63 @@ class AnimEditorPaintToolExpandedControlsView: UIView {
     required init?(coder: NSCoder) { fatalError() }
     
     private func setupUI() {
+        let cardView = AnimEditorToolSidebarCardView()
+        addSubview(cardView)
+        cardView.pinEdges([.leading, .top], padding: outsidePadding)
+        cardView.pinWidth(to: menuWidth)
+        
         let stack = UIStackView()
         stack.axis = .vertical
-        stack.spacing = 8
-        addSubview(stack)
+        cardView.contentView.addSubview(stack)
         stack.pinEdges()
         
         for brushID in AppConfig.paintBrushIDs {
-            let button = createBrushButton(id: brushID)
-            stack.addArrangedSubview(button)
+            let row = createBrushRow(id: brushID)
+            stack.addArrangedSubview(row)
         }
     }
     
-    private func createBrushButton(id: String) -> UIButton {
-        let button = UIButton(type: .system)
-        button.setTitle(id, for: .normal)
-        button.contentHorizontalAlignment = .leading
+    private func createBrushRow(id: String) -> UIView {
+        let row = UIView()
+        row.pinHeight(to: rowHeight)
+        
+        let button = BrushButton()
+        row.addSubview(button)
+        button.pinEdges()
+        
         button.addAction(
             UIAction { [weak self] _ in
                 guard let self else { return }
                 self.delegate?.onSelectBrush(self, id: id)
             },
             for: .primaryActionTriggered)
-        return button
+        
+        let label = UILabel()
+        label.text = id
+        label.textColor = .editorLabel
+        label.font = .systemFont(ofSize: fontSize, weight: .regular)
+        
+        row.addSubview(label)
+        label.pinEdges(.leading, padding: labelHPadding)
+        label.pin(.centerY)
+        
+        return row
+    }
+    
+}
+
+private class BrushButton: UIButton {
+    
+    override var isHighlighted: Bool {
+        didSet {
+            if isHighlighted {
+                backgroundColor = UIColor(white: 1, alpha: 0.15)
+            } else {
+                UIView.animate(withDuration: 0.25) {
+                    self.backgroundColor = .clear
+                }
+            }
+        }
     }
     
 }
