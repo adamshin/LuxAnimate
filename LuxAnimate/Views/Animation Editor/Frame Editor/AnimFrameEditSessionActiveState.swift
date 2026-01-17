@@ -14,7 +14,7 @@ class AnimFrameEditSessionActiveState:
     private let layer: Scene.Layer
     private let layerContent: Scene.AnimationLayerContent
     private let frameIndex: Int
-//    private let onionSkinConfig: AnimEditorOnionSkinConfig?
+    private let onionSkinConfig: AnimEditorOnionSkinConfig?
     private let editorToolState: AnimEditorToolState?
     
     private let frameSceneGraph: FrameSceneGraph
@@ -43,6 +43,7 @@ class AnimFrameEditSessionActiveState:
         layer: Scene.Layer,
         layerContent: Scene.AnimationLayerContent,
         frameIndex: Int,
+        onionSkinConfig: AnimEditorOnionSkinConfig?,
         editorToolState: AnimEditorToolState?,
         frameSceneGraph: FrameSceneGraph,
         activeDrawingManifest: AnimFrameEditorHelper.ActiveDrawingManifest,
@@ -53,6 +54,7 @@ class AnimFrameEditSessionActiveState:
         self.layer = layer
         self.layerContent = layerContent
         self.frameIndex = frameIndex
+        self.onionSkinConfig = onionSkinConfig
         self.editorToolState = editorToolState
         
         self.frameSceneGraph = frameSceneGraph
@@ -101,7 +103,7 @@ class AnimFrameEditSessionActiveState:
                 frameSceneGraph: frameSceneGraph,
                 activeDrawingManifest: activeDrawingManifest,
                 activeDrawingTexture: activeDrawingTexture,
-                onionSkinConfig: nil)
+                onionSkinConfig: onionSkinConfig)
     }
     
     // MARK: - Interface

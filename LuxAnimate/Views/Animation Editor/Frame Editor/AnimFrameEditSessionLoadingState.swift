@@ -81,6 +81,7 @@ class AnimFrameEditSessionLoadingState:
             layer: layer,
             layerContent: layerContent,
             frameIndex: frameIndex,
+            onionSkinConfig: onionSkinConfig,
             editorToolState: editorToolState,
             frameSceneGraph: frameSceneGraph,
             activeDrawingManifest: activeDrawingManifest,
