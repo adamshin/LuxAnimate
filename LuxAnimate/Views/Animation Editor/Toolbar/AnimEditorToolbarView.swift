@@ -65,7 +65,7 @@ class AnimEditorToolbarView: PassthroughView {
     private let onionSkinButton = {
         let button = UIButton(type: .system)
         let image = UIImage(
-            systemName: "square.stack.3d.up",
+            systemName: "square.on.square.dashed",
             withConfiguration: iconConfig)
         button.setImage(image, for: .normal)
         button.tintColor = .editorLabel
