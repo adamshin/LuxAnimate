@@ -1,31 +1,31 @@
 //
-//  AnimEditor2ToolbarToolPickerVC.swift
+//  AnimEditorToolbarToolPickerVC.swift
 //
 
 import UIKit
 
-extension AnimEditor2ToolbarToolPickerVC {
+extension AnimEditorToolbarToolPickerVC {
     
     @MainActor
     protocol Delegate: AnyObject {
         
         func onSelectTool(
-            _ vc: AnimEditor2ToolbarToolPickerVC,
-            tool: AnimEditor2ToolbarVC.Tool,
+            _ vc: AnimEditorToolbarToolPickerVC,
+            tool: AnimEditorToolbarVC.Tool,
             isAlreadySelected: Bool)
         
     }
     
 }
 
-class AnimEditor2ToolbarToolPickerVC: UIViewController {
+class AnimEditorToolbarToolPickerVC: UIViewController {
     
-    private var selectedTool: AnimEditor2ToolbarVC.Tool?
+    private var selectedTool: AnimEditorToolbarVC.Tool?
     
     weak var delegate: Delegate?
     
     private let bodyView =
-        AnimEditor2ToolbarToolPickerView()
+        AnimEditorToolbarToolPickerView()
     
     // MARK: - Lifecycle
     
@@ -41,7 +41,7 @@ class AnimEditor2ToolbarToolPickerVC: UIViewController {
     // MARK: - Interface
     
     func update(
-        selectedTool: AnimEditor2ToolbarVC.Tool?
+        selectedTool: AnimEditorToolbarVC.Tool?
     ) {
         self.selectedTool = selectedTool
         bodyView.update(selectedTool: selectedTool)
@@ -51,12 +51,12 @@ class AnimEditor2ToolbarToolPickerVC: UIViewController {
 
 // MARK: - Delegates
 
-extension AnimEditor2ToolbarToolPickerVC:
-    AnimEditor2ToolbarToolPickerView.Delegate {
+extension AnimEditorToolbarToolPickerVC:
+    AnimEditorToolbarToolPickerView.Delegate {
     
     func onSelectTool(
-        _ v: AnimEditor2ToolbarToolPickerView,
-        tool: AnimEditor2ToolbarVC.Tool
+        _ v: AnimEditorToolbarToolPickerView,
+        tool: AnimEditorToolbarVC.Tool
     ) {
         let isAlreadySelected = selectedTool == tool
         selectedTool = tool

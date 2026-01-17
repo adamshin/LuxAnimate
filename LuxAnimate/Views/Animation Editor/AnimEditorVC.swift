@@ -40,7 +40,7 @@ class AnimEditorVC: UIViewController {
     private let workspaceControlsContainerVC
         = PassthroughContainerViewController()
     
-    private let toolbarVC: AnimEditor2ToolbarVC
+    private let toolbarVC: AnimEditorToolbarVC
     private let timelineVC: AnimEditorTimelineVC
     
     // MARK: - State
@@ -88,7 +88,7 @@ class AnimEditorVC: UIViewController {
             index: focusedFrameIndex,
             model: model)
         
-        toolbarVC = AnimEditor2ToolbarVC()
+        toolbarVC = AnimEditorToolbarVC()
         
         timelineVC = AnimEditorTimelineVC(
             projectID: projectID,
@@ -159,7 +159,7 @@ class AnimEditorVC: UIViewController {
         toolbarVC.update(model: model)
         toolbarVC.update(isOnionSkinOn: isOnionSkinOn)
         
-        let initialTool: AnimEditor2ToolbarVC.Tool = .paint
+        let initialTool: AnimEditorToolbarVC.Tool = .paint
         toolbarVC.update(selectedTool: initialTool)
         
         let toolState = Self.toolState(for: initialTool)
@@ -196,7 +196,7 @@ class AnimEditorVC: UIViewController {
     }
     
     private func updateInternal(
-        selectedToolbarTool tool: AnimEditor2ToolbarVC.Tool
+        selectedToolbarTool tool: AnimEditorToolbarVC.Tool
     ) {
         let toolState = Self.toolState(for: tool)
         toolStateMachine.setToolState(toolState)
@@ -287,7 +287,7 @@ extension AnimEditorVC {
     }
     
     private static func toolState(
-        for tool: AnimEditor2ToolbarVC.Tool
+        for tool: AnimEditorToolbarVC.Tool
     ) -> AnimEditorToolState {
         switch tool {
         case .paint: AnimEditorPaintToolState()
@@ -310,26 +310,26 @@ extension AnimEditorVC: EditorWorkspaceVC.Delegate {
     
 }
 
-extension AnimEditorVC: AnimEditor2ToolbarVC.Delegate {
+extension AnimEditorVC: AnimEditorToolbarVC.Delegate {
     
-    func onSelectBack(_ vc: AnimEditor2ToolbarVC) {
+    func onSelectBack(_ vc: AnimEditorToolbarVC) {
         dismiss()
     }
     
-    func onSelectUndo(_ vc: AnimEditor2ToolbarVC) {
+    func onSelectUndo(_ vc: AnimEditorToolbarVC) {
         delegate?.onRequestUndo(self)
     }
-    func onSelectRedo(_ vc: AnimEditor2ToolbarVC) {
+    func onSelectRedo(_ vc: AnimEditorToolbarVC) {
         delegate?.onRequestRedo(self)
     }
     
-    func onSelectOnionSkin(_ vc: AnimEditor2ToolbarVC) {
+    func onSelectOnionSkin(_ vc: AnimEditorToolbarVC) {
         updateInternal(isOnionSkinOn: !isOnionSkinOn)
     }
 
     func onSelectTool(
-        _ vc: AnimEditor2ToolbarVC,
-        tool: AnimEditor2ToolbarVC.Tool,
+        _ vc: AnimEditorToolbarVC,
+        tool: AnimEditorToolbarVC.Tool,
         isAlreadySelected: Bool
     ) {
         if isAlreadySelected {

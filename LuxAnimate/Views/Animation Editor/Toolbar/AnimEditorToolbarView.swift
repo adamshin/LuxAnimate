@@ -1,5 +1,5 @@
 //
-//  AnimEditor2ToolbarView.swift
+//  AnimEditorToolbarView.swift
 //
 
 import UIKit
@@ -18,21 +18,21 @@ private let iconConfig = UIImage.SymbolConfiguration(
 
 // MARK: - Delegate
 
-extension AnimEditor2ToolbarView {
+extension AnimEditorToolbarView {
     
     @MainActor
     protocol Delegate: AnyObject {
-        func onSelectBack(_ v: AnimEditor2ToolbarView)
-        func onSelectOnionSkin(_ v: AnimEditor2ToolbarView)
-        func onSelectUndo(_ v: AnimEditor2ToolbarView)
-        func onSelectRedo(_ v: AnimEditor2ToolbarView)
+        func onSelectBack(_ v: AnimEditorToolbarView)
+        func onSelectOnionSkin(_ v: AnimEditorToolbarView)
+        func onSelectUndo(_ v: AnimEditorToolbarView)
+        func onSelectRedo(_ v: AnimEditorToolbarView)
     }
     
 }
 
-// MARK: - AnimEditor2ToolbarView
+// MARK: - AnimEditorToolbarView
 
-class AnimEditor2ToolbarView: PassthroughView {
+class AnimEditorToolbarView: PassthroughView {
     
     private let backButton = {
         var config = UIButton.Configuration.plain()
