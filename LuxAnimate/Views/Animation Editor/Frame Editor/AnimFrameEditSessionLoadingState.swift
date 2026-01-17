@@ -17,6 +17,7 @@ class AnimFrameEditSessionLoadingState:
     private let layer: Scene.Layer
     private let layerContent: Scene.AnimationLayerContent
     private let frameIndex: Int
+    private let onionSkinConfig: AnimEditorOnionSkinConfig?
     private let editorToolState: AnimEditorToolState?
     
     private let frameSceneGraph: FrameSceneGraph
@@ -41,6 +42,7 @@ class AnimFrameEditSessionLoadingState:
         layer: Scene.Layer,
         layerContent: Scene.AnimationLayerContent,
         frameIndex: Int,
+        onionSkinConfig: AnimEditorOnionSkinConfig?,
         editorToolState: AnimEditorToolState?
     ) {
         self.projectManifest = projectManifest
@@ -48,6 +50,7 @@ class AnimFrameEditSessionLoadingState:
         self.layer = layer
         self.layerContent = layerContent
         self.frameIndex = frameIndex
+        self.onionSkinConfig = onionSkinConfig
         self.editorToolState = editorToolState
         
         frameSceneGraph = FrameSceneGraphGenerator.generate(
@@ -59,7 +62,7 @@ class AnimFrameEditSessionLoadingState:
             .activeDrawingManifest(
                 layerContent: layerContent,
                 frameIndex: frameIndex,
-                onionSkinConfig: nil)
+                onionSkinConfig: onionSkinConfig)
         
         assetManifest = AnimFrameEditorHelper
             .assetManifest(

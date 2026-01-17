@@ -20,7 +20,7 @@ extension AnimEditor2ToolbarToolPickerVC {
 
 class AnimEditor2ToolbarToolPickerVC: UIViewController {
     
-    private(set) var selectedTool: AnimEditor2ToolbarVC.Tool?
+    private var selectedTool: AnimEditor2ToolbarVC.Tool?
     
     weak var delegate: Delegate?
     

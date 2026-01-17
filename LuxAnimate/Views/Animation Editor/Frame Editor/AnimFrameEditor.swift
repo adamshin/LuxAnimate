@@ -68,7 +68,8 @@ class AnimFrameEditor {
     func update(
         model: AnimEditorModel,
         focusedFrameIndex: Int,
-        editorToolState: AnimEditorToolState?
+        editorToolState: AnimEditorToolState?,
+        onionSkinConfig: AnimEditorOnionSkinConfig?
     ) {
         if let updateContext, updateContext.ignoreUpdate {
             return
@@ -80,6 +81,7 @@ class AnimFrameEditor {
             layer: model.layer,
             layerContent: model.layerContent,
             frameIndex: focusedFrameIndex,
+            onionSkinConfig: onionSkinConfig,
             editorToolState: editorToolState,
             delegate: self)
     }

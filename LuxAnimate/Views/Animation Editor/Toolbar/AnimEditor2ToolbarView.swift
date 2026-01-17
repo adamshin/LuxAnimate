@@ -23,6 +23,7 @@ extension AnimEditor2ToolbarView {
     @MainActor
     protocol Delegate: AnyObject {
         func onSelectBack(_ v: AnimEditor2ToolbarView)
+        func onSelectOnionSkin(_ v: AnimEditor2ToolbarView)
         func onSelectUndo(_ v: AnimEditor2ToolbarView)
         func onSelectRedo(_ v: AnimEditor2ToolbarView)
     }
@@ -58,6 +59,17 @@ class AnimEditor2ToolbarView: PassthroughView {
                     .editorLabel
             }
         }
+        return button
+    }()
+    
+    private let onionSkinButton = {
+        let button = UIButton(type: .system)
+        let image = UIImage(
+            systemName: "square.stack.3d.up",
+            withConfiguration: iconConfig)
+        button.setImage(image, for: .normal)
+        button.tintColor = .editorLabel
+        button.pinWidth(to: buttonWidth)
         return button
     }()
     
@@ -134,12 +146,17 @@ class AnimEditor2ToolbarView: PassthroughView {
         
         leftStack.addArrangedSubview(toolPickerContainer)
         
+        rightStack.addArrangedSubview(onionSkinButton)
         rightStack.addArrangedSubview(undoButton)
         rightStack.addArrangedSubview(redoButton)
         
         backButton.addHandler { [weak self] in
             guard let self else { return }
             delegate?.onSelectBack(self)
+        }
+        onionSkinButton.addHandler { [weak self] in
+            guard let self else { return }
+            delegate?.onSelectOnionSkin(self)
         }
         undoButton.addHandler { [weak self] in
             guard let self else { return }
@@ -159,6 +176,11 @@ class AnimEditor2ToolbarView: PassthroughView {
     ) {
         undoButton.isEnabled = undoEnabled
         redoButton.isEnabled = redoEnabled
+    }
+    
+    func update(isOnionSkinOn: Bool) {
+        onionSkinButton.tintColor =
+            isOnionSkinOn ? .systemBlue : .editorLabel
     }
     
 }

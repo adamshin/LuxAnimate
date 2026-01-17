@@ -18,6 +18,8 @@ extension AnimEditor2ToolbarVC {
         func onSelectUndo(_ vc: AnimEditor2ToolbarVC)
         func onSelectRedo(_ vc: AnimEditor2ToolbarVC)
         
+        func onSelectOnionSkin(_ vc: AnimEditor2ToolbarVC)
+        
         func onSelectTool(
             _ vc: AnimEditor2ToolbarVC,
             tool: Tool,
@@ -64,14 +66,14 @@ class AnimEditor2ToolbarVC: UIViewController {
             redoEnabled: redoEnabled)
     }
     
+    func update(isOnionSkinOn: Bool) {
+        bodyView.update(isOnionSkinOn: isOnionSkinOn)
+    }
+    
     func update(
         selectedTool: AnimEditor2ToolbarVC.Tool
     ) {
         toolPickerVC.update(selectedTool: selectedTool)
-    }
-    
-    var selectedTool: AnimEditor2ToolbarVC.Tool? {
-        toolPickerVC.selectedTool
     }
     
 }
@@ -83,6 +85,9 @@ extension AnimEditor2ToolbarVC:
     
     func onSelectBack(_ v: AnimEditor2ToolbarView) {
         delegate?.onSelectBack(self)
+    }
+    func onSelectOnionSkin(_ v: AnimEditor2ToolbarView) {
+        delegate?.onSelectOnionSkin(self)
     }
     func onSelectUndo(_ v: AnimEditor2ToolbarView) {
         delegate?.onSelectUndo(self)

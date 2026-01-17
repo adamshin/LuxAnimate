@@ -51,8 +51,7 @@ class AnimEditorVC: UIViewController {
     
     private var model: AnimEditorModel
     private var focusedFrameIndex: Int
-    
-    // TODO: Onion skin settings
+    private var isOnionSkinOn = false
     
     private let toolStateMachine = AnimEditorToolStateMachine()
     private let frameEditor = AnimFrameEditor()
@@ -90,7 +89,6 @@ class AnimEditorVC: UIViewController {
             model: model)
         
         toolbarVC = AnimEditor2ToolbarVC()
-        toolbarVC.update(model: model)
         
         timelineVC = AnimEditorTimelineVC(
             projectID: projectID,
@@ -158,10 +156,16 @@ class AnimEditorVC: UIViewController {
     }
     
     private func setupInitialState() {
-        let initialTool: AnimEditor2ToolbarVC.Tool = .paint
+        toolbarVC.update(model: model)
+        toolbarVC.update(isOnionSkinOn: isOnionSkinOn)
         
+        let initialTool: AnimEditor2ToolbarVC.Tool = .paint
         toolbarVC.update(selectedTool: initialTool)
-        updateInternal(selectedToolbarTool: initialTool)
+        
+        let toolState = Self.toolState(for: initialTool)
+        toolStateMachine.setToolState(toolState)
+        
+        updateFrameEditor()
     }
     
     // MARK: - Internal State
@@ -194,11 +198,7 @@ class AnimEditorVC: UIViewController {
     private func updateInternal(
         selectedToolbarTool tool: AnimEditor2ToolbarVC.Tool
     ) {
-        let toolState: AnimEditorToolState = switch tool {
-        case .paint: AnimEditorPaintToolState()
-        case .erase: AnimEditorEraseToolState()
-        }
-        
+        let toolState = Self.toolState(for: tool)
         toolStateMachine.setToolState(toolState)
         
         updateFrameEditor()
@@ -217,11 +217,24 @@ class AnimEditorVC: UIViewController {
         updateFrameEditor()
     }
     
+    private func updateInternal(
+        isOnionSkinOn newValue: Bool
+    ) {
+        isOnionSkinOn = newValue
+        toolbarVC.update(isOnionSkinOn: isOnionSkinOn)
+        
+        updateFrameEditor()
+    }
+    
     private func updateFrameEditor() {
+        let onionSkinConfig = isOnionSkinOn ?
+            AppConfig.onionSkinConfig : nil
+        
         frameEditor.update(
             model: model,
             focusedFrameIndex: focusedFrameIndex,
-            editorToolState: toolStateMachine.toolState)
+            editorToolState: toolStateMachine.toolState,
+            onionSkinConfig: onionSkinConfig)
     }
     
     // MARK: - Frame
@@ -273,6 +286,15 @@ extension AnimEditorVC {
         return clamp(index, min: 0, max: frameCount - 1)
     }
     
+    private static func toolState(
+        for tool: AnimEditor2ToolbarVC.Tool
+    ) -> AnimEditorToolState {
+        switch tool {
+        case .paint: AnimEditorPaintToolState()
+        case .erase: AnimEditorEraseToolState()
+        }
+    }
+    
 }
 
 // MARK: - Delegates
@@ -293,6 +315,7 @@ extension AnimEditorVC: AnimEditor2ToolbarVC.Delegate {
     func onSelectBack(_ vc: AnimEditor2ToolbarVC) {
         dismiss()
     }
+    
     func onSelectUndo(_ vc: AnimEditor2ToolbarVC) {
         delegate?.onRequestUndo(self)
     }
@@ -300,6 +323,10 @@ extension AnimEditorVC: AnimEditor2ToolbarVC.Delegate {
         delegate?.onRequestRedo(self)
     }
     
+    func onSelectOnionSkin(_ vc: AnimEditor2ToolbarVC) {
+        updateInternal(isOnionSkinOn: !isOnionSkinOn)
+    }
+
     func onSelectTool(
         _ vc: AnimEditor2ToolbarVC,
         tool: AnimEditor2ToolbarVC.Tool,
@@ -311,7 +338,7 @@ extension AnimEditorVC: AnimEditor2ToolbarVC.Delegate {
             updateInternal(selectedToolbarTool: tool)
         }
     }
-    
+
 }
 
 extension AnimEditorVC: AnimEditorTimelineVC.Delegate {

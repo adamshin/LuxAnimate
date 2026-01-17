@@ -54,6 +54,7 @@ class AnimFrameEditSession {
         layer: Scene.Layer,
         layerContent: Scene.AnimationLayerContent,
         frameIndex: Int,
+        onionSkinConfig: AnimEditorOnionSkinConfig?,
         editorToolState: AnimEditorToolState?,
         delegate: Delegate?
     ) {
@@ -65,6 +66,7 @@ class AnimFrameEditSession {
             layer: layer,
             layerContent: layerContent,
             frameIndex: frameIndex,
+            onionSkinConfig: onionSkinConfig,
             editorToolState: editorToolState)
         
         beginState(loadingState)
