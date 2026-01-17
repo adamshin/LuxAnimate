@@ -683,13 +683,10 @@
 		669ACDE72F18C87E000B3A15 /* Frame Editor */ = {
 			isa = PBXGroup;
 			children = (
+				669ACE092F1C5587000B3A15 /* Edit Session */,
 				669ACDF42F18ECF9000B3A15 /* Tool State */,
 				66A59E942C899BC300CF553E /* Shared */,
 				669ACDE82F18C8D3000B3A15 /* AnimFrameEditor.swift */,
-				669ACDEA2F18C91A000B3A15 /* AnimFrameEditSession.swift */,
-				669ACDEC2F18E5D3000B3A15 /* AnimFrameEditSessionState.swift */,
-				669ACDF02F18EA7E000B3A15 /* AnimFrameEditSessionLoadingState.swift */,
-				669ACDF22F18EA8B000B3A15 /* AnimFrameEditSessionActiveState.swift */,
 			);
 			path = "Frame Editor";
 			sourceTree = "<group>";
@@ -715,6 +712,17 @@
 				669ACE032F199310000B3A15 /* AnimEditorPaintToolExpandedControlsView.swift */,
 			);
 			path = Paint;
+			sourceTree = "<group>";
+		};
+		669ACE092F1C5587000B3A15 /* Edit Session */ = {
+			isa = PBXGroup;
+			children = (
+				669ACDEA2F18C91A000B3A15 /* AnimFrameEditSession.swift */,
+				669ACDEC2F18E5D3000B3A15 /* AnimFrameEditSessionState.swift */,
+				669ACDF02F18EA7E000B3A15 /* AnimFrameEditSessionLoadingState.swift */,
+				669ACDF22F18EA8B000B3A15 /* AnimFrameEditSessionActiveState.swift */,
+			);
+			path = "Edit Session";
 			sourceTree = "<group>";
 		};
 		669E20C62C40A61D008546E1 /* Scene Editor */ = {
