@@ -65,54 +65,41 @@ struct AnimFrameEditorHelper {
     
     // MARK: - Assets
     
-    struct AssetManifest {
-        var activeDrawingAssetID: String?
-        var otherAssetIDs: Set<String>
-        
-        func allAssetIDs() -> Set<String> {
-            var assetIDs = otherAssetIDs
-            if let activeDrawingAssetID {
-                assetIDs.insert(activeDrawingAssetID)
-            }
-            return assetIDs
-        }
-    }
-    
-    static func assetManifest(
+    static func assetIDs(
         frameSceneGraph: FrameSceneGraph,
         activeDrawingManifest: ActiveDrawingManifest
-    ) -> AssetManifest {
+    ) -> Set<String> {
+        var assetIDs = Set<String>()
         
-        let activeDrawingAssetID = activeDrawingManifest
-            .activeDrawing?.fullAssetID
-        
-        var drawings: [Scene.Drawing] = []
-        
+        // Collect asset IDs from frame scene graph layers
         for layer in frameSceneGraph.layers {
             switch layer.content {
             case .drawing(let content):
-                drawings.append(content.drawing)
+                if let assetID = content.drawing.fullAssetID {
+                    assetIDs.insert(assetID)
+                }
             }
         }
         
-        drawings.append(contentsOf: 
-            activeDrawingManifest.prevOnionSkinDrawings)
-        drawings.append(contentsOf: 
-            activeDrawingManifest.nextOnionSkinDrawings)
+        // Collect asset IDs from active drawing
+        if let assetID = activeDrawingManifest.activeDrawing?.fullAssetID {
+            assetIDs.insert(assetID)
+        }
         
-        var otherAssetIDs = Set<String>()
-        for drawing in drawings {
-            if let fullAssetID = drawing.fullAssetID {
-                otherAssetIDs.insert(fullAssetID)
+        // Collect asset IDs from onion skin drawings
+        for drawing in activeDrawingManifest.prevOnionSkinDrawings {
+            if let assetID = drawing.fullAssetID {
+                assetIDs.insert(assetID)
             }
         }
-        if let activeDrawingAssetID {
-            otherAssetIDs.remove(activeDrawingAssetID)
+        
+        for drawing in activeDrawingManifest.nextOnionSkinDrawings {
+            if let assetID = drawing.fullAssetID {
+                assetIDs.insert(assetID)
+            }
         }
         
-        return AssetManifest(
-            activeDrawingAssetID: activeDrawingAssetID,
-            otherAssetIDs: otherAssetIDs)
+        return assetIDs
     }
     
 }

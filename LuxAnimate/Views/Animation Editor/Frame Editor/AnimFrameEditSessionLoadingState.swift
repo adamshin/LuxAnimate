@@ -25,9 +25,6 @@ class AnimFrameEditSessionLoadingState:
     private let activeDrawingManifest:
         AnimFrameEditorHelper.ActiveDrawingManifest
     
-    private let assetManifest:
-        AnimFrameEditorHelper.AssetManifest
-    
     private let assetIDsToLoad: Set<String>
     
     private var loadStartTime: TimeInterval = 0
@@ -64,12 +61,10 @@ class AnimFrameEditSessionLoadingState:
                 frameIndex: frameIndex,
                 onionSkinConfig: onionSkinConfig)
         
-        assetManifest = AnimFrameEditorHelper
-            .assetManifest(
+        assetIDsToLoad = AnimFrameEditorHelper
+            .assetIDs(
                 frameSceneGraph: frameSceneGraph,
                 activeDrawingManifest: activeDrawingManifest)
-        
-        assetIDsToLoad = assetManifest.allAssetIDs()
     }
     
     // MARK: - Logic
@@ -84,8 +79,7 @@ class AnimFrameEditSessionLoadingState:
             onionSkinConfig: onionSkinConfig,
             editorToolState: editorToolState,
             frameSceneGraph: frameSceneGraph,
-            activeDrawingManifest: activeDrawingManifest,
-            assetManifest: assetManifest)
+            activeDrawingManifest: activeDrawingManifest)
         
         delegate?.changeState(self, newState: newState)
     }

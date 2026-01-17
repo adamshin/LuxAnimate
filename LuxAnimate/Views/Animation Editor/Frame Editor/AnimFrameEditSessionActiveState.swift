@@ -22,9 +22,6 @@ class AnimFrameEditSessionActiveState:
     private let activeDrawingManifest:
         AnimFrameEditorHelper.ActiveDrawingManifest
     
-    private let assetManifest:
-        AnimFrameEditorHelper.AssetManifest
-    
     private let toolState: AnimFrameEditSessionToolState?
     
     private let workspaceSceneGraphGenerator
@@ -46,8 +43,7 @@ class AnimFrameEditSessionActiveState:
         onionSkinConfig: AnimEditorOnionSkinConfig?,
         editorToolState: AnimEditorToolState?,
         frameSceneGraph: FrameSceneGraph,
-        activeDrawingManifest: AnimFrameEditorHelper.ActiveDrawingManifest,
-        assetManifest: AnimFrameEditorHelper.AssetManifest
+        activeDrawingManifest: AnimFrameEditorHelper.ActiveDrawingManifest
     ) {
         self.projectManifest = projectManifest
         self.sceneManifest = sceneManifest
@@ -59,7 +55,6 @@ class AnimFrameEditSessionActiveState:
         
         self.frameSceneGraph = frameSceneGraph
         self.activeDrawingManifest = activeDrawingManifest
-        self.assetManifest = assetManifest
         
         let drawingCanvasSize = layer.contentSize
         
