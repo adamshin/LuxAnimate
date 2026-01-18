@@ -22,72 +22,65 @@ class AnimFrameEditorWorkspaceSceneGraphGenerator {
     weak var delegate: AnimFrameEditorWorkspaceSceneGraphGeneratorDelegate?
     
     func generate(
-        frameSceneGraph: FrameSceneGraph,
-        activeDrawingManifest: AnimFrameEditorHelper.ActiveDrawingManifest,
-        activeDrawingTexture: MTLTexture?,
-        onionSkinConfig: AnimEditorOnionSkinConfig?
+        editContext: AnimFrameEditContext,
+        activeDrawingTexture: MTLTexture?
     ) -> EditorWorkspaceSceneGraph {
-        
+
         var outputLayers: [EditorWorkspaceSceneGraph.Layer] = []
-        
+
         let backgroundLayer = EditorWorkspaceSceneGraph.Layer(
             content: .rect(.init(
-                color: frameSceneGraph.backgroundColor)),
-            contentSize: frameSceneGraph.contentSize,
+                color: editContext.frameSceneGraph.backgroundColor)),
+            contentSize: editContext.frameSceneGraph.contentSize,
             transform: .identity,
             alpha: 1)
-        
+
         outputLayers.append(backgroundLayer)
-        
-        for layer in frameSceneGraph.layers {
+
+        for layer in editContext.frameSceneGraph.layers {
             let layerOutputLayers = outputLayersForLayer(
                 layer: layer,
-                activeDrawingManifest: activeDrawingManifest,
-                activeDrawingTexture: activeDrawingTexture,
-                onionSkinConfig: onionSkinConfig)
-            
+                editContext: editContext,
+                activeDrawingTexture: activeDrawingTexture)
+
             outputLayers.append(contentsOf: layerOutputLayers)
         }
-        
+
         return EditorWorkspaceSceneGraph(
-            contentSize: frameSceneGraph.contentSize,
+            contentSize: editContext.frameSceneGraph.contentSize,
             layers: outputLayers)
     }
     
     private func outputLayersForLayer(
         layer: FrameSceneGraph.Layer,
-        activeDrawingManifest: AnimFrameEditorHelper.ActiveDrawingManifest,
-        activeDrawingTexture: MTLTexture?,
-        onionSkinConfig: AnimEditorOnionSkinConfig?
+        editContext: AnimFrameEditContext,
+        activeDrawingTexture: MTLTexture?
     ) -> [EditorWorkspaceSceneGraph.Layer] {
-        
+
         switch layer.content {
         case .drawing(let drawingLayerContent):
             return outputLayersForDrawingLayer(
                 layer: layer,
                 drawingLayerContent: drawingLayerContent,
-                activeDrawingManifest: activeDrawingManifest,
-                activeDrawingTexture: activeDrawingTexture,
-                onionSkinConfig: onionSkinConfig)
+                editContext: editContext,
+                activeDrawingTexture: activeDrawingTexture)
         }
     }
     
     private func outputLayersForDrawingLayer(
         layer: FrameSceneGraph.Layer,
         drawingLayerContent: FrameSceneGraph.DrawingLayerContent,
-        activeDrawingManifest: AnimFrameEditorHelper.ActiveDrawingManifest,
-        activeDrawingTexture: MTLTexture?,
-        onionSkinConfig: AnimEditorOnionSkinConfig?
+        editContext: AnimFrameEditContext,
+        activeDrawingTexture: MTLTexture?
     ) -> [EditorWorkspaceSceneGraph.Layer] {
-        
-        if drawingLayerContent.drawing.id == activeDrawingManifest.activeDrawing?.id {
+
+        if drawingLayerContent.drawing.id == editContext.activeDrawingContext.activeDrawing?.id {
             return outputLayersForActiveDrawingLayer(
                 layer: layer,
                 drawingLayerContent: drawingLayerContent,
-                activeDrawingManifest: activeDrawingManifest,
-                activeDrawingTexture: activeDrawingTexture,
-                onionSkinConfig: onionSkinConfig)
-            
+                editContext: editContext,
+                activeDrawingTexture: activeDrawingTexture)
+
         } else {
             return outputLayersForInactiveDrawingLayer(
                 layer: layer,
@@ -98,38 +91,32 @@ class AnimFrameEditorWorkspaceSceneGraphGenerator {
     private func outputLayersForActiveDrawingLayer(
         layer: FrameSceneGraph.Layer,
         drawingLayerContent: FrameSceneGraph.DrawingLayerContent,
-        activeDrawingManifest: AnimFrameEditorHelper.ActiveDrawingManifest,
-        activeDrawingTexture: MTLTexture?,
-        onionSkinConfig: AnimEditorOnionSkinConfig?
+        editContext: AnimFrameEditContext,
+        activeDrawingTexture: MTLTexture?
     ) -> [EditorWorkspaceSceneGraph.Layer] {
-        
+
         var outputLayers: [EditorWorkspaceSceneGraph.Layer] = []
-        
-        for (index, drawing) in
-            activeDrawingManifest.prevOnionSkinDrawings.enumerated()
-        {
-            outputLayers.append(outputLayerForDrawingLayer(
+
+        // Previous onion skin layers with pre-computed colors
+        for onionDrawing in editContext.activeDrawingContext.prevOnionSkinDrawings {
+            outputLayers.append(outputLayerForOnionSkinDrawing(
                 layer: layer,
-                drawing: drawing,
-                onionSkinConfig: onionSkinConfig,
-                onionSkinOffset: -index - 1))
+                onionDrawing: onionDrawing))
         }
-        
-        for (index, drawing) in
-            activeDrawingManifest.nextOnionSkinDrawings.enumerated()
-        {
-            outputLayers.append(outputLayerForDrawingLayer(
+
+        // Next onion skin layers with pre-computed colors
+        for onionDrawing in editContext.activeDrawingContext.nextOnionSkinDrawings {
+            outputLayers.append(outputLayerForOnionSkinDrawing(
                 layer: layer,
-                drawing: drawing,
-                onionSkinConfig: onionSkinConfig,
-                onionSkinOffset: index + 1))
+                onionDrawing: onionDrawing))
         }
-        
+
+        // Active drawing
         outputLayers.append(outputLayerForDrawingLayer(
             layer: layer,
             drawing: drawingLayerContent.drawing,
             replacementTexture: activeDrawingTexture))
-        
+
         return outputLayers
     }
     
@@ -145,14 +132,34 @@ class AnimFrameEditorWorkspaceSceneGraphGenerator {
         return [outputLayer]
     }
     
+    private func outputLayerForOnionSkinDrawing(
+        layer: FrameSceneGraph.Layer,
+        onionDrawing: AnimFrameEditContext.ActiveDrawingContext.OnionSkinDrawing
+    ) -> EditorWorkspaceSceneGraph.Layer {
+
+        let texture = onionDrawing.drawing.fullAssetID.flatMap {
+            delegate?.assetTexture(self, assetID: $0)
+        }
+
+        let imageLayerContent = EditorWorkspaceSceneGraph
+            .ImageLayerContent(
+                texture: texture,
+                colorMode: .stencil,
+                color: onionDrawing.tintColor)
+
+        return EditorWorkspaceSceneGraph.Layer(
+            content: .image(imageLayerContent),
+            contentSize: layer.contentSize,
+            transform: layer.transform,
+            alpha: layer.alpha)
+    }
+
     private func outputLayerForDrawingLayer(
         layer: FrameSceneGraph.Layer,
         drawing: Scene.Drawing,
-        replacementTexture: MTLTexture? = nil,
-        onionSkinConfig: AnimEditorOnionSkinConfig? = nil,
-        onionSkinOffset: Int = 0
+        replacementTexture: MTLTexture? = nil
     ) -> EditorWorkspaceSceneGraph.Layer {
-        
+
         let texture: MTLTexture?
         if let replacementTexture {
             texture = replacementTexture
@@ -161,39 +168,13 @@ class AnimFrameEditorWorkspaceSceneGraphGenerator {
                 delegate?.assetTexture(self, assetID: $0)
             }
         }
-        
-        let colorMode: ColorMode
-        let color: Color
-        
-        if let onionSkinConfig {
-            if onionSkinOffset == 0 {
-                colorMode = .none
-            } else {
-                colorMode = .stencil
-            }
-            if onionSkinOffset == 0 {
-                color = .clear
-            } else if onionSkinOffset > 0 {
-                color = onionSkinConfig.nextColor.withAlpha(
-                    onionSkinConfig.alpha -
-                    onionSkinConfig.alphaFalloff * Double(abs(onionSkinOffset)))
-            } else {
-                color = onionSkinConfig.prevColor.withAlpha(
-                    onionSkinConfig.alpha -
-                    onionSkinConfig.alphaFalloff * Double(abs(onionSkinOffset)))
-            }
-            
-        } else {
-            colorMode = .none
-            color = .clear
-        }
-        
+
         let imageLayerContent = EditorWorkspaceSceneGraph
             .ImageLayerContent(
                 texture: texture,
-                colorMode: colorMode,
-                color: color)
-        
+                colorMode: .none,
+                color: .clear)
+
         return EditorWorkspaceSceneGraph.Layer(
             content: .image(imageLayerContent),
             contentSize: layer.contentSize,

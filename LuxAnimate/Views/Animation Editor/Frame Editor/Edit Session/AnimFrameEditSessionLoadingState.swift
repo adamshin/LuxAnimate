@@ -17,15 +17,9 @@ class AnimFrameEditSessionLoadingState:
     private let layer: Scene.Layer
     private let layerContent: Scene.AnimationLayerContent
     private let frameIndex: Int
-    private let onionSkinConfig: AnimEditorOnionSkinConfig?
     private let editorToolState: AnimEditorToolState?
-    
-    private let frameSceneGraph: FrameSceneGraph
-    
-    private let activeDrawingManifest:
-        AnimFrameEditorHelper.ActiveDrawingManifest
-    
-    private let assetIDsToLoad: Set<String>
+
+    private let editContext: AnimFrameEditContext
     
     private var loadStartTime: TimeInterval = 0
     
@@ -47,24 +41,15 @@ class AnimFrameEditSessionLoadingState:
         self.layer = layer
         self.layerContent = layerContent
         self.frameIndex = frameIndex
-        self.onionSkinConfig = onionSkinConfig
         self.editorToolState = editorToolState
-        
-        frameSceneGraph = FrameSceneGraphGenerator.generate(
+
+        editContext = AnimFrameEditContext(
             projectManifest: projectManifest,
             sceneManifest: sceneManifest,
-            frameIndex: frameIndex)
-        
-        activeDrawingManifest = AnimFrameEditorHelper
-            .activeDrawingManifest(
-                layerContent: layerContent,
-                frameIndex: frameIndex,
-                onionSkinConfig: onionSkinConfig)
-        
-        assetIDsToLoad = AnimFrameEditorHelper
-            .assetIDs(
-                frameSceneGraph: frameSceneGraph,
-                activeDrawingManifest: activeDrawingManifest)
+            layer: layer,
+            layerContent: layerContent,
+            frameIndex: frameIndex,
+            onionSkinConfig: onionSkinConfig)
     }
     
     // MARK: - Logic
@@ -76,11 +61,9 @@ class AnimFrameEditSessionLoadingState:
             layer: layer,
             layerContent: layerContent,
             frameIndex: frameIndex,
-            onionSkinConfig: onionSkinConfig,
             editorToolState: editorToolState,
-            frameSceneGraph: frameSceneGraph,
-            activeDrawingManifest: activeDrawingManifest)
-        
+            editContext: editContext)
+
         delegate?.changeState(self, newState: newState)
     }
     
@@ -89,25 +72,25 @@ class AnimFrameEditSessionLoadingState:
     func begin() {
 //        delegate?.setEditInteractionEnabled(
 //            self, enabled: false)
-        
+
         loadStartTime = ProcessInfo.processInfo.systemUptime
-        
-        delegate?.loadAssets(self, assetIDs: assetIDsToLoad)
+
+        delegate?.loadAssets(self, assetIDs: editContext.assetIDs)
     }
     
     func onFrame() -> EditorWorkspaceSceneGraph? { nil }
     
     func onAssetLoaderUpdate() {
         guard let delegate else { return }
-        
+
         if delegate.hasLoadedAssets(
-            self, assetIDs: assetIDsToLoad)
+            self, assetIDs: editContext.assetIDs)
         {
 //            let loadEndTime = ProcessInfo.processInfo.systemUptime
 //            let loadTime = loadEndTime - loadStartTime
 //            let loadTimeMs = Int(loadTime * 1000)
 //            print("Loaded assets. \(loadTimeMs) ms")
-            
+
             beginActiveState()
         }
     }

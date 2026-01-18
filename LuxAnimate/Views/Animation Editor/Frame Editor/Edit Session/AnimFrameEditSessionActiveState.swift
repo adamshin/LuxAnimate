@@ -14,13 +14,9 @@ class AnimFrameEditSessionActiveState:
     private let layer: Scene.Layer
     private let layerContent: Scene.AnimationLayerContent
     private let frameIndex: Int
-    private let onionSkinConfig: AnimEditorOnionSkinConfig?
     private let editorToolState: AnimEditorToolState?
-    
-    private let frameSceneGraph: FrameSceneGraph
-    
-    private let activeDrawingManifest:
-        AnimFrameEditorHelper.ActiveDrawingManifest
+
+    private let editContext: AnimFrameEditContext
     
     private let toolState: AnimFrameEditSessionToolState?
     
@@ -40,21 +36,17 @@ class AnimFrameEditSessionActiveState:
         layer: Scene.Layer,
         layerContent: Scene.AnimationLayerContent,
         frameIndex: Int,
-        onionSkinConfig: AnimEditorOnionSkinConfig?,
         editorToolState: AnimEditorToolState?,
-        frameSceneGraph: FrameSceneGraph,
-        activeDrawingManifest: AnimFrameEditorHelper.ActiveDrawingManifest
+        editContext: AnimFrameEditContext
     ) {
         self.projectManifest = projectManifest
         self.sceneManifest = sceneManifest
         self.layer = layer
         self.layerContent = layerContent
         self.frameIndex = frameIndex
-        self.onionSkinConfig = onionSkinConfig
         self.editorToolState = editorToolState
-        
-        self.frameSceneGraph = frameSceneGraph
-        self.activeDrawingManifest = activeDrawingManifest
+
+        self.editContext = editContext
         
         let drawingCanvasSize = layer.contentSize
         
@@ -86,19 +78,17 @@ class AnimFrameEditSessionActiveState:
     private func updateWorkspaceSceneGraph() {
         // TODO: Allow more customization from the tool?
         // Screen-space UI overlays, etc.
-        
+
         // We should probably also draw the outline of the
         // selected layer.
-        
+
         let activeDrawingTexture =
             toolState?.drawingCanvasTexture()
-        
+
         workspaceSceneGraph = workspaceSceneGraphGenerator
             .generate(
-                frameSceneGraph: frameSceneGraph,
-                activeDrawingManifest: activeDrawingManifest,
-                activeDrawingTexture: activeDrawingTexture,
-                onionSkinConfig: onionSkinConfig)
+                editContext: editContext,
+                activeDrawingTexture: activeDrawingTexture)
     }
     
     // MARK: - Interface
@@ -106,18 +96,18 @@ class AnimFrameEditSessionActiveState:
     func begin() {
 //        delegate?.setEditInteractionEnabled(
 //            self, enabled: true)
-        
-        if let activeDrawing = activeDrawingManifest.activeDrawing,
+
+        if let activeDrawing = editContext.activeDrawingContext.activeDrawing,
             let fullAssetID = activeDrawing.fullAssetID
         {
             let activeDrawingAsset = delegate?.asset(
                 self, assetID: fullAssetID)
-            
+
             if let texture = activeDrawingAsset?.texture {
                 toolState?.setDrawingCanvasTextureContents(texture)
             }
         }
-        
+
         updateWorkspaceSceneGraph()
     }
     
@@ -166,10 +156,10 @@ extension AnimFrameEditSessionActiveState:
         _ s: AnimFrameEditSessionToolState,
         imageSet: DrawingAssetProcessor.ImageSet
     ) {
-        guard let activeDrawing = activeDrawingManifest
-            .activeDrawing
+        guard let activeDrawing = editContext
+            .activeDrawingContext.activeDrawing
         else { return }
-        
+
         delegate?.onRequestEdit(
             self,
             drawingID: activeDrawing.id,
