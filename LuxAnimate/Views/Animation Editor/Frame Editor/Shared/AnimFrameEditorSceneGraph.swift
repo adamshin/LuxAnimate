@@ -1,17 +1,19 @@
 //
-//  AnimFrameEditContext.swift
+//  AnimFrameEditorSceneGraph.swift
 //
 
 import Foundation
 import Color
 
-/// Everything needed to draw and edit a specific frame.
+/// Animation frame editor scene graph.
 ///
-/// This context represents all the data required to render a frame in the animation editor,
-/// including the frame's scene graph structure, which drawings to show (including onion skin layers
-/// with pre-computed colors and alphas), and which assets need to be loaded.
-struct AnimFrameEditContext {
+/// An intermediate scene graph representation for the animation frame editor. Built from a FrameSceneGraph,
+/// this adds editor-specific information like which drawing is active (for live canvas replacement),
+/// onion skin layers with pre-computed colors/alphas, and asset IDs for loading. Gets converted to
+/// EditorWorkspaceSceneGraph for rendering.
+struct AnimFrameEditorSceneGraph {
 
+    let layer: Scene.Layer
     let frameSceneGraph: FrameSceneGraph
     let activeDrawingContext: ActiveDrawingContext
     let assetIDs: Set<String>
@@ -43,6 +45,8 @@ struct AnimFrameEditContext {
         frameIndex: Int,
         onionSkinConfig: AnimEditorOnionSkinConfig?
     ) {
+        self.layer = layer
+
         // Generate frame scene graph
         self.frameSceneGraph = FrameSceneGraphGenerator.generate(
             projectManifest: projectManifest,

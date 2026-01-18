@@ -59,16 +59,19 @@ class AnimFrameEditSession {
         delegate: Delegate?
     ) {
         self.delegate = delegate
-        
-        let loadingState = AnimFrameEditSessionLoadingState(
+
+        let sceneGraph = AnimFrameEditorSceneGraph(
             projectManifest: projectManifest,
             sceneManifest: sceneManifest,
             layer: layer,
             layerContent: layerContent,
             frameIndex: frameIndex,
-            onionSkinConfig: onionSkinConfig,
+            onionSkinConfig: onionSkinConfig)
+
+        let loadingState = AnimFrameEditSessionLoadingState(
+            sceneGraph: sceneGraph,
             editorToolState: editorToolState)
-        
+
         beginState(loadingState)
     }
     

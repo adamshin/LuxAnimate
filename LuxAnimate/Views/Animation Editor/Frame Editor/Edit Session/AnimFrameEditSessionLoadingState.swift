@@ -12,57 +12,29 @@ class AnimFrameEditSessionLoadingState:
         case invalidLayerContent
     }
     
-    private let projectManifest: Project.Manifest
-    private let sceneManifest: Scene.Manifest
-    private let layer: Scene.Layer
-    private let layerContent: Scene.AnimationLayerContent
-    private let frameIndex: Int
+    private let sceneGraph: AnimFrameEditorSceneGraph
     private let editorToolState: AnimEditorToolState?
 
-    private let editContext: AnimFrameEditContext
-    
     private var loadStartTime: TimeInterval = 0
-    
+
     weak var delegate: AnimFrameEditSessionStateDelegate?
-    
+
     // MARK: - Init
-    
+
     init(
-        projectManifest: Project.Manifest,
-        sceneManifest: Scene.Manifest,
-        layer: Scene.Layer,
-        layerContent: Scene.AnimationLayerContent,
-        frameIndex: Int,
-        onionSkinConfig: AnimEditorOnionSkinConfig?,
+        sceneGraph: AnimFrameEditorSceneGraph,
         editorToolState: AnimEditorToolState?
     ) {
-        self.projectManifest = projectManifest
-        self.sceneManifest = sceneManifest
-        self.layer = layer
-        self.layerContent = layerContent
-        self.frameIndex = frameIndex
+        self.sceneGraph = sceneGraph
         self.editorToolState = editorToolState
-
-        editContext = AnimFrameEditContext(
-            projectManifest: projectManifest,
-            sceneManifest: sceneManifest,
-            layer: layer,
-            layerContent: layerContent,
-            frameIndex: frameIndex,
-            onionSkinConfig: onionSkinConfig)
     }
     
     // MARK: - Logic
     
     private func beginActiveState() {
         let newState = AnimFrameEditSessionActiveState(
-            projectManifest: projectManifest,
-            sceneManifest: sceneManifest,
-            layer: layer,
-            layerContent: layerContent,
-            frameIndex: frameIndex,
-            editorToolState: editorToolState,
-            editContext: editContext)
+            sceneGraph: sceneGraph,
+            editorToolState: editorToolState)
 
         delegate?.changeState(self, newState: newState)
     }
@@ -75,7 +47,7 @@ class AnimFrameEditSessionLoadingState:
 
         loadStartTime = ProcessInfo.processInfo.systemUptime
 
-        delegate?.loadAssets(self, assetIDs: editContext.assetIDs)
+        delegate?.loadAssets(self, assetIDs: sceneGraph.assetIDs)
     }
     
     func onFrame() -> EditorWorkspaceSceneGraph? { nil }
@@ -84,7 +56,7 @@ class AnimFrameEditSessionLoadingState:
         guard let delegate else { return }
 
         if delegate.hasLoadedAssets(
-            self, assetIDs: editContext.assetIDs)
+            self, assetIDs: sceneGraph.assetIDs)
         {
 //            let loadEndTime = ProcessInfo.processInfo.systemUptime
 //            let loadTime = loadEndTime - loadStartTime

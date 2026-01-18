@@ -9,15 +9,7 @@ import Metal
 class AnimFrameEditSessionActiveState:
     AnimFrameEditSessionState {
     
-    private let projectManifest: Project.Manifest
-    private let sceneManifest: Scene.Manifest
-    private let layer: Scene.Layer
-    private let layerContent: Scene.AnimationLayerContent
-    private let frameIndex: Int
-    private let editorToolState: AnimEditorToolState?
-
-    private let editContext: AnimFrameEditContext
-    
+    private let sceneGraph: AnimFrameEditorSceneGraph
     private let toolState: AnimFrameEditSessionToolState?
     
     private let workspaceSceneGraphGenerator
@@ -31,37 +23,25 @@ class AnimFrameEditSessionActiveState:
     // MARK: - Init
     
     init(
-        projectManifest: Project.Manifest,
-        sceneManifest: Scene.Manifest,
-        layer: Scene.Layer,
-        layerContent: Scene.AnimationLayerContent,
-        frameIndex: Int,
-        editorToolState: AnimEditorToolState?,
-        editContext: AnimFrameEditContext
+        sceneGraph: AnimFrameEditorSceneGraph,
+        editorToolState: AnimEditorToolState?
     ) {
-        self.projectManifest = projectManifest
-        self.sceneManifest = sceneManifest
-        self.layer = layer
-        self.layerContent = layerContent
-        self.frameIndex = frameIndex
-        self.editorToolState = editorToolState
+        self.sceneGraph = sceneGraph
 
-        self.editContext = editContext
-        
-        let drawingCanvasSize = layer.contentSize
-        
+        let drawingCanvasSize = sceneGraph.layer.contentSize
+
         if let editorToolState {
             switch editorToolState {
             case let state as AnimEditorPaintToolState:
                 toolState = AnimFrameEditSessionPaintToolState(
                     editorToolState: state,
                     drawingCanvasSize: drawingCanvasSize)
-                
+
             case let state as AnimEditorEraseToolState:
                 toolState = AnimFrameEditSessionEraseToolState(
                     editorToolState: state,
                     drawingCanvasSize: drawingCanvasSize)
-                
+
             default:
                 toolState = nil
             }
@@ -69,7 +49,7 @@ class AnimFrameEditSessionActiveState:
             toolState = nil
         }
         toolState?.delegate = self
-        
+
         workspaceSceneGraphGenerator.delegate = self
     }
     
@@ -87,7 +67,7 @@ class AnimFrameEditSessionActiveState:
 
         workspaceSceneGraph = workspaceSceneGraphGenerator
             .generate(
-                editContext: editContext,
+                sceneGraph: sceneGraph,
                 activeDrawingTexture: activeDrawingTexture)
     }
     
@@ -97,7 +77,7 @@ class AnimFrameEditSessionActiveState:
 //        delegate?.setEditInteractionEnabled(
 //            self, enabled: true)
 
-        if let activeDrawing = editContext.activeDrawingContext.activeDrawing,
+        if let activeDrawing = sceneGraph.activeDrawingContext.activeDrawing,
             let fullAssetID = activeDrawing.fullAssetID
         {
             let activeDrawingAsset = delegate?.asset(
@@ -143,20 +123,20 @@ extension AnimFrameEditSessionActiveState:
     func layerContentSize(
         _ s: AnimFrameEditSessionToolState
     ) -> Size {
-        Size(layer.contentSize)
+        Size(sceneGraph.layer.contentSize)
     }
-    
+
     func layerTransform(
         _ s: AnimFrameEditSessionToolState
     ) -> Matrix3 {
-        layer.transform
+        sceneGraph.layer.transform
     }
     
     func onRequestEdit(
         _ s: AnimFrameEditSessionToolState,
         imageSet: DrawingAssetProcessor.ImageSet
     ) {
-        guard let activeDrawing = editContext
+        guard let activeDrawing = sceneGraph
             .activeDrawingContext.activeDrawing
         else { return }
 

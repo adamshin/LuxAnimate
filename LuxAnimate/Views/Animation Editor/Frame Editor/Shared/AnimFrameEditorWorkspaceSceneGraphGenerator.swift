@@ -22,7 +22,7 @@ class AnimFrameEditorWorkspaceSceneGraphGenerator {
     weak var delegate: AnimFrameEditorWorkspaceSceneGraphGeneratorDelegate?
     
     func generate(
-        editContext: AnimFrameEditContext,
+        sceneGraph: AnimFrameEditorSceneGraph,
         activeDrawingTexture: MTLTexture?
     ) -> EditorWorkspaceSceneGraph {
 
@@ -30,30 +30,30 @@ class AnimFrameEditorWorkspaceSceneGraphGenerator {
 
         let backgroundLayer = EditorWorkspaceSceneGraph.Layer(
             content: .rect(.init(
-                color: editContext.frameSceneGraph.backgroundColor)),
-            contentSize: editContext.frameSceneGraph.contentSize,
+                color: sceneGraph.frameSceneGraph.backgroundColor)),
+            contentSize: sceneGraph.frameSceneGraph.contentSize,
             transform: .identity,
             alpha: 1)
 
         outputLayers.append(backgroundLayer)
 
-        for layer in editContext.frameSceneGraph.layers {
+        for layer in sceneGraph.frameSceneGraph.layers {
             let layerOutputLayers = outputLayersForLayer(
                 layer: layer,
-                editContext: editContext,
+                sceneGraph: sceneGraph,
                 activeDrawingTexture: activeDrawingTexture)
 
             outputLayers.append(contentsOf: layerOutputLayers)
         }
 
         return EditorWorkspaceSceneGraph(
-            contentSize: editContext.frameSceneGraph.contentSize,
+            contentSize: sceneGraph.frameSceneGraph.contentSize,
             layers: outputLayers)
     }
     
     private func outputLayersForLayer(
         layer: FrameSceneGraph.Layer,
-        editContext: AnimFrameEditContext,
+        sceneGraph: AnimFrameEditorSceneGraph,
         activeDrawingTexture: MTLTexture?
     ) -> [EditorWorkspaceSceneGraph.Layer] {
 
@@ -62,7 +62,7 @@ class AnimFrameEditorWorkspaceSceneGraphGenerator {
             return outputLayersForDrawingLayer(
                 layer: layer,
                 drawingLayerContent: drawingLayerContent,
-                editContext: editContext,
+                sceneGraph: sceneGraph,
                 activeDrawingTexture: activeDrawingTexture)
         }
     }
@@ -70,15 +70,15 @@ class AnimFrameEditorWorkspaceSceneGraphGenerator {
     private func outputLayersForDrawingLayer(
         layer: FrameSceneGraph.Layer,
         drawingLayerContent: FrameSceneGraph.DrawingLayerContent,
-        editContext: AnimFrameEditContext,
+        sceneGraph: AnimFrameEditorSceneGraph,
         activeDrawingTexture: MTLTexture?
     ) -> [EditorWorkspaceSceneGraph.Layer] {
 
-        if drawingLayerContent.drawing.id == editContext.activeDrawingContext.activeDrawing?.id {
+        if drawingLayerContent.drawing.id == sceneGraph.activeDrawingContext.activeDrawing?.id {
             return outputLayersForActiveDrawingLayer(
                 layer: layer,
                 drawingLayerContent: drawingLayerContent,
-                editContext: editContext,
+                sceneGraph: sceneGraph,
                 activeDrawingTexture: activeDrawingTexture)
 
         } else {
@@ -91,21 +91,21 @@ class AnimFrameEditorWorkspaceSceneGraphGenerator {
     private func outputLayersForActiveDrawingLayer(
         layer: FrameSceneGraph.Layer,
         drawingLayerContent: FrameSceneGraph.DrawingLayerContent,
-        editContext: AnimFrameEditContext,
+        sceneGraph: AnimFrameEditorSceneGraph,
         activeDrawingTexture: MTLTexture?
     ) -> [EditorWorkspaceSceneGraph.Layer] {
 
         var outputLayers: [EditorWorkspaceSceneGraph.Layer] = []
 
         // Previous onion skin layers with pre-computed colors
-        for onionDrawing in editContext.activeDrawingContext.prevOnionSkinDrawings {
+        for onionDrawing in sceneGraph.activeDrawingContext.prevOnionSkinDrawings {
             outputLayers.append(outputLayerForOnionSkinDrawing(
                 layer: layer,
                 onionDrawing: onionDrawing))
         }
 
         // Next onion skin layers with pre-computed colors
-        for onionDrawing in editContext.activeDrawingContext.nextOnionSkinDrawings {
+        for onionDrawing in sceneGraph.activeDrawingContext.nextOnionSkinDrawings {
             outputLayers.append(outputLayerForOnionSkinDrawing(
                 layer: layer,
                 onionDrawing: onionDrawing))
@@ -134,7 +134,7 @@ class AnimFrameEditorWorkspaceSceneGraphGenerator {
     
     private func outputLayerForOnionSkinDrawing(
         layer: FrameSceneGraph.Layer,
-        onionDrawing: AnimFrameEditContext.ActiveDrawingContext.OnionSkinDrawing
+        onionDrawing: AnimFrameEditorSceneGraph.ActiveDrawingContext.OnionSkinDrawing
     ) -> EditorWorkspaceSceneGraph.Layer {
 
         let texture = onionDrawing.drawing.fullAssetID.flatMap {
