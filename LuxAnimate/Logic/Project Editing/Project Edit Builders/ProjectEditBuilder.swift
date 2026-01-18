@@ -31,9 +31,9 @@ struct ProjectEditBuilder {
             throw Error.invalidSceneID
         }
         
-        // Generate scene render manifest
+        // Build scene render manifest
         let sceneRenderManifest =
-            SceneRenderManifestGenerator.generate(
+            SceneRenderManifestBuilder.build(
                 projectManifest: projectManifest,
                 sceneManifest: sceneEdit.sceneManifest)
         
@@ -96,9 +96,9 @@ struct ProjectEditBuilder {
             backgroundColor: backgroundColor,
             layers: [])
         
-        // Generate scene render manifest
+        // Build scene render manifest
         let sceneRenderManifest =
-            SceneRenderManifestGenerator.generate(
+            SceneRenderManifestBuilder.build(
                 projectManifest: projectManifest,
                 sceneManifest: sceneManifest)
         

@@ -48,7 +48,7 @@ struct AnimFrameEditorSceneGraph {
         self.layer = layer
 
         // Generate frame scene graph
-        self.frameSceneGraph = FrameSceneGraphGenerator.generate(
+        self.frameSceneGraph = FrameSceneGraphBuilder.build(
             projectManifest: projectManifest,
             sceneManifest: sceneManifest,
             frameIndex: frameIndex)

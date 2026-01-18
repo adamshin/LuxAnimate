@@ -1,19 +1,19 @@
 //
-//  FrameSceneGraphGenerator.swift
+//  FrameSceneGraphBuilder.swift
 //
 
 import Foundation
 import Geometry
 
-struct FrameSceneGraphGenerator {
+struct FrameSceneGraphBuilder {
     
-    static func generate(
+    static func build(
         projectManifest: Project.Manifest,
         sceneManifest: Scene.Manifest,
         frameIndex: Int
     ) -> FrameSceneGraph {
         
-        let sceneGraphs = generate(
+        let sceneGraphs = build(
             projectManifest: projectManifest,
             sceneManifest: sceneManifest,
             frameIndexes: [frameIndex])
@@ -21,7 +21,7 @@ struct FrameSceneGraphGenerator {
         return sceneGraphs.first!
     }
     
-    static func generate(
+    static func build(
         projectManifest: Project.Manifest,
         sceneManifest: Scene.Manifest,
         frameIndexes: [Int]
