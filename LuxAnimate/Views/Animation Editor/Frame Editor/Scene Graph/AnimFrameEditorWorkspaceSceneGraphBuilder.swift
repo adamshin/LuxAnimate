@@ -1,5 +1,5 @@
 //
-//  AnimFrameEditorWorkspaceSceneGraphGenerator.swift
+//  AnimFrameEditorWorkspaceSceneGraphBuilder.swift
 //
 
 import Metal
@@ -7,21 +7,21 @@ import Render
 import Color
 
 @MainActor
-protocol AnimFrameEditorWorkspaceSceneGraphGeneratorDelegate: AnyObject {
+protocol AnimFrameEditorWorkspaceSceneGraphBuilderDelegate: AnyObject {
     
     func assetTexture(
-        _ g: AnimFrameEditorWorkspaceSceneGraphGenerator,
+        _ g: AnimFrameEditorWorkspaceSceneGraphBuilder,
         assetID: String
     ) -> MTLTexture?
     
 }
 
 @MainActor
-class AnimFrameEditorWorkspaceSceneGraphGenerator {
+class AnimFrameEditorWorkspaceSceneGraphBuilder {
     
-    weak var delegate: AnimFrameEditorWorkspaceSceneGraphGeneratorDelegate?
+    weak var delegate: AnimFrameEditorWorkspaceSceneGraphBuilderDelegate?
     
-    func generate(
+    func build(
         sceneGraph: AnimFrameEditorSceneGraph,
         activeDrawingTexture: MTLTexture?
     ) -> EditorWorkspaceSceneGraph {

@@ -12,8 +12,8 @@ class AnimFrameEditSessionActiveState:
     private let sceneGraph: AnimFrameEditorSceneGraph
     private let toolState: AnimFrameEditSessionToolState?
     
-    private let workspaceSceneGraphGenerator
-        = AnimFrameEditorWorkspaceSceneGraphGenerator()
+    private let workspaceSceneGraphBuilder
+        = AnimFrameEditorWorkspaceSceneGraphBuilder()
     
     private var workspaceSceneGraph:
         EditorWorkspaceSceneGraph?
@@ -50,7 +50,7 @@ class AnimFrameEditSessionActiveState:
         }
         toolState?.delegate = self
 
-        workspaceSceneGraphGenerator.delegate = self
+        workspaceSceneGraphBuilder.delegate = self
     }
     
     // MARK: - Logic
@@ -58,15 +58,15 @@ class AnimFrameEditSessionActiveState:
     private func updateWorkspaceSceneGraph() {
         // TODO: Allow more customization from the tool?
         // Screen-space UI overlays, etc.
-
+        
         // We should probably also draw the outline of the
         // selected layer.
-
+        
         let activeDrawingTexture =
             toolState?.drawingCanvasTexture()
-
-        workspaceSceneGraph = workspaceSceneGraphGenerator
-            .generate(
+        
+        workspaceSceneGraph = workspaceSceneGraphBuilder
+            .build(
                 sceneGraph: sceneGraph,
                 activeDrawingTexture: activeDrawingTexture)
     }
@@ -77,17 +77,18 @@ class AnimFrameEditSessionActiveState:
 //        delegate?.setEditInteractionEnabled(
 //            self, enabled: true)
 
-        if let activeDrawing = sceneGraph.activeDrawingContext.activeDrawing,
+        if let activeDrawing = sceneGraph
+                .activeDrawingContext.activeDrawing,
             let fullAssetID = activeDrawing.fullAssetID
         {
             let activeDrawingAsset = delegate?.asset(
                 self, assetID: fullAssetID)
-
+            
             if let texture = activeDrawingAsset?.texture {
                 toolState?.setDrawingCanvasTextureContents(texture)
             }
         }
-
+        
         updateWorkspaceSceneGraph()
     }
     
@@ -149,10 +150,10 @@ extension AnimFrameEditSessionActiveState:
 }
 
 extension AnimFrameEditSessionActiveState:
-    AnimFrameEditorWorkspaceSceneGraphGeneratorDelegate {
+    AnimFrameEditorWorkspaceSceneGraphBuilderDelegate {
     
     func assetTexture(
-        _ g: AnimFrameEditorWorkspaceSceneGraphGenerator,
+        _ g: AnimFrameEditorWorkspaceSceneGraphBuilder,
         assetID: String
     ) -> MTLTexture? {
         
