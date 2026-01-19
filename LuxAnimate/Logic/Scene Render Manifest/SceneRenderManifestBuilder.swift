@@ -1,20 +1,20 @@
 //
-//  SceneRenderManifestGenerator.swift
+//  SceneRenderManifestBuilder.swift
 //
 
 import Foundation
 
-struct SceneRenderManifestGenerator {
+struct SceneRenderManifestBuilder {
     
-    static func generate(
+    static func build(
         projectManifest: Project.Manifest,
         sceneManifest: Scene.Manifest
     ) -> Scene.RenderManifest {
         
         let frameIndexes = Array(0 ..< sceneManifest.frameCount)
         
-        let frameSceneGraphs = FrameSceneGraphGenerator
-            .generate(
+        let frameSceneGraphs = FrameSceneGraphBuilder
+            .build(
                 projectManifest: projectManifest,
                 sceneManifest: sceneManifest,
                 frameIndexes: frameIndexes)

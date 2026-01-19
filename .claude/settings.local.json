@@ -8,7 +8,8 @@
       "Bash(tree:*)",
       "Bash(ls:*)",
       "Bash(git log:*)",
-      "Bash(xcodebuild:*)"
+      "Bash(xcodebuild:*)",
+      "Bash(git mv:*)"
     ]
   }
 }
