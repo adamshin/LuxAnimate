@@ -54,7 +54,7 @@ struct AnimFrameEditorSceneGraph {
             frameIndex: frameIndex)
 
         // Resolve active drawing with pre-computed colors/alphas
-        self.activeDrawingContext = Self.resolveActiveDrawing(
+        self.activeDrawingContext = Self.buildActiveDrawingContext(
             layerContent: layerContent,
             frameIndex: frameIndex,
             onionSkinConfig: onionSkinConfig)
@@ -67,7 +67,7 @@ struct AnimFrameEditorSceneGraph {
 
     // MARK: - Active Drawing Resolution
 
-    private static func resolveActiveDrawing(
+    private static func buildActiveDrawingContext(
         layerContent: Scene.AnimationLayerContent,
         frameIndex: Int,
         onionSkinConfig: AnimEditorOnionSkinConfig?
@@ -86,50 +86,68 @@ struct AnimFrameEditorSceneGraph {
         var prevOnionSkinDrawings: [ActiveDrawingContext.OnionSkinDrawing] = []
         var nextOnionSkinDrawings: [ActiveDrawingContext.OnionSkinDrawing] = []
 
-        if let activeDrawingIndex {
+        if let activeDrawingIndex, let config = onionSkinConfig {
             activeDrawing = sortedDrawings[activeDrawingIndex]
 
-            if let config = onionSkinConfig {
-                // Build previous onion skin layers with pre-computed colors/alphas
-                var prevDrawingIndex = activeDrawingIndex
-                for offset in 1...config.prevCount {
-                    prevDrawingIndex -= 1
-                    if sortedDrawings.indices.contains(prevDrawingIndex) {
-                        let drawing = sortedDrawings[prevDrawingIndex]
-                        let alpha = config.alpha - config.alphaFalloff * Double(offset)
-                        let tintColor = config.prevColor.withAlpha(alpha)
+            // Build previous onion skin layers
+            prevOnionSkinDrawings = buildOnionSkinLayers(
+                sortedDrawings: sortedDrawings,
+                startIndex: activeDrawingIndex,
+                count: config.prevCount,
+                direction: -1,
+                baseColor: config.prevColor,
+                alpha: config.alpha,
+                alphaFalloff: config.alphaFalloff)
 
-                        prevOnionSkinDrawings.append(
-                            ActiveDrawingContext.OnionSkinDrawing(
-                                drawing: drawing,
-                                tintColor: tintColor,
-                                alpha: alpha))
-                    }
-                }
+            // Build next onion skin layers
+            nextOnionSkinDrawings = buildOnionSkinLayers(
+                sortedDrawings: sortedDrawings,
+                startIndex: activeDrawingIndex,
+                count: config.nextCount,
+                direction: 1,
+                baseColor: config.nextColor,
+                alpha: config.alpha,
+                alphaFalloff: config.alphaFalloff)
 
-                // Build next onion skin layers with pre-computed colors/alphas
-                var nextDrawingIndex = activeDrawingIndex
-                for offset in 1...config.nextCount {
-                    nextDrawingIndex += 1
-                    if sortedDrawings.indices.contains(nextDrawingIndex) {
-                        let drawing = sortedDrawings[nextDrawingIndex]
-                        let alpha = config.alpha - config.alphaFalloff * Double(offset)
-                        let tintColor = config.nextColor.withAlpha(alpha)
-
-                        nextOnionSkinDrawings.append(
-                            ActiveDrawingContext.OnionSkinDrawing(
-                                drawing: drawing,
-                                tintColor: tintColor,
-                                alpha: alpha))
-                    }
-                }
-            }
+        } else if let activeDrawingIndex {
+            activeDrawing = sortedDrawings[activeDrawingIndex]
         }
 
         return ActiveDrawingContext(
             activeDrawing: activeDrawing,
             prevOnionSkinDrawings: prevOnionSkinDrawings,
             nextOnionSkinDrawings: nextOnionSkinDrawings)
+    }
+
+    private static func buildOnionSkinLayers(
+        sortedDrawings: [Scene.Drawing],
+        startIndex: Int,
+        count: Int,
+        direction: Int,
+        baseColor: Color,
+        alpha: Double,
+        alphaFalloff: Double
+    ) -> [ActiveDrawingContext.OnionSkinDrawing] {
+
+        var layers: [ActiveDrawingContext.OnionSkinDrawing] = []
+        var index = startIndex
+
+        for offset in 1...count {
+            index += direction
+            if sortedDrawings.indices.contains(index) {
+                let drawing = sortedDrawings[index]
+                let layerAlpha = alpha - alphaFalloff * Double(offset)
+                let tintColor = baseColor.withAlpha(layerAlpha)
+
+                layers.append(
+                    ActiveDrawingContext.OnionSkinDrawing(
+                        drawing: drawing,
+                        tintColor: tintColor,
+                        alpha: layerAlpha))
+            }
+        }
+
+        return layers
     }
 
     // MARK: - Asset Collection
