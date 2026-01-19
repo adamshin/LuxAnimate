@@ -20,7 +20,7 @@ struct FrameSceneGraph: Codable {
     }
     
     struct DrawingLayerContent: Codable {
-        var drawing: Scene.Drawing
+        var drawing: Project.Drawing
     }
     
     var contentSize: Size
