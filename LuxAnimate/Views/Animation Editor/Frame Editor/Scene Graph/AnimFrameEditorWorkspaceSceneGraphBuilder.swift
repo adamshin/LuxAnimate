@@ -7,7 +7,8 @@ import Render
 import Color
 
 @MainActor
-protocol AnimFrameEditorWorkspaceSceneGraphBuilderDelegate: AnyObject {
+protocol AnimFrameEditorWorkspaceSceneGraphBuilderDelegate:
+    AnyObject {
     
     func assetTexture(
         _ g: AnimFrameEditorWorkspaceSceneGraphBuilder,
@@ -19,167 +20,148 @@ protocol AnimFrameEditorWorkspaceSceneGraphBuilderDelegate: AnyObject {
 @MainActor
 class AnimFrameEditorWorkspaceSceneGraphBuilder {
     
-    weak var delegate: AnimFrameEditorWorkspaceSceneGraphBuilderDelegate?
+    weak var delegate:
+        AnimFrameEditorWorkspaceSceneGraphBuilderDelegate?
     
     func build(
         sceneGraph: AnimFrameEditorSceneGraph,
         activeDrawingTexture: MTLTexture?
     ) -> EditorWorkspaceSceneGraph {
-
-        var outputLayers: [EditorWorkspaceSceneGraph.Layer] = []
-
-        let backgroundLayer = EditorWorkspaceSceneGraph.Layer(
-            content: .rect(.init(
-                color: sceneGraph.frameSceneGraph.backgroundColor)),
-            contentSize: sceneGraph.frameSceneGraph.contentSize,
+        
+        let contentSize = sceneGraph
+            .frameSceneGraph.contentSize
+        
+        var layers: [EditorWorkspaceSceneGraph.Layer] = []
+        
+        buildBackgroundLayer(
+            sceneGraph: sceneGraph,
+            output: &layers)
+        
+        buildContentLayers(
+            sceneGraph: sceneGraph,
+            activeDrawingTexture: activeDrawingTexture,
+            output: &layers)
+        
+        return EditorWorkspaceSceneGraph(
+            contentSize: contentSize,
+            layers: layers)
+    }
+    
+    private func buildBackgroundLayer(
+        sceneGraph: AnimFrameEditorSceneGraph,
+        output: inout [EditorWorkspaceSceneGraph.Layer]
+    ) {
+        let color = sceneGraph
+            .frameSceneGraph.backgroundColor
+        let contentSize = sceneGraph
+            .frameSceneGraph.contentSize
+        
+        let l = EditorWorkspaceSceneGraph.Layer(
+            content: .rect(.init(color: color)),
+            contentSize: contentSize,
             transform: .identity,
             alpha: 1)
-
-        outputLayers.append(backgroundLayer)
-
+        
+        output.append(l)
+    }
+    
+    private func buildContentLayers(
+        sceneGraph: AnimFrameEditorSceneGraph,
+        activeDrawingTexture: MTLTexture?,
+        output: inout [EditorWorkspaceSceneGraph.Layer]
+    ) {
         for layer in sceneGraph.frameSceneGraph.layers {
-            let layerOutputLayers = outputLayersForLayer(
-                layer: layer,
-                sceneGraph: sceneGraph,
-                activeDrawingTexture: activeDrawingTexture)
-
-            outputLayers.append(contentsOf: layerOutputLayers)
-        }
-
-        return EditorWorkspaceSceneGraph(
-            contentSize: sceneGraph.frameSceneGraph.contentSize,
-            layers: outputLayers)
-    }
-    
-    private func outputLayersForLayer(
-        layer: FrameSceneGraph.Layer,
-        sceneGraph: AnimFrameEditorSceneGraph,
-        activeDrawingTexture: MTLTexture?
-    ) -> [EditorWorkspaceSceneGraph.Layer] {
-
-        switch layer.content {
-        case .drawing(let drawingLayerContent):
-            return outputLayersForDrawingLayer(
-                layer: layer,
-                drawingLayerContent: drawingLayerContent,
-                sceneGraph: sceneGraph,
-                activeDrawingTexture: activeDrawingTexture)
-        }
-    }
-    
-    private func outputLayersForDrawingLayer(
-        layer: FrameSceneGraph.Layer,
-        drawingLayerContent: FrameSceneGraph.DrawingLayerContent,
-        sceneGraph: AnimFrameEditorSceneGraph,
-        activeDrawingTexture: MTLTexture?
-    ) -> [EditorWorkspaceSceneGraph.Layer] {
-
-        if drawingLayerContent.drawing.id == sceneGraph.activeDrawingContext.activeDrawing?.id {
-            return outputLayersForActiveDrawingLayer(
-                layer: layer,
-                drawingLayerContent: drawingLayerContent,
-                sceneGraph: sceneGraph,
-                activeDrawingTexture: activeDrawingTexture)
-
-        } else {
-            return outputLayersForInactiveDrawingLayer(
-                layer: layer,
-                drawingLayerContent: drawingLayerContent)
-        }
-    }
-    
-    private func outputLayersForActiveDrawingLayer(
-        layer: FrameSceneGraph.Layer,
-        drawingLayerContent: FrameSceneGraph.DrawingLayerContent,
-        sceneGraph: AnimFrameEditorSceneGraph,
-        activeDrawingTexture: MTLTexture?
-    ) -> [EditorWorkspaceSceneGraph.Layer] {
-
-        var outputLayers: [EditorWorkspaceSceneGraph.Layer] = []
-
-        // Previous onion skin layers with pre-computed colors
-        for onionDrawing in sceneGraph.activeDrawingContext.prevOnionSkinDrawings {
-            outputLayers.append(outputLayerForOnionSkinDrawing(
-                layer: layer,
-                onionDrawing: onionDrawing))
-        }
-
-        // Next onion skin layers with pre-computed colors
-        for onionDrawing in sceneGraph.activeDrawingContext.nextOnionSkinDrawings {
-            outputLayers.append(outputLayerForOnionSkinDrawing(
-                layer: layer,
-                onionDrawing: onionDrawing))
-        }
-
-        // Active drawing
-        outputLayers.append(outputLayerForDrawingLayer(
-            layer: layer,
-            drawing: drawingLayerContent.drawing,
-            replacementTexture: activeDrawingTexture))
-
-        return outputLayers
-    }
-    
-    private func outputLayersForInactiveDrawingLayer(
-        layer: FrameSceneGraph.Layer,
-        drawingLayerContent: FrameSceneGraph.DrawingLayerContent
-    ) -> [EditorWorkspaceSceneGraph.Layer] {
-        
-        let outputLayer = outputLayerForDrawingLayer(
-            layer: layer,
-            drawing: drawingLayerContent.drawing)
-        
-        return [outputLayer]
-    }
-    
-    private func outputLayerForOnionSkinDrawing(
-        layer: FrameSceneGraph.Layer,
-        onionDrawing: AnimFrameEditorSceneGraph.OnionSkinDrawing
-    ) -> EditorWorkspaceSceneGraph.Layer {
-
-        let texture = onionDrawing.drawing.fullAssetID.flatMap {
-            delegate?.assetTexture(self, assetID: $0)
-        }
-
-        let imageLayerContent = EditorWorkspaceSceneGraph
-            .ImageLayerContent(
-                texture: texture,
-                colorMode: .stencil,
-                color: onionDrawing.tintColor)
-
-        return EditorWorkspaceSceneGraph.Layer(
-            content: .image(imageLayerContent),
-            contentSize: layer.contentSize,
-            transform: layer.transform,
-            alpha: layer.alpha)
-    }
-
-    private func outputLayerForDrawingLayer(
-        layer: FrameSceneGraph.Layer,
-        drawing: Scene.Drawing,
-        replacementTexture: MTLTexture? = nil
-    ) -> EditorWorkspaceSceneGraph.Layer {
-
-        let texture: MTLTexture?
-        if let replacementTexture {
-            texture = replacementTexture
-        } else {
-            texture = drawing.fullAssetID.flatMap {
-                delegate?.assetTexture(self, assetID: $0)
+            switch layer.content {
+            case .drawing(let drawingLayerContent):
+                buildLayersForDrawingLayer(
+                    layer: layer,
+                    drawingLayerContent: drawingLayerContent,
+                    sceneGraph: sceneGraph,
+                    activeDrawingTexture: activeDrawingTexture,
+                    output: &output)
             }
         }
-
-        let imageLayerContent = EditorWorkspaceSceneGraph
-            .ImageLayerContent(
+    }
+    
+    private func buildLayersForDrawingLayer(
+        layer: FrameSceneGraph.Layer,
+        drawingLayerContent: FrameSceneGraph.DrawingLayerContent,
+        sceneGraph: AnimFrameEditorSceneGraph,
+        activeDrawingTexture: MTLTexture?,
+        output: inout [EditorWorkspaceSceneGraph.Layer]
+    ) {
+        let isActiveDrawing =
+            drawingLayerContent.drawing.id ==
+            sceneGraph.activeDrawingContext.activeDrawing?.id
+        
+        if isActiveDrawing {
+            buildLayersForActiveDrawing(
+                layer: layer,
+                drawing: drawingLayerContent.drawing,
+                sceneGraph: sceneGraph,
+                activeDrawingTexture: activeDrawingTexture,
+                output: &output)
+        } else {
+            buildLayerForDrawing(
+                layer: layer,
+                drawing: drawingLayerContent.drawing,
+                output: &output)
+        }
+    }
+    
+    private func buildLayersForActiveDrawing(
+        layer: FrameSceneGraph.Layer,
+        drawing: Scene.Drawing,
+        sceneGraph: AnimFrameEditorSceneGraph,
+        activeDrawingTexture: MTLTexture?,
+        output: inout [EditorWorkspaceSceneGraph.Layer]
+    ) {
+        for drawing in sceneGraph
+            .activeDrawingContext.onionSkinDrawings
+        {
+            buildLayerForDrawing(
+                layer: layer,
+                drawing: drawing.drawing,
+                colorMode: .stencil,
+                color: drawing.tintColor,
+                output: &output)
+        }
+        
+        buildLayerForDrawing(
+            layer: layer,
+            drawing: drawing,
+            overrideTexture: activeDrawingTexture,
+            output: &output)
+    }
+    
+    private func buildLayerForDrawing(
+        layer: FrameSceneGraph.Layer,
+        drawing: Scene.Drawing,
+        overrideTexture: MTLTexture? = nil,
+        colorMode: ColorMode = .none,
+        color: Color = .clear,
+        output: inout [EditorWorkspaceSceneGraph.Layer]
+    ) {
+        let texture: MTLTexture?
+        if let overrideTexture {
+            texture = overrideTexture
+        } else if let assetID = drawing.fullAssetID {
+            texture = delegate?
+                .assetTexture(self, assetID: assetID)
+        } else {
+            texture = nil
+        }
+        
+        let o = EditorWorkspaceSceneGraph.Layer(
+            content: .image(.init(
                 texture: texture,
-                colorMode: .none,
-                color: .clear)
-
-        return EditorWorkspaceSceneGraph.Layer(
-            content: .image(imageLayerContent),
+                colorMode: colorMode,
+                color: color)),
             contentSize: layer.contentSize,
             transform: layer.transform,
             alpha: layer.alpha)
+        
+        output.append(o)
     }
     
 }

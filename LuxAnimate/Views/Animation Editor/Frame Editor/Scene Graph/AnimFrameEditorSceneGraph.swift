@@ -9,8 +9,7 @@ extension AnimFrameEditorSceneGraph {
     
     struct ActiveDrawingContext {
         let activeDrawing: Scene.Drawing?
-        let prevOnionSkinDrawings: [OnionSkinDrawing]
-        let nextOnionSkinDrawings: [OnionSkinDrawing]
+        let onionSkinDrawings: [OnionSkinDrawing]
     }
     
     struct OnionSkinDrawing {
@@ -45,17 +44,18 @@ struct AnimFrameEditorSceneGraph {
             sceneManifest: sceneManifest,
             frameIndex: frameIndex)
         
-        activeDrawingContext = Self.activeDrawingContext(
-            layerContent: layerContent,
-            frameIndex: frameIndex,
-            onionSkinConfig: onionSkinConfig)
+        activeDrawingContext =
+            Self.buildActiveDrawingContext(
+                layerContent: layerContent,
+                frameIndex: frameIndex,
+                onionSkinConfig: onionSkinConfig)
         
         assetIDs = Self.collectAssetIDs(
             frameSceneGraph: frameSceneGraph,
             activeDrawingContext: activeDrawingContext)
     }
     
-    private static func activeDrawingContext(
+    private static func buildActiveDrawingContext(
         layerContent: Scene.AnimationLayerContent,
         frameIndex: Int,
         onionSkinConfig: AnimEditorOnionSkinConfig?
@@ -71,17 +71,15 @@ struct AnimFrameEditorSceneGraph {
         guard let activeDrawingIndex else {
             return ActiveDrawingContext(
                 activeDrawing: nil,
-                prevOnionSkinDrawings: [],
-                nextOnionSkinDrawings: [])
+                onionSkinDrawings: [])
         }
         
         let activeDrawing = sortedDrawings[activeDrawingIndex]
         
-        let prevOnionSkinDrawings: [OnionSkinDrawing]
-        let nextOnionSkinDrawings: [OnionSkinDrawing]
+        let onionSkinDrawings: [OnionSkinDrawing]
         
         if let config = onionSkinConfig {
-            prevOnionSkinDrawings = onionSkinDrawings(
+            let prevDrawings = buildOnionSkinDrawings(
                 sortedDrawings: sortedDrawings,
                 activeDrawingIndex: activeDrawingIndex,
                 direction: -1,
@@ -90,7 +88,7 @@ struct AnimFrameEditorSceneGraph {
                 alpha: config.alpha,
                 alphaFalloff: config.alphaFalloff)
             
-            nextOnionSkinDrawings = onionSkinDrawings(
+            let nextDrawings = buildOnionSkinDrawings(
                 sortedDrawings: sortedDrawings,
                 activeDrawingIndex: activeDrawingIndex,
                 direction: 1,
@@ -99,18 +97,18 @@ struct AnimFrameEditorSceneGraph {
                 alpha: config.alpha,
                 alphaFalloff: config.alphaFalloff)
             
+            onionSkinDrawings = prevDrawings + nextDrawings
+            
         } else {
-            prevOnionSkinDrawings = []
-            nextOnionSkinDrawings = []
+            onionSkinDrawings = []
         }
         
         return ActiveDrawingContext(
             activeDrawing: activeDrawing,
-            prevOnionSkinDrawings: prevOnionSkinDrawings,
-            nextOnionSkinDrawings: nextOnionSkinDrawings)
+            onionSkinDrawings: onionSkinDrawings)
     }
     
-    private static func onionSkinDrawings(
+    private static func buildOnionSkinDrawings(
         sortedDrawings: [Scene.Drawing],
         activeDrawingIndex: Int,
         direction: Int,
@@ -164,13 +162,7 @@ struct AnimFrameEditorSceneGraph {
             assetIDs.insert(assetID)
         }
         
-        for onionSkinDrawing in activeDrawingContext.prevOnionSkinDrawings {
-            if let assetID = onionSkinDrawing.drawing.fullAssetID {
-                assetIDs.insert(assetID)
-            }
-        }
-        
-        for onionSkinDrawing in activeDrawingContext.nextOnionSkinDrawings {
+        for onionSkinDrawing in activeDrawingContext.onionSkinDrawings {
             if let assetID = onionSkinDrawing.drawing.fullAssetID {
                 assetIDs.insert(assetID)
             }
