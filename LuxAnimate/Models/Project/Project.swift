@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import Geometry
 import Color
 
 enum Project {
