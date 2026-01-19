@@ -134,7 +134,7 @@ class AnimFrameEditorWorkspaceSceneGraphBuilder {
     
     private func outputLayerForOnionSkinDrawing(
         layer: FrameSceneGraph.Layer,
-        onionDrawing: AnimFrameEditorSceneGraph.ActiveDrawingContext.OnionSkinDrawing
+        onionDrawing: AnimFrameEditorSceneGraph.OnionSkinDrawing
     ) -> EditorWorkspaceSceneGraph.Layer {
 
         let texture = onionDrawing.drawing.fullAssetID.flatMap {
