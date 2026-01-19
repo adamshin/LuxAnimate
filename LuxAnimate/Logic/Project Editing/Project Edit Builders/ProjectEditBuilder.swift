@@ -54,15 +54,13 @@ struct ProjectEditBuilder {
         projectManifest: Project.Manifest
     ) -> ProjectEditManager.Edit {
 
-        let frameCount = projectManifest.content.metadata.frameCount
+        let drawing = Project.Drawing(
+            id: IDGenerator.id(),
+            frameIndex: 0,
+            fullAssetID: nil,
+            thumbnailAssetID: nil)
 
-        let drawings = (0 ..< frameCount).map { index in
-            Project.Drawing(
-                id: IDGenerator.id(),
-                frameIndex: index,
-                fullAssetID: nil,
-                thumbnailAssetID: nil)
-        }
+        let drawings = [drawing]
 
         let animationLayerContent = Project.AnimationLayerContent(
             drawings: drawings)
