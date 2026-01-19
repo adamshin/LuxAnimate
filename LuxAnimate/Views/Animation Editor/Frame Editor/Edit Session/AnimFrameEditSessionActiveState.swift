@@ -27,21 +27,21 @@ class AnimFrameEditSessionActiveState:
         editorToolState: AnimEditorToolState?
     ) {
         self.sceneGraph = sceneGraph
-
+        
         let drawingCanvasSize = sceneGraph.layer.contentSize
-
+        
         if let editorToolState {
             switch editorToolState {
             case let state as AnimEditorPaintToolState:
                 toolState = AnimFrameEditSessionPaintToolState(
                     editorToolState: state,
                     drawingCanvasSize: drawingCanvasSize)
-
+                
             case let state as AnimEditorEraseToolState:
                 toolState = AnimFrameEditSessionEraseToolState(
                     editorToolState: state,
                     drawingCanvasSize: drawingCanvasSize)
-
+                
             default:
                 toolState = nil
             }
@@ -49,7 +49,7 @@ class AnimFrameEditSessionActiveState:
             toolState = nil
         }
         toolState?.delegate = self
-
+        
         workspaceSceneGraphBuilder.delegate = self
     }
     
@@ -74,9 +74,6 @@ class AnimFrameEditSessionActiveState:
     // MARK: - Interface
     
     func begin() {
-//        delegate?.setEditInteractionEnabled(
-//            self, enabled: true)
-
         if let activeDrawing = sceneGraph
                 .activeDrawingContext.activeDrawing,
             let fullAssetID = activeDrawing.fullAssetID
@@ -94,7 +91,6 @@ class AnimFrameEditSessionActiveState:
     
     func onFrame() -> EditorWorkspaceSceneGraph? {
         toolState?.onFrame()
-        
         updateWorkspaceSceneGraph()
         
         return workspaceSceneGraph
