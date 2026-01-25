@@ -1,25 +1,24 @@
 //
-//  SceneRenderManifestBuilder.swift
+//  RenderManifestBuilder.swift
 //
 
 import Foundation
 
-struct SceneRenderManifestBuilder {
+struct RenderManifestBuilder {
     
     static func build(
-        projectManifest: Project.Manifest,
-        sceneManifest: Scene.Manifest
-    ) -> Scene.RenderManifest {
+        projectManifest: Project.Manifest
+    ) -> Project.RenderManifest {
         
-        let frameIndexes = Array(0 ..< sceneManifest.frameCount)
+        let frameCount = projectManifest.content.metadata.frameCount
+        let frameIndexes = Array(0 ..< frameCount)
         
         let frameSceneGraphs = FrameSceneGraphBuilder
             .build(
                 projectManifest: projectManifest,
-                sceneManifest: sceneManifest,
                 frameIndexes: frameIndexes)
         
-        var sceneRenderManifest = Scene.RenderManifest(
+        var renderManifest = Project.RenderManifest(
             frameRenderManifests: [:],
             frameRenderManifestFingerprintsByFrameIndex: [])
         
@@ -29,16 +28,15 @@ struct SceneRenderManifestBuilder {
             
             let fingerprint = frameRenderManifest.fingerprint()
             
-            sceneRenderManifest
-                .frameRenderManifests[fingerprint]
+            renderManifest.frameRenderManifests[fingerprint]
                 = frameRenderManifest
             
-            sceneRenderManifest
+            renderManifest
                 .frameRenderManifestFingerprintsByFrameIndex
                 .append(fingerprint)
         }
         
-        return sceneRenderManifest
+        return renderManifest
     }
     
 }

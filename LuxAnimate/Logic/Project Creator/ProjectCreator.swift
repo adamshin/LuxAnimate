@@ -4,11 +4,13 @@
 
 import Foundation
 import FileCoding
+import Color
 
 private let defaultCanvasSize = PixelSize(
     width: 1920, height: 1080)
 
 private let defaultFramesPerSecond = 12
+private let defaultFrameCount = 100
 
 struct ProjectCreator {
     
@@ -19,8 +21,6 @@ struct ProjectCreator {
     ) throws -> String {
         
         let projectID = try createEmptyProject(name: name)
-        
-        try setupInitialContent(projectID: projectID)
         
         return projectID
     }
@@ -59,11 +59,18 @@ struct ProjectCreator {
         
         let contentMetadata = Project.ContentMetadata(
             viewportSize: defaultCanvasSize,
-            framesPerSecond: defaultFramesPerSecond)
+            framesPerSecond: defaultFramesPerSecond,
+            frameCount: defaultFrameCount,
+            backgroundColor: .white)
+        
+        let renderManifest = Project.RenderManifest(
+            frameRenderManifests: [:],
+            frameRenderManifestFingerprintsByFrameIndex: [])
         
         let content = Project.Content(
             metadata: contentMetadata,
-            sceneRefs: [])
+            layers: [],
+            renderManifest: renderManifest)
         
         return Project.Manifest(
             id: id,
@@ -71,19 +78,6 @@ struct ProjectCreator {
             createdAt: now,
             content: content,
             assetIDs: [])
-    }
-    
-    private func setupInitialContent(
-        projectID: String
-    ) throws {
-        
-        // TODO: Create empty scene and drawing
-        
-//        let editor = try ProjectContentEditor(
-//            projectID: projectID)
-//        
-//        try editor.createEmptyDrawing(
-//            frameIndex: 0)
     }
     
 }

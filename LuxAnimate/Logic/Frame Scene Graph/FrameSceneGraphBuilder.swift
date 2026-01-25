@@ -9,13 +9,11 @@ struct FrameSceneGraphBuilder {
     
     static func build(
         projectManifest: Project.Manifest,
-        sceneManifest: Scene.Manifest,
         frameIndex: Int
     ) -> FrameSceneGraph {
         
         let sceneGraphs = build(
             projectManifest: projectManifest,
-            sceneManifest: sceneManifest,
             frameIndexes: [frameIndex])
         
         return sceneGraphs.first!
@@ -23,16 +21,15 @@ struct FrameSceneGraphBuilder {
     
     static func build(
         projectManifest: Project.Manifest,
-        sceneManifest: Scene.Manifest,
         frameIndexes: [Int]
     ) -> [FrameSceneGraph] {
         
         let metadata = projectManifest.content.metadata
         let contentSize = Size(metadata.viewportSize)
         
-        let sceneGraphLayerProviders = sceneManifest.layers.map {
+        let sceneGraphLayerProviders = projectManifest.content.layers.map {
             Self.sceneGraphLayerProvider(
-                sceneManifest: sceneManifest,
+                projectManifest: projectManifest,
                 layer: $0)
         }
         
@@ -41,7 +38,7 @@ struct FrameSceneGraphBuilder {
         for frameIndex in frameIndexes {
             var sceneGraph = FrameSceneGraph(
                 contentSize: contentSize,
-                backgroundColor: sceneManifest.backgroundColor,
+                backgroundColor: metadata.backgroundColor,
                 layers: [])
             
             for sceneGraphLayerProvider in sceneGraphLayerProviders {
@@ -59,14 +56,14 @@ struct FrameSceneGraphBuilder {
     }
     
     private static func sceneGraphLayerProvider(
-        sceneManifest: Scene.Manifest,
-        layer: Scene.Layer
+        projectManifest: Project.Manifest,
+        layer: Project.Layer
     ) -> SceneGraphLayerProvider {
         
         switch layer.content {
         case .animation(let layerContent):
             return AnimationSceneGraphLayerProvider(
-                sceneManifest: sceneManifest,
+                projectManifest: projectManifest,
                 layer: layer,
                 layerContent: layerContent)
         }
@@ -86,16 +83,16 @@ private protocol SceneGraphLayerProvider {
 
 private struct AnimationSceneGraphLayerProvider: SceneGraphLayerProvider {
     
-    private let layer: Scene.Layer
-    private let layerContent: Scene.AnimationLayerContent
+    private let layer: Project.Layer
+    private let layerContent: Project.AnimationLayerContent
     
-    private let sortedDrawings: [Scene.Drawing]
+    private let sortedDrawings: [Project.Drawing]
     private let frameIndexesToSortedDrawingIndexes: [Int: Int]
     
     init(
-        sceneManifest: Scene.Manifest,
-        layer: Scene.Layer,
-        layerContent: Scene.AnimationLayerContent
+        projectManifest: Project.Manifest,
+        layer: Project.Layer,
+        layerContent: Project.AnimationLayerContent
     ) {
         self.layer = layer
         self.layerContent = layerContent
@@ -103,7 +100,7 @@ private struct AnimationSceneGraphLayerProvider: SceneGraphLayerProvider {
         sortedDrawings = layerContent.drawings.sorted(
             using: KeyPathComparator(\.frameIndex))
         
-        let maxFrameIndex = sceneManifest.frameCount - 1
+        let maxFrameIndex = projectManifest.content.metadata.frameCount - 1
         
         var frameIndexesToSortedDrawingIndexes: [Int: Int] = [:]
         

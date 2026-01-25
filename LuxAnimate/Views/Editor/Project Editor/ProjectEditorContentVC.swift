@@ -9,14 +9,14 @@ protocol ProjectEditorContentVCDelegate: AnyObject {
     
     func onSelectBack(_ vc: ProjectEditorContentVC)
     
-    func onSelectAddScene(_ vc: ProjectEditorContentVC)
-    func onSelectRemoveScene(_ vc: ProjectEditorContentVC)
+    func onSelectAddLayer(_ vc: ProjectEditorContentVC)
+    func onSelectRemoveLayer(_ vc: ProjectEditorContentVC)
     func onSelectUndo(_ vc: ProjectEditorContentVC)
     func onSelectRedo(_ vc: ProjectEditorContentVC)
     
-    func onSelectScene(
+    func onSelectLayer(
         _ vc: ProjectEditorContentVC,
-        sceneID: String)
+        layerID: String)
     
 }
 
@@ -24,19 +24,18 @@ class ProjectEditorContentVC: UIViewController {
     
     weak var delegate: ProjectEditorContentVCDelegate?
     
-    // TODO: Make this non-optional, with a placeholder empty value?
     private var model: ProjectEditorModel?
     
     private lazy var backButton = UIBarButtonItem(
         title: "Back", style: .done,
         target: self, action: #selector(onSelectBack))
     
-    private lazy var addSceneButton = UIBarButtonItem(
-        title: "Add Scene", style: .plain,
-        target: self, action: #selector(onSelectAddScene))
-    private lazy var removeSceneButton = UIBarButtonItem(
-        title: "Remove Scene", style: .plain,
-        target: self, action: #selector(onSelectRemoveScene))
+    private lazy var addLayerButton = UIBarButtonItem(
+        title: "Add Layer", style: .plain,
+        target: self, action: #selector(onSelectAddLayer))
+    private lazy var removeLayerButton = UIBarButtonItem(
+        title: "Remove Layer", style: .plain,
+        target: self, action: #selector(onSelectRemoveLayer))
     private lazy var undoButton = UIBarButtonItem(
         title: "Undo", style: .plain,
         target: self, action: #selector(onSelectUndo))
@@ -57,9 +56,9 @@ class ProjectEditorContentVC: UIViewController {
             UIBarButtonItem.fixedSpace(20),
             undoButton,
             UIBarButtonItem.fixedSpace(20),
-            removeSceneButton,
+            removeLayerButton,
             UIBarButtonItem.fixedSpace(20),
-            addSceneButton,
+            addLayerButton,
         ]
         
         view.addSubview(tableView)
@@ -73,11 +72,11 @@ class ProjectEditorContentVC: UIViewController {
     @objc private func onSelectBack() {
         delegate?.onSelectBack(self)
     }
-    @objc private func onSelectAddScene() {
-        delegate?.onSelectAddScene(self)
+    @objc private func onSelectAddLayer() {
+        delegate?.onSelectAddLayer(self)
     }
-    @objc private func onSelectRemoveScene() {
-        delegate?.onSelectRemoveScene(self)
+    @objc private func onSelectRemoveLayer() {
+        delegate?.onSelectRemoveLayer(self)
     }
     @objc private func onSelectUndo() {
         delegate?.onSelectUndo(self)
@@ -98,8 +97,8 @@ class ProjectEditorContentVC: UIViewController {
     private func updateButtons() {
         guard let model else { return }
         
-        removeSceneButton.isEnabled =
-            model.projectManifest.content.sceneRefs.count > 0
+        removeLayerButton.isEnabled =
+            model.projectManifest.content.layers.count > 0
         
         undoButton.isEnabled = model.availableUndoCount > 0
         redoButton.isEnabled = model.availableRedoCount > 0
@@ -122,10 +121,10 @@ extension ProjectEditorContentVC: UITableViewDataSource {
         numberOfRowsInSection section: Int
     ) -> Int {
         switch section {
-        case 0: 
+        case 0:
             2
         case 1:
-            model?.projectManifest.content.sceneRefs.count ?? 0
+            model?.projectManifest.content.layers.count ?? 0
         default:
             0
         }
@@ -152,24 +151,28 @@ extension ProjectEditorContentVC: UITableViewDataSource {
                     .content.metadata.viewportSize
                 let framesPerSecond = model.projectManifest
                     .content.metadata.framesPerSecond
+                let frameCount = model.projectManifest
+                    .content.metadata.frameCount
                 
                 cell.textLabel?.text = """
                     \(viewportSize.width) × \(viewportSize.height)\
                     \u{2002}\u{2022}\u{2002}\
-                    \(framesPerSecond) fps
+                    \(framesPerSecond) fps\
+                    \u{2002}\u{2022}\u{2002}\
+                    \(frameCount) frames
                     """
                 
             case 1:
-                let sceneCount = model.projectManifest
-                    .content.sceneRefs.count
+                let layerCount = model.projectManifest
+                    .content.layers.count
                 let assetCount = model.projectManifest
                     .assetIDs.count
                 
-                let sceneText = "\(sceneCount) \(sceneCount == 1 ? "scene" : "scenes")"
+                let layerText = "\(layerCount) \(layerCount == 1 ? "layer" : "layers")"
                 
                 let assetText = "\(assetCount) \(assetCount == 1 ? "asset" : "assets")"
                 
-                cell.textLabel?.text = "\(sceneText), \(assetText)"
+                cell.textLabel?.text = "\(layerText), \(assetText)"
                 
             default:
                 break
@@ -177,7 +180,8 @@ extension ProjectEditorContentVC: UITableViewDataSource {
             
         case 1:
             cell.accessoryType = .disclosureIndicator
-            cell.textLabel?.text = "Scene \(indexPath.row + 1)"
+            let layer = model.projectManifest.content.layers[indexPath.row]
+            cell.textLabel?.text = layer.name
             
         default:
             break
@@ -196,7 +200,7 @@ extension ProjectEditorContentVC: UITableViewDelegate {
     ) -> String? {
         switch section {
         case 0: "Project Info"
-        case 1: "Scenes"
+        case 1: "Layers"
         default: nil
         }
     }
@@ -209,8 +213,8 @@ extension ProjectEditorContentVC: UITableViewDelegate {
         
         if indexPath.section == 1 {
             guard let model else { return }
-            let sceneRef = model.projectManifest.content.sceneRefs[indexPath.row]
-            delegate?.onSelectScene(self, sceneID: sceneRef.id)
+            let layer = model.projectManifest.content.layers[indexPath.row]
+            delegate?.onSelectLayer(self, layerID: layer.id)
         }
     }
     

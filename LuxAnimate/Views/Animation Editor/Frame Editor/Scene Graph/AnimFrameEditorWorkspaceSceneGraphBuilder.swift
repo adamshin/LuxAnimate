@@ -111,7 +111,7 @@ class AnimFrameEditorWorkspaceSceneGraphBuilder {
     
     private func buildLayersForActiveDrawing(
         layer: FrameSceneGraph.Layer,
-        drawing: Scene.Drawing,
+        drawing: Project.Drawing,
         sceneGraph: AnimFrameEditorSceneGraph,
         activeDrawingTexture: MTLTexture?,
         output: inout [EditorWorkspaceSceneGraph.Layer]
@@ -136,7 +136,7 @@ class AnimFrameEditorWorkspaceSceneGraphBuilder {
     
     private func buildLayerForDrawing(
         layer: FrameSceneGraph.Layer,
-        drawing: Scene.Drawing,
+        drawing: Project.Drawing,
         overrideTexture: MTLTexture? = nil,
         colorMode: ColorMode = .none,
         color: Color = .clear,

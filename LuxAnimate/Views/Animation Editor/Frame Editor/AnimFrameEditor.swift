@@ -77,7 +77,6 @@ class AnimFrameEditor {
         
         editSession = AnimFrameEditSession(
             projectManifest: model.projectManifest,
-            sceneManifest: model.sceneManifest,
             layer: model.layer,
             layerContent: model.layerContent,
             frameIndex: focusedFrameIndex,

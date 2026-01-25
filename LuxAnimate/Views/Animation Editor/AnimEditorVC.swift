@@ -1,5 +1,5 @@
 //
-//  AnimEditorVC2.swift
+//  AnimEditorVC.swift
 //
 
 import UIKit
@@ -10,6 +10,12 @@ private let contentSize = Size(
 
 extension AnimEditorVC {
     
+    struct InputModel {
+        var projectManifest: Project.Manifest
+        var availableUndoCount: Int
+        var availableRedoCount: Int
+    }
+    
     @MainActor
     protocol Delegate: AnyObject {
         
@@ -18,7 +24,7 @@ extension AnimEditorVC {
         
         func onRequestEdit(
             _ vc: AnimEditorVC,
-            layer: Scene.Layer,
+            layer: Project.Layer,
             layerContentEdit: AnimationLayerContentEditBuilder.Edit)
         
         func pendingEditAsset(
@@ -46,7 +52,6 @@ class AnimEditorVC: UIViewController {
     // MARK: - State
     
     private let projectID: String
-    private let sceneID: String
     private let layerID: String
     
     private var model: AnimEditorModel
@@ -68,18 +73,16 @@ class AnimEditorVC: UIViewController {
     
     init(
         projectID: String,
-        sceneID: String,
         layerID: String,
-        sceneEditorModel: SceneEditorModel,
+        inputModel: InputModel,
         focusedFrameIndex: Int
     ) throws {
         
         self.projectID = projectID
-        self.sceneID = sceneID
         self.layerID = layerID
         
         let model = try Self.createModel(
-            sceneEditorModel: sceneEditorModel,
+            inputModel: inputModel,
             layerID: layerID)
         
         self.model = model
@@ -171,11 +174,11 @@ class AnimEditorVC: UIViewController {
     // MARK: - Internal State
     
     private func updateInternal(
-        sceneEditorModel: SceneEditorModel
+        inputModel: InputModel
     ) {
         do {
             model = try Self.createModel(
-                sceneEditorModel: sceneEditorModel,
+                inputModel: inputModel,
                 layerID: layerID)
             
             focusedFrameIndex = Self.clampedFrameIndex(
@@ -256,8 +259,8 @@ class AnimEditorVC: UIViewController {
     
     // MARK: - Interface
     
-    func update(sceneEditorModel: SceneEditorModel) {
-        updateInternal(sceneEditorModel: sceneEditorModel)
+    func update(inputModel: InputModel) {
+        updateInternal(inputModel: inputModel)
     }
     
 }
@@ -267,22 +270,21 @@ class AnimEditorVC: UIViewController {
 extension AnimEditorVC {
     
     private static func createModel(
-        sceneEditorModel sm: SceneEditorModel,
+        inputModel: InputModel,
         layerID: String
     ) throws -> AnimEditorModel {
         
         try AnimEditorModel(
-            projectManifest: sm.projectManifest,
-            sceneManifest: sm.sceneManifest,
+            projectManifest: inputModel.projectManifest,
             layerID: layerID,
-            availableUndoCount: sm.availableUndoCount,
-            availableRedoCount: sm.availableRedoCount)
+            availableUndoCount: inputModel.availableUndoCount,
+            availableRedoCount: inputModel.availableRedoCount)
     }
     
     private static func clampedFrameIndex(
         index: Int, model: AnimEditorModel
     ) -> Int {
-        let frameCount = model.sceneManifest.frameCount
+        let frameCount = model.projectManifest.content.metadata.frameCount
         return clamp(index, min: 0, max: frameCount - 1)
     }
     
@@ -326,7 +328,7 @@ extension AnimEditorVC: AnimEditorToolbarVC.Delegate {
     func onSelectOnionSkin(_ vc: AnimEditorToolbarVC) {
         updateInternal(isOnionSkinOn: !isOnionSkinOn)
     }
-
+    
     func onSelectTool(
         _ vc: AnimEditorToolbarVC,
         tool: AnimEditorToolbarVC.Tool,
@@ -338,7 +340,7 @@ extension AnimEditorVC: AnimEditorToolbarVC.Delegate {
             updateInternal(selectedToolbarTool: tool)
         }
     }
-
+    
 }
 
 extension AnimEditorVC: AnimEditorTimelineVC.Delegate {

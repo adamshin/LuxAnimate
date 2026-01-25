@@ -8,12 +8,12 @@ import Color
 extension AnimFrameEditorSceneGraph {
     
     struct ActiveDrawingContext {
-        let activeDrawing: Scene.Drawing?
+        let activeDrawing: Project.Drawing?
         let onionSkinDrawings: [OnionSkinDrawing]
     }
     
     struct OnionSkinDrawing {
-        let drawing: Scene.Drawing
+        let drawing: Project.Drawing
         let tintColor: Color
         let alpha: Double
     }
@@ -22,7 +22,7 @@ extension AnimFrameEditorSceneGraph {
 
 struct AnimFrameEditorSceneGraph {
     
-    var layer: Scene.Layer
+    var layer: Project.Layer
     
     var frameSceneGraph: FrameSceneGraph
     var activeDrawingContext: ActiveDrawingContext
@@ -31,9 +31,8 @@ struct AnimFrameEditorSceneGraph {
     
     init(
         projectManifest: Project.Manifest,
-        sceneManifest: Scene.Manifest,
-        layer: Scene.Layer,
-        layerContent: Scene.AnimationLayerContent,
+        layer: Project.Layer,
+        layerContent: Project.AnimationLayerContent,
         frameIndex: Int,
         onionSkinConfig: AnimEditorOnionSkinConfig?
     ) {
@@ -41,7 +40,6 @@ struct AnimFrameEditorSceneGraph {
         
         frameSceneGraph = FrameSceneGraphBuilder.build(
             projectManifest: projectManifest,
-            sceneManifest: sceneManifest,
             frameIndex: frameIndex)
         
         activeDrawingContext =
@@ -56,7 +54,7 @@ struct AnimFrameEditorSceneGraph {
     }
     
     private static func buildActiveDrawingContext(
-        layerContent: Scene.AnimationLayerContent,
+        layerContent: Project.AnimationLayerContent,
         frameIndex: Int,
         onionSkinConfig: AnimEditorOnionSkinConfig?
     ) -> ActiveDrawingContext {
@@ -109,7 +107,7 @@ struct AnimFrameEditorSceneGraph {
     }
     
     private static func buildOnionSkinDrawings(
-        sortedDrawings: [Scene.Drawing],
+        sortedDrawings: [Project.Drawing],
         activeDrawingIndex: Int,
         direction: Int,
         count: Int,
