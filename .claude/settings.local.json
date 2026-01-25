@@ -9,7 +9,23 @@
       "Bash(ls:*)",
       "Bash(git log:*)",
       "Bash(xcodebuild:*)",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "Bash(swift-format:*)",
+      "Bash(xcrun swift-format:*)",
+      "Bash(xargs:*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "^(Edit|MultiEdit|Write)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path' | xargs -I {} xcrun swift-format -i \"{}\" 2>/dev/null || true"
+          }
+        ]
+      }
     ]
   }
 }
