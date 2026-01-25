@@ -59,16 +59,9 @@ class ProjectEditorVC: UIViewController {
     // MARK: - Model
     
     private func modelFromEditManager()
-    -> ProjectEditorModel {
-        
+        -> ProjectEditorModel
+    {
         ProjectEditorModel(
-            projectManifest: editManager.projectManifest,
-            availableUndoCount: editManager.availableUndoCount,
-            availableRedoCount: editManager.availableRedoCount)
-    }
-    
-    private func animEditorInputModel() -> AnimEditorVC.InputModel {
-        AnimEditorVC.InputModel(
             projectManifest: editManager.projectManifest,
             availableUndoCount: editManager.availableUndoCount,
             availableRedoCount: editManager.availableRedoCount)
@@ -78,7 +71,7 @@ class ProjectEditorVC: UIViewController {
     
     private func update(model: ProjectEditorModel) {
         contentVC.update(model: model)
-        animEditorVC?.update(inputModel: animEditorInputModel())
+        animEditorVC?.update(projectEditorModel: model)
     }
     
     // MARK: - Editing
@@ -109,13 +102,13 @@ class ProjectEditorVC: UIViewController {
     // MARK: - Navigation
     
     private func showAnimationEditor(layerID: String) {
+        let model = modelFromEditManager()
+        
         do {
-            let inputModel = animEditorInputModel()
-            
             let vc = try AnimEditorVC(
                 projectID: projectID,
                 layerID: layerID,
-                inputModel: inputModel,
+                projectEditorModel: model,
                 focusedFrameIndex: 0)
             
             vc.delegate = self
@@ -123,7 +116,7 @@ class ProjectEditorVC: UIViewController {
             
             present(vc, animated: true)
             
-        } catch { }
+        } catch {}
     }
     
 }
@@ -179,19 +172,21 @@ extension ProjectEditorVC: AnimEditorVC.Delegate {
         let projectManifest = editManager.projectManifest
         
         do {
-            let layerEdit = try AnimationLayerContentEditBuilder
+            let layerEdit =
+                try AnimationLayerContentEditBuilder
                 .applyAnimationLayerContentEdit(
                     projectManifest: projectManifest,
                     layer: layer,
                     layerContentEdit: layerContentEdit)
             
-            let edit = try ProjectEditBuilder.applyLayerEdit(
-                projectManifest: projectManifest,
-                layerEdit: layerEdit)
+            let edit =
+                try ProjectEditBuilder.applyLayerEdit(
+                    projectManifest: projectManifest,
+                    layerEdit: layerEdit)
             
             editManager.applyEdit(edit: edit)
             
-        } catch { }
+        } catch {}
     }
     
     func pendingEditAsset(

@@ -12,7 +12,8 @@
       "Bash(git mv:*)",
       "Bash(swift-format:*)",
       "Bash(xcrun swift-format:*)",
-      "Bash(xargs:*)"
+      "Bash(xargs:*)",
+      "Bash(swiftc -parse:*)"
     ]
   },
   "hooks": {

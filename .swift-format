@@ -1,7 +1,10 @@
 {
   "version" : 1,
+  "rules": {
+    "OrderedImports": false
+  },
   "indentation": { "spaces": 4 },
-  "lineLength" : 60,
+  "lineLength" : 80,
   "indentBlankLines" : true,
   "spacesAroundRangeFormationOperators": true
 }

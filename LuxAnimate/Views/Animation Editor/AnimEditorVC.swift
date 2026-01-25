@@ -10,12 +10,6 @@ private let contentSize = Size(
 
 extension AnimEditorVC {
     
-    struct InputModel {
-        var projectManifest: Project.Manifest
-        var availableUndoCount: Int
-        var availableRedoCount: Int
-    }
-    
     @MainActor
     protocol Delegate: AnyObject {
         
@@ -43,8 +37,8 @@ class AnimEditorVC: UIViewController {
     private let bodyView = AnimEditorView()
     
     private let workspaceVC = EditorWorkspaceVC()
-    private let workspaceControlsContainerVC
-        = PassthroughContainerViewController()
+    private let workspaceControlsContainerVC =
+        PassthroughContainerViewController()
     
     private let toolbarVC: AnimEditorToolbarVC
     private let timelineVC: AnimEditorTimelineVC
@@ -58,7 +52,8 @@ class AnimEditorVC: UIViewController {
     private var focusedFrameIndex: Int
     private var isOnionSkinOn = false
     
-    private let toolStateMachine = AnimEditorToolStateMachine()
+    private let toolStateMachine =
+        AnimEditorToolStateMachine()
     private let frameEditor = AnimFrameEditor()
     
     private let assetLoader: AnimEditorAssetLoader
@@ -74,7 +69,7 @@ class AnimEditorVC: UIViewController {
     init(
         projectID: String,
         layerID: String,
-        inputModel: InputModel,
+        projectEditorModel: ProjectEditorModel,
         focusedFrameIndex: Int
     ) throws {
         
@@ -82,7 +77,7 @@ class AnimEditorVC: UIViewController {
         self.layerID = layerID
         
         let model = try Self.createModel(
-            inputModel: inputModel,
+            projectEditorModel: projectEditorModel,
             layerID: layerID)
         
         self.model = model
@@ -174,11 +169,11 @@ class AnimEditorVC: UIViewController {
     // MARK: - Internal State
     
     private func updateInternal(
-        inputModel: InputModel
+        projectEditorModel: ProjectEditorModel
     ) {
         do {
             model = try Self.createModel(
-                inputModel: inputModel,
+                projectEditorModel: projectEditorModel,
                 layerID: layerID)
             
             focusedFrameIndex = Self.clampedFrameIndex(
@@ -230,8 +225,8 @@ class AnimEditorVC: UIViewController {
     }
     
     private func updateFrameEditor() {
-        let onionSkinConfig = isOnionSkinOn ?
-            AppConfig.onionSkinConfig : nil
+        let onionSkinConfig =
+            isOnionSkinOn ? AppConfig.onionSkinConfig : nil
         
         frameEditor.update(
             model: model,
@@ -259,8 +254,8 @@ class AnimEditorVC: UIViewController {
     
     // MARK: - Interface
     
-    func update(inputModel: InputModel) {
-        updateInternal(inputModel: inputModel)
+    func update(projectEditorModel: ProjectEditorModel) {
+        updateInternal(projectEditorModel: projectEditorModel)
     }
     
 }
@@ -270,21 +265,22 @@ class AnimEditorVC: UIViewController {
 extension AnimEditorVC {
     
     private static func createModel(
-        inputModel: InputModel,
+        projectEditorModel pm: ProjectEditorModel,
         layerID: String
     ) throws -> AnimEditorModel {
         
         try AnimEditorModel(
-            projectManifest: inputModel.projectManifest,
+            projectManifest: pm.projectManifest,
             layerID: layerID,
-            availableUndoCount: inputModel.availableUndoCount,
-            availableRedoCount: inputModel.availableRedoCount)
+            availableUndoCount: pm.availableUndoCount,
+            availableRedoCount: pm.availableRedoCount)
     }
     
     private static func clampedFrameIndex(
         index: Int, model: AnimEditorModel
     ) -> Int {
-        let frameCount = model.projectManifest.content.metadata.frameCount
+        let frameCount = model
+            .projectManifest.content.metadata.frameCount
         return clamp(index, min: 0, max: frameCount - 1)
     }
     
@@ -364,7 +360,8 @@ extension AnimEditorVC: AnimEditorTimelineVC.Delegate {
     
     func onRequestEdit(
         _ vc: AnimEditorTimelineVC,
-        layerContentEdit: AnimationLayerContentEditBuilder.Edit
+        layerContentEdit: AnimationLayerContentEditBuilder
+            .Edit
     ) {
         delegate?.onRequestEdit(
             self,
@@ -401,7 +398,8 @@ extension AnimEditorVC: AnimEditorAssetLoader.Delegate {
 }
 
 extension AnimEditorVC:
-    AnimEditorToolStateMachine.Delegate {
+    AnimEditorToolStateMachine.Delegate
+{
     
     func toolStateDidEnd(
         _ machine: AnimEditorToolStateMachine
@@ -428,12 +426,14 @@ extension AnimEditorVC:
 extension AnimEditorVC: AnimFrameEditor.Delegate {
     
     func workspaceViewSize(_ e: AnimFrameEditor)
-    -> Size {
+        -> Size
+    {
         Size(workspaceVC.view.bounds.size)
     }
     
     func workspaceTransform(_ e: AnimFrameEditor)
-    -> EditorWorkspaceTransform {
+        -> EditorWorkspaceTransform
+    {
         workspaceVC.workspaceTransform()
     }
     
@@ -461,18 +461,19 @@ extension AnimEditorVC: AnimFrameEditor.Delegate {
         drawingID: String,
         imageSet: DrawingAssetProcessor.ImageSet
     ) {
-        let imageSet = AnimationLayerContentEditBuilder
+        let imageSet =
+            AnimationLayerContentEditBuilder
             .DrawingImageSet(
                 full: imageSet.full,
                 thumbnail: imageSet.thumbnail)
         
         do {
-            let layerContentEdit = try
-                AnimationLayerContentEditBuilder
-                    .editDrawing(
-                        layerContent: model.layerContent,
-                        drawingID: drawingID,
-                        imageSet: imageSet)
+            let layerContentEdit =
+                try AnimationLayerContentEditBuilder
+                .editDrawing(
+                    layerContent: model.layerContent,
+                    drawingID: drawingID,
+                    imageSet: imageSet)
             
             delegate?.onRequestEdit(
                 self,
