@@ -6,30 +6,30 @@ import UIKit
 
 @MainActor
 protocol ProjectEditorContentVCDelegate: AnyObject {
-
+    
     func onSelectBack(_ vc: ProjectEditorContentVC)
-
+    
     func onSelectAddLayer(_ vc: ProjectEditorContentVC)
     func onSelectRemoveLayer(_ vc: ProjectEditorContentVC)
     func onSelectUndo(_ vc: ProjectEditorContentVC)
     func onSelectRedo(_ vc: ProjectEditorContentVC)
-
+    
     func onSelectLayer(
         _ vc: ProjectEditorContentVC,
         layerID: String)
-
+    
 }
 
 class ProjectEditorContentVC: UIViewController {
-
+    
     weak var delegate: ProjectEditorContentVCDelegate?
-
+    
     private var model: ProjectEditorModel?
-
+    
     private lazy var backButton = UIBarButtonItem(
         title: "Back", style: .done,
         target: self, action: #selector(onSelectBack))
-
+    
     private lazy var addLayerButton = UIBarButtonItem(
         title: "Add Layer", style: .plain,
         target: self, action: #selector(onSelectAddLayer))
@@ -42,14 +42,14 @@ class ProjectEditorContentVC: UIViewController {
     private lazy var redoButton = UIBarButtonItem(
         title: "Redo", style: .plain,
         target: self, action: #selector(onSelectRedo))
-
+    
     private let tableView = UITableView(
         frame: .zero,
         style: .insetGrouped)
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         navigationItem.leftBarButtonItem = backButton
         navigationItem.rightBarButtonItems = [
             redoButton,
@@ -60,15 +60,15 @@ class ProjectEditorContentVC: UIViewController {
             UIBarButtonItem.fixedSpace(20),
             addLayerButton,
         ]
-
+        
         view.addSubview(tableView)
         tableView.pinEdges()
-
+        
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(UITableViewCell.self)
     }
-
+    
     @objc private func onSelectBack() {
         delegate?.onSelectBack(self)
     }
@@ -84,38 +84,38 @@ class ProjectEditorContentVC: UIViewController {
     @objc private func onSelectRedo() {
         delegate?.onSelectRedo(self)
     }
-
+    
     func update(model: ProjectEditorModel) {
         self.model = model
-
+        
         navigationItem.title = model.projectManifest.name
-
+        
         updateButtons()
         tableView.reloadData()
     }
-
+    
     private func updateButtons() {
         guard let model else { return }
-
+        
         removeLayerButton.isEnabled =
             model.projectManifest.content.layers.count > 0
-
+        
         undoButton.isEnabled = model.availableUndoCount > 0
         redoButton.isEnabled = model.availableRedoCount > 0
     }
-
+    
 }
 
 // MARK: - Table View
 
 extension ProjectEditorContentVC: UITableViewDataSource {
-
+    
     func numberOfSections(
         in tableView: UITableView
     ) -> Int {
         2
     }
-
+    
     func tableView(
         _ tableView: UITableView,
         numberOfRowsInSection section: Int
@@ -129,22 +129,22 @@ extension ProjectEditorContentVC: UITableViewDataSource {
             0
         }
     }
-
+    
     func tableView(
         _ tableView: UITableView,
         cellForRowAt indexPath: IndexPath
     ) -> UITableViewCell {
-
+        
         let cell = tableView.dequeue(
             UITableViewCell.self,
             for: indexPath)
-
+        
         guard let model else { return cell }
-
+        
         switch indexPath.section {
         case 0:
             cell.accessoryType = .none
-
+            
             switch indexPath.row {
             case 0:
                 let viewportSize = model.projectManifest
@@ -153,7 +153,7 @@ extension ProjectEditorContentVC: UITableViewDataSource {
                     .content.metadata.framesPerSecond
                 let frameCount = model.projectManifest
                     .content.metadata.frameCount
-
+                
                 cell.textLabel?.text = """
                     \(viewportSize.width) × \(viewportSize.height)\
                     \u{2002}\u{2022}\u{2002}\
@@ -161,39 +161,39 @@ extension ProjectEditorContentVC: UITableViewDataSource {
                     \u{2002}\u{2022}\u{2002}\
                     \(frameCount) frames
                     """
-
+                
             case 1:
                 let layerCount = model.projectManifest
                     .content.layers.count
                 let assetCount = model.projectManifest
                     .assetIDs.count
-
+                
                 let layerText = "\(layerCount) \(layerCount == 1 ? "layer" : "layers")"
-
+                
                 let assetText = "\(assetCount) \(assetCount == 1 ? "asset" : "assets")"
-
+                
                 cell.textLabel?.text = "\(layerText), \(assetText)"
-
+                
             default:
                 break
             }
-
+            
         case 1:
             cell.accessoryType = .disclosureIndicator
             let layer = model.projectManifest.content.layers[indexPath.row]
             cell.textLabel?.text = layer.name
-
+            
         default:
             break
         }
-
+        
         return cell
     }
-
+    
 }
 
 extension ProjectEditorContentVC: UITableViewDelegate {
-
+    
     func tableView(
         _ tableView: UITableView,
         titleForHeaderInSection section: Int
@@ -204,18 +204,18 @@ extension ProjectEditorContentVC: UITableViewDelegate {
         default: nil
         }
     }
-
+    
     func tableView(
         _ tableView: UITableView,
         didSelectRowAt indexPath: IndexPath
     ) {
         tableView.deselectRow(at: indexPath, animated: true)
-
+        
         if indexPath.section == 1 {
             guard let model else { return }
             let layer = model.projectManifest.content.layers[indexPath.row]
             delegate?.onSelectLayer(self, layerID: layer.id)
         }
     }
-
+    
 }
